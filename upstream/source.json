@@ -1,0 +1,13 @@
+{
+  "repository": "https://github.com/dbbaskette/Deep-Research-skills",
+  "upstream": "https://github.com/Weizhena/Deep-Research-skills",
+  "commit": "6ce38f60e3f8b22502c29873f96503a4e0c5addb",
+  "language": "English",
+  "adaptations": [
+    "Current Codex agent metadata and inherited model",
+    "Writable project results for deep research",
+    "Config-directory-independent paths",
+    "Project-local Python dependency preparation",
+    "Reuse existing approval for agreed research batches"
+  ]
+}

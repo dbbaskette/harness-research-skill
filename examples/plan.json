@@ -1,0 +1,14 @@
+{
+  "topic": "Example research scope",
+  "purpose": "planning",
+  "scope": "supplied-only",
+  "sources": [],
+  "items": [
+    {
+      "id": "availability",
+      "question": "What do the selected documents establish about availability?",
+      "public_query": null,
+      "claim": null
+    }
+  ]
+}

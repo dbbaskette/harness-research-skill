@@ -1,0 +1,23 @@
+{
+  "name": "harness-research-skill",
+  "version": "0.1.0",
+  "type": "module",
+  "license": "MIT",
+  "description": "Scoped research, evidence tracking and resumable reports across agent harnesses.",
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "harness-research": "scripts/harness-research.mjs"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "context:update": "node tools/context-usage.mjs --write",
+    "context:check": "node tools/context-usage.mjs --check",
+    "install:skill": "node scripts/install.mjs",
+    "ci:local": "bash scripts/ci/tart-macos.sh"
+  },
+  "devDependencies": {
+    "js-tiktoken": "1.0.21"
+  }
+}
