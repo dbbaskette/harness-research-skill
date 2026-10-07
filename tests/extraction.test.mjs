@@ -122,3 +122,12 @@ test('preserved comparative validator detects missing fields without requiring s
   await writeFile(result, '{"name":"Synthetic"}');
   await assert.rejects(exec(process.env.HARNESS_RESEARCH_PYTHON, args));
 });
+
+test('macOS system aliases normalize without allowing user directory symlinks', { skip: process.platform !== 'darwin' }, async t => {
+  const options = await fixture(t);
+  assert.ok(options.root.startsWith('/private/var/'));
+  const alias = options.root.replace('/private/var/', '/var/');
+  const result = await install({ ...options, home: join(alias, 'home'), shared: join(alias, 'shared') });
+  assert.equal(result.shared, options.shared);
+  for (const target of result.targets) await access(join(target, 'SKILL.md'));
+});

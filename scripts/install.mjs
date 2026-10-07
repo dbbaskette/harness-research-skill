@@ -27,6 +27,18 @@ async function state(path) {
   try { const stat = await lstat(path); return { link: stat.isSymbolicLink() ? await readlink(path) : null, ino: stat.ino, dev: stat.dev }; }
   catch (error) { if (error.code === 'ENOENT') return null; throw error; }
 }
+async function systemPath(value) {
+  const path = resolve(value);
+  // macOS's root aliases are OS-owned; user-controlled directory symlinks
+  // remain disallowed by checkParents. Normalize before destination planning.
+  if (process.platform === 'darwin') for (const prefix of ['/var', '/tmp', '/etc']) {
+    if (path === prefix || path.startsWith(prefix + '/')) {
+      const actual = await realpath(prefix);
+      if (actual === '/private' + prefix) return actual + path.slice(prefix.length);
+    }
+  }
+  return path;
+}
 async function checkParents(path) {
   const parts = resolve(path).split('/').filter(Boolean);
   let current = '/';
@@ -52,7 +64,7 @@ async function legacyLinks(home, claude, current) {
   }
   for (const entry of entries) {
     const existing = await state(entry.path);
-    entry.status = existing?.link && resolve(dirname(entry.path), existing.link) === entry.old ? 'would-migrate' : 'preserved';
+    entry.status = existing?.link && await systemPath(resolve(dirname(entry.path), existing.link)) === entry.old ? 'would-migrate' : 'preserved';
     entry.previous = existing;
   }
   return entries;
@@ -61,9 +73,9 @@ async function legacyLinks(home, claude, current) {
 export async function install({ source = packageRoot, home = homedir(), claudeConfigDir, shared, dryRun = false } = {}) {
   if (Number(process.versions.node.split('.')[0]) < 20) throw new Error('Node.js 20+ is required.');
   source = await realpath(resolve(source));
-  home = resolve(home);
-  const claude = claudeConfigDir ? resolve(claudeConfigDir) : join(home, '.claude');
-  shared = resolve(shared ?? (process.platform === 'darwin' ? join(home, 'Library', 'Application Support', 'Harness Research') : join(home, '.local', 'share', 'harness-research')));
+  home = await systemPath(home);
+  const claude = claudeConfigDir ? await systemPath(claudeConfigDir) : join(home, '.claude');
+  shared = await systemPath(shared ?? (process.platform === 'darwin' ? join(home, 'Library', 'Application Support', 'Harness Research') : join(home, '.local', 'share', 'harness-research')));
   const targets = [join(home, '.agents', 'skills', 'harness-research'), join(claude, 'skills', 'harness-research'), join(home, '.cursor', 'skills', 'harness-research')];
   if (new Set(targets).size !== targets.length || targets.some(path => path === shared || path.startsWith(shared + '/') || shared.startsWith(path + '/'))) throw new Error('Install destinations overlap.');
   const payload = await files(source), checks = Object.fromEntries([...payload].map(([name, bytes]) => [name, hash(bytes)]));
