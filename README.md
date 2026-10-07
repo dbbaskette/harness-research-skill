@@ -185,19 +185,38 @@ The skill loads focused guidance for the selected workflow. Counts below cover
 instruction loading, excluding documents, images and tool responses.
 
 <!-- CONTEXT-USAGE:START -->
-Measured with `cl100k_base`; cumulative whole-file instruction counts.
+Measured with `cl100k_base`; cumulative instruction counts, including a normalized
+representative guidance-start response. Bootstrap activation is shown separately.
 
 | Reading path | Tokens |
 | --- | ---: |
-| Discovery metadata | 39 |
+| Discovery metadata | 38 |
 | Installed bootstrap | 383 |
-| Bootstrap + current guidance entry | 845 |
-| Focused research / fact-check with saved report | 2,411 |
-| Comparative workflow routing | 1,359 |
-| Legacy migration | 1,085 |
+| Bootstrap + current guidance entry | 868 |
+| Brief fact-check / cited answer | 1,696 |
+| Focused research with saved report | 2,518 |
+| Status / resume without new findings | 1,170 |
+| Comparative routing only | 1,466 |
+| Codex comparative outline | 2,426 |
+| Codex add items | 1,631 |
+| Codex add fields | 1,651 |
+| Codex deep results | 2,314 |
+| Codex deep results + saved evidence | 3,136 |
+| Claude comparative outline | 2,443 |
+| Claude deep results | 2,336 |
+| Saved research + general web strategy | 3,015 |
+| Saved research + academic strategy | 3,107 |
+| Saved research + GitHub strategy | 2,902 |
+| Saved research + technical Q&A strategy | 2,807 |
+| Saved research + Chinese sources strategy | 3,032 |
+| Legacy migration | 1,192 |
 
-One source strategy, selected comparative resources and evidence add conditional
-context. The complete upstream bundle is never a default loading path.
+Comparative rows include the selected platform resource, not the complete bundle.
+Each strategy row includes one router and one strategy. Status/resume skips plan
+and finding schemas until a new save is needed. Brief cited answers need no saved
+queue; requested reports and resumable work retain the evidence contract. Source
+content, images, research helper results and conversation add separately. The JSON
+report also exposes direct-handoff paths without the bootstrap/start response.
 <!-- CONTEXT-USAGE:END -->
 
 Run `npm run context:update` after guidance changes; `npm run context:check`
