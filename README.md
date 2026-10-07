@@ -6,7 +6,7 @@ topics, compare options and fact-check claims. It keeps findings, conflicting
 evidence and unanswered questions so you can pick up the work later.
 
 You describe what you need in plain language. The agent plans the research,
-reads sources and saves the report.
+reads sources and automatically saves a cited report in your project.
 
 ## 1. Install once
 
@@ -41,16 +41,14 @@ Choose the prompt for your agent:
 
 ```text
 $harness-research Compare PostgreSQL and SQLite for a small internal application.
-Use public primary sources. Cover deployment, concurrency and maintenance,
-and save a cited report in this project.
+Use public primary sources. Cover deployment, concurrency and maintenance.
 ```
 
 **Claude Code**
 
 ```text
 /harness-research Compare PostgreSQL and SQLite for a small internal application.
-Use public primary sources. Cover deployment, concurrency and maintenance,
-and save a cited report in this project.
+Use public primary sources. Cover deployment, concurrency and maintenance.
 ```
 
 **Cursor**
@@ -58,7 +56,7 @@ and save a cited report in this project.
 ```text
 Use the harness-research skill to compare PostgreSQL and SQLite for a small
 internal application. Use public primary sources. Cover deployment, concurrency
-and maintenance, and save a cited report in this project.
+and maintenance.
 ```
 
 Replace the example with your question. Specify whether the agent should use
@@ -73,7 +71,7 @@ attachments. Name the files and the source boundary in your prompt:
 ```text
 $harness-research Read sources/product-brief.pdf and sources/release-notes.md.
 Using only these documents, determine which launch claims are supported.
-Cite the supporting passages and show contradictions or missing evidence.
+Show contradictions or missing evidence.
 ```
 
 Use `/harness-research` in Claude Code, or ask Cursor to use the skill.
@@ -82,7 +80,9 @@ are recorded as coverage gaps.
 
 ## 3. Read the report and continue later
 
-The agent returns a synthesis and a link to the report. The saved report is at:
+The standard research workflow saves a report automatically and includes citations
+as findings are recorded. The agent returns a synthesis and a link to the report,
+which is saved at:
 
 ```text
 your-project/.harness-research/research-report.md
@@ -142,6 +142,8 @@ node scripts/harness-research.mjs status --project /absolute/project
 
 See the [evidence contract](references/evidence.md) for input formats and
 [comparative workflow](references/comparative.md) for item/field outlines.
+Existing item/field projects retain their configured output directory; the
+automatic report path above applies to the Node evidence workflow.
 Optional comparative field validation uses project-local Python/PyYAML, prepared
 only when needed. The core workflow requires only Node.js.
 
