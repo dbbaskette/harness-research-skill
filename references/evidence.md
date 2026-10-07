@@ -55,10 +55,5 @@ coordinator. A busy-save error should be retried after the current save finishes
 After an interrupted helper, inspect the recorded process and lock before recovery;
 never remove a lock belonging to an active save.
 
-`node scripts/harness-research.mjs status --project DIR` refreshes the report and returns pending,
-unresolved and stale question IDs, the saved source mode, and document coverage
-gaps. Content-basis or source-snapshot changes mark
-results stale; replan/reassess before reusing them. Skip completed work only when
-current. Keep earlier JSON/report revisions in `.harness-research/history/`.
-A dated local snapshot is not proof that the live source is still current.
-
+For status and continuation, read [resume](resume.md); plan/finding schemas are
+needed only when changing the plan or recording new evidence.
