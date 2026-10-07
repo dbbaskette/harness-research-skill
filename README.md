@@ -147,6 +147,25 @@ automatic report path above applies to the Node evidence workflow.
 Optional comparative field validation uses project-local Python/PyYAML, prepared
 only when needed. The core workflow requires only Node.js.
 
+## Guidance updates
+
+The installer registers a small local entrypoint. For new work, it quietly checks
+this public repository’s `main`, saves an exact guidance revision, and returns
+only paths and status. The agent reads the entry and relevant references, not
+the whole library. Git and network access are needed for first/new-task refreshes;
+no GitHub account is required.
+
+Existing decks or research reports keep their saved task and runtime. Resuming
+uses that pin without fetching. Explicitly adopting newer guidance starts a new
+task and requires rechecking affected reviews. A failed fetch or incompatible
+runtime is reported; it is never described as current.
+
+**Instructions update automatically; executable helpers do not.** Rerun the trusted
+shell installer from a current repository copy to update helpers or the entrypoint.
+Guidance snapshots contain no executable scripts. The installed helper supports
+`start`, `resume`, `cached`, and `pin` through `scripts/sync-guidance.mjs --help`.
+
+
 ## Development and provenance
 
 This project extracts Tanzu Brand's custom research engine and its pinned modified
@@ -171,10 +190,11 @@ Measured with `cl100k_base`; cumulative whole-file instruction counts.
 | Reading path | Tokens |
 | --- | ---: |
 | Discovery metadata | 39 |
-| Activated entrypoint | 446 |
-| Focused research / fact-check with saved report | 2,012 |
-| Comparative workflow routing | 960 |
-| Legacy migration | 686 |
+| Installed bootstrap | 383 |
+| Bootstrap + current guidance entry | 845 |
+| Focused research / fact-check with saved report | 2,411 |
+| Comparative workflow routing | 1,359 |
+| Legacy migration | 1,085 |
 
 One source strategy, selected comparative resources and evidence add conditional
 context. The complete upstream bundle is never a default loading path.
