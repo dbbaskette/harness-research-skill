@@ -54,3 +54,24 @@ Brand's full local suite **PASS** on commit
 - The owned clone was removed and its directory confirmed absent. No live Google,
   model or research service account was used. Brand changes are committed locally;
   its publication is separate from this public skill repository.
+
+
+## Guidance bootstrap verification — October 7, 2026
+
+The guidance-only entrypoint and installed runtime at
+`d1c38b2af9d179f6ce9e9324643679b91984a62b` passed **30/30**, zero skips,
+on macOS 27.0 / Node 22.23.2 in Brand's combined disposable Tart gate. It included
+the isolated comparative validator and behavior tests for freshness, task pins,
+compatibility, unsafe caches, concurrency, changed guidance/runtime detection
+and installed bootstrap placement. The actual installed helper fetched public
+main `fc8cba77600b1b47994abffe716ff78caac36c33` without a GitHub sign-in and
+created its cited report after refresh. A separate disposable host check resumed
+both skills' saved task revisions without a new fetch.
+
+Brand passed 268 active tests plus 15 browser checks; Slides passed 34/34 with
+actual browser editing and native rendering. Logs:
+`~/Library/Logs/Tanzu Brand/Tart Tests/`
+`tanzu-brand-test-20261007135019-46797-595efb92/`.
+The owned VM was deleted and base/signed-in VMs were untouched. No live model or
+Google account was used. These local candidates are unpublished; later
+instruction/documentation-only changes reuse the unchanged runtime evidence.

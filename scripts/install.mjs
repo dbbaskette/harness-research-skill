@@ -8,7 +8,7 @@ import { randomUUID } from 'node:crypto';
 import { hash, digest } from './lib/common.mjs';
 
 const packageRoot = fileURLToPath(new URL('../', import.meta.url));
-const roots = ['SKILL.md', 'LICENSE', 'NOTICE.md', 'package.json', 'package-lock.json', 'references', 'scripts', 'upstream', 'examples'];
+const roots = ['SKILL.md', 'LICENSE', 'NOTICE.md', 'package.json', 'package-lock.json', 'bootstrap', 'guidance', 'references', 'scripts', 'upstream', 'examples'];
 const aliases = ['research', 'research-add-items', 'research-add-fields', 'research-deep', 'research-report'];
 
 async function files(root) {
@@ -21,6 +21,7 @@ async function files(root) {
     else throw new Error('Unsupported package member');
   }
   for (const name of roots) await visit(name);
+  out.set('SKILL.md', await readFile(join(root, 'bootstrap/SKILL.md')));
   return out;
 }
 async function state(path) {
