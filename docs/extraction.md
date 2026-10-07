@@ -37,6 +37,20 @@ skill parents remain rejected. Tests use local synthetic documents and an
 isolated Python validator environment; no live provider, model or web research
 account was used. Documentation-only changes reuse this runtime evidence.
 
-Brand's full integration suite is running separately against a pinned checkout
-of this independent public repo. Its installer only checks the dependency;
-research installation occurs explicitly in the disposable CI guest.
+## Brand integration verification
+
+Brand's full local suite **PASS** on commit
+`59b41c6f377db4ed58a323a6a716005b0d95b47d`, with this engine pinned at `0dec21c`.
+
+- macOS 27.0 / Node 22.23.2; 266 active tests passed, four optional skips,
+  plus 15/15 real-browser checks.
+- The guest cloned this public repo at the exact pin and explicitly installed
+  research. Brand found it available in Codex and Claude; the installed research
+  CLI created a supplied-only report without any Brand research commands.
+- Source/Mac installers, release smoke, portable/Mac archive checksums and
+  installed engine inspection passed. Brand packages include no research bundle.
+- Logs: `~/Library/Logs/Tanzu Brand/Tart Tests/`
+  `tanzu-brand-test-20261007125147-89575-2b9a1c50/`.
+- The owned clone was removed and its directory confirmed absent. No live Google,
+  model or research service account was used. Brand changes are committed locally;
+  its publication is separate from this public skill repository.
