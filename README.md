@@ -17,7 +17,7 @@ You do not need to run `npm install`.
 In your terminal:
 
 ```sh
-git clone https://github.com/dbbaskette/harness-research-skill.git
+git clone --branch v0.3.0 https://github.com/dbbaskette/harness-research-skill.git
 cd harness-research-skill
 bash scripts/Install-Harness-Research.sh
 ```
@@ -28,6 +28,32 @@ Codex, Claude Code and Cursor. Successful installation prints JSON with
 
 To preview the installation before making changes, run
 `bash scripts/Install-Harness-Research.sh --dry-run` first.
+
+### Check or update your version
+
+The current release is [v0.3.0](https://github.com/dbbaskette/harness-research-skill/releases/tag/v0.3.0).
+Check the installed helper without network access or a project:
+
+```sh
+node "$HOME/.agents/skills/harness-research/scripts/harness-research.mjs" --version
+# harness-research 0.3.0
+```
+
+To update an existing clone, run from its directory:
+
+```sh
+git fetch origin tag v0.3.0
+git switch --detach v0.3.0
+bash scripts/Install-Harness-Research.sh
+```
+
+On start or resume, the agent reports the installed runtime version and the
+guidance release, revision and freshness. These can differ: new tasks fetch
+instructions from `main`, while executable updates require the installer.
+Resumed tasks report their saved guidance and runtime, even after an installation
+update. Older guidance without a release label is reported as unknown, with its
+exact revision. An older helper without `--version` can be identified from its
+installed `package.json`; reinstall to get the new version reporting.
 
 ## 2. Start your first research session
 
@@ -201,25 +227,25 @@ representative guidance-start response. Bootstrap activation is shown separately
 | Reading path | Tokens |
 | --- | ---: |
 | Discovery metadata | 38 |
-| Installed bootstrap | 428 |
-| Bootstrap + current guidance entry | 1,013 |
-| Explicit chat-only cited answer | 1,942 |
-| Focused research with saved report | 3,063 |
-| Status / resume without new findings | 1,405 |
-| Comparative routing only | 1,695 |
-| Codex comparative outline | 2,655 |
-| Codex add items | 1,860 |
-| Codex add fields | 1,880 |
-| Codex deep results | 2,543 |
-| Codex deep results + saved evidence | 3,664 |
-| Claude comparative outline | 2,672 |
-| Claude deep results | 2,565 |
-| Saved research + general web strategy | 3,560 |
-| Saved research + academic strategy | 3,652 |
-| Saved research + GitHub strategy | 3,447 |
-| Saved research + technical Q&A strategy | 3,352 |
-| Saved research + Chinese sources strategy | 3,577 |
-| Legacy migration | 1,337 |
+| Installed bootstrap | 448 |
+| Bootstrap + current guidance entry | 1,059 |
+| Explicit chat-only cited answer | 2,013 |
+| Focused research with saved report | 3,134 |
+| Status / resume without new findings | 1,476 |
+| Comparative routing only | 1,766 |
+| Codex comparative outline | 2,726 |
+| Codex add items | 1,931 |
+| Codex add fields | 1,951 |
+| Codex deep results | 2,614 |
+| Codex deep results + saved evidence | 3,735 |
+| Claude comparative outline | 2,743 |
+| Claude deep results | 2,636 |
+| Saved research + general web strategy | 3,631 |
+| Saved research + academic strategy | 3,723 |
+| Saved research + GitHub strategy | 3,518 |
+| Saved research + technical Q&A strategy | 3,423 |
+| Saved research + Chinese sources strategy | 3,648 |
+| Legacy migration | 1,408 |
 
 Comparative rows include the selected platform resource, not the complete bundle.
 Each strategy row includes one router and one strategy. Status/resume skips plan

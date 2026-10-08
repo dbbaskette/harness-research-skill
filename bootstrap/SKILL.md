@@ -17,8 +17,9 @@ Resolve this installed directory once. For new work, run:
 node "<installed-skill>/scripts/sync-guidance.mjs" start --project "<content-project>"
 ```
 
-The compact result returns the guidance entry, exact revision, task ID, and
-installed runtime. Read that entry, then only the references for this task.
+The compact result returns runtime/guidance versions, the guidance entry, exact
+revision, task ID and installed runtime. Briefly tell the user the versions,
+revision and freshness on start/resume. Read that entry, then only this task's references.
 References are relative to the fetched guidance directory; every executable
 command uses the returned **runtime**, never the fetched directory. The AI owns
 helper JSON and commands; do not require users to run them or repeat settled intake.

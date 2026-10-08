@@ -25,7 +25,9 @@ export async function measureContext() {
   const contents = Object.fromEntries(await Promise.all(paths.map(async path => [path, await readFile(new URL(path, root), 'utf8')])));
   const files = Object.fromEntries(paths.map(path => [path, count(contents[path])]));
   // Representative start response shape, normalized paths; no fetch or account access.
-  const guidanceResult = JSON.stringify({ freshness: 'current-at-start', revision: createHash('sha256').update('sample guidance revision').digest('hex').slice(0, 40), task: createHash('sha256').update('sample guidance task').digest('hex').slice(0, 32), guidance: '<guidance>/SKILL.md', runtime: '<runtime>' }, null, 2) + '\n';
+  const pkg = JSON.parse(await readFile(new URL('package.json', root), 'utf8'));
+  const manifest = JSON.parse(await readFile(new URL('guidance/manifest.json', root), 'utf8'));
+  const guidanceResult = JSON.stringify({ freshness: 'current-at-start', runtimeVersion: pkg.version, guidanceVersion: manifest.version ?? null, revision: createHash('sha256').update('sample guidance revision').digest('hex').slice(0, 40), task: createHash('sha256').update('sample guidance task').digest('hex').slice(0, 32), guidance: '<guidance>/SKILL.md', runtime: '<runtime>' }, null, 2) + '\n';
   const outputs = { guidanceStart: guidanceResult };
 
   const samples = Object.fromEntries(Object.entries(outputs).map(([name, value]) => [name, count(value)]));

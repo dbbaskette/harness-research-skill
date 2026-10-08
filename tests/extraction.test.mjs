@@ -109,7 +109,14 @@ test('generic entrypoint routes valid local resources and CLI refuses irrelevant
     for (const [, target] of content.matchAll(/\[[^\]]+\]\(([^)]+)\)/g)) if (!/^[a-z]+:/i.test(target)) await access(join(dirname(join(source, name)), target.split('#')[0]));
   }
   await assert.rejects(exec(process.execPath, [join(source, 'scripts/harness-research.mjs'), 'status', '--project', source, '--file', 'ignored.json']), /not valid for status/);
+  const pkg = JSON.parse(await readFile(join(source, 'package.json'), 'utf8'));
+  const manifest = JSON.parse(await readFile(join(source, 'guidance/manifest.json'), 'utf8'));
+  const lock = JSON.parse(await readFile(join(source, 'package-lock.json'), 'utf8'));
+  assert.equal(manifest.version, pkg.version); assert.equal(lock.version, pkg.version); assert.equal(lock.packages[''].version, pkg.version);
+  assert.equal((await exec(process.execPath, [join(source, 'scripts/harness-research.mjs'), '--version'])).stdout.trim(), `harness-research ${pkg.version}`);
+  await assert.rejects(exec(process.execPath, [join(source, 'scripts/harness-research.mjs'), '--version', 'status', '--project', source]), /Use --version alone/);
   const entry = await readFile(join(source, 'SKILL.md'), 'utf8');
+  assert.ok(entry.includes(`Guidance release: **${manifest.version}**`));
   assert.ok(entry.split(/\s+/).length < 430);
   const agent = await readFile(join(source, 'upstream/codex/agents/web-researcher.toml'), 'utf8');
   assert.doesNotMatch(agent, /^model\s*=/m);

@@ -2,10 +2,15 @@
 import { parseArgs } from 'node:util';
 import { readFile } from 'node:fs/promises';
 import { planResearch, recordResearch, researchStatus, migrateResearch } from './lib/research.mjs';
-const { values, positionals } = parseArgs({ options: { project: { type: 'string' }, file: { type: 'string' }, run: { type: 'string' }, item: { type: 'string' }, 'allow-web': { type: 'boolean' }, help: { type: 'boolean', short: 'h' } }, allowPositionals: true });
+const { values, positionals } = parseArgs({ options: { project: { type: 'string' }, file: { type: 'string' }, run: { type: 'string' }, item: { type: 'string' }, 'allow-web': { type: 'boolean' }, version: { type: 'boolean' }, help: { type: 'boolean', short: 'h' } }, allowPositionals: true });
 try {
   const action = positionals[0];
-  if (values.help) console.log('Usage: node scripts/harness-research.mjs plan|record|status|migrate --project DIR [--file JSON] [--run ID --item ID] [--allow-web]');
+  if (values.version) {
+    if (positionals.length || Object.keys(values).length !== 1) throw new Error('Use --version alone.');
+    const pkg = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'));
+    console.log(`harness-research ${pkg.version}`);
+  }
+  else if (values.help) console.log('Usage: node scripts/harness-research.mjs plan|record|status|migrate --project DIR [--file JSON] [--run ID --item ID] [--allow-web]\n       node scripts/harness-research.mjs --version');
   else {
     if (!values.project || positionals.length !== 1 || !['plan', 'record', 'status', 'migrate'].includes(action)) throw new Error('Choose plan, record, status or migrate and supply --project.');
     const allowed = { plan: ['project', 'file', 'allow-web'], record: ['project', 'file', 'run', 'item'], status: ['project'], migrate: ['project'] }[action];

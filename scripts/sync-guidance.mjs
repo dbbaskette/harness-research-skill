@@ -120,6 +120,8 @@ export async function start({ project, runtime = root, source, revision } = {}) 
     const metadata = listing.find(item => item.name === 'guidance/manifest.json') ?? listing.find(item => item.name === 'package.json');
     if (!metadata || metadata.mode !== '100644' || metadata.type !== 'blob') throw new Error('Guidance compatibility metadata is missing.');
     const manifest = JSON.parse(await blob(repository, metadata.id, metadata.size));
+    const guidanceVersion = manifest.version ?? null;
+    if (guidanceVersion !== null) version(guidanceVersion);
     if (metadata.name === 'guidance/manifest.json') {
       if (manifest.schema !== 1 || manifest.skill !== config.skill || manifest.entry !== 'SKILL.md') throw new Error('Unsupported guidance contract.');
       compatible(manifest.minimumRuntime, config.version);
@@ -136,10 +138,10 @@ export async function start({ project, runtime = root, source, revision } = {}) 
       await mkdir(dirname(path), { recursive: true, mode: 0o700 }); await writeFile(path, bytes, { flag: 'wx', mode: 0o400 });
       hashes[item.name] = sha(bytes);
     }
-    const pin = { schema: 1, skill: config.skill, repository: config.repository, revision: commit, task, createdAt: new Date().toISOString(), runtime: config.runtime, runtimeVersion: config.version, runtimeFiles: await runtimeHashes(config.runtime), files: hashes };
+    const pin = { schema: 1, skill: config.skill, repository: config.repository, revision: commit, guidanceVersion, task, createdAt: new Date().toISOString(), runtime: config.runtime, runtimeVersion: config.version, runtimeFiles: await runtimeHashes(config.runtime), files: hashes };
     await writeFile(join(stage, 'pin.json'), JSON.stringify(pin, null, 2) + '\n', { flag: 'wx', mode: 0o400 });
     const snapshot = join(cache, 'tasks', task); await rename(stage, snapshot); stage = null;
-    return { freshness: 'current-at-start', revision: commit, task, guidance: join(snapshot, 'SKILL.md'), runtime: config.runtime };
+    return { freshness: 'current-at-start', runtimeVersion: config.version, guidanceVersion, revision: commit, task, guidance: join(snapshot, 'SKILL.md'), runtime: config.runtime };
   } finally { if (stage) await rm(stage, { recursive: true, force: true }); await lock.close(); await rm(join(cache, '.sync-lock')); }
 }
 export async function resume({ project, task, runtime = root, cached = false } = {}) {
@@ -149,6 +151,7 @@ export async function resume({ project, task, runtime = root, cached = false } =
   for (const path of [tasks, snapshot]) { const stat = await lstat(path); if (!stat.isDirectory() || stat.isSymbolicLink()) throw new Error('Unsafe saved guidance directory.'); }
   const pin = JSON.parse(await file(join(snapshot, 'pin.json')));
   if (pin.schema !== 1 || pin.task !== task || pin.skill !== config.skill || pin.repository !== config.repository || !revisionPattern.test(pin.revision) || !pin.files?.['SKILL.md']) throw new Error('Invalid saved guidance pin.');
+  if (pin.guidanceVersion !== undefined && pin.guidanceVersion !== null) version(pin.guidanceVersion);
   for (const [name, digest] of Object.entries(pin.files)) {
     if (!validPath(name) || !allowed(name)) throw new Error('Invalid saved guidance path.');
     let parent = dirname(join(snapshot, name));
@@ -157,7 +160,7 @@ export async function resume({ project, task, runtime = root, cached = false } =
   }
   const saved = await settings(pin.runtime);
   if (saved.skill !== config.skill || saved.version !== pin.runtimeVersion || JSON.stringify(await runtimeHashes(saved.runtime)) !== JSON.stringify(pin.runtimeFiles)) throw new Error('Saved executable runtime changed or is unavailable; restore it with its trusted installer.');
-  return { freshness: cached ? 'cached-by-choice' : 'pinned', revision: pin.revision, task, guidance: join(snapshot, 'SKILL.md'), runtime: saved.runtime };
+  return { freshness: cached ? 'cached-by-choice' : 'pinned', runtimeVersion: saved.version, guidanceVersion: pin.guidanceVersion ?? null, revision: pin.revision, task, guidance: join(snapshot, 'SKILL.md'), runtime: saved.runtime };
 }
 async function main() {
   const { values, positionals } = parseArgs({ options: { project: { type: 'string' }, task: { type: 'string' }, revision: { type: 'string' }, help: { type: 'boolean' } }, allowPositionals: true });
