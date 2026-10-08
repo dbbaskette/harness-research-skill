@@ -22,6 +22,10 @@ async function fixture(t) {
   const commit = async () => { await exec('git', ['-C', source, 'add', '.']); await exec('git', ['-C', source, '-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.invalid', '-c', 'commit.gpgsign=false', 'commit', '-qm', 'Fixture update']); return (await exec('git', ['-C', source, 'rev-parse', 'HEAD'])).stdout.trim(); };
   return { dir, source, runtime, project, commit, first: await commit() };
 }
+async function startInProcess(fixture, env) {
+  const script = `const {start} = await import(${JSON.stringify(new URL('../scripts/sync-guidance.mjs', import.meta.url).href)}); try { await start(${JSON.stringify(fixture)}); } catch (error) { console.error(error.message); process.exitCode = 1; }`;
+  return exec(process.execPath, ['--input-type=module', '--eval', script], { env });
+}
 test('new work sees main advancement; resumed work retains guidance and installed runtime without network', async t => {
   const f = await fixture(t), first = await start(f);
   assert.equal(first.revision, f.first); assert.equal(first.runtime, f.runtime);
@@ -54,6 +58,29 @@ test('fetch failures preserve existing tasks and never claim current guidance', 
   await assert.rejects(start({ ...f, source: join(f.dir, 'missing') }), /fetch failed/);
   assert.equal((await resume({ ...f, task: pin.task })).revision, f.first);
 });
+test('DNS failures identify the network restriction without leaking Git URLs and allow a retry', async t => {
+  const f = await fixture(t), pin = await start(f), bin = join(f.dir, 'bin');
+  await mkdir(bin);
+  const realGit = (await exec('which', ['git'])).stdout.trim();
+  const diagnostic = 'fatal: unable to access https://user:sensitive-token@private.example/customer-code: Could not resolve host: private.example\n';
+  await writeFile(join(bin, 'git'), `#!/usr/bin/env node\nconst {spawnSync} = require('node:child_process');\nconst args = process.argv.slice(2);\nif (args.includes('fetch')) { process.stderr.write(${JSON.stringify(diagnostic)}); process.exit(128); }\nconst result = spawnSync(${JSON.stringify(realGit)}, args, {stdio: 'inherit'}); process.exit(result.status ?? 1);\n`, { mode: 0o700 });
+  await assert.rejects(startInProcess(f, { ...process.env, PATH: bin + ':' + process.env.PATH }), error => {
+    assert.match(error.stderr, /Guidance fetch failed \(git fetch\).*source host \(DNS\)/);
+    assert.match(error.stderr, /permitted network-access flow/);
+    assert.doesNotMatch(error.stderr, /sensitive-token|private\.example|customer-code/);
+    return true;
+  });
+  assert.equal((await resume({ ...f, task: pin.task })).revision, f.first);
+  assert.equal((await start(f)).runtime, pin.runtime);
+});
+test('missing Git reports the actual local operation instead of a fetch failure', async t => {
+  const f = await fixture(t); await start(f);
+  await assert.rejects(startInProcess(f, { ...process.env, PATH: '' }), error => {
+    assert.match(error.stderr, /Guidance Git operation failed \(git rev-parse\).*Git is not installed or is not on PATH/);
+    assert.doesNotMatch(error.stderr, /Guidance fetch failed/);
+    return true;
+  });
+});
 test('rejects symlink or executable guidance and unsafe caches', async t => {
   const f = await fixture(t);
   await symlink('../SKILL.md', join(f.source, 'references/link.md')); await f.commit();
@@ -67,7 +94,7 @@ test('rejects symlink or executable guidance and unsafe caches', async t => {
 test('pins an approved ancestor explicitly and rejects other commits or malformed task IDs', async t => {
   const f = await fixture(t); await writeFile(join(f.source, 'references/design.md'), 'New'); await f.commit();
   const pin = await start({ ...f, revision: f.first }); assert.equal(pin.revision, f.first);
-  await assert.rejects(start({ ...f, revision: 'a'.repeat(40) }), /fetch failed/);
+  await assert.rejects(start({ ...f, revision: 'a'.repeat(40) }), /Git operation failed \(git merge-base\)/);
   await assert.rejects(resume({ ...f, task: '../escape' }), /Invalid saved task/);
 });
 test('refresh lock refuses concurrent updates without deleting another owner’s lock', async t => {

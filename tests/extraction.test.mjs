@@ -104,7 +104,9 @@ test('legacy migration refuses active locks, unowned state and hostile history w
 test('generic entrypoint routes valid local resources and CLI refuses irrelevant flags', async () => {
   for (const name of ['SKILL.md', ...await readdir(join(source, 'references')).then(names => names.map(name => `references/${name}`))]) {
     const content = await readFile(join(source, name), 'utf8');
-    for (const [, target] of content.matchAll(/\[[^\]]+\]\(([^)]+)\)/g)) if (!/^[a-z]+:/i.test(target)) await access(join(dirname(join(source, name)), target));
+    // Section fragments are validated by context-usage.test.mjs; only the file
+    // part is a filesystem path.
+    for (const [, target] of content.matchAll(/\[[^\]]+\]\(([^)]+)\)/g)) if (!/^[a-z]+:/i.test(target)) await access(join(dirname(join(source, name)), target.split('#')[0]));
   }
   await assert.rejects(exec(process.execPath, [join(source, 'scripts/harness-research.mjs'), 'status', '--project', source, '--file', 'ignored.json']), /not valid for status/);
   const entry = await readFile(join(source, 'SKILL.md'), 'utf8');

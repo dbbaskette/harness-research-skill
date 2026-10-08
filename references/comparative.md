@@ -38,3 +38,10 @@ and named missing/uncertain fields. The retained legacy `research-report` skill
 omits uncertain values; Harness Research keeps gaps visible in its synthesis.
 For tracked factual questions, also save evidence through the Node helper. Do
 not turn item/field JSON into factual claims without inspected source passages.
+
+Save the final cited comparison as a readable report in the retained project
+output location, open it, and verify coverage of the agreed items and fields
+before returning or using it for dependent content. JSON results and source
+collection alone are not the handoff. Apply the
+[completion checks](evidence.md#before-handoff) to tracked factual questions;
+retain explicit uncertainty rather than requiring every finding to be supported.
