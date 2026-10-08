@@ -31,7 +31,10 @@ guidance starts a new task and requires rechecking affected review conclusions.
 
 New tasks check public main. A failed fetch or incompatible runtime is reported,
 not described as current. An existing task can resume without fetching. For an
-explicitly chosen older task, use `cached` with its saved ID and disclose that
+agent sandbox DNS/network failure, retry the same command through the host's
+available network-permission flow. Report a denied or unavailable retry; do not
+switch entrypoints expecting a separate runtime or silently bypass the refresh.
+For an explicitly chosen older task, use `cached` with its saved ID and disclose that
 choice. Update executable helpers with the trusted shell installer; guidance
 refresh never installs or executes repository scripts.
 

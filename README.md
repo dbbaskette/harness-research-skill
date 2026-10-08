@@ -80,8 +80,8 @@ are recorded as coverage gaps.
 
 ## 3. Read the report and continue later
 
-The standard research workflow saves a report automatically and includes citations
-as findings are recorded. The agent returns a synthesis and a link to the report,
+Using Harness Research on its own produces a saved cited report; no Brand skill
+or follow-up request to write it is needed. The agent returns a synthesis and a link to the report,
 which is saved at:
 
 ```text
@@ -90,6 +90,10 @@ your-project/.harness-research/research-report.md
 
 It includes findings, citations, contradictions, document coverage gaps and
 pending or unresolved questions. The agent updates it as findings are saved.
+Before returning the research result or starting dependent content, the agent
+opens the report and checks that the agreed findings, citations and gaps
+are saved. A partial handoff requires your explicit direction. Only an explicitly
+requested chat-only answer omits the saved report.
 If your file browser hides dot folders, open the report using the agent's link
 or its full path.
 
@@ -155,6 +159,12 @@ only paths and status. The agent reads the entry and relevant references, not
 the whole library. Git and network access are needed for first/new-task refreshes;
 no GitHub account is required.
 
+If a refresh reports a DNS/network failure inside an agent sandbox, retry the same
+command through the host's network-permission flow, or from a terminal with
+network access. Changing skill entrypoints uses the same helper and runtime.
+The helper reports the failing Git operation and a safe diagnostic; it does not
+print credentials, proxy settings or private Git URLs.
+
 Existing decks or research reports keep their saved task and runtime. Resuming
 uses that pin without fetching. Explicitly adopting newer guidance starts a new
 task and requires rechecking affected reviews. A failed fetch or incompatible
@@ -191,30 +201,30 @@ representative guidance-start response. Bootstrap activation is shown separately
 | Reading path | Tokens |
 | --- | ---: |
 | Discovery metadata | 38 |
-| Installed bootstrap | 383 |
-| Bootstrap + current guidance entry | 868 |
-| Brief fact-check / cited answer | 1,696 |
-| Focused research with saved report | 2,518 |
-| Status / resume without new findings | 1,170 |
-| Comparative routing only | 1,466 |
-| Codex comparative outline | 2,426 |
-| Codex add items | 1,631 |
-| Codex add fields | 1,651 |
-| Codex deep results | 2,314 |
-| Codex deep results + saved evidence | 3,136 |
-| Claude comparative outline | 2,443 |
-| Claude deep results | 2,336 |
-| Saved research + general web strategy | 3,015 |
-| Saved research + academic strategy | 3,107 |
-| Saved research + GitHub strategy | 2,902 |
-| Saved research + technical Q&A strategy | 2,807 |
-| Saved research + Chinese sources strategy | 3,032 |
-| Legacy migration | 1,192 |
+| Installed bootstrap | 428 |
+| Bootstrap + current guidance entry | 1,013 |
+| Explicit chat-only cited answer | 1,942 |
+| Focused research with saved report | 3,063 |
+| Status / resume without new findings | 1,405 |
+| Comparative routing only | 1,695 |
+| Codex comparative outline | 2,655 |
+| Codex add items | 1,860 |
+| Codex add fields | 1,880 |
+| Codex deep results | 2,543 |
+| Codex deep results + saved evidence | 3,664 |
+| Claude comparative outline | 2,672 |
+| Claude deep results | 2,565 |
+| Saved research + general web strategy | 3,560 |
+| Saved research + academic strategy | 3,652 |
+| Saved research + GitHub strategy | 3,447 |
+| Saved research + technical Q&A strategy | 3,352 |
+| Saved research + Chinese sources strategy | 3,577 |
+| Legacy migration | 1,337 |
 
 Comparative rows include the selected platform resource, not the complete bundle.
 Each strategy row includes one router and one strategy. Status/resume skips plan
-and finding schemas until a new save is needed. Brief cited answers need no saved
-queue; requested reports and resumable work retain the evidence contract. Source
+and finding schemas until a new save is needed. Only explicitly requested chat-only
+answers omit the saved queue; default research uses the evidence contract. Source
 content, images, research helper results and conversation add separately. The JSON
 report also exposes direct-handoff paths without the bootstrap/start response.
 <!-- CONTEXT-USAGE:END -->

@@ -4,7 +4,7 @@ Use `node scripts/harness-research.mjs ACTION` from the installed package.
 Pass `--project` the content project's absolute directory. Node 20+ is the only
 runtime requirement; helpers do not search or upload. The AI prepares inputs.
 
-`node scripts/harness-research.mjs plan --project DIR --file plan.json` saves the queue and immediately
+Save the plan before investigating its questions. `node scripts/harness-research.mjs plan --project DIR --file plan.json` saves the queue and immediately
 writes `.harness-research/research-report.md`. A matching plan resumes results;
 a changed plan or changed content basis retains history and starts a new run.
 Plans contain `topic`, `purpose` (planning/fact-check), `scope`
@@ -36,7 +36,8 @@ Google UTF-16 indexes or slide coordinates. These claims remain local. Supplied-
 plans have null public queries. Changing a saved supplied-only plan to public-web
 needs explicit user approval, represented by the helper's `--allow-web` flag.
 
-Save each finding with `node scripts/harness-research.mjs record --project DIR --run RUN --item ID
+Record each assessed finding as work proceeds; do not leave results only in the
+conversation or wait for downstream authoring. Save each finding with `node scripts/harness-research.mjs record --project DIR --run RUN --item ID
 --file finding.json`. A finding contains `status` (supported, contradicted,
 insufficient, unavailable), `summary`, `limits`, and `evidence`. Each evidence
 entry gives `file` (project-relative inspected snapshot), `title`, `origin`
@@ -57,3 +58,26 @@ never remove a lock belonging to an active save.
 
 For status and continuation, read [resume](resume.md); plan/finding schemas are
 needed only when changing the plan or recording new evidence.
+
+## Before handoff
+
+Before returning standalone research, claiming saved research is complete or
+using it for content, run `node scripts/harness-research.mjs status --project DIR` from the
+installed runtime and open the returned `report` file. Verify it contains the
+recorded findings for the agreed question scope, citations for supported or
+contradicted findings, and explicit limits for unresolved results. A guidance
+snapshot, task pin, source list or report containing only pending questions does
+not satisfy this check.
+
+Require no pending questions in that scope and reassess stale evidence before
+handoff. Insufficient or unavailable findings may remain: record their actual
+evidence gaps, including missing dates or release identification, rather than
+inventing support or treating unfinished work as unavailable. Research coverage
+can be complete while a claim remains unsupported.
+
+If persistence fails or the report is missing, finish saving and verification
+before returning the research deliverable or starting dependent content. If blocked or interrupted, identify the remaining
+work and link a partial report only if it exists; independent design preparation
+may continue. Proceed from partial research only when the user explicitly directs
+that handoff, retaining its limits. For standalone research, return a brief cited
+synthesis and the verified report link. Include the path in any content brief too.

@@ -51,7 +51,24 @@ async function git(repository, ...args) {
   Object.assign(env, { GIT_TERMINAL_PROMPT: '0', GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: '/dev/null' });
   try {
     return (await exec('git', ['--git-dir=' + repository, '-c', 'core.hooksPath=/dev/null', ...args], { env, timeout: 45000, maxBuffer: 16 * 1024 * 1024, encoding: 'buffer' })).stdout;
-  } catch { throw new Error('Guidance fetch failed. Check Git and network access; existing work can resume its saved task.'); }
+  } catch (error) {
+    const operation = args[0], stderr = String(error.stderr ?? '');
+    // Report a useful cause without echoing Git's potentially credential-bearing
+    // URLs, proxy settings, local paths or arbitrary remote output.
+    const reason = error.code === 'ENOENT' ? 'Git is not installed or is not on PATH.'
+      : error.killed || error.code === 'ETIMEDOUT' ? 'Git timed out.'
+      : /could not resolve proxy/i.test(stderr) ? 'Git could not resolve the proxy host (DNS).'
+      : /could not resolve host|could not resolve hostname|name or service not known|temporary failure in name resolution/i.test(stderr) ? 'Git could not resolve the source host (DNS).'
+      : /certificate|SSL|TLS/i.test(stderr) ? 'Git could not establish a trusted TLS connection.'
+      : /failed to connect|couldn.t connect|connection refused|network is unreachable/i.test(stderr) ? 'Git could not connect to the source host.'
+      : /permission denied|operation not permitted|access denied/i.test(stderr) ? 'Git was denied access.'
+      : Number.isInteger(error.code) ? `Git exited with status ${error.code}.` : 'Git could not complete the operation.';
+    const prefix = operation === 'fetch' ? 'Guidance fetch failed' : 'Guidance Git operation failed';
+    const recovery = operation === 'fetch'
+      ? 'If the agent sandbox restricts networking, retry this command through the host\'s permitted network-access flow. Existing work can resume its saved task without fetching.'
+      : 'Check the reported Git operation and local cache; this is not necessarily a network failure.';
+    throw new Error(`${prefix} (git ${operation}). ${reason} ${recovery}`);
+  }
 }
 function version(value) {
   if (!/^\d+\.\d+\.\d+$/.test(value)) throw new Error('Invalid guidance/runtime version.');

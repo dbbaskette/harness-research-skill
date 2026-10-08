@@ -12,6 +12,13 @@ IDs, saved source mode and document coverage gaps. Read the report and selected
 questions; reuse completed findings only when their inputs and source snapshots
 are unchanged. Local hashes do not establish live-source currency.
 
+Before resuming dependent content work, verify the report contains the agreed
+findings, citations and gaps, with no pending questions or stale evidence in the
+handoff scope. Guidance/task records alone are insufficient. If research is
+`not-started`, incomplete or stale, load the workflow/evidence path and finish
+the saved work first. A partial handoff requires explicit user direction;
+insufficient/unavailable findings remain visible without blocking completed coverage.
+
 Retain saved source restrictions, selected documents and completion boundary.
 A supplied-only run does not authorize web searches. Reassess stale findings;
 load [workflow](workflow.md) and [evidence](evidence.md) only when researching,
