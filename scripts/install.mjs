@@ -93,7 +93,7 @@ export async function install({ source = packageRoot, home = homedir(), claudeCo
   await checkParents(shared);
   const legacy = await legacyLinks(home, claude, current);
   for (const entry of legacy.filter(entry => entry.status === 'would-migrate')) await checkParents(dirname(entry.path));
-  if (dryRun) return { status: 'dry-run', shared, runtime, targets, legacy, contentDigest };
+  if (dryRun) return { status: 'dry-run', runtimeVersion: pkg.version, shared, runtime, targets, legacy, contentDigest };
   await safeParent(shared);
   const lock = await open(join(shared, '.install-lock'), 'wx', 0o600), created = [], migrated = [];
   try {
@@ -128,7 +128,7 @@ export async function install({ source = packageRoot, home = homedir(), claudeCo
     const temp = join(shared, `.pointer-${randomUUID()}`);
     try { await symlink(`versions/${id}`, temp); await rename(temp, current); }
     finally { await rm(temp, { force: true }); }
-    return { status: 'installed', shared, runtime, targets, legacy, contentDigest };
+    return { status: 'installed', runtimeVersion: pkg.version, shared, runtime, targets, legacy, contentDigest };
   } catch (error) {
     const failures = [];
     for (const entry of migrated.reverse()) try {

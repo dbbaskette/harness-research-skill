@@ -17,6 +17,7 @@ HARNESS_RESEARCH_PYTHON="$work/validator/bin/python" npm test 2>&1 | tee "$resul
 npm run context:check 2>&1 | tee "$results_dir/context.log"
 bash scripts/Install-Harness-Research.sh --home "$work/home" --shared "$work/shared" 2>&1 | tee "$results_dir/installer.log"
 node "$work/home/.agents/skills/harness-research/scripts/harness-research.mjs" --help 2>&1 | tee "$results_dir/installed-help.log"
+node "$work/home/.agents/skills/harness-research/scripts/harness-research.mjs" --version 2>&1 | tee "$results_dir/installed-version.log"
 mkdir "$work/content"
 cp examples/plan.json "$work/content/plan.json"
 node "$work/home/.claude/skills/harness-research/scripts/harness-research.mjs" plan --project "$work/content" --file "$work/content/plan.json" 2>&1 | tee "$results_dir/installed-plan.log"

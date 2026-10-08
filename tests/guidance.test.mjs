@@ -17,7 +17,7 @@ async function fixture(t) {
   await writeFile(join(source, 'SKILL.md'), `---\nname: ${skill}\n---\nFirst guidance\n`);
   await writeFile(join(source, 'references/design.md'), 'First reference');
   await writeFile(join(source, 'scripts/helper.mjs'), "throw new Error('Remote helper must not execute');");
-  await writeFile(join(source, 'guidance/manifest.json'), JSON.stringify({ schema: 1, skill, entry: 'SKILL.md', minimumRuntime: '0.2.0' }));
+  await writeFile(join(source, 'guidance/manifest.json'), JSON.stringify({ schema: 1, skill, version: '0.3.0', entry: 'SKILL.md', minimumRuntime: '0.2.0' }));
   await exec('git', ['init', '-q', '--initial-branch=main', source]);
   const commit = async () => { await exec('git', ['-C', source, 'add', '.']); await exec('git', ['-C', source, '-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.invalid', '-c', 'commit.gpgsign=false', 'commit', '-qm', 'Fixture update']); return (await exec('git', ['-C', source, 'rev-parse', 'HEAD'])).stdout.trim(); };
   return { dir, source, runtime, project, commit, first: await commit() };
@@ -29,15 +29,38 @@ async function startInProcess(fixture, env) {
 test('new work sees main advancement; resumed work retains guidance and installed runtime without network', async t => {
   const f = await fixture(t), first = await start(f);
   assert.equal(first.revision, f.first); assert.equal(first.runtime, f.runtime);
+  assert.equal(first.runtimeVersion, '0.2.0'); assert.equal(first.guidanceVersion, '0.3.0');
   const snapshot = join(first.guidance, '..');
   assert.deepEqual((await readdir(snapshot)).sort(), ['SKILL.md', 'pin.json', 'references']);
-  await writeFile(join(f.source, 'SKILL.md'), `---\nname: ${skill}\n---\nSecond guidance\n`); const secondCommit = await f.commit();
+  await writeFile(join(f.source, 'SKILL.md'), `---\nname: ${skill}\n---\nSecond guidance\n`);
+  await writeFile(join(f.source, 'guidance/manifest.json'), JSON.stringify({ schema: 1, skill, version: '0.4.0', entry: 'SKILL.md', minimumRuntime: '0.2.0' })); const secondCommit = await f.commit();
   const second = await start(f); assert.equal(second.revision, secondCommit);
+  assert.equal(second.runtimeVersion, '0.2.0'); assert.equal(second.guidanceVersion, '0.4.0');
   await rm(f.source, { recursive: true });
   const continued = await resume({ ...f, task: first.task });
   assert.equal(continued.freshness, 'pinned'); assert.equal(continued.revision, f.first);
+  assert.equal(continued.runtimeVersion, '0.2.0'); assert.equal(continued.guidanceVersion, '0.3.0');
   assert.match(await readFile(continued.guidance, 'utf8'), /First guidance/);
   assert.equal((await resume({ ...f, task: first.task, cached: true })).freshness, 'cached-by-choice');
+});
+test('older guidance and task pins report unknown release without inventing a version', async t => {
+  const f = await fixture(t);
+  await writeFile(join(f.source, 'guidance/manifest.json'), JSON.stringify({ schema: 1, skill, entry: 'SKILL.md', minimumRuntime: '0.2.0' })); await f.commit();
+  const started = await start(f); assert.equal(started.guidanceVersion, null);
+  const pinFile = join(started.guidance, '..', 'pin.json'), pin = JSON.parse(await readFile(pinFile, 'utf8'));
+  delete pin.guidanceVersion; await chmod(pinFile, 0o600); await writeFile(pinFile, JSON.stringify(pin));
+  const upgraded = join(f.dir, 'upgraded'); await mkdir(upgraded);
+  await writeFile(join(upgraded, 'package.json'), JSON.stringify({ name: pkg.name, version: '0.3.0' }));
+  await rm(f.source, { recursive: true });
+  const continued = await resume({ ...f, runtime: upgraded, task: started.task });
+  assert.equal(continued.runtimeVersion, '0.2.0'); assert.equal(continued.guidanceVersion, null);
+  assert.equal(continued.runtime, f.runtime); assert.equal(continued.revision, started.revision);
+});
+test('malformed guidance release cannot create a task', async t => {
+  const f = await fixture(t);
+  await writeFile(join(f.source, 'guidance/manifest.json'), JSON.stringify({ schema: 1, skill, version: 'latest', entry: 'SKILL.md', minimumRuntime: '0.2.0' })); await f.commit();
+  await assert.rejects(start(f), /Invalid guidance\/runtime version/);
+  assert.deepEqual(await readdir(join(f.project, '.' + skill, 'guidance')), ['repository.git']);
 });
 test('guidance and executable changes are detected when resuming saved work', async t => {
   const f = await fixture(t), pin = await start(f);
@@ -106,6 +129,9 @@ test('refresh lock refuses concurrent updates without deleting another owner’s
 test('installed discovery entry is the small bootstrap while executable helpers stay local', async t => {
  const dir=await realpath(await mkdtemp(join(tmpdir(),'harness-bootstrap-install-')));t.after(()=>rm(dir,{recursive:true,force:true}));
  const result=await install({home:join(dir,'home'),shared:join(dir,'shared')});
+ assert.equal(result.runtimeVersion,pkg.version);
+ const version = await exec(process.execPath,[join(result.runtime,'scripts/harness-research.mjs'),'--version']);
+ assert.equal(version.stdout.trim(),`harness-research ${pkg.version}`);
  assert.equal(await readFile(join(result.runtime,'SKILL.md'),'utf8'),await readFile(new URL('../bootstrap/SKILL.md',import.meta.url),'utf8'));
  assert.notEqual(await readFile(join(result.runtime,'SKILL.md'),'utf8'),await readFile(new URL('../SKILL.md',import.meta.url),'utf8'));
  assert.match(await readFile(join(result.runtime,'scripts/sync-guidance.mjs'),'utf8'),/Refresh instructions only/);
