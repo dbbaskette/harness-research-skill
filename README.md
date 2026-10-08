@@ -17,7 +17,7 @@ You do not need to run `npm install`.
 In your terminal:
 
 ```sh
-git clone --branch v0.3.0 https://github.com/dbbaskette/harness-research-skill.git
+git clone --branch v0.8.0 https://github.com/dbbaskette/harness-research-skill.git
 cd harness-research-skill
 bash scripts/Install-Harness-Research.sh
 ```
@@ -31,19 +31,19 @@ To preview the installation before making changes, run
 
 ### Check or update your version
 
-The current release is [v0.3.0](https://github.com/dbbaskette/harness-research-skill/releases/tag/v0.3.0).
+The current release is [v0.8.0](https://github.com/dbbaskette/harness-research-skill/releases/tag/v0.8.0).
 Check the installed helper without network access or a project:
 
 ```sh
 node "$HOME/.agents/skills/harness-research/scripts/harness-research.mjs" --version
-# harness-research 0.3.0
+# harness-research 0.8.0
 ```
 
 To update an existing clone, run from its directory:
 
 ```sh
-git fetch origin tag v0.3.0
-git switch --detach v0.3.0
+git fetch origin tag v0.8.0
+git switch --detach v0.8.0
 bash scripts/Install-Harness-Research.sh
 ```
 
@@ -176,6 +176,9 @@ Existing item/field projects retain their configured output directory; the
 automatic report path above applies to the Node evidence workflow.
 Optional comparative field validation uses project-local Python/PyYAML, prepared
 only when needed. The core workflow requires only Node.js.
+
+Release ZIPs/checksums are available on the [release page](https://github.com/dbbaskette/harness-research-skill/releases/tag/v0.8.0).
+Maintainers can follow the [release procedure](docs/releases.md).
 
 ## Guidance updates
 
