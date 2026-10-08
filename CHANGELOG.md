@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.0
+
+- Align the runtime, guidance release, compatibility floor, and installation examples with Tanzu Brand and Harness Slides 0.8.0.
+- Retain saved tasks on their original guidance/runtime; new tasks use the aligned release.
+- Refresh progressive-disclosure measurements for the current package.
+
 ## 0.3.0
 
 First tagged GitHub release.

@@ -5,7 +5,7 @@ description: Research topics, compare options and fact-check claims using select
 
 # Harness Research
 
-Guidance release: **0.3.0**. On start/resume, briefly report the installed runtime
+Guidance release: **0.8.0**. On start/resume, briefly report the installed runtime
 version, guidance release/revision and freshness. For older helpers, read runtime
 `package.json` and this guidance release; never equate runtime and guidance versions.
 
