@@ -133,6 +133,22 @@ test('a kept finding whose snapshot changed is reported stale', async t => {
   assert.equal(next.status, 'stale'); assert.deepEqual(next.staleItems, ['availability']);
 });
 
+test('a finding may carry a one-line headline, shown as its answer', async t => {
+  const root = await fixture(t);
+  const first = await planResearch(root, plan());
+  const saved = async () => JSON.parse(await readFile(join(root, '.harness-research', 'research.json'), 'utf8'));
+  await recordResearch(root, first.run, 'availability', { ...finding(), headline: '  Feature A ships in version 2. ' });
+  assert.equal((await saved()).results.availability.headline, 'Feature A ships in version 2.');
+  assert.match(await report(root), /Answer: Feature A ships in version 2\.\n\nThe feature is available in version 2\./);
+  const open = { status: 'insufficient', summary: 'No benchmark.', limits: 'Open.', evidence: [] };
+  await recordResearch(root, first.run, 'performance', open);
+  assert.equal(Object.hasOwn((await saved()).results.performance, 'headline'), false);
+  for (const headline of ['', '   ', 'Two\nlines', 'x'.repeat(301), 7]) {
+    await assert.rejects(recordResearch(root, first.run, 'performance', { ...open, summary: 'Changed.', headline }), /Headline requires one nonempty line/);
+  }
+  assert.equal((await saved()).results.performance.summary, 'No benchmark.');
+});
+
 test('changed content or evidence is stale and cannot silently be counted as current', async t => {
   const root = await fixture(t);
   const initial = await planResearch(root, plan());
