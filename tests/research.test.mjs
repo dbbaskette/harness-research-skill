@@ -55,6 +55,66 @@ test('matching plans resume findings and changes retain history with a new run',
   await assert.rejects(recordResearch(root, first.run, 'availability', finding()), /run or content changed/);
 });
 
+const pricing = () => ({ id: 'pricing', question: 'Check published pricing', public_query: 'public pricing page', claim: null });
+
+test('a changed plan keeps the findings of questions that did not change', async t => {
+  const root = await fixture(t);
+  const first = await planResearch(root, plan());
+  assert.deepEqual(first.carried, []);
+  await recordResearch(root, first.run, 'availability', finding());
+  const added = plan(); added.items.push(pricing());
+  const next = await planResearch(root, added);
+  assert.notEqual(next.run, first.run);
+  assert.equal(next.completed, 1); assert.equal(next.total, 3);
+  assert.deepEqual(next.carried, ['availability']);
+  assert.deepEqual(next.pending, ['performance', 'pricing']);
+  assert.match(await report(root), /https:\/\/example.invalid\/release/);
+  assert.ok((await readdir(join(root, '.harness-research', 'history'))).some(name => name.endsWith('.json')));
+  const recorded = await recordResearch(root, next.run, 'pricing', { status: 'insufficient', summary: 'No public price.', limits: 'Pricing is quoted privately.', evidence: [] });
+  assert.equal(recorded.completed, 2);
+});
+
+test('a reworded or removed question loses its finding and the rest keep theirs', async t => {
+  const root = await fixture(t);
+  const first = await planResearch(root, plan());
+  await recordResearch(root, first.run, 'availability', finding());
+  await recordResearch(root, first.run, 'performance', { status: 'insufficient', summary: 'No benchmark.', limits: 'Open.', evidence: [] });
+  const reworded = plan(); reworded.items[1].question = 'Check published benchmark methods';
+  const next = await planResearch(root, reworded);
+  assert.deepEqual(next.carried, ['availability']); assert.deepEqual(next.pending, ['performance']);
+  const fewer = plan(); fewer.items = fewer.items.slice(0, 1);
+  const last = await planResearch(root, fewer);
+  assert.deepEqual(last.carried, ['availability']);
+  assert.equal(last.total, 1); assert.equal(last.completed, 1);
+});
+
+test('a changed topic, input or scope keeps no finding', async t => {
+  const changes = [
+    changed => { changed.topic = 'Another topic'; },
+    changed => { changed.input_files = []; },
+    changed => { changed.scope = 'supplied-only'; changed.items.forEach(item => { item.public_query = null; }); },
+  ];
+  for (const change of changes) {
+    const root = await fixture(t);
+    const first = await planResearch(root, plan());
+    await recordResearch(root, first.run, 'availability', finding());
+    const changed = plan(); change(changed);
+    const next = await planResearch(root, changed);
+    assert.equal(next.completed, 0); assert.deepEqual(next.carried, []);
+  }
+});
+
+test('a kept finding whose snapshot changed is reported stale', async t => {
+  const root = await fixture(t);
+  const first = await planResearch(root, plan());
+  await recordResearch(root, first.run, 'availability', finding());
+  await writeFile(join(root, 'sources', 'release.md'), 'Feature A was removed in version 3.');
+  const added = plan(); added.items.push(pricing());
+  const next = await planResearch(root, added);
+  assert.deepEqual(next.carried, ['availability']);
+  assert.equal(next.status, 'stale'); assert.deepEqual(next.staleItems, ['availability']);
+});
+
 test('changed content or evidence is stale and cannot silently be counted as current', async t => {
   const root = await fixture(t);
   const initial = await planResearch(root, plan());

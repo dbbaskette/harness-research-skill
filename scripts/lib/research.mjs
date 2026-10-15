@@ -140,6 +140,21 @@ async function save(locations, value) {
   return status;
 }
 
+// The saved findings a changed plan keeps: those of questions defined exactly as before,
+// when the topic, purpose, scope, selected sources and pinned inputs are all unchanged.
+function keptResults(old, plan, pin) {
+  const same = ['topic', 'purpose', 'scope'].every(key => old[key] === plan[key])
+    && stable(old.sources ?? null) === stable(plan.sources ?? null)
+    && stable(old.inputs) === stable(pin);
+  if (!same) return {};
+  const before = new Map(old.items.map(item => [item.id, stable(item)]));
+  const kept = {};
+  for (const item of plan.items) {
+    if (before.get(item.id) === stable(item) && Object.hasOwn(old.results, item.id)) kept[item.id] = old.results[item.id];
+  }
+  return kept;
+}
+
 async function planUnlocked(project, supplied, { allowWeb = false } = {}) {
   const locations = await paths(project);
   if (!await exists(locations.file) && await exists(join(locations.root, '.tanzu-research'))) throw new Error('Older Brand research exists; run migrate before starting a new plan.');
@@ -168,13 +183,16 @@ async function planUnlocked(project, supplied, { allowWeb = false } = {}) {
   const plan = { topic: supplied.topic, purpose: supplied.purpose, scope: supplied.scope, input_files: [...files].sort(), ...(sources === undefined ? {} : { sources }), items: supplied.items };
   const pin = await inputs(locations.root, plan.input_files);
   const run = digest(stable([plan, pin])).slice(0, 24);
+  let kept = {};
   if (await exists(locations.file)) {
     const old = await readState(locations.file);
     if (old.scope === 'supplied-only' && plan.scope === 'public-web' && !allowWeb) throw new Error('Supplied-only research requires explicit permission before changing to public-web scope.');
-    if (old.run === run) return statusUnlocked(project);
+    if (old.run === run) return { ...(await statusUnlocked(project)), carried: [] };
+    kept = keptResults(old, plan, pin);
   }
   await paths(project, true);
-  return save(locations, { schema: 1, owner: 'harness-research', run, ...plan, inputs: pin, results: {}, created_at: new Date().toISOString() });
+  const status = await save(locations, { schema: 1, owner: 'harness-research', run, ...plan, inputs: pin, results: kept, created_at: new Date().toISOString() });
+  return { ...status, carried: plan.items.map(item => item.id).filter(id => Object.hasOwn(kept, id)) };
 }
 async function recordUnlocked(project, run, id, supplied) {
   const locations = await paths(project);
