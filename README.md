@@ -233,21 +233,21 @@ representative guidance-start response. Bootstrap activation is shown separately
 | Installed bootstrap | 448 |
 | Bootstrap + current guidance entry | 1,059 |
 | Explicit chat-only cited answer | 2,013 |
-| Focused research with saved report | 3,198 |
+| Focused research with saved report | 3,204 |
 | Status / resume without new findings | 1,476 |
 | Comparative routing only | 1,766 |
 | Codex comparative outline | 2,726 |
 | Codex add items | 1,931 |
 | Codex add fields | 1,951 |
 | Codex deep results | 2,614 |
-| Codex deep results + saved evidence | 3,799 |
+| Codex deep results + saved evidence | 3,805 |
 | Claude comparative outline | 2,743 |
 | Claude deep results | 2,636 |
-| Saved research + general web strategy | 3,695 |
-| Saved research + academic strategy | 3,787 |
-| Saved research + GitHub strategy | 3,582 |
-| Saved research + technical Q&A strategy | 3,487 |
-| Saved research + Chinese sources strategy | 3,712 |
+| Saved research + general web strategy | 3,701 |
+| Saved research + academic strategy | 3,793 |
+| Saved research + GitHub strategy | 3,588 |
+| Saved research + technical Q&A strategy | 3,493 |
+| Saved research + Chinese sources strategy | 3,718 |
 | Legacy migration | 1,408 |
 
 Comparative rows include the selected platform resource, not the complete bundle.

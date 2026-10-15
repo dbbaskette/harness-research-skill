@@ -43,8 +43,8 @@ unchanged; `plan` lists them in `carried`. Anything else starts with no findings
 Record each assessed finding as work proceeds; do not leave results only in the
 conversation or wait for downstream authoring. Save each finding with `node scripts/harness-research.mjs record --project DIR --run RUN --item ID
 --file finding.json`. A finding contains `status` (supported, contradicted,
-insufficient, unavailable), an optional one-line `headline` giving the answer,
-`summary`, `limits`, and `evidence`. Each evidence
+insufficient, unavailable), an optional one-line `headline` giving the answer
+(omit it if none), `summary`, `limits`, and `evidence`. Each evidence
 entry gives `file` (project-relative inspected snapshot), `title`, `origin`
 (original URL or supplied-file identity), `quote`, `start`, `locator`, and
 optional `source_date` and `source_id` for a selected reference. The helper binds

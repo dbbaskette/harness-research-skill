@@ -237,6 +237,7 @@ test('question IDs matching object properties start pending and the packaged CLI
   const file = join(root, 'plan.json'); await writeFile(file, JSON.stringify(supplied));
   const { stdout } = await exec(process.execPath, [join(sourceRoot, 'scripts/harness-research.mjs'), 'plan', '--project', root, '--file', file]);
   assert.deepEqual(JSON.parse(stdout).pending, ['constructor']);
+  assert.deepEqual(JSON.parse(stdout).carried, []);
   await access(join(root, '.harness-research/research-report.md'));
   const status = await exec(process.execPath, [join(sourceRoot, 'scripts/harness-research.mjs'), 'status', '--project', root]);
   assert.equal(JSON.parse(status.stdout).status, 'in-progress');
