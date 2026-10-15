@@ -110,6 +110,7 @@ function render(value, status) {
     lines.push(`## ${item.id}`, '', literal(item.question), '', `Status: ${finding?.status ?? 'pending'}.`, '');
     if (item.claim) lines.push(`Claim in ${literal(item.claim.file)} at character ${item.claim.start}:`, `> ${literal(item.claim.quote).replace(/\n/g, '\n> ')}`, '');
     if (!finding) continue;
+    if (finding.headline) lines.push(`Answer: ${literal(finding.headline)}`, '');
     lines.push(literal(finding.summary), '', `Limits/open questions: ${literal(finding.limits)}`, `Checked: ${finding.checked_at}`, '');
     for (const source of finding.evidence) {
       if (source.source_id) lines.push(`Supplied document: ${literal(source.source_id)}; original revision SHA256: ${source.original_sha256 ?? source.sha256}`, '');
@@ -140,6 +141,21 @@ async function save(locations, value) {
   return status;
 }
 
+// The saved findings a changed plan keeps: those of questions defined exactly as before,
+// when the topic, purpose, scope, selected sources and pinned inputs are all unchanged.
+function keptResults(old, plan, pin) {
+  const same = ['topic', 'purpose', 'scope'].every(key => old[key] === plan[key])
+    && stable(old.sources ?? null) === stable(plan.sources ?? null)
+    && stable(old.inputs) === stable(pin);
+  if (!same) return {};
+  const before = new Map(old.items.map(item => [item.id, stable(item)]));
+  const kept = {};
+  for (const item of plan.items) {
+    if (before.get(item.id) === stable(item) && Object.hasOwn(old.results, item.id)) kept[item.id] = old.results[item.id];
+  }
+  return kept;
+}
+
 async function planUnlocked(project, supplied, { allowWeb = false } = {}) {
   const locations = await paths(project);
   if (!await exists(locations.file) && await exists(join(locations.root, '.tanzu-research'))) throw new Error('Older Brand research exists; run migrate before starting a new plan.');
@@ -168,13 +184,16 @@ async function planUnlocked(project, supplied, { allowWeb = false } = {}) {
   const plan = { topic: supplied.topic, purpose: supplied.purpose, scope: supplied.scope, input_files: [...files].sort(), ...(sources === undefined ? {} : { sources }), items: supplied.items };
   const pin = await inputs(locations.root, plan.input_files);
   const run = digest(stable([plan, pin])).slice(0, 24);
+  let kept = {};
   if (await exists(locations.file)) {
     const old = await readState(locations.file);
     if (old.scope === 'supplied-only' && plan.scope === 'public-web' && !allowWeb) throw new Error('Supplied-only research requires explicit permission before changing to public-web scope.');
-    if (old.run === run) return statusUnlocked(project);
+    if (old.run === run) return { ...(await statusUnlocked(project)), carried: [] };
+    kept = keptResults(old, plan, pin);
   }
   await paths(project, true);
-  return save(locations, { schema: 1, owner: 'harness-research', run, ...plan, inputs: pin, results: {}, created_at: new Date().toISOString() });
+  const status = await save(locations, { schema: 1, owner: 'harness-research', run, ...plan, inputs: pin, results: kept, created_at: new Date().toISOString() });
+  return { ...status, carried: plan.items.map(item => item.id).filter(id => Object.hasOwn(kept, id)) };
 }
 async function recordUnlocked(project, run, id, supplied) {
   const locations = await paths(project);
@@ -183,6 +202,7 @@ async function recordUnlocked(project, run, id, supplied) {
   if (!value.items.some(item => item.id === id)) throw new Error('Unknown research question.');
   if (!verdicts.includes(supplied.status) || !Array.isArray(supplied.evidence) || supplied.evidence.length > 20) throw new Error('Result requires a supported/contradicted/insufficient/unavailable status and up to 20 evidence passages.');
   text(supplied.summary, 'Summary', 12000); text(supplied.limits, 'Coverage limits');
+  if (supplied.headline !== undefined && (typeof supplied.headline !== 'string' || !supplied.headline.trim() || supplied.headline.length > 300 || /[\r\n]/.test(supplied.headline))) throw new Error('Headline requires one nonempty line (maximum 300 characters).');
   const evidence = [];
   for (const source of supplied.evidence) {
     text(source.title, 'Source title'); text(source.origin, 'Source origin'); text(source.locator, 'Source location'); text(source.quote, 'Evidence quote', 12000);
@@ -195,7 +215,7 @@ async function recordUnlocked(project, run, id, supplied) {
     evidence.push({ ...source, ...(selected ? { source_id: selected.id, title: selected.title, origin: selected.origin, original_sha256: value.inputs[selected.original_file ?? selected.file] } : {}), sha256: digest(bytes) });
   }
   if (['supported', 'contradicted'].includes(supplied.status) && !evidence.length) throw new Error('Supported or contradicted findings require an inspected source passage.');
-  value.results[id] = { status: supplied.status, summary: supplied.summary, limits: supplied.limits, evidence, checked_at: new Date().toISOString() };
+  value.results[id] = { status: supplied.status, ...(supplied.headline !== undefined ? { headline: supplied.headline.trim() } : {}), summary: supplied.summary, limits: supplied.limits, evidence, checked_at: new Date().toISOString() };
   return save(locations, value);
 }
 async function statusUnlocked(project) {

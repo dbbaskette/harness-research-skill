@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.1
+
+- A changed plan keeps the findings of questions whose definition is unchanged, when the topic, purpose, scope, selected sources and input files are unchanged. `plan` reports them in `carried`.
+- A finding may carry an optional one-line `headline`, kept in the record and shown as `Answer:` in the report.
+- Guidance names both; its minimum runtime is now 0.8.1. Tanzu Brand and Harness Slides remain at 0.8.0.
+
 ## 0.8.0
 
 - Align the runtime, guidance release, compatibility floor, and installation examples with Tanzu Brand and Harness Slides 0.8.0.

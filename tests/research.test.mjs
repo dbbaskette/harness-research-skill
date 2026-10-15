@@ -55,6 +55,103 @@ test('matching plans resume findings and changes retain history with a new run',
   await assert.rejects(recordResearch(root, first.run, 'availability', finding()), /run or content changed/);
 });
 
+const pricing = () => ({ id: 'pricing', question: 'Check published pricing', public_query: 'public pricing page', claim: null });
+
+test('a changed plan keeps the findings of questions that did not change', async t => {
+  const root = await fixture(t);
+  const first = await planResearch(root, plan());
+  assert.deepEqual(first.carried, []);
+  await recordResearch(root, first.run, 'availability', finding());
+  assert.deepEqual((await planResearch(root, plan())).carried, []);
+  const archived = async () => (await readdir(join(root, '.harness-research', 'history'))).filter(name => name.endsWith('.json')).length;
+  const before = await archived();
+  const added = plan(); added.items.push(pricing());
+  const next = await planResearch(root, added);
+  assert.notEqual(next.run, first.run);
+  assert.equal(next.completed, 1); assert.equal(next.total, 3);
+  assert.deepEqual(next.carried, ['availability']);
+  assert.deepEqual(next.pending, ['performance', 'pricing']);
+  assert.match(await report(root), /https:\/\/example.invalid\/release/);
+  assert.ok(await archived() > before);
+  const recorded = await recordResearch(root, next.run, 'pricing', { status: 'insufficient', summary: 'No public price.', limits: 'Pricing is quoted privately.', evidence: [] });
+  assert.equal(recorded.completed, 2);
+});
+
+test('a reworded or removed question loses its finding and the rest keep theirs', async t => {
+  const root = await fixture(t);
+  const first = await planResearch(root, plan());
+  await recordResearch(root, first.run, 'availability', finding());
+  await recordResearch(root, first.run, 'performance', { status: 'insufficient', summary: 'No benchmark.', limits: 'Open.', evidence: [] });
+  const reworded = plan(); reworded.items[1].question = 'Check published benchmark methods';
+  const next = await planResearch(root, reworded);
+  assert.deepEqual(next.carried, ['availability']); assert.deepEqual(next.pending, ['performance']);
+  await recordResearch(root, next.run, 'performance', { status: 'insufficient', summary: 'Still no benchmark.', limits: 'Open.', evidence: [] });
+  const fewer = plan(); fewer.items = fewer.items.slice(0, 1);
+  const last = await planResearch(root, fewer);
+  assert.deepEqual(last.carried, ['availability']);
+  assert.equal(last.total, 1); assert.equal(last.completed, 1);
+});
+
+test('a changed topic, purpose, scope, selected sources or input keeps no finding', async t => {
+  const local = () => { const base = plan(); base.items.forEach(item => { item.public_query = null; }); return base; };
+  const claimed = () => { const base = plan(); base.items.forEach(item => { item.claim = { file: 'brief.md', quote: 'Synthetic public product research.', start: 0 }; }); return base; };
+  const selected = source => uploadedPlan(source, 'public-web');
+  const changes = [
+    [plan, changed => { changed.topic = 'Another topic'; }],
+    [plan, changed => { changed.input_files = []; }],
+    [local, changed => { changed.scope = 'supplied-only'; }],
+    [claimed, changed => { changed.purpose = 'fact-check'; }],
+    [selected, changed => { changed.sources = [{ ...changed.sources[0], title: 'Renamed technical brief' }]; }],
+  ];
+  for (const [base, change] of changes) {
+    const root = await fixture(t); const source = await uploadFixture(root);
+    const first = await planResearch(root, base(source));
+    await recordResearch(root, first.run, 'availability', finding());
+    const changed = base(source); change(changed);
+    const next = await planResearch(root, changed);
+    assert.notEqual(next.run, first.run); assert.equal(next.completed, 0); assert.deepEqual(next.carried, []);
+  }
+});
+
+test('unchanged selected sources keep a finding when a question is added', async t => {
+  const root = await fixture(t); const source = await uploadFixture(root);
+  const first = await planResearch(root, uploadedPlan(source));
+  await recordResearch(root, first.run, 'availability', uploadFinding());
+  const added = uploadedPlan(source); added.items.push({ ...pricing(), public_query: null });
+  const next = await planResearch(root, added);
+  assert.deepEqual(next.carried, ['availability']); assert.equal(next.status, 'in-progress'); assert.deepEqual(next.pending, ['pricing']);
+});
+
+test('a kept finding whose snapshot changed is reported stale', async t => {
+  const root = await fixture(t);
+  const first = await planResearch(root, plan());
+  await recordResearch(root, first.run, 'availability', finding());
+  await writeFile(join(root, 'sources', 'release.md'), 'Feature A was removed in version 3.');
+  const added = plan(); added.items.push(pricing());
+  const next = await planResearch(root, added);
+  assert.deepEqual(next.carried, ['availability']);
+  assert.equal(next.status, 'stale'); assert.deepEqual(next.staleItems, ['availability']);
+});
+
+test('a finding may carry a one-line headline, shown as its answer', async t => {
+  const root = await fixture(t);
+  const first = await planResearch(root, plan());
+  const saved = async () => JSON.parse(await readFile(join(root, '.harness-research', 'research.json'), 'utf8'));
+  await recordResearch(root, first.run, 'availability', { ...finding(), headline: '  Feature A ships in *version 2*. ' });
+  assert.equal((await saved()).results.availability.headline, 'Feature A ships in *version 2*.');
+  assert.match(await report(root), /Answer: Feature A ships in \\\*version 2\\\*\.\n\nThe feature is available in version 2\./);
+  const open = { status: 'insufficient', summary: 'No benchmark.', limits: 'Open.', evidence: [] };
+  await recordResearch(root, first.run, 'performance', open);
+  assert.equal(Object.hasOwn((await saved()).results.performance, 'headline'), false);
+  assert.equal((await report(root)).match(/^Answer: /gm).length, 1);
+  for (const headline of ['', '   ', 'Two\nlines', 'Two\rlines', 'x'.repeat(301), 7, null]) {
+    await assert.rejects(recordResearch(root, first.run, 'performance', { ...open, summary: 'Changed.', headline }), /Headline requires one nonempty line/);
+  }
+  assert.equal((await saved()).results.performance.summary, 'No benchmark.');
+  await recordResearch(root, first.run, 'performance', { ...open, headline: 'x'.repeat(300) });
+  assert.equal((await saved()).results.performance.headline.length, 300);
+});
+
 test('changed content or evidence is stale and cannot silently be counted as current', async t => {
   const root = await fixture(t);
   const initial = await planResearch(root, plan());
@@ -140,6 +237,7 @@ test('question IDs matching object properties start pending and the packaged CLI
   const file = join(root, 'plan.json'); await writeFile(file, JSON.stringify(supplied));
   const { stdout } = await exec(process.execPath, [join(sourceRoot, 'scripts/harness-research.mjs'), 'plan', '--project', root, '--file', file]);
   assert.deepEqual(JSON.parse(stdout).pending, ['constructor']);
+  assert.deepEqual(JSON.parse(stdout).carried, []);
   await access(join(root, '.harness-research/research-report.md'));
   const status = await exec(process.execPath, [join(sourceRoot, 'scripts/harness-research.mjs'), 'status', '--project', root]);
   assert.equal(JSON.parse(status.stdout).status, 'in-progress');
