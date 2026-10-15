@@ -36,10 +36,15 @@ Google UTF-16 indexes or slide coordinates. These claims remain local. Supplied-
 plans have null public queries. Changing a saved supplied-only plan to public-web
 needs explicit user approval, represented by the helper's `--allow-web` flag.
 
+Changing a saved plan starts a new run. Questions whose definition is unchanged keep
+their findings when the topic, purpose, scope, selected sources and input files are
+unchanged; `plan` lists them in `carried`. Anything else starts with no findings.
+
 Record each assessed finding as work proceeds; do not leave results only in the
 conversation or wait for downstream authoring. Save each finding with `node scripts/harness-research.mjs record --project DIR --run RUN --item ID
 --file finding.json`. A finding contains `status` (supported, contradicted,
-insufficient, unavailable), `summary`, `limits`, and `evidence`. Each evidence
+insufficient, unavailable), an optional one-line `headline` giving the answer,
+`summary`, `limits`, and `evidence`. Each evidence
 entry gives `file` (project-relative inspected snapshot), `title`, `origin`
 (original URL or supplied-file identity), `quote`, `start`, `locator`, and
 optional `source_date` and `source_id` for a selected reference. The helper binds
