@@ -227,8 +227,8 @@ The issue automates the middle step. The two ends, which decide how good the rep
 stay as they are.
 
 1. **The questions decide the report, and nobody checks them.** `research` starts from a
-   saved plan. A plan of broad questions gives broad answers. The one standalone report on
-   this computer (Valkey vs Redis, 8 October) had nine questions such as "What are in-memory
+   saved plan. A plan of broad questions gives broad answers. The one standalone report I
+   could find on this computer (Valkey vs Redis, 8 October) had nine questions such as "What are in-memory
    data structures and their customer use cases?"
 2. **The report is a ledger, not a report.** It lists each question with its verdict,
    summary, limits and quotes. There is no overall answer, no reading across questions, no
@@ -240,8 +240,9 @@ stay as they are.
    was "supported" by one passage. The first summary claims caches, sessions, counters and
    rankings; its only passage is "Valkey is a data structure server." Parallel workers
    produce more of this faster unless something checks support (decision 2).
-4. **The verdicts suit claims, not questions.** Seven of the nine Valkey questions were
-   explanations, so "supported" said nothing about how well they were answered (decision 3).
+4. **The verdicts suit claims, not questions.** All nine Valkey questions were open
+   questions, not claims, so "supported" said nothing about how well each was answered
+   (decision 3).
 5. **Workers do not see each other.** Each question is researched alone. The same pages are
    fetched several times, terms drift between findings, and a contradiction between two
    questions is never noticed. Only a synthesis step sees across them (decision 1).
