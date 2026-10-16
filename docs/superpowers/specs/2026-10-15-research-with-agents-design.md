@@ -348,6 +348,29 @@ its gates (with `--plan-only`), and what the facts feed.
   narrow topic from given documents alone. Timed and costed, with the reports read by a person
   and a sample of facts checked by hand against their sources.
 
+## Acceptance: better than today, measured
+
+Before release, the same three requests are run with today's skill (0.8.1) and with this
+design, in Claude Code, and the results compared:
+
+1. A broad topic: "a report on LLMs".
+2. A comparison with given sources: "Redis vs Valkey", with two PDFs and two links.
+3. A fact-check: the claims in an existing deck.
+
+For each run, record the time, the cost, the number of facts (or findings), the sources
+used, and the questions left unanswered. Then a person checks a random sample of 30 facts
+from each run against their sources: is the quote in the source, and does it say what the
+fact says?
+
+The design is ready to release when, on all three requests:
+
+- Every sampled quote is in its source.
+- At least 9 in 10 sampled facts say no more than their quotes.
+- Every section of the outline has facts or a stated gap.
+- The new run is judged more useful as a reference by the person reading both.
+
+Time and cost are recorded, not limited; they decide the default depth.
+
 ## Release and adoption
 
 - harness-research 0.9.0, a runtime change: `minimumRuntime` moves to 0.9.0 and Brand's pin
