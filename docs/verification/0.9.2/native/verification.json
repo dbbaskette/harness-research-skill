@@ -1,0 +1,61 @@
+{
+  "source_commit": "b6156d81669400cb50738c800cbd4350a4d1e8a9",
+  "source_tree": "6275b59ac90a7b4654fbb294bfe304adce443651",
+  "source_was_clean": true,
+  "gate": "host npm test in a clean worktree (not the Tart VM gate)",
+  "environment": {
+    "os": "macOS 27.0.1",
+    "node": "v22.23.1",
+    "npm": "10.9.8",
+    "python": "3.14.5 without PyYAML"
+  },
+  "tests": {
+    "total": 117,
+    "passed": 116,
+    "failed": 0,
+    "skipped": 1
+  },
+  "audit": "0 vulnerabilities",
+  "context": "passed",
+  "installer": "passed",
+  "installed_version": "harness-research 0.9.2 (all three discovery links)",
+  "installed_command_checks": {
+    "passed": 45,
+    "failed": 0,
+    "driver": "../0.9.1/installed/drive.mjs"
+  },
+  "installed_fix_checks": {
+    "passed": 9,
+    "failed": 0,
+    "driver": "installed/fixes-check.mjs"
+  },
+  "guidance_fallback": "older-compatible-release with notice; v0.9.2 pinned; control current-at-start",
+  "live": "one fresh Codex run: complete, research/report.md returned, nothing written outside research/; plain missing-folder message seen",
+  "log_sha256": {
+    "audit.log": "6d8c5c8f3d7684adb070417bd608d01ae90aa3dc26a65af03ffda4955f38d9a3",
+    "context.log": "d589e4fe5f93939476044f1ea31bf0ec9d8dc113d3eed37947a13708e1dcc08b",
+    "environment.txt": "d3997bccfadf3929d7a4b7a2fb251fb6372b2a1fbf49745c2b68504de5a8deb4",
+    "result.txt": "c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431",
+    "tests.log": "04ab01d13bc1b850eda43ee424dd28c78529478a33a9e81e6df951ebf22ea975"
+  },
+  "installed_sha256": {
+    "checks.json": "e1f9f4103e2a49bb2d6cc1f23b404337dc12e7a9dc415801ad9c0b446935fa8d",
+    "cleanup.log": "440ee13fc55e3b40ce35cba6cc6e630302113e65b1d572c8c638694bd0c8b6cc",
+    "fixes-check.mjs": "270efdf0c41c6c31860243d2afb306a4aac5de07a01ddb31c828bb3eb014afd5",
+    "fixes-checks.json": "032381373a4c8ce5197126218c94966176b1cb3d743c9bd8626832f80b5b71e2",
+    "fixes-transcript.jsonl": "ff9f2416a75c0af48ba7fe2574022f01cde920548f95a4521ee3dc588c1a8289",
+    "installed-research-help.log": "a546daea063d0d28b14249f5da24bbc702215d1dd3c0d1f7bb5141a7cf64d891",
+    "installed-version.log": "42d3d4224817862b40c2ac467d7f64ba39b8e3e4a48d18a23a08f25e15a3068d",
+    "installer.log": "7b5d0efb2883fc7fdd4653cddee03e97d1e3d3deb280b072007003cd2e050fcf",
+    "result.txt": "048cfd39b0fb9b89589c8382019ca2b236bca3bf2435cf9a476fc8f9b1b7d148",
+    "transcript.jsonl": "5dabaf6870c7c5dd31387dc5faf2ef2f9e07d4445c1a67a262a91b69e35ea8a1"
+  },
+  "guidance_fallback_sha256": {
+    "pinned-guidance.txt": "1b5f2879e951d30d82d878326add73ff043003c6db1ed4856e121b1abf2f2afe",
+    "repository.txt": "0856d2be14c8f4580934825babda74d57188bffc3834f4b72c219921b0717692",
+    "start-with-newer-release.json": "973fd08018ab697c401a50cf005a84a3e6f6e3a679c455e7e155ed317cb7bf24",
+    "start-without-newer-release.json": "36089646c3d4f1aa9480b5718b89671490a397ff8c4af813f6e78769659dc070",
+    "sync-check.sh": "37b5fa2db251c4b117c038a1951370c88ad6bf5467d69dfea54eb4affd4aaa19"
+  },
+  "not_run": "npm run ci:local (Tart VM); the Python-gated test was skipped (no PyYAML in the session sandbox)."
+}

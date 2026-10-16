@@ -8,7 +8,9 @@ const regular = async path => { const info = await exists(path); return info?.is
 // Reuse reads the portable research/ folder: its committed manifest, facts.json and pinned source
 // text. Another project's private .harness-research queue is never needed.
 export async function readOrigin(root, supplied) {
-  const base = await realpath(isAbsolute(supplied) ? supplied : resolve(root, supplied)).catch(() => { throw new Error(`No saved research at ${supplied}.`); });
+  // A relative --from is read against --project, like every other file argument; say so when it finds nothing.
+  const lookedIn = isAbsolute(supplied) ? supplied : resolve(root, supplied);
+  const base = await realpath(lookedIn).catch(() => { throw new Error(`No saved research at ${supplied}${isAbsolute(supplied) ? '' : ` (looked in ${lookedIn}; a relative --from is read relative to --project)`}.`); });
   let folder = base, owner = dirname(base);
   if (await regular(join(base, 'research', 'output.json'))) { folder = join(base, 'research'); owner = base; }
   else if (!await regular(join(base, 'output.json'))) throw new Error(`No saved research at ${supplied}: expected research/output.json.`);

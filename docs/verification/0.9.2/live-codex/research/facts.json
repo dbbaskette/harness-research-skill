@@ -1,0 +1,3266 @@
+{
+  "schema": 1,
+  "run": "76c693a80fa045c6a7e090cf",
+  "output_revision": 29,
+  "runtime_version": "0.9.2",
+  "guidance_version": "0.9.2",
+  "guidance_revision": null,
+  "guidance_task": null,
+  "title": "SQLite WAL: an application team's enablement decision",
+  "topic": "SQLite WAL mode for an application team deciding whether to enable it: reader/writer interaction, checkpoints, durability, limitations and practical decision guidance; focused, sqlite.org documentation first",
+  "about": "",
+  "depth": "light",
+  "source_mode": "public-web",
+  "scope": "Focused public-documentation research for an application team: explain WAL mechanics and reader/writer interaction, checkpoint policy and operations, durability settings, deployment limitations, safe enablement and version caveats. Prefer sqlite.org primary documentation; no workload benchmark or application-specific validation. Assumed local-host file-backed database. Eight questions across four sections keep this narrow request focused.",
+  "status": "complete",
+  "created_at": "2026-10-16T17:51:28.261Z",
+  "updated_at": "2026-10-16T17:56:54.893Z",
+  "prose_review": "not independently reviewed at light depth",
+  "sections": [
+    {
+      "id": "concurrency",
+      "name": "How WAL changes reader and writer interaction"
+    },
+    {
+      "id": "checkpoints",
+      "name": "Checkpoints and WAL growth"
+    },
+    {
+      "id": "durability",
+      "name": "Durability and recovery"
+    },
+    {
+      "id": "deployment",
+      "name": "Enablement decision and limitations"
+    }
+  ],
+  "subjects": [],
+  "questions": [
+    {
+      "id": "mechanics",
+      "question": "How does a WAL commit work, what snapshot do readers see, and how many writers can run?",
+      "section": "concurrency",
+      "subject": null,
+      "kind": "open",
+      "round": 1,
+      "coverage": "answered",
+      "gaps": [],
+      "assessment": {
+        "by": "/root/checker_a",
+        "at": "2026-10-16T17:54:06.661Z"
+      },
+      "verdict": null,
+      "headline": {
+        "sentence": "WAL gives readers stable snapshots alongside a writer; writes still serialize.",
+        "facts": [
+          "fact-4aa91348147e499694c7c71eba6d0839",
+          "fact-1006ab1b3eb046bd82312efb19c5f732"
+        ]
+      },
+      "answer": [
+        {
+          "sentence": "SQLite appends changed pages and a commit record to the WAL, allowing a commit without first copying those changes into the main database file.",
+          "facts": [
+            "fact-de3643a0e3cb42cf8ff03dbb6f25a654"
+          ],
+          "paragraph": 1
+        },
+        {
+          "sentence": "Each read transaction keeps its own commit end mark: it reads the latest eligible page from the WAL, or falls back to the main database, so later commits do not change its snapshot.",
+          "facts": [
+            "fact-4aa91348147e499694c7c71eba6d0839",
+            "fact-1139b327046b48c2a32dc776a5a1397b"
+          ],
+          "paragraph": 1
+        },
+        {
+          "sentence": "Readers and a writer can run together, but only one writer can hold the database's write transaction at a time.",
+          "facts": [
+            "fact-1006ab1b3eb046bd82312efb19c5f732"
+          ],
+          "paragraph": 1
+        }
+      ],
+      "facts": [
+        "fact-4aa91348147e499694c7c71eba6d0839",
+        "fact-1139b327046b48c2a32dc776a5a1397b",
+        "fact-1006ab1b3eb046bd82312efb19c5f732",
+        "fact-de3643a0e3cb42cf8ff03dbb6f25a654"
+      ]
+    },
+    {
+      "id": "contention",
+      "question": "Which contention and stale-snapshot cases remain, and what transaction practices follow?",
+      "section": "concurrency",
+      "subject": null,
+      "kind": "open",
+      "round": 1,
+      "coverage": "answered",
+      "gaps": [],
+      "assessment": {
+        "by": "/root/checker_a",
+        "at": "2026-10-16T17:54:06.661Z"
+      },
+      "verdict": null,
+      "headline": {
+        "sentence": "Handle lock contention and restart stale read-to-write transactions.",
+        "facts": [
+          "fact-fe3aeb5b61b440ba86a8e63def835b0c",
+          "fact-43180b3e4ea04b738edb40756af9d65b"
+        ]
+      },
+      "answer": [
+        {
+          "sentence": "A transaction that reads an old snapshot and later tries to write can receive SQLITE_BUSY_SNAPSHOT; it must release that snapshot and begin a new transaction.",
+          "facts": [
+            "fact-43180b3e4ea04b738edb40756af9d65b"
+          ],
+          "paragraph": 1
+        },
+        {
+          "sentence": "BEGIN IMMEDIATE acquires the write transaction up front for read-then-write work, preventing competing writers from invalidating that transaction's snapshot; it can itself return SQLITE_BUSY if another writer is active.",
+          "facts": [
+            "fact-9a663a901c1748e19b1d9640459ef4fc",
+            "fact-17b74af582864435adaabe05e9586ff8"
+          ],
+          "paragraph": 1
+        },
+        {
+          "sentence": "Queries can also return SQLITE_BUSY during exclusive locking, last-connection cleanup, or crash recovery.",
+          "facts": [
+            "fact-fe3aeb5b61b440ba86a8e63def835b0c"
+          ],
+          "paragraph": 1
+        },
+        {
+          "sentence": "Implicit transactions finish when their last active statement finishes; resetting or finalizing statements guarantees completion.",
+          "facts": [
+            "fact-682d75b73c164687a076ad0d89200200"
+          ],
+          "paragraph": 1
+        }
+      ],
+      "facts": [
+        "fact-fe3aeb5b61b440ba86a8e63def835b0c",
+        "fact-43180b3e4ea04b738edb40756af9d65b",
+        "fact-9a663a901c1748e19b1d9640459ef4fc",
+        "fact-17b74af582864435adaabe05e9586ff8",
+        "fact-682d75b73c164687a076ad0d89200200"
+      ]
+    },
+    {
+      "id": "checkpoint-policy",
+      "question": "What does a checkpoint do, when do automatic checkpoints run, and how do PASSIVE, FULL, RESTART and TRUNCATE differ?",
+      "section": "checkpoints",
+      "subject": null,
+      "kind": "open",
+      "round": 1,
+      "coverage": "answered",
+      "gaps": [],
+      "assessment": {
+        "by": "/root/checker_b",
+        "at": "2026-10-16T17:54:44.856Z"
+      },
+      "verdict": null,
+      "headline": {
+        "sentence": "Checkpoints copy committed WAL content into the database; the default policy favors nonblocking progress.",
+        "facts": [
+          "fact-3f360a95ceec4bbf81148cde65602f74",
+          "fact-44a1beaee67144f99d7bec6350bb3f79"
+        ]
+      },
+      "answer": [
+        {
+          "sentence": "By default, commits reaching 1000 WAL pages trigger an automatic checkpoint; the threshold is adjustable or can be disabled.",
+          "facts": [
+            "fact-ae5e37a33e1a4aa6b423f7a130b8e3b4"
+          ],
+          "paragraph": 1
+        },
+        {
+          "sentence": "PASSIVE, used automatically, copies what it can without waiting for readers or writers and may leave work unfinished.",
+          "facts": [
+            "fact-44a1beaee67144f99d7bec6350bb3f79"
+          ],
+          "paragraph": 1
+        },
+        {
+          "sentence": "FULL waits for the writer and sufficiently current reader snapshots, then checkpoints and syncs on success; it blocks new writers while allowing readers.",
+          "facts": [
+            "fact-198269c968114d8f9a5278b878cca881"
+          ],
+          "paragraph": 1
+        },
+        {
+          "sentence": "RESTART additionally waits until readers no longer need WAL content so the next writer can reuse the beginning; TRUNCATE additionally shrinks the WAL to zero bytes on success.",
+          "facts": [
+            "fact-5fc64c6e26f64d838fe1e5bf5196a3bf"
+          ],
+          "paragraph": 1
+        },
+        {
+          "sentence": "If the busy handler stops waiting, these aggressive modes can return SQLITE_BUSY with only partial progress.",
+          "facts": [
+            "fact-5fc64c6e26f64d838fe1e5bf5196a3bf"
+          ],
+          "paragraph": 1
+        }
+      ],
+      "facts": [
+        "fact-3f360a95ceec4bbf81148cde65602f74",
+        "fact-ae5e37a33e1a4aa6b423f7a130b8e3b4",
+        "fact-44a1beaee67144f99d7bec6350bb3f79",
+        "fact-198269c968114d8f9a5278b878cca881",
+        "fact-5fc64c6e26f64d838fe1e5bf5196a3bf"
+      ]
+    },
+    {
+      "id": "wal-growth",
+      "question": "Why can WAL grow or commits stall, and what should a team monitor or tune?",
+      "section": "checkpoints",
+      "subject": null,
+      "kind": "open",
+      "round": 1,
+      "coverage": "answered",
+      "gaps": [],
+      "assessment": {
+        "by": "/root/checker_b",
+        "at": "2026-10-16T17:54:44.856Z"
+      },
+      "verdict": null,
+      "headline": {
+        "sentence": "Watch checkpoint progress and long transactions, not just the WAL's physical file size.",
+        "facts": [
+          "fact-a9ce58a0a1884809befd0a266a5e020d",
+          "fact-090c20c597474a288320158beec89c87",
+          "fact-0415e9580e9e46978877c9c56c586a68"
+        ]
+      },
+      "answer": [
+        {
+          "sentence": "Overlapping read transactions can prevent WAL reset, disabled checkpoints permit continued growth, and a large write transaction cannot reset the WAL before it finishes.",
+          "facts": [
+            "fact-a9ce58a0a1884809befd0a266a5e020d"
+          ],
+          "paragraph": 1
+        },
+        {
+          "sentence": "A completed checkpoint normally enables recycling the existing WAL space rather than shrinking the file, so a large file alone does not prove checkpoint failure.",
+          "facts": [
+            "fact-090c20c597474a288320158beec89c87"
+          ],
+          "paragraph": 1
+        },
+        {
+          "sentence": "PRAGMA wal_checkpoint reports a busy indicator, WAL page count, and checkpointed page count to assess progress.",
+          "facts": [
+            "fact-0415e9580e9e46978877c9c56c586a68"
+          ],
+          "paragraph": 1
+        },
+        {
+          "sentence": "Automatic checkpoints run in the committing thread by default and can make occasional commits much slower; periodic checkpoints can instead run in another thread or process.",
+          "facts": [
+            "fact-150e23e2d388496bb704f3799a1f61e5"
+          ],
+          "paragraph": 1
+        }
+      ],
+      "facts": [
+        "fact-a9ce58a0a1884809befd0a266a5e020d",
+        "fact-090c20c597474a288320158beec89c87",
+        "fact-150e23e2d388496bb704f3799a1f61e5",
+        "fact-0415e9580e9e46978877c9c56c586a68"
+      ]
+    },
+    {
+      "id": "sync-durability",
+      "question": "How do synchronous FULL, NORMAL and OFF affect WAL durability and consistency after application crash versus power or operating-system failure?",
+      "section": "durability",
+      "subject": null,
+      "kind": "open",
+      "round": 1,
+      "coverage": "answered",
+      "gaps": [],
+      "assessment": {
+        "by": "/root/checker_c",
+        "at": "2026-10-16T17:54:44.413Z"
+      },
+      "verdict": null,
+      "headline": {
+        "sentence": "Choose FULL when acknowledged commits must survive power loss; NORMAL trades that durability for fewer syncs.",
+        "facts": [
+          "fact-545fd5cefbeb4ee7b4378e98aba888e2",
+          "fact-7576abaf8c9f4334a83f275d37fdef66",
+          "fact-0d5f1e4cfb024f98ac22849c0db7cd9c"
+        ]
+      },
+      "answer": [
+        {
+          "sentence": "In WAL mode, synchronous=FULL adds a WAL sync after each transaction commit and provides atomicity, consistency, isolation, and durability.",
+          "facts": [
+            "fact-545fd5cefbeb4ee7b4378e98aba888e2"
+          ],
+          "paragraph": 1
+        },
+        {
+          "sentence": "With synchronous=NORMAL, syncs occur around checkpoints and WAL reuse rather than most transactions; the database stays consistent, but power loss or an OS crash can roll back committed transactions.",
+          "facts": [
+            "fact-0d5f1e4cfb024f98ac22849c0db7cd9c",
+            "fact-7576abaf8c9f4334a83f275d37fdef66"
+          ],
+          "paragraph": 1
+        },
+        {
+          "sentence": "An application crash alone does not lose committed transactions under NORMAL; synchronous=OFF also survives an application crash, but power loss or OS failure can corrupt the database.",
+          "facts": [
+            "fact-7576abaf8c9f4334a83f275d37fdef66",
+            "fact-f7901e77e59e4b9aa5536951d3837237"
+          ],
+          "paragraph": 1
+        },
+        {
+          "sentence": "Durability assumes the operating system and storage actually honor SQLite's synchronization requests.",
+          "facts": [
+            "fact-826a960988084e4ca75fb2224950ed07"
+          ],
+          "paragraph": 1
+        }
+      ],
+      "facts": [
+        "fact-545fd5cefbeb4ee7b4378e98aba888e2",
+        "fact-7576abaf8c9f4334a83f275d37fdef66",
+        "fact-f7901e77e59e4b9aa5536951d3837237",
+        "fact-0d5f1e4cfb024f98ac22849c0db7cd9c",
+        "fact-826a960988084e4ca75fb2224950ed07"
+      ]
+    },
+    {
+      "id": "recovery-backup",
+      "question": "What must the team know about recovery, sidecar files, backups and safe database copying?",
+      "section": "durability",
+      "subject": null,
+      "kind": "open",
+      "round": 1,
+      "coverage": "answered",
+      "gaps": [],
+      "assessment": {
+        "by": "/root/checker_c",
+        "at": "2026-10-16T17:54:44.413Z"
+      },
+      "verdict": null,
+      "headline": {
+        "sentence": "Treat the WAL as database state and use SQLite's live backup facilities.",
+        "facts": [
+          "fact-93be901d07774c279c03c857d5066170",
+          "fact-e3a042ff1d034c289671215482448e4d"
+        ]
+      },
+      "answer": [
+        {
+          "sentence": "A commit does not require a checkpoint, so committed data can still reside in the WAL rather than the main database file.",
+          "facts": [
+            "fact-de3643a0e3cb42cf8ff03dbb6f25a654"
+          ],
+          "paragraph": 1
+        },
+        {
+          "sentence": "Separating the database from its WAL while copying or moving it can lose committed transactions or corrupt the database; copying the main file alone is unsafe when committed changes remain in the WAL.",
+          "facts": [
+            "fact-93be901d07774c279c03c857d5066170"
+          ],
+          "paragraph": 1
+        },
+        {
+          "sentence": "SQLite documents the Online Backup API and VACUUM INTO for backing up a live database.",
+          "facts": [
+            "fact-e3a042ff1d034c289671215482448e4d"
+          ],
+          "paragraph": 1
+        },
+        {
+          "sentence": "After the last connection crashes, the first new connection performs recovery under an exclusive lock, and concurrent queries can receive SQLITE_BUSY.",
+          "facts": [
+            "fact-374bba01b2534a569a03beff81fffbe4"
+          ],
+          "paragraph": 1
+        }
+      ],
+      "facts": [
+        "fact-93be901d07774c279c03c857d5066170",
+        "fact-374bba01b2534a569a03beff81fffbe4",
+        "fact-e3a042ff1d034c289671215482448e4d",
+        "fact-de3643a0e3cb42cf8ff03dbb6f25a654"
+      ]
+    },
+    {
+      "id": "enablement",
+      "question": "When is WAL a good fit, how is it enabled and verified, which connection settings need care, and which current version caveat matters?",
+      "section": "deployment",
+      "subject": null,
+      "kind": "open",
+      "round": 1,
+      "coverage": "answered",
+      "gaps": [],
+      "assessment": {
+        "by": "/root/checker_d",
+        "at": "2026-10-16T17:55:06.636Z"
+      },
+      "verdict": null,
+      "headline": {
+        "sentence": "WAL is a candidate for local applications needing reader/writer overlap, with explicit durability and checkpoint policies.",
+        "facts": [
+          "fact-4c960a3bcf414775841354e9e8b945e6",
+          "fact-013a4cb7c0c248cc9daab75bbdffc497",
+          "fact-545fd5cefbeb4ee7b4378e98aba888e2",
+          "fact-7576abaf8c9f4334a83f275d37fdef66",
+          "fact-b89ed03c8319488f91a27461e673eb77"
+        ]
+      },
+      "answer": [
+        {
+          "sentence": "Decision implication (inference): WAL improves reader/writer overlap, but does not add parallel writers, and mostly-read applications that seldom write can be slightly slower.",
+          "facts": [
+            "fact-4c960a3bcf414775841354e9e8b945e6",
+            "fact-1006ab1b3eb046bd82312efb19c5f732"
+          ],
+          "paragraph": 1
+        },
+        {
+          "sentence": "Enable with PRAGMA journal_mode=WAL and check that the returned mode is wal; the mode persists across reopenings and applies to all connections to that database file.",
+          "facts": [
+            "fact-f4d85a48f2b449658b29daaf812d23f0",
+            "fact-f5cee22a58cc4ac4b39328a943a7c50d"
+          ],
+          "paragraph": 1
+        },
+        {
+          "sentence": "Automatic checkpoint configuration belongs to each connection; a busy timeout likewise installs a connection's busy handler and replaces any previous handler.",
+          "facts": [
+            "fact-b89ed03c8319488f91a27461e673eb77",
+            "fact-cf8da9b4736744b9afa01b88f182c503"
+          ],
+          "paragraph": 1
+        },
+        {
+          "sentence": "Version check: SQLite fixed the rare WAL-reset corruption race in 3.51.3 and later, with backports in 3.44.6 and 3.50.7; it affects concurrent connections attempting writes or checkpoints simultaneously.",
+          "facts": [
+            "fact-c5497525bf21424681e54515a3beb457",
+            "fact-ddfa4513a46444db94368c77f2f91809"
+          ],
+          "paragraph": 1
+        }
+      ],
+      "facts": [
+        "fact-4c960a3bcf414775841354e9e8b945e6",
+        "fact-f4d85a48f2b449658b29daaf812d23f0",
+        "fact-f5cee22a58cc4ac4b39328a943a7c50d",
+        "fact-b89ed03c8319488f91a27461e673eb77",
+        "fact-cf8da9b4736744b9afa01b88f182c503",
+        "fact-c5497525bf21424681e54515a3beb457",
+        "fact-ddfa4513a46444db94368c77f2f91809"
+      ]
+    },
+    {
+      "id": "limitations",
+      "question": "What limitations affect network filesystems, multiple databases, page size, read-only use, transaction size and write-heavy workloads?",
+      "section": "deployment",
+      "subject": null,
+      "kind": "open",
+      "round": 1,
+      "coverage": "answered",
+      "gaps": [],
+      "assessment": {
+        "by": "/root/checker_d",
+        "at": "2026-10-16T17:55:06.636Z"
+      },
+      "verdict": null,
+      "headline": {
+        "sentence": "WAL requires local-host access and has operational limits beyond write serialization.",
+        "facts": [
+          "fact-013a4cb7c0c248cc9daab75bbdffc497",
+          "fact-1006ab1b3eb046bd82312efb19c5f732"
+        ]
+      },
+      "answer": [
+        {
+          "sentence": "All database users must run on the same host; WAL does not work over network filesystems.",
+          "facts": [
+            "fact-013a4cb7c0c248cc9daab75bbdffc497"
+          ],
+          "paragraph": 1
+        },
+        {
+          "sentence": "Updates spanning ATTACHed databases are atomic per database but not across the set, and page_size changes require leaving WAL for a rollback journal mode.",
+          "facts": [
+            "fact-7e0dc73bf47c43a1a053d466581fc2e6",
+            "fact-628f1e6e75b641c092c249492aca168b"
+          ],
+          "paragraph": 1
+        },
+        {
+          "sentence": "Read-only WAL support began in SQLite 3.22.0 and requires readable existing sidecars, permission to create them, or an immutable connection.",
+          "facts": [
+            "fact-96e617b4c6f24ea59e804e696aea4311"
+          ],
+          "paragraph": 1
+        },
+        {
+          "sentence": "The old large-transaction efficiency limitation was removed in 3.11.0; large write transactions can still create large WAL files, and write-heavy workloads remain constrained by the single writer.",
+          "facts": [
+            "fact-c6df07cffe894ed7a461fd5013c2ed84",
+            "fact-1006ab1b3eb046bd82312efb19c5f732"
+          ],
+          "paragraph": 1
+        }
+      ],
+      "facts": [
+        "fact-013a4cb7c0c248cc9daab75bbdffc497",
+        "fact-7e0dc73bf47c43a1a053d466581fc2e6",
+        "fact-628f1e6e75b641c092c249492aca168b",
+        "fact-96e617b4c6f24ea59e804e696aea4311",
+        "fact-c6df07cffe894ed7a461fd5013c2ed84"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "source-10df15fcdda077049242",
+      "given": null,
+      "title": "Write-Ahead Logging",
+      "origin": "https://www.sqlite.org/wal.html",
+      "publisher": "SQLite project",
+      "standing": "primary",
+      "provenance": "found",
+      "capture": null,
+      "pages": null,
+      "file": "research/sources/concurrency-wal.md",
+      "pinned": "research/sources/revisions/7037d951bcc5a4c3c70105825c02aa2286a5752eb73d029bfa2a4f5d9c458626.txt",
+      "sha256": "7037d951bcc5a4c3c70105825c02aa2286a5752eb73d029bfa2a4f5d9c458626",
+      "original_file": null,
+      "original_sha256": null,
+      "limits": "none",
+      "source_date": null,
+      "saved_at": "2026-10-16T17:53:08.148Z"
+    },
+    {
+      "id": "source-cc732968c8eac4980a7a",
+      "given": null,
+      "title": "Isolation In SQLite",
+      "origin": "https://www.sqlite.org/isolation.html",
+      "publisher": "SQLite project",
+      "standing": "primary",
+      "provenance": "found",
+      "capture": null,
+      "pages": null,
+      "file": "research/sources/concurrency-isolation.md",
+      "pinned": "research/sources/revisions/86def601fb3b0b2f00cc08ed04870478a779276ef3c5f130a61ba70c9c98e0ff.txt",
+      "sha256": "86def601fb3b0b2f00cc08ed04870478a779276ef3c5f130a61ba70c9c98e0ff",
+      "original_file": null,
+      "original_sha256": null,
+      "limits": "none",
+      "source_date": null,
+      "saved_at": "2026-10-16T17:53:08.149Z"
+    },
+    {
+      "id": "source-6320e865864ef8f81c44",
+      "given": null,
+      "title": "Transaction",
+      "origin": "https://www.sqlite.org/lang_transaction.html",
+      "publisher": "SQLite project",
+      "standing": "primary",
+      "provenance": "found",
+      "capture": null,
+      "pages": null,
+      "file": "research/sources/concurrency-lang_transaction.md",
+      "pinned": "research/sources/revisions/23f1d8cb37293a3fc96d78953c5c519edb63b90c28d9adbfdcb02b7b9eeb6550.txt",
+      "sha256": "23f1d8cb37293a3fc96d78953c5c519edb63b90c28d9adbfdcb02b7b9eeb6550",
+      "original_file": null,
+      "original_sha256": null,
+      "limits": "none",
+      "source_date": null,
+      "saved_at": "2026-10-16T17:53:08.150Z"
+    },
+    {
+      "id": "source-df6ecfdf38647b2ab2db",
+      "given": null,
+      "title": "Write-Ahead Logging",
+      "origin": "https://sqlite.org/wal.html",
+      "publisher": "SQLite project",
+      "standing": "primary",
+      "provenance": "found",
+      "capture": null,
+      "pages": null,
+      "file": "research/sources/checkpoints-wal.txt",
+      "pinned": "research/sources/revisions/b26f7a935eaf42713229e38a40754b5c3bf67d36253e1a5b0e776596e5cd5211.txt",
+      "sha256": "b26f7a935eaf42713229e38a40754b5c3bf67d36253e1a5b0e776596e5cd5211",
+      "original_file": null,
+      "original_sha256": null,
+      "limits": "none",
+      "source_date": null,
+      "saved_at": "2026-10-16T17:53:30.500Z"
+    },
+    {
+      "id": "source-db013e8d9f9c664d5965",
+      "given": null,
+      "title": "Checkpoint a database",
+      "origin": "https://sqlite.org/c3ref/wal_checkpoint_v2.html",
+      "publisher": "SQLite project",
+      "standing": "primary",
+      "provenance": "found",
+      "capture": null,
+      "pages": null,
+      "file": "research/sources/checkpoints-api.txt",
+      "pinned": "research/sources/revisions/1632c1114efe669256c68de4c179655ae6a37645374b754e0cded7cd1a39cad5.txt",
+      "sha256": "1632c1114efe669256c68de4c179655ae6a37645374b754e0cded7cd1a39cad5",
+      "original_file": null,
+      "original_sha256": null,
+      "limits": "none",
+      "source_date": null,
+      "saved_at": "2026-10-16T17:53:30.501Z"
+    },
+    {
+      "id": "source-452c2d8dfbf813441a2f",
+      "given": null,
+      "title": "Pragma statements supported by SQLite",
+      "origin": "https://sqlite.org/pragma.html",
+      "publisher": "SQLite project",
+      "standing": "primary",
+      "provenance": "found",
+      "capture": null,
+      "pages": null,
+      "file": "research/sources/checkpoints-pragma.txt",
+      "pinned": "research/sources/revisions/2f5869d25b59a520e75747124dae55f379374f29f13da7644e72b25dc792c94d.txt",
+      "sha256": "2f5869d25b59a520e75747124dae55f379374f29f13da7644e72b25dc792c94d",
+      "original_file": null,
+      "original_sha256": null,
+      "limits": "none",
+      "source_date": null,
+      "saved_at": "2026-10-16T17:53:30.503Z"
+    },
+    {
+      "id": "source-4cee7aec84ba0abb3cdf",
+      "given": null,
+      "title": "PRAGMA Statements — synchronous",
+      "origin": "https://sqlite.org/pragma.html#pragma_synchronous",
+      "publisher": "SQLite project",
+      "standing": "primary",
+      "provenance": "found",
+      "capture": null,
+      "pages": null,
+      "file": "research/sources/durability-pragma.txt",
+      "pinned": "research/sources/revisions/2f5869d25b59a520e75747124dae55f379374f29f13da7644e72b25dc792c94d.txt",
+      "sha256": "2f5869d25b59a520e75747124dae55f379374f29f13da7644e72b25dc792c94d",
+      "original_file": null,
+      "original_sha256": null,
+      "limits": "none",
+      "source_date": null,
+      "saved_at": "2026-10-16T17:53:36.317Z"
+    },
+    {
+      "id": "source-465a9e7fe3d879584d45",
+      "given": null,
+      "title": "SQLite Backup API",
+      "origin": "https://sqlite.org/backup.html",
+      "publisher": "SQLite project",
+      "standing": "primary",
+      "provenance": "found",
+      "capture": null,
+      "pages": null,
+      "file": "research/sources/durability-backup.txt",
+      "pinned": "research/sources/revisions/640eb0940beb7bd32146a416c79ee326b1ea2a32e05f134d43ea51ce50bee622.txt",
+      "sha256": "640eb0940beb7bd32146a416c79ee326b1ea2a32e05f134d43ea51ce50bee622",
+      "original_file": null,
+      "original_sha256": null,
+      "limits": "none",
+      "source_date": null,
+      "saved_at": "2026-10-16T17:53:36.320Z"
+    },
+    {
+      "id": "source-9a3681c381427ce152be",
+      "given": null,
+      "title": "Atomic Commit In SQLite",
+      "origin": "https://sqlite.org/atomiccommit.html",
+      "publisher": "SQLite project",
+      "standing": "primary",
+      "provenance": "found",
+      "capture": null,
+      "pages": null,
+      "file": "research/sources/durability-atomiccommit.txt",
+      "pinned": "research/sources/revisions/08e859c0d598b1e60279292432d572ba8ce63eee7ef137ee12f54cf14186be42.txt",
+      "sha256": "08e859c0d598b1e60279292432d572ba8ce63eee7ef137ee12f54cf14186be42",
+      "original_file": null,
+      "original_sha256": null,
+      "limits": "none",
+      "source_date": null,
+      "saved_at": "2026-10-16T17:53:36.321Z"
+    },
+    {
+      "id": "source-d2c1df874e2ea89d1a6e",
+      "given": null,
+      "title": "Write-Ahead Logging",
+      "origin": "https://sqlite.org/wal.html",
+      "publisher": "SQLite project",
+      "standing": "primary",
+      "provenance": "found",
+      "capture": null,
+      "pages": null,
+      "file": "research/sources/deployment-wal.txt",
+      "pinned": "research/sources/revisions/3e0b0c6363b232eae74e6d27c01ab82b07c371cb8dcb3b0b70cd0b9a47494896.txt",
+      "sha256": "3e0b0c6363b232eae74e6d27c01ab82b07c371cb8dcb3b0b70cd0b9a47494896",
+      "original_file": null,
+      "original_sha256": null,
+      "limits": "none",
+      "source_date": "2026-08-25",
+      "saved_at": "2026-10-16T17:53:49.490Z"
+    },
+    {
+      "id": "source-23c6f339260afd6d7da9",
+      "given": null,
+      "title": "PRAGMA Statements",
+      "origin": "https://sqlite.org/pragma.html",
+      "publisher": "SQLite project",
+      "standing": "primary",
+      "provenance": "found",
+      "capture": null,
+      "pages": null,
+      "file": "research/sources/deployment-pragma.txt",
+      "pinned": "research/sources/revisions/5595be83342193edd95965a770b1288b503d350a6412776267916b713d2cf454.txt",
+      "sha256": "5595be83342193edd95965a770b1288b503d350a6412776267916b713d2cf454",
+      "original_file": null,
+      "original_sha256": null,
+      "limits": "none",
+      "source_date": null,
+      "saved_at": "2026-10-16T17:53:49.492Z"
+    },
+    {
+      "id": "source-0380acd4a6185e35a128",
+      "given": null,
+      "title": "Configure an auto-checkpoint",
+      "origin": "https://sqlite.org/c3ref/wal_autocheckpoint.html",
+      "publisher": "SQLite project",
+      "standing": "primary",
+      "provenance": "found",
+      "capture": null,
+      "pages": null,
+      "file": "research/sources/deployment-autocheckpoint.txt",
+      "pinned": "research/sources/revisions/648178c56f253acf62775766be6aed13b5c2612acd7534ee21c300b567a13dce.txt",
+      "sha256": "648178c56f253acf62775766be6aed13b5c2612acd7534ee21c300b567a13dce",
+      "original_file": null,
+      "original_sha256": null,
+      "limits": "none",
+      "source_date": null,
+      "saved_at": "2026-10-16T17:53:49.493Z"
+    },
+    {
+      "id": "source-0048a761d0314ee6ad82",
+      "given": null,
+      "title": "Set A Busy Timeout",
+      "origin": "https://sqlite.org/c3ref/busy_timeout.html",
+      "publisher": "SQLite project",
+      "standing": "primary",
+      "provenance": "found",
+      "capture": null,
+      "pages": null,
+      "file": "research/sources/deployment-busy.txt",
+      "pinned": "research/sources/revisions/772d73f320208afefdeb7d016ba6f4b300606c18b02d96e8af7eb1a56a625a2a.txt",
+      "sha256": "772d73f320208afefdeb7d016ba6f4b300606c18b02d96e8af7eb1a56a625a2a",
+      "original_file": null,
+      "original_sha256": null,
+      "limits": "none",
+      "source_date": null,
+      "saved_at": "2026-10-16T17:53:49.493Z"
+    },
+    {
+      "id": "source-c98007d7008f08208ab6",
+      "given": null,
+      "title": "SQLite Release 3.51.3",
+      "origin": "https://sqlite.org/releaselog/3_51_3.html",
+      "publisher": "SQLite project",
+      "standing": "primary",
+      "provenance": "found",
+      "capture": null,
+      "pages": null,
+      "file": "research/sources/deployment-release.txt",
+      "pinned": "research/sources/revisions/097af401f50d951d83a2afd4358a28847812af73118dc0604f5bb92a9c9b6690.txt",
+      "sha256": "097af401f50d951d83a2afd4358a28847812af73118dc0604f5bb92a9c9b6690",
+      "original_file": null,
+      "original_sha256": null,
+      "limits": "none",
+      "source_date": "2026-03-13",
+      "saved_at": "2026-10-16T17:53:49.494Z"
+    }
+  ],
+  "facts": [
+    {
+      "key": "fact-4aa91348147e499694c7c71eba6d0839",
+      "statement": "Each SQLite WAL reader retains its last-valid-commit end mark throughout the transaction, yielding a stable snapshot.",
+      "questions": [
+        "mechanics"
+      ],
+      "section": "concurrency",
+      "subject": null,
+      "as_of": null,
+      "authored_by": "/root/concurrency",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/checker_a",
+        "at": "2026-10-16T17:54:06.661Z",
+        "inspected_sources": [
+          {
+            "source": "source-10df15fcdda077049242",
+            "sha256": "7037d951bcc5a4c3c70105825c02aa2286a5752eb73d029bfa2a4f5d9c458626",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-cc732968c8eac4980a7a",
+            "sha256": "86def601fb3b0b2f00cc08ed04870478a779276ef3c5f130a61ba70c9c98e0ff",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-6320e865864ef8f81c44",
+            "sha256": "23f1d8cb37293a3fc96d78953c5c519edb63b90c28d9adbfdcb02b7b9eeb6550",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-10df15fcdda077049242",
+          "quote": "each reader can potentially have its own end mark. But for any\n\nparticular reader, the end mark is unchanged for the duration of the\n\ntransaction, thus ensuring that a single read transaction only sees\n\nthe database content as it existed at a single point in time.",
+          "start": 6154,
+          "quote_sha256": "89e0b7c7ba23492349fd549229134c2d2899d1d3b2cb64b39b4913980440d812",
+          "source_sha256": "7037d951bcc5a4c3c70105825c02aa2286a5752eb73d029bfa2a4f5d9c458626",
+          "locator": "2.2. Concurrency"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    },
+    {
+      "key": "fact-1139b327046b48c2a32dc776a5a1397b",
+      "statement": "A SQLite WAL reader uses the latest page copy before its end mark, falling back to the original database when no eligible WAL copy exists.",
+      "questions": [
+        "mechanics"
+      ],
+      "section": "concurrency",
+      "subject": null,
+      "as_of": null,
+      "authored_by": "/root/concurrency",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/checker_a",
+        "at": "2026-10-16T17:54:06.661Z",
+        "inspected_sources": [
+          {
+            "source": "source-10df15fcdda077049242",
+            "sha256": "7037d951bcc5a4c3c70105825c02aa2286a5752eb73d029bfa2a4f5d9c458626",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-cc732968c8eac4980a7a",
+            "sha256": "86def601fb3b0b2f00cc08ed04870478a779276ef3c5f130a61ba70c9c98e0ff",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-6320e865864ef8f81c44",
+            "sha256": "23f1d8cb37293a3fc96d78953c5c519edb63b90c28d9adbfdcb02b7b9eeb6550",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-10df15fcdda077049242",
+          "quote": "When a reader needs a page of content, it first checks the WAL to\n\nsee if that page appears there, and if so it pulls in the last copy\n\nof the page that occurs in the WAL prior to the reader's end mark.\n\nIf no copy of the page exists in the WAL prior to the reader's end mark,\n\nthen the page is read from the original database file.",
+          "start": 6420,
+          "quote_sha256": "92de080a063877cd4556df1c4126400f813bd1f9ea1b71652d20aa5dfd1ee415",
+          "source_sha256": "7037d951bcc5a4c3c70105825c02aa2286a5752eb73d029bfa2a4f5d9c458626",
+          "locator": "2.2. Concurrency"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    },
+    {
+      "key": "fact-1006ab1b3eb046bd82312efb19c5f732",
+      "statement": "SQLite WAL allows readers and a writer to operate concurrently but permits only one writer at a time.",
+      "questions": [
+        "mechanics"
+      ],
+      "section": "concurrency",
+      "subject": null,
+      "as_of": null,
+      "authored_by": "/root/concurrency",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/checker_a",
+        "at": "2026-10-16T17:54:06.661Z",
+        "inspected_sources": [
+          {
+            "source": "source-10df15fcdda077049242",
+            "sha256": "7037d951bcc5a4c3c70105825c02aa2286a5752eb73d029bfa2a4f5d9c458626",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-cc732968c8eac4980a7a",
+            "sha256": "86def601fb3b0b2f00cc08ed04870478a779276ef3c5f130a61ba70c9c98e0ff",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-6320e865864ef8f81c44",
+            "sha256": "23f1d8cb37293a3fc96d78953c5c519edb63b90c28d9adbfdcb02b7b9eeb6550",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-10df15fcdda077049242",
+          "quote": "Writers merely append new content to the end of the WAL file.\n\nBecause writers do nothing that would interfere with the actions of\n\nreaders, writers and readers can run at the same time. However,\n\nsince there is only one WAL file, there can only be one writer at\n\na time.",
+          "start": 7348,
+          "quote_sha256": "ad92f538de6e4712beec5452148cfc38a6ef08228680334e08abc3893740e75f",
+          "source_sha256": "7037d951bcc5a4c3c70105825c02aa2286a5752eb73d029bfa2a4f5d9c458626",
+          "locator": "2.2. Concurrency"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    },
+    {
+      "key": "fact-fe3aeb5b61b440ba86a8e63def835b0c",
+      "statement": "SQLite WAL queries can still return SQLITE_BUSY during exclusive locking, last-connection cleanup, or crash recovery.",
+      "questions": [
+        "contention"
+      ],
+      "section": "concurrency",
+      "subject": null,
+      "as_of": null,
+      "authored_by": "/root/concurrency",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/checker_a",
+        "at": "2026-10-16T17:54:06.661Z",
+        "inspected_sources": [
+          {
+            "source": "source-10df15fcdda077049242",
+            "sha256": "7037d951bcc5a4c3c70105825c02aa2286a5752eb73d029bfa2a4f5d9c458626",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-cc732968c8eac4980a7a",
+            "sha256": "86def601fb3b0b2f00cc08ed04870478a779276ef3c5f130a61ba70c9c98e0ff",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-6320e865864ef8f81c44",
+            "sha256": "23f1d8cb37293a3fc96d78953c5c519edb63b90c28d9adbfdcb02b7b9eeb6550",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-10df15fcdda077049242",
+          "quote": "If another database connection has the database mode open\n\nin exclusive locking mode then all queries against the\n\ndatabase will return SQLITE_BUSY.",
+          "start": 26185,
+          "quote_sha256": "cb4f29565410bac60d1c18f64d6a3d560b6bfc8cfea784cd9ea07a851e6ff5c3",
+          "source_sha256": "7037d951bcc5a4c3c70105825c02aa2286a5752eb73d029bfa2a4f5d9c458626",
+          "locator": "9. Sometimes Queries Return SQLITE_BUSY In WAL Mode"
+        },
+        {
+          "source": "source-10df15fcdda077049242",
+          "quote": "When the last connection to a particular database is closing,\n\nthat connection will acquire an exclusive lock for a short time while\n\nit cleans up the WAL and shared-memory files. If a separate attempt\n\nis made to open and query the database while the first connection is\n\nstill in the middle of its cleanup process, the second connection\n\nmight get an SQLITE_BUSY error.",
+          "start": 26539,
+          "quote_sha256": "3782392b3d2b7d2f726735c2684ffd7b315bd6a2f126d7b6f9480ee6eb05fa6c",
+          "source_sha256": "7037d951bcc5a4c3c70105825c02aa2286a5752eb73d029bfa2a4f5d9c458626",
+          "locator": "9. Sometimes Queries Return SQLITE_BUSY In WAL Mode"
+        },
+        {
+          "source": "source-10df15fcdda077049242",
+          "quote": "If the last connection to a database crashed, then the first new\n\nconnection to open the database will start a recovery process. An\n\nexclusive lock is held during recovery. So if a third database connection\n\ntries to jump in and query while the second connection is running recovery,\n\nthe third connection will get an SQLITE_BUSY error.",
+          "start": 26912,
+          "quote_sha256": "1cadfa4ae5a22dde02d1a4eca0e69fd4ebc92d8b8462b39cbb8cbe2add7e65e7",
+          "source_sha256": "7037d951bcc5a4c3c70105825c02aa2286a5752eb73d029bfa2a4f5d9c458626",
+          "locator": "9. Sometimes Queries Return SQLITE_BUSY In WAL Mode"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    },
+    {
+      "key": "fact-43180b3e4ea04b738edb40756af9d65b",
+      "statement": "A SQLite WAL read-to-write upgrade from an outdated snapshot fails with SQLITE_BUSY_SNAPSHOT and requires releasing the snapshot and starting a new transaction.",
+      "questions": [
+        "contention"
+      ],
+      "section": "concurrency",
+      "subject": null,
+      "as_of": null,
+      "authored_by": "/root/concurrency",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/checker_a",
+        "at": "2026-10-16T17:54:06.661Z",
+        "inspected_sources": [
+          {
+            "source": "source-10df15fcdda077049242",
+            "sha256": "7037d951bcc5a4c3c70105825c02aa2286a5752eb73d029bfa2a4f5d9c458626",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-cc732968c8eac4980a7a",
+            "sha256": "86def601fb3b0b2f00cc08ed04870478a779276ef3c5f130a61ba70c9c98e0ff",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-6320e865864ef8f81c44",
+            "sha256": "23f1d8cb37293a3fc96d78953c5c519edb63b90c28d9adbfdcb02b7b9eeb6550",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-cc732968c8eac4980a7a",
+          "quote": "The attempt by X to escalate its\n\ntransaction from a read transaction to a write transaction fails with an\n\nSQLITE_BUSY_SNAPSHOT error because the snapshot of the database being\n\nviewed by X is no longer the latest version of the database. If X were\n\nallowed to write, it would fork the history of the database file, which is\n\nsomething SQLite does not support. In order for X to write to the database,\n\nit must first release its snapshot (using ROLLBACK for example) then\n\nstart a new transaction with a subsequent BEGIN.",
+          "start": 6344,
+          "quote_sha256": "9123b5524bdf505b8e83109f4bbfe69c627f1d6b62eebb2b83a76b229995c3c2",
+          "source_sha256": "86def601fb3b0b2f00cc08ed04870478a779276ef3c5f130a61ba70c9c98e0ff",
+          "locator": "Isolation And Concurrency"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    },
+    {
+      "key": "fact-9a663a901c1748e19b1d9640459ef4fc",
+      "statement": "SQLite BEGIN IMMEDIATE avoids later stale-snapshot upgrades by starting a write transaction immediately and blocking competing writers.",
+      "questions": [
+        "contention"
+      ],
+      "section": "concurrency",
+      "subject": null,
+      "as_of": null,
+      "authored_by": "/root/concurrency",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/checker_a",
+        "at": "2026-10-16T17:54:06.661Z",
+        "inspected_sources": [
+          {
+            "source": "source-10df15fcdda077049242",
+            "sha256": "7037d951bcc5a4c3c70105825c02aa2286a5752eb73d029bfa2a4f5d9c458626",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-cc732968c8eac4980a7a",
+            "sha256": "86def601fb3b0b2f00cc08ed04870478a779276ef3c5f130a61ba70c9c98e0ff",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-6320e865864ef8f81c44",
+            "sha256": "23f1d8cb37293a3fc96d78953c5c519edb63b90c28d9adbfdcb02b7b9eeb6550",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-cc732968c8eac4980a7a",
+          "quote": "If X starts a transaction that will initially only read but X knows it\n\nwill eventually want to write and does not want to be troubled with\n\npossible SQLITE_BUSY_SNAPSHOT errors that arise because another connection\n\njumped ahead of it in line, then X can issue BEGIN IMMEDIATE to start\n\nits transaction instead of just an ordinary BEGIN. The BEGIN IMMEDIATE\n\ncommand goes ahead and starts a write transaction, and thus blocks all\n\nother writers.",
+          "start": 6868,
+          "quote_sha256": "98437dec325cf0033b977fc9da7dea5402b77de9810543f20fa490649acd6f61",
+          "source_sha256": "86def601fb3b0b2f00cc08ed04870478a779276ef3c5f130a61ba70c9c98e0ff",
+          "locator": "Isolation And Concurrency"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    },
+    {
+      "key": "fact-17b74af582864435adaabe05e9586ff8",
+      "statement": "SQLite BEGIN IMMEDIATE can itself fail with SQLITE_BUSY when another connection already has an active write transaction.",
+      "questions": [
+        "contention"
+      ],
+      "section": "concurrency",
+      "subject": null,
+      "as_of": null,
+      "authored_by": "/root/concurrency",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/checker_a",
+        "at": "2026-10-16T17:54:06.661Z",
+        "inspected_sources": [
+          {
+            "source": "source-10df15fcdda077049242",
+            "sha256": "7037d951bcc5a4c3c70105825c02aa2286a5752eb73d029bfa2a4f5d9c458626",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-cc732968c8eac4980a7a",
+            "sha256": "86def601fb3b0b2f00cc08ed04870478a779276ef3c5f130a61ba70c9c98e0ff",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-6320e865864ef8f81c44",
+            "sha256": "23f1d8cb37293a3fc96d78953c5c519edb63b90c28d9adbfdcb02b7b9eeb6550",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-6320e865864ef8f81c44",
+          "quote": "IMMEDIATE causes the database connection to start a new write\n\nimmediately, without waiting for a write statement. The\n\nBEGIN IMMEDIATE might fail with SQLITE_BUSY if another write\n\ntransaction is already active on another database connection.",
+          "start": 4301,
+          "quote_sha256": "aa6fcba2d917df218de7d30f191e982cdd71de31388632914a4c6719df4366ec",
+          "source_sha256": "23f1d8cb37293a3fc96d78953c5c519edb63b90c28d9adbfdcb02b7b9eeb6550",
+          "locator": "2.2. DEFERRED, IMMEDIATE, and EXCLUSIVE transactions"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    },
+    {
+      "key": "fact-682d75b73c164687a076ad0d89200200",
+      "statement": "SQLite implicit transactions commit when the last active statement finishes; resetting or finalizing prepared statements guarantees statement completion.",
+      "questions": [
+        "contention"
+      ],
+      "section": "concurrency",
+      "subject": null,
+      "as_of": null,
+      "authored_by": "/root/concurrency",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/checker_a",
+        "at": "2026-10-16T17:54:06.661Z",
+        "inspected_sources": [
+          {
+            "source": "source-10df15fcdda077049242",
+            "sha256": "7037d951bcc5a4c3c70105825c02aa2286a5752eb73d029bfa2a4f5d9c458626",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-cc732968c8eac4980a7a",
+            "sha256": "86def601fb3b0b2f00cc08ed04870478a779276ef3c5f130a61ba70c9c98e0ff",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-6320e865864ef8f81c44",
+            "sha256": "23f1d8cb37293a3fc96d78953c5c519edb63b90c28d9adbfdcb02b7b9eeb6550",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-6320e865864ef8f81c44",
+          "quote": "An implicit transaction (a transaction that is started automatically,\n\nnot a transaction started by BEGIN) is committed automatically when\n\nthe last active statement finishes. A statement finishes when its\n\nlast cursor closes, which is guaranteed to happen when the\n\nprepared statement is reset or\n\nfinalized.",
+          "start": 4869,
+          "quote_sha256": "d7b906e773c41f9b7fe1724b5995b28c5da211622203901be79f7d0be45ca36b",
+          "source_sha256": "23f1d8cb37293a3fc96d78953c5c519edb63b90c28d9adbfdcb02b7b9eeb6550",
+          "locator": "2.3. Implicit versus explicit transactions"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    },
+    {
+      "key": "fact-3f360a95ceec4bbf81148cde65602f74",
+      "statement": "A SQLite checkpoint transfers committed WAL transactions back into the database file.",
+      "questions": [
+        "checkpoint-policy"
+      ],
+      "section": "checkpoints",
+      "subject": null,
+      "as_of": null,
+      "authored_by": "/root/checkpoints",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/checker_b",
+        "at": "2026-10-16T17:54:44.856Z",
+        "inspected_sources": [
+          {
+            "source": "source-df6ecfdf38647b2ab2db",
+            "sha256": "b26f7a935eaf42713229e38a40754b5c3bf67d36253e1a5b0e776596e5cd5211",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-db013e8d9f9c664d5965",
+            "sha256": "1632c1114efe669256c68de4c179655ae6a37645374b754e0cded7cd1a39cad5",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-452c2d8dfbf813441a2f",
+            "sha256": "2f5869d25b59a520e75747124dae55f379374f29f13da7644e72b25dc792c94d",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-df6ecfdf38647b2ab2db",
+          "quote": "Moving\nthe WAL file transactions back into the database is called a\n\"checkpoint\".",
+          "start": 4854,
+          "quote_sha256": "584c40d12041b5e198950c66f85c7c891301684b9e6441ddfcb79d1c51c2e4cd",
+          "source_sha256": "b26f7a935eaf42713229e38a40754b5c3bf67d36253e1a5b0e776596e5cd5211",
+          "locator": "§2.1 Checkpointing"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    },
+    {
+      "key": "fact-ae5e37a33e1a4aa6b423f7a130b8e3b4",
+      "statement": "SQLite automatically checkpoints at commits reaching 1000 WAL pages by default; applications can adjust or disable this threshold.",
+      "questions": [
+        "checkpoint-policy"
+      ],
+      "section": "checkpoints",
+      "subject": null,
+      "as_of": null,
+      "authored_by": "/root/checkpoints",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/checker_b",
+        "at": "2026-10-16T17:54:44.856Z",
+        "inspected_sources": [
+          {
+            "source": "source-df6ecfdf38647b2ab2db",
+            "sha256": "b26f7a935eaf42713229e38a40754b5c3bf67d36253e1a5b0e776596e5cd5211",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-db013e8d9f9c664d5965",
+            "sha256": "1632c1114efe669256c68de4c179655ae6a37645374b754e0cded7cd1a39cad5",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-452c2d8dfbf813441a2f",
+            "sha256": "2f5869d25b59a520e75747124dae55f379374f29f13da7644e72b25dc792c94d",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-df6ecfdf38647b2ab2db",
+          "quote": "By default, SQLite will automatically checkpoint whenever a COMMIT\noccurs that causes the WAL file to be 1000 pages or more in size, or when the\nlast database connection on a database file closes.",
+          "start": 13163,
+          "quote_sha256": "623b864535a0b02987e5283e224c6739cb9175d2cc0e0191b0fdda11c675a04a",
+          "source_sha256": "b26f7a935eaf42713229e38a40754b5c3bf67d36253e1a5b0e776596e5cd5211",
+          "locator": "§3.1 Automatic Checkpoint"
+        },
+        {
+          "source": "source-df6ecfdf38647b2ab2db",
+          "quote": "The automatic checkpoint\nthreshold can be changed or automatic checkpointing can be completely\ndisabled using the wal_autocheckpoint pragma or by calling the\nsqlite3_wal_autocheckpoint() C interface.",
+          "start": 13581,
+          "quote_sha256": "0ee7055b2d47714545de029259cb27f2b3efc8ef86443176adc25a223ac3b0a4",
+          "source_sha256": "b26f7a935eaf42713229e38a40754b5c3bf67d36253e1a5b0e776596e5cd5211",
+          "locator": "§3.1 Automatic Checkpoint"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    },
+    {
+      "key": "fact-44a1beaee67144f99d7bec6350bb3f79",
+      "statement": "SQLite automatic checkpoints use PASSIVE mode, which makes available progress without waiting for readers or writers and may finish incompletely.",
+      "questions": [
+        "checkpoint-policy"
+      ],
+      "section": "checkpoints",
+      "subject": null,
+      "as_of": null,
+      "authored_by": "/root/checkpoints",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/checker_b",
+        "at": "2026-10-16T17:54:44.856Z",
+        "inspected_sources": [
+          {
+            "source": "source-df6ecfdf38647b2ab2db",
+            "sha256": "b26f7a935eaf42713229e38a40754b5c3bf67d36253e1a5b0e776596e5cd5211",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-db013e8d9f9c664d5965",
+            "sha256": "1632c1114efe669256c68de4c179655ae6a37645374b754e0cded7cd1a39cad5",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-452c2d8dfbf813441a2f",
+            "sha256": "2f5869d25b59a520e75747124dae55f379374f29f13da7644e72b25dc792c94d",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-452c2d8dfbf813441a2f",
+          "quote": "All automatic checkpoints are PASSIVE.",
+          "start": 79777,
+          "quote_sha256": "5d8f0d5e86c09a1f4248f8301334ae377c4c4930e469ef79dc297429686e5638",
+          "source_sha256": "2f5869d25b59a520e75747124dae55f379374f29f13da7644e72b25dc792c94d",
+          "locator": "PRAGMA wal_autocheckpoint"
+        },
+        {
+          "source": "source-db013e8d9f9c664d5965",
+          "quote": "Checkpoint as many frames as possible without waiting for any database\nreaders or writers to finish, then sync the database file if all frames\nin the log were checkpointed.",
+          "start": 814,
+          "quote_sha256": "def790b67a065fecdb8217ca4f9736652d70b0a97bc7a9075361e879eb5b06f4",
+          "source_sha256": "1632c1114efe669256c68de4c179655ae6a37645374b754e0cded7cd1a39cad5",
+          "locator": "SQLITE_CHECKPOINT_PASSIVE"
+        },
+        {
+          "source": "source-db013e8d9f9c664d5965",
+          "quote": "On the other hand, passive mode might leave the checkpoint unfinished\nif there are concurrent readers or writers.",
+          "start": 1069,
+          "quote_sha256": "467a4c7a22bacd5166c1786717ce81b6e67f3409aa916c4dc186f5a4b31b1f29",
+          "source_sha256": "1632c1114efe669256c68de4c179655ae6a37645374b754e0cded7cd1a39cad5",
+          "locator": "SQLITE_CHECKPOINT_PASSIVE"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    },
+    {
+      "key": "fact-198269c968114d8f9a5278b878cca881",
+      "statement": "SQLite FULL checkpoints wait for the writer and sufficiently current reader snapshots, then checkpoint and sync; they block new writers while allowing readers.",
+      "questions": [
+        "checkpoint-policy"
+      ],
+      "section": "checkpoints",
+      "subject": null,
+      "as_of": null,
+      "authored_by": "/root/checkpoints",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/checker_b",
+        "at": "2026-10-16T17:54:44.856Z",
+        "inspected_sources": [
+          {
+            "source": "source-df6ecfdf38647b2ab2db",
+            "sha256": "b26f7a935eaf42713229e38a40754b5c3bf67d36253e1a5b0e776596e5cd5211",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-db013e8d9f9c664d5965",
+            "sha256": "1632c1114efe669256c68de4c179655ae6a37645374b754e0cded7cd1a39cad5",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-452c2d8dfbf813441a2f",
+            "sha256": "2f5869d25b59a520e75747124dae55f379374f29f13da7644e72b25dc792c94d",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-db013e8d9f9c664d5965",
+          "quote": "This mode blocks (it invokes the\nbusy-handler callback) until there is no\ndatabase writer and all readers are reading from the most recent database\nsnapshot. It then checkpoints all frames in the log file and syncs the\ndatabase file. This mode blocks new database writers while it is pending,\nbut new database readers are allowed to continue unimpeded.",
+          "start": 1206,
+          "quote_sha256": "bf8420be7339c9bf39411e709c7ab1bcc59a5a75a287253717baa72e56a47d7c",
+          "source_sha256": "1632c1114efe669256c68de4c179655ae6a37645374b754e0cded7cd1a39cad5",
+          "locator": "SQLITE_CHECKPOINT_FULL"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    },
+    {
+      "key": "fact-5fc64c6e26f64d838fe1e5bf5196a3bf",
+      "statement": "SQLite RESTART additionally waits for readers to finish using the WAL, and TRUNCATE also shrinks it to zero bytes; busy-handler refusal can instead leave either incomplete with SQLITE_BUSY.",
+      "questions": [
+        "checkpoint-policy"
+      ],
+      "section": "checkpoints",
+      "subject": null,
+      "as_of": null,
+      "authored_by": "/root/checkpoints",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/checker_b",
+        "at": "2026-10-16T17:54:44.856Z",
+        "inspected_sources": [
+          {
+            "source": "source-df6ecfdf38647b2ab2db",
+            "sha256": "b26f7a935eaf42713229e38a40754b5c3bf67d36253e1a5b0e776596e5cd5211",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-db013e8d9f9c664d5965",
+            "sha256": "1632c1114efe669256c68de4c179655ae6a37645374b754e0cded7cd1a39cad5",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-452c2d8dfbf813441a2f",
+            "sha256": "2f5869d25b59a520e75747124dae55f379374f29f13da7644e72b25dc792c94d",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-db013e8d9f9c664d5965",
+          "quote": "This mode works the same way as SQLITE_CHECKPOINT_FULL with the addition\nthat after checkpointing the log file it blocks (calls the\nbusy-handler callback)\nuntil all readers are reading from the database file only. This ensures\nthat the next writer will restart the log file from the beginning.",
+          "start": 1585,
+          "quote_sha256": "9c1e43bf400ae974d7028591e3aadb1f87b2a7de2a2d936171ea1837886ec0ac",
+          "source_sha256": "1632c1114efe669256c68de4c179655ae6a37645374b754e0cded7cd1a39cad5",
+          "locator": "SQLITE_CHECKPOINT_RESTART"
+        },
+        {
+          "source": "source-db013e8d9f9c664d5965",
+          "quote": "This mode works the same way as SQLITE_CHECKPOINT_RESTART with the\naddition that it also truncates the log file to zero bytes just prior\nto a successful return.",
+          "start": 2031,
+          "quote_sha256": "eb14d4b79da6703bbf6e77f2adaec6cdcf581c4b6278213b046df5586105a7c1",
+          "source_sha256": "1632c1114efe669256c68de4c179655ae6a37645374b754e0cded7cd1a39cad5",
+          "locator": "SQLITE_CHECKPOINT_TRUNCATE"
+        },
+        {
+          "source": "source-db013e8d9f9c664d5965",
+          "quote": "If the busy-handler returns 0 before\nthe writer lock is obtained or while waiting for database readers, the\ncheckpoint operation proceeds from that point in the same way as\nSQLITE_CHECKPOINT_PASSIVE - checkpointing as many frames as possible\nwithout blocking any further. SQLITE_BUSY is returned in this case.",
+          "start": 3745,
+          "quote_sha256": "f804901de4bbf58cd898d1c998fda53fd5ffd72c025bd7fd9f65a2d8ed27a2cd",
+          "source_sha256": "1632c1114efe669256c68de4c179655ae6a37645374b754e0cded7cd1a39cad5",
+          "locator": "Writer lock and busy-handler behavior"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    },
+    {
+      "key": "fact-a9ce58a0a1884809befd0a266a5e020d",
+      "statement": "SQLite WAL growth can persist when overlapping readers prevent reset, automatic checkpoints are disabled, or a large write transaction prevents resetting the WAL until it finishes.",
+      "questions": [
+        "wal-growth"
+      ],
+      "section": "checkpoints",
+      "subject": null,
+      "as_of": null,
+      "authored_by": "/root/checkpoints",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/checker_b",
+        "at": "2026-10-16T17:54:44.856Z",
+        "inspected_sources": [
+          {
+            "source": "source-df6ecfdf38647b2ab2db",
+            "sha256": "b26f7a935eaf42713229e38a40754b5c3bf67d36253e1a5b0e776596e5cd5211",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-db013e8d9f9c664d5965",
+            "sha256": "1632c1114efe669256c68de4c179655ae6a37645374b754e0cded7cd1a39cad5",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-452c2d8dfbf813441a2f",
+            "sha256": "2f5869d25b59a520e75747124dae55f379374f29f13da7644e72b25dc792c94d",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-df6ecfdf38647b2ab2db",
+          "quote": "However, if a database has many concurrent overlapping readers\nand there is always at least one active reader, then\nno checkpoints will be able to complete\nand hence the WAL file will grow without bound.",
+          "start": 20193,
+          "quote_sha256": "4afd5e409555677ecae7cf21c6b5eea5b05a6756113006102ad74a1aa12a9490",
+          "source_sha256": "b26f7a935eaf42713229e38a40754b5c3bf67d36253e1a5b0e776596e5cd5211",
+          "locator": "§6 Checkpoint starvation"
+        },
+        {
+          "source": "source-df6ecfdf38647b2ab2db",
+          "quote": "If an application disables the\nautomatic checkpoint, then there is nothing to prevent the WAL file\nfrom growing excessively.",
+          "start": 19496,
+          "quote_sha256": "dd090599739e1a2a2570a17e59efc19a81e6678cba2d5400a414ae55dadf3047",
+          "source_sha256": "b26f7a935eaf42713229e38a40754b5c3bf67d36253e1a5b0e776596e5cd5211",
+          "locator": "§6 Disabling the automatic checkpoint mechanism"
+        },
+        {
+          "source": "source-df6ecfdf38647b2ab2db",
+          "quote": "the WAL file cannot be reset in the middle of a write\ntransaction. So a large change to a large database\nmight result in a large WAL file.",
+          "start": 21079,
+          "quote_sha256": "71ebfe6a6b028118fb58709060702ad89cf15de581c7efecef7226318ea848cf",
+          "source_sha256": "b26f7a935eaf42713229e38a40754b5c3bf67d36253e1a5b0e776596e5cd5211",
+          "locator": "§6 Very large write transactions"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    },
+    {
+      "key": "fact-090c20c597474a288320158beec89c87",
+      "statement": "SQLite normally recycles the WAL by overwriting from its beginning rather than truncating it, so checkpoint completion does not ordinarily reduce its physical file size.",
+      "questions": [
+        "wal-growth"
+      ],
+      "section": "checkpoints",
+      "subject": null,
+      "as_of": null,
+      "authored_by": "/root/checkpoints",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/checker_b",
+        "at": "2026-10-16T17:54:44.856Z",
+        "inspected_sources": [
+          {
+            "source": "source-df6ecfdf38647b2ab2db",
+            "sha256": "b26f7a935eaf42713229e38a40754b5c3bf67d36253e1a5b0e776596e5cd5211",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-db013e8d9f9c664d5965",
+            "sha256": "1632c1114efe669256c68de4c179655ae6a37645374b754e0cded7cd1a39cad5",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-452c2d8dfbf813441a2f",
+            "sha256": "2f5869d25b59a520e75747124dae55f379374f29f13da7644e72b25dc792c94d",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-df6ecfdf38647b2ab2db",
+          "quote": "The checkpoint does not normally truncate the WAL file\n(unless the journal_size_limit pragma is set). Instead, it merely\ncauses SQLite to start overwriting the WAL file from the beginning.",
+          "start": 18375,
+          "quote_sha256": "266dbd5d5e3e3bcce126630e14503e773189a7bc5e6e4c2e9a0bf00a45958e2e",
+          "source_sha256": "b26f7a935eaf42713229e38a40754b5c3bf67d36253e1a5b0e776596e5cd5211",
+          "locator": "§6 Avoiding Excessively Large WAL Files"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    },
+    {
+      "key": "fact-150e23e2d388496bb704f3799a1f61e5",
+      "statement": "SQLite runs automatic checkpoints in the committing thread by default, making some commits much slower; applications can move periodic checkpoints to another thread or process.",
+      "questions": [
+        "wal-growth"
+      ],
+      "section": "checkpoints",
+      "subject": null,
+      "as_of": null,
+      "authored_by": "/root/checkpoints",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/checker_b",
+        "at": "2026-10-16T17:54:44.856Z",
+        "inspected_sources": [
+          {
+            "source": "source-df6ecfdf38647b2ab2db",
+            "sha256": "b26f7a935eaf42713229e38a40754b5c3bf67d36253e1a5b0e776596e5cd5211",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-db013e8d9f9c664d5965",
+            "sha256": "1632c1114efe669256c68de4c179655ae6a37645374b754e0cded7cd1a39cad5",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-452c2d8dfbf813441a2f",
+            "sha256": "2f5869d25b59a520e75747124dae55f379374f29f13da7644e72b25dc792c94d",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-df6ecfdf38647b2ab2db",
+          "quote": "By default, the checkpoint will be\nrun automatically by the same thread that does the COMMIT that pushes\nthe WAL over its size limit. This has the effect of causing most\nCOMMIT operations to be very fast but an occasional COMMIT (those that trigger\na checkpoint) to be much slower. If that effect is undesirable, then\nthe application can disable automatic checkpointing and run the\nperiodic checkpoints in a separate thread, or separate process.",
+          "start": 10551,
+          "quote_sha256": "d618a5227d5334b967b03c7dc81568de93f583db906c8af0100e27f0adc63e0b",
+          "source_sha256": "b26f7a935eaf42713229e38a40754b5c3bf67d36253e1a5b0e776596e5cd5211",
+          "locator": "§2.3 Performance Considerations"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    },
+    {
+      "key": "fact-545fd5cefbeb4ee7b4378e98aba888e2",
+      "statement": "In WAL mode, synchronous=FULL syncs the WAL after each transaction commit and provides atomicity, consistency, isolation and durability.",
+      "questions": [
+        "sync-durability"
+      ],
+      "section": "durability",
+      "subject": null,
+      "as_of": null,
+      "authored_by": "/root/durability",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/checker_c",
+        "at": "2026-10-16T17:54:44.413Z",
+        "inspected_sources": [
+          {
+            "source": "source-df6ecfdf38647b2ab2db",
+            "sha256": "b26f7a935eaf42713229e38a40754b5c3bf67d36253e1a5b0e776596e5cd5211",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-4cee7aec84ba0abb3cdf",
+            "sha256": "2f5869d25b59a520e75747124dae55f379374f29f13da7644e72b25dc792c94d",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-465a9e7fe3d879584d45",
+            "sha256": "640eb0940beb7bd32146a416c79ee326b1ea2a32e05f134d43ea51ce50bee622",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-9a3681c381427ce152be",
+            "sha256": "08e859c0d598b1e60279292432d572ba8ce63eee7ef137ee12f54cf14186be42",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-4cee7aec84ba0abb3cdf",
+          "quote": "FULL is atomic, consistent, isolated, and durable (ACID) in WAL mode and\nis atomic, consistent, and isolated with a rollback journal.",
+          "start": 66311,
+          "quote_sha256": "bf036bc4f2380411774af083c1835f4e41cd949ee8e95a822c24f7666a405bd3",
+          "source_sha256": "2f5869d25b59a520e75747124dae55f379374f29f13da7644e72b25dc792c94d",
+          "locator": "PRAGMA synchronous"
+        },
+        {
+          "source": "source-4cee7aec84ba0abb3cdf",
+          "quote": "With synchronous=FULL in WAL mode, an additional\nsync operation of the WAL file happens after each transaction commit.\nThe extra WAL sync following each transaction helps ensure that\ntransactions are durable across a power loss.",
+          "start": 68943,
+          "quote_sha256": "9c7758b370358636c26fc767eed77329256c03b6dcd0159adcc1f996d21af48d",
+          "source_sha256": "2f5869d25b59a520e75747124dae55f379374f29f13da7644e72b25dc792c94d",
+          "locator": "PRAGMA synchronous"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    },
+    {
+      "key": "fact-7576abaf8c9f4334a83f275d37fdef66",
+      "statement": "WAL with synchronous=NORMAL remains consistent, but committed transactions may roll back after power loss or a system crash; transactions survive application crashes.",
+      "questions": [
+        "sync-durability"
+      ],
+      "section": "durability",
+      "subject": null,
+      "as_of": null,
+      "authored_by": "/root/durability",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/checker_c",
+        "at": "2026-10-16T17:54:44.413Z",
+        "inspected_sources": [
+          {
+            "source": "source-df6ecfdf38647b2ab2db",
+            "sha256": "b26f7a935eaf42713229e38a40754b5c3bf67d36253e1a5b0e776596e5cd5211",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-4cee7aec84ba0abb3cdf",
+            "sha256": "2f5869d25b59a520e75747124dae55f379374f29f13da7644e72b25dc792c94d",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-465a9e7fe3d879584d45",
+            "sha256": "640eb0940beb7bd32146a416c79ee326b1ea2a32e05f134d43ea51ce50bee622",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-9a3681c381427ce152be",
+            "sha256": "08e859c0d598b1e60279292432d572ba8ce63eee7ef137ee12f54cf14186be42",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-4cee7aec84ba0abb3cdf",
+          "quote": "WAL mode is always consistent\nwith synchronous=NORMAL, but WAL mode does lose durability. A transaction\ncommitted in WAL mode with synchronous=NORMAL might roll back following\na power loss or system crash. Transactions are durable across application\ncrashes regardless of the synchronous setting or journal mode.",
+          "start": 67119,
+          "quote_sha256": "f4282c83e44c47e5760859a120e3bb7d49905a5c2eef053926cf931ed269b795",
+          "source_sha256": "2f5869d25b59a520e75747124dae55f379374f29f13da7644e72b25dc792c94d",
+          "locator": "PRAGMA synchronous"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    },
+    {
+      "key": "fact-f7901e77e59e4b9aa5536951d3837237",
+      "statement": "With synchronous=OFF, SQLite skips syncing; an application crash leaves data safe, but operating-system failure or power loss can corrupt the database.",
+      "questions": [
+        "sync-durability"
+      ],
+      "section": "durability",
+      "subject": null,
+      "as_of": null,
+      "authored_by": "/root/durability",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/checker_c",
+        "at": "2026-10-16T17:54:44.413Z",
+        "inspected_sources": [
+          {
+            "source": "source-df6ecfdf38647b2ab2db",
+            "sha256": "b26f7a935eaf42713229e38a40754b5c3bf67d36253e1a5b0e776596e5cd5211",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-4cee7aec84ba0abb3cdf",
+            "sha256": "2f5869d25b59a520e75747124dae55f379374f29f13da7644e72b25dc792c94d",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-465a9e7fe3d879584d45",
+            "sha256": "640eb0940beb7bd32146a416c79ee326b1ea2a32e05f134d43ea51ce50bee622",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-9a3681c381427ce152be",
+            "sha256": "08e859c0d598b1e60279292432d572ba8ce63eee7ef137ee12f54cf14186be42",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-4cee7aec84ba0abb3cdf",
+          "quote": "With synchronous OFF (0), SQLite continues without syncing\nas soon as it has handed data off to the operating system.\nIf the application running SQLite crashes, the data will be safe, but\nthe database might become corrupted if the operating system\ncrashes or the computer loses power before that data has been written\nto non-volatile storage.",
+          "start": 67816,
+          "quote_sha256": "3b69ec2083a80459abbf21115f8f3335396ca3c5e99db3af0baa9e9ecfd2ffb3",
+          "source_sha256": "2f5869d25b59a520e75747124dae55f379374f29f13da7644e72b25dc792c94d",
+          "locator": "PRAGMA synchronous"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    },
+    {
+      "key": "fact-0d5f1e4cfb024f98ac22849c0db7cd9c",
+      "statement": "With synchronous=NORMAL in WAL mode, synchronization occurs around checkpoints and WAL reuse rather than during most transactions.",
+      "questions": [
+        "sync-durability"
+      ],
+      "section": "durability",
+      "subject": null,
+      "as_of": null,
+      "authored_by": "/root/durability",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/checker_c",
+        "at": "2026-10-16T17:54:44.413Z",
+        "inspected_sources": [
+          {
+            "source": "source-df6ecfdf38647b2ab2db",
+            "sha256": "b26f7a935eaf42713229e38a40754b5c3bf67d36253e1a5b0e776596e5cd5211",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-4cee7aec84ba0abb3cdf",
+            "sha256": "2f5869d25b59a520e75747124dae55f379374f29f13da7644e72b25dc792c94d",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-465a9e7fe3d879584d45",
+            "sha256": "640eb0940beb7bd32146a416c79ee326b1ea2a32e05f134d43ea51ce50bee622",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-9a3681c381427ce152be",
+            "sha256": "08e859c0d598b1e60279292432d572ba8ce63eee7ef137ee12f54cf14186be42",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-4cee7aec84ba0abb3cdf",
+          "quote": "In WAL mode when synchronous is NORMAL (1), the WAL file is\nsynchronized before each checkpoint and the database file is\nsynchronized after each completed checkpoint and the WAL file\nheader is synchronized when a WAL file begins to be reused after\na checkpoint, but no sync operations occur during most transactions.",
+          "start": 68626,
+          "quote_sha256": "ddadeaa337b86d15b9d53150b719dad31e102b4bff988b2a42bc05c48892e92a",
+          "source_sha256": "2f5869d25b59a520e75747124dae55f379374f29f13da7644e72b25dc792c94d",
+          "locator": "PRAGMA synchronous"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    },
+    {
+      "key": "fact-826a960988084e4ca75fb2224950ed07",
+      "statement": "SQLite durability relies on the operating system and storage honoring synchronization requests; SQLite assumes flush or fsync waits for pending file writes to finish.",
+      "questions": [
+        "sync-durability"
+      ],
+      "section": "durability",
+      "subject": null,
+      "as_of": null,
+      "authored_by": "/root/durability",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/checker_c",
+        "at": "2026-10-16T17:54:44.413Z",
+        "inspected_sources": [
+          {
+            "source": "source-df6ecfdf38647b2ab2db",
+            "sha256": "b26f7a935eaf42713229e38a40754b5c3bf67d36253e1a5b0e776596e5cd5211",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-4cee7aec84ba0abb3cdf",
+            "sha256": "2f5869d25b59a520e75747124dae55f379374f29f13da7644e72b25dc792c94d",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-465a9e7fe3d879584d45",
+            "sha256": "640eb0940beb7bd32146a416c79ee326b1ea2a32e05f134d43ea51ce50bee622",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-9a3681c381427ce152be",
+            "sha256": "08e859c0d598b1e60279292432d572ba8ce63eee7ef137ee12f54cf14186be42",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-9a3681c381427ce152be",
+          "quote": "SQLite assumes that the flush or fsync will not return until\nall pending write operations for the file that is being flushed have\ncompleted.",
+          "start": 7440,
+          "quote_sha256": "edcf1354034d6791a8b36d9a7e96952f78a04ad256c1eb34892875b5ee3f63b4",
+          "source_sha256": "08e859c0d598b1e60279292432d572ba8ce63eee7ef137ee12f54cf14186be42",
+          "locator": "2. Hardware Assumptions"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    },
+    {
+      "key": "fact-93be901d07774c279c03c857d5066170",
+      "statement": "The WAL file is persistent database state; separating it from the database during copying or moving can lose committed transactions or corrupt the database.",
+      "questions": [
+        "recovery-backup"
+      ],
+      "section": "durability",
+      "subject": null,
+      "as_of": null,
+      "authored_by": "/root/durability",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/checker_c",
+        "at": "2026-10-16T17:54:44.413Z",
+        "inspected_sources": [
+          {
+            "source": "source-df6ecfdf38647b2ab2db",
+            "sha256": "b26f7a935eaf42713229e38a40754b5c3bf67d36253e1a5b0e776596e5cd5211",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-4cee7aec84ba0abb3cdf",
+            "sha256": "2f5869d25b59a520e75747124dae55f379374f29f13da7644e72b25dc792c94d",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-465a9e7fe3d879584d45",
+            "sha256": "640eb0940beb7bd32146a416c79ee326b1ea2a32e05f134d43ea51ce50bee622",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-9a3681c381427ce152be",
+            "sha256": "08e859c0d598b1e60279292432d572ba8ce63eee7ef137ee12f54cf14186be42",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-df6ecfdf38647b2ab2db",
+          "quote": "The WAL file is part of the persistent state of the\ndatabase and should be kept with the database if the database is copied\nor moved. If a database file is separated from its WAL file, then\ntransactions that were previously committed to the database might be lost,\nor the database file might become corrupted.",
+          "start": 16668,
+          "quote_sha256": "4c3012d421829e58aaf3e94c99a8014a3a673b5b986db2e968e663f9e9c91c7a",
+          "source_sha256": "b26f7a935eaf42713229e38a40754b5c3bf67d36253e1a5b0e776596e5cd5211",
+          "locator": "4. The WAL File"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    },
+    {
+      "key": "fact-374bba01b2534a569a03beff81fffbe4",
+      "statement": "After the last connection crashes, the first new connection performs recovery while holding an exclusive lock, and concurrent queries can receive SQLITE_BUSY.",
+      "questions": [
+        "recovery-backup"
+      ],
+      "section": "durability",
+      "subject": null,
+      "as_of": null,
+      "authored_by": "/root/durability",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/checker_c",
+        "at": "2026-10-16T17:54:44.413Z",
+        "inspected_sources": [
+          {
+            "source": "source-df6ecfdf38647b2ab2db",
+            "sha256": "b26f7a935eaf42713229e38a40754b5c3bf67d36253e1a5b0e776596e5cd5211",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-4cee7aec84ba0abb3cdf",
+            "sha256": "2f5869d25b59a520e75747124dae55f379374f29f13da7644e72b25dc792c94d",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-465a9e7fe3d879584d45",
+            "sha256": "640eb0940beb7bd32146a416c79ee326b1ea2a32e05f134d43ea51ce50bee622",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-9a3681c381427ce152be",
+            "sha256": "08e859c0d598b1e60279292432d572ba8ce63eee7ef137ee12f54cf14186be42",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-df6ecfdf38647b2ab2db",
+          "quote": "If the last connection to a database crashed, then the first new\nconnection to open the database will start a recovery process. An\nexclusive lock is held during recovery. So if a third database connection\ntries to jump in and query while the second connection is running recovery,\nthe third connection will get an SQLITE_BUSY error.",
+          "start": 26431,
+          "quote_sha256": "fd4d8ff1d7a9d1c2070d138fea3fa5d369b0fc40ad233be4bf9271eacaadf59b",
+          "source_sha256": "b26f7a935eaf42713229e38a40754b5c3bf67d36253e1a5b0e776596e5cd5211",
+          "locator": "9. Sometimes Queries Return SQLITE_BUSY In WAL Mode"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    },
+    {
+      "key": "fact-e3a042ff1d034c289671215482448e4d",
+      "statement": "SQLite documents the Online Backup API and VACUUM INTO as methods for backing up a live database.",
+      "questions": [
+        "recovery-backup"
+      ],
+      "section": "durability",
+      "subject": null,
+      "as_of": null,
+      "authored_by": "/root/durability",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/checker_c",
+        "at": "2026-10-16T17:54:44.413Z",
+        "inspected_sources": [
+          {
+            "source": "source-df6ecfdf38647b2ab2db",
+            "sha256": "b26f7a935eaf42713229e38a40754b5c3bf67d36253e1a5b0e776596e5cd5211",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-4cee7aec84ba0abb3cdf",
+            "sha256": "2f5869d25b59a520e75747124dae55f379374f29f13da7644e72b25dc792c94d",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-465a9e7fe3d879584d45",
+            "sha256": "640eb0940beb7bd32146a416c79ee326b1ea2a32e05f134d43ea51ce50bee622",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-9a3681c381427ce152be",
+            "sha256": "08e859c0d598b1e60279292432d572ba8ce63eee7ef137ee12f54cf14186be42",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-465a9e7fe3d879584d45",
+          "quote": "The Online Backup API is the original method for making backups of a\nlive SQLite databases. Other more recent techniques for accomplishing\nthe same thing include:\nThe VACUUM INTO command will make a vacuumed copy of a live\nSQLite database into a separate file.",
+          "start": 2448,
+          "quote_sha256": "5fed48f664d465ecb557cd3540039602026583f4945e61470ad9c9853996cd57",
+          "source_sha256": "640eb0940beb7bd32146a416c79ee326b1ea2a32e05f134d43ea51ce50bee622",
+          "locator": "1.1. Other Backup Techniques"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    },
+    {
+      "key": "fact-4c960a3bcf414775841354e9e8b945e6",
+      "statement": "SQLite WAL permits concurrent readers and a writer, but can be slightly slower for applications that mostly read and seldom write.",
+      "questions": [
+        "enablement"
+      ],
+      "section": "deployment",
+      "subject": null,
+      "as_of": null,
+      "authored_by": "/root",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/checker_d",
+        "at": "2026-10-16T17:55:06.636Z",
+        "inspected_sources": [
+          {
+            "source": "source-d2c1df874e2ea89d1a6e",
+            "sha256": "3e0b0c6363b232eae74e6d27c01ab82b07c371cb8dcb3b0b70cd0b9a47494896",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-0380acd4a6185e35a128",
+            "sha256": "648178c56f253acf62775766be6aed13b5c2612acd7534ee21c300b567a13dce",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-0048a761d0314ee6ad82",
+            "sha256": "772d73f320208afefdeb7d016ba6f4b300606c18b02d96e8af7eb1a56a625a2a",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-c98007d7008f08208ab6",
+            "sha256": "097af401f50d951d83a2afd4358a28847812af73118dc0604f5bb92a9c9b6690",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-d2c1df874e2ea89d1a6e",
+          "quote": "WAL provides more concurrency as readers do not block writers and \n a writer does not block readers. Reading and writing can proceed \n concurrently.",
+          "start": 1229,
+          "quote_sha256": "9923502e139def7c6df2582ebe89194b43f2afc552b84aeffad394b2d8374824",
+          "source_sha256": "3e0b0c6363b232eae74e6d27c01ab82b07c371cb8dcb3b0b70cd0b9a47494896",
+          "locator": "§1 Overview, advantages"
+        },
+        {
+          "source": "source-d2c1df874e2ea89d1a6e",
+          "quote": "WAL might be very slightly slower (perhaps 1% or 2% slower)\n than the traditional rollback-journal approach\n in applications that do mostly reads and seldom write.",
+          "start": 2782,
+          "quote_sha256": "4b7651d98f512a54a40cea09b5b7aeed5fbc91d206843c74b7612adcd85c3826",
+          "source_sha256": "3e0b0c6363b232eae74e6d27c01ab82b07c371cb8dcb3b0b70cd0b9a47494896",
+          "locator": "§1 Overview, disadvantages"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    },
+    {
+      "key": "fact-f4d85a48f2b449658b29daaf812d23f0",
+      "statement": "PRAGMA journal_mode=WAL enables WAL only if the returned journal mode is wal; conversion can fail when the VFS lacks shared-memory support.",
+      "questions": [
+        "enablement"
+      ],
+      "section": "deployment",
+      "subject": null,
+      "as_of": null,
+      "authored_by": "/root",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/checker_d",
+        "at": "2026-10-16T17:55:06.636Z",
+        "inspected_sources": [
+          {
+            "source": "source-d2c1df874e2ea89d1a6e",
+            "sha256": "3e0b0c6363b232eae74e6d27c01ab82b07c371cb8dcb3b0b70cd0b9a47494896",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-0380acd4a6185e35a128",
+            "sha256": "648178c56f253acf62775766be6aed13b5c2612acd7534ee21c300b567a13dce",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-0048a761d0314ee6ad82",
+            "sha256": "772d73f320208afefdeb7d016ba6f4b300606c18b02d96e8af7eb1a56a625a2a",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-c98007d7008f08208ab6",
+            "sha256": "097af401f50d951d83a2afd4358a28847812af73118dc0604f5bb92a9c9b6690",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-d2c1df874e2ea89d1a6e",
+          "quote": "PRAGMA journal_mode=WAL;\n\nThe journal_mode pragma returns a string which is the new journal mode.\nOn success, the pragma will return the string \"wal\". If \nthe conversion to WAL could not be completed (for example, if the VFS\ndoes not support the necessary shared-memory primitives) then the\njournaling mode will be unchanged and the string returned from the\nprimitive will be the prior journaling mode (for example \"delete\").",
+          "start": 12840,
+          "quote_sha256": "cd969efa2c13e8e1c42b245f369062373eea7409c24bca6b34c3925c09cd9586",
+          "source_sha256": "3e0b0c6363b232eae74e6d27c01ab82b07c371cb8dcb3b0b70cd0b9a47494896",
+          "locator": "§3 Activating And Configuring WAL Mode"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    },
+    {
+      "key": "fact-f5cee22a58cc4ac4b39328a943a7c50d",
+      "statement": "WAL mode persists across database reopenings and applies to all connections accessing the same database file.",
+      "questions": [
+        "enablement"
+      ],
+      "section": "deployment",
+      "subject": null,
+      "as_of": null,
+      "authored_by": "/root",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/checker_d",
+        "at": "2026-10-16T17:55:06.636Z",
+        "inspected_sources": [
+          {
+            "source": "source-d2c1df874e2ea89d1a6e",
+            "sha256": "3e0b0c6363b232eae74e6d27c01ab82b07c371cb8dcb3b0b70cd0b9a47494896",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-0380acd4a6185e35a128",
+            "sha256": "648178c56f253acf62775766be6aed13b5c2612acd7534ee21c300b567a13dce",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-0048a761d0314ee6ad82",
+            "sha256": "772d73f320208afefdeb7d016ba6f4b300606c18b02d96e8af7eb1a56a625a2a",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-c98007d7008f08208ab6",
+            "sha256": "097af401f50d951d83a2afd4358a28847812af73118dc0604f5bb92a9c9b6690",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-d2c1df874e2ea89d1a6e",
+          "quote": "Unlike the other journaling modes, \nPRAGMA journal_mode=WAL is\npersistent. If a process sets WAL mode, then closes and reopens the\ndatabase, the database will come back in WAL mode.",
+          "start": 15195,
+          "quote_sha256": "36e041451aaaf6fa30a14aa6edbd89b907779c82b2456202b443b713697bc3a6",
+          "source_sha256": "3e0b0c6363b232eae74e6d27c01ab82b07c371cb8dcb3b0b70cd0b9a47494896",
+          "locator": "§3.3 Persistence of WAL mode"
+        },
+        {
+          "source": "source-d2c1df874e2ea89d1a6e",
+          "quote": "The WAL journal mode will be set on all\nconnections to the same database file if it is set on any one connection.",
+          "start": 15895,
+          "quote_sha256": "6b1baa823f096c9dc35f32451479ec3ba0687e35415d5e187d39d922db0698c7",
+          "source_sha256": "3e0b0c6363b232eae74e6d27c01ab82b07c371cb8dcb3b0b70cd0b9a47494896",
+          "locator": "§3.3 Persistence of WAL mode"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    },
+    {
+      "key": "fact-b89ed03c8319488f91a27461e673eb77",
+      "statement": "Every new SQLite connection starts with automatic checkpointing enabled at the default threshold, so checkpoint configuration is connection-specific.",
+      "questions": [
+        "enablement"
+      ],
+      "section": "deployment",
+      "subject": null,
+      "as_of": null,
+      "authored_by": "/root",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/checker_d",
+        "at": "2026-10-16T17:55:06.636Z",
+        "inspected_sources": [
+          {
+            "source": "source-d2c1df874e2ea89d1a6e",
+            "sha256": "3e0b0c6363b232eae74e6d27c01ab82b07c371cb8dcb3b0b70cd0b9a47494896",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-0380acd4a6185e35a128",
+            "sha256": "648178c56f253acf62775766be6aed13b5c2612acd7534ee21c300b567a13dce",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-0048a761d0314ee6ad82",
+            "sha256": "772d73f320208afefdeb7d016ba6f4b300606c18b02d96e8af7eb1a56a625a2a",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-c98007d7008f08208ab6",
+            "sha256": "097af401f50d951d83a2afd4358a28847812af73118dc0604f5bb92a9c9b6690",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-0380acd4a6185e35a128",
+          "quote": "Every new database connection defaults to having the auto-checkpoint\nenabled with a threshold of 1000 or SQLITE_DEFAULT_WAL_AUTOCHECKPOINT\npages.",
+          "start": 1055,
+          "quote_sha256": "68973c85871d883ef60c07828fef152440fb80c1a2c28932217f4e7461e08c63",
+          "source_sha256": "648178c56f253acf62775766be6aed13b5c2612acd7534ee21c300b567a13dce",
+          "locator": "Configure an auto-checkpoint"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    },
+    {
+      "key": "fact-cf8da9b4736744b9afa01b88f182c503",
+      "statement": "A SQLite busy timeout installs a connection's busy handler to wait before returning SQLITE_BUSY and replaces any existing handler.",
+      "questions": [
+        "enablement"
+      ],
+      "section": "deployment",
+      "subject": null,
+      "as_of": null,
+      "authored_by": "/root",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/checker_d",
+        "at": "2026-10-16T17:55:06.636Z",
+        "inspected_sources": [
+          {
+            "source": "source-d2c1df874e2ea89d1a6e",
+            "sha256": "3e0b0c6363b232eae74e6d27c01ab82b07c371cb8dcb3b0b70cd0b9a47494896",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-0380acd4a6185e35a128",
+            "sha256": "648178c56f253acf62775766be6aed13b5c2612acd7534ee21c300b567a13dce",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-0048a761d0314ee6ad82",
+            "sha256": "772d73f320208afefdeb7d016ba6f4b300606c18b02d96e8af7eb1a56a625a2a",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-c98007d7008f08208ab6",
+            "sha256": "097af401f50d951d83a2afd4358a28847812af73118dc0604f5bb92a9c9b6690",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-0048a761d0314ee6ad82",
+          "quote": "This routine sets a busy handler that sleeps\nfor a specified amount of time when a table is locked. The handler\nwill sleep multiple times until at least \"ms\" milliseconds of sleeping\nhave accumulated. After at least \"ms\" milliseconds of sleeping,\nthe handler returns 0 which causes sqlite3_step() to return\nSQLITE_BUSY.",
+          "start": 317,
+          "quote_sha256": "81ff0618e8081220dda44d4363cc9501fd3b1a5e8ad539cf6f60ed0d21a8350f",
+          "source_sha256": "772d73f320208afefdeb7d016ba6f4b300606c18b02d96e8af7eb1a56a625a2a",
+          "locator": "Set A Busy Timeout"
+        },
+        {
+          "source": "source-0048a761d0314ee6ad82",
+          "quote": "There can only be a single busy handler for a particular\ndatabase connection at any given moment. If another busy handler\nwas defined (using sqlite3_busy_handler()) prior to calling\nthis routine, that other busy handler is cleared.",
+          "start": 733,
+          "quote_sha256": "53a76bcc74968a2971766743096e19adc2e3b606caea9e28ffcbe0a609e3f644",
+          "source_sha256": "772d73f320208afefdeb7d016ba6f4b300606c18b02d96e8af7eb1a56a625a2a",
+          "locator": "Set A Busy Timeout"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    },
+    {
+      "key": "fact-c5497525bf21424681e54515a3beb457",
+      "statement": "SQLite fixed the rare WAL-reset corruption race in 3.51.3 and later, with backports in 3.44.6 and 3.50.7.",
+      "questions": [
+        "enablement"
+      ],
+      "section": "deployment",
+      "subject": null,
+      "as_of": null,
+      "authored_by": "/root",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/checker_d",
+        "at": "2026-10-16T17:55:06.636Z",
+        "inspected_sources": [
+          {
+            "source": "source-d2c1df874e2ea89d1a6e",
+            "sha256": "3e0b0c6363b232eae74e6d27c01ab82b07c371cb8dcb3b0b70cd0b9a47494896",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-0380acd4a6185e35a128",
+            "sha256": "648178c56f253acf62775766be6aed13b5c2612acd7534ee21c300b567a13dce",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-0048a761d0314ee6ad82",
+            "sha256": "772d73f320208afefdeb7d016ba6f4b300606c18b02d96e8af7eb1a56a625a2a",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-c98007d7008f08208ab6",
+            "sha256": "097af401f50d951d83a2afd4358a28847812af73118dc0604f5bb92a9c9b6690",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-d2c1df874e2ea89d1a6e",
+          "quote": "The bug is likely present in all version of SQLite from\n3.7.0 (2010-07-21) through 3.51.2 (2026-01-09). It is\nfixed in version 3.51.3 (2026-03-13) and later. Backports of the fix\nare available for some earlier releases:\n3.44.6 and\n3.50.7.",
+          "start": 28174,
+          "quote_sha256": "af37b730464e5ceb1950a48c31e58a899c152af825aca53accfac8e6dc70ab71",
+          "source_sha256": "3e0b0c6363b232eae74e6d27c01ab82b07c371cb8dcb3b0b70cd0b9a47494896",
+          "locator": "§11 The WAL-Reset Bug"
+        },
+        {
+          "source": "source-c98007d7008f08208ab6",
+          "quote": "Changes in this specific patch release, version 3.51.3 (2026-03-13):\n\n Fix the WAL-reset database corruption bug.",
+          "start": 3952,
+          "quote_sha256": "263da4eb59e0e9e05036c132b31612f3aaacee3c00da60b4a74bc507ac09ef57",
+          "source_sha256": "097af401f50d951d83a2afd4358a28847812af73118dc0604f5bb92a9c9b6690",
+          "locator": "Changes in this specific patch release"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    },
+    {
+      "key": "fact-ddfa4513a46444db94368c77f2f91809",
+      "statement": "The WAL-reset bug affects concurrent connections in separate threads or processes that attempt writing or checkpointing simultaneously.",
+      "questions": [
+        "enablement"
+      ],
+      "section": "deployment",
+      "subject": null,
+      "as_of": null,
+      "authored_by": "/root",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/checker_d",
+        "at": "2026-10-16T17:55:06.636Z",
+        "inspected_sources": [
+          {
+            "source": "source-d2c1df874e2ea89d1a6e",
+            "sha256": "3e0b0c6363b232eae74e6d27c01ab82b07c371cb8dcb3b0b70cd0b9a47494896",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-0380acd4a6185e35a128",
+            "sha256": "648178c56f253acf62775766be6aed13b5c2612acd7534ee21c300b567a13dce",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-0048a761d0314ee6ad82",
+            "sha256": "772d73f320208afefdeb7d016ba6f4b300606c18b02d96e8af7eb1a56a625a2a",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-c98007d7008f08208ab6",
+            "sha256": "097af401f50d951d83a2afd4358a28847812af73118dc0604f5bb92a9c9b6690",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-d2c1df874e2ea89d1a6e",
+          "quote": "The bug only affects databases in WAL mode when there are two or more\ndatabase connections open on the same file, in separate threads or processes,\nand when those two connections attempt to write or checkpoint at the\nsame instant.",
+          "start": 28414,
+          "quote_sha256": "407cfcf4b8b9556527cd9119b8ddee1589f4c892c4a80b279650e48e1d5c0970",
+          "source_sha256": "3e0b0c6363b232eae74e6d27c01ab82b07c371cb8dcb3b0b70cd0b9a47494896",
+          "locator": "§11 The WAL-Reset Bug"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    },
+    {
+      "key": "fact-013a4cb7c0c248cc9daab75bbdffc497",
+      "statement": "SQLite WAL requires database users on the same host and does not work over a network filesystem.",
+      "questions": [
+        "limitations"
+      ],
+      "section": "deployment",
+      "subject": null,
+      "as_of": null,
+      "authored_by": "/root",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/checker_d",
+        "at": "2026-10-16T17:55:06.636Z",
+        "inspected_sources": [
+          {
+            "source": "source-d2c1df874e2ea89d1a6e",
+            "sha256": "3e0b0c6363b232eae74e6d27c01ab82b07c371cb8dcb3b0b70cd0b9a47494896",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-0380acd4a6185e35a128",
+            "sha256": "648178c56f253acf62775766be6aed13b5c2612acd7534ee21c300b567a13dce",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-0048a761d0314ee6ad82",
+            "sha256": "772d73f320208afefdeb7d016ba6f4b300606c18b02d96e8af7eb1a56a625a2a",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-c98007d7008f08208ab6",
+            "sha256": "097af401f50d951d83a2afd4358a28847812af73118dc0604f5bb92a9c9b6690",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-d2c1df874e2ea89d1a6e",
+          "quote": "All processes using a database must be on the same host computer;\n WAL does not work over a network filesystem. This is because WAL requires\n all processes to share a small amount of memory and processes on\n separate host machines obviously cannot share memory with each other.",
+          "start": 1607,
+          "quote_sha256": "0f354916df1a58295b570bf8c673d569e174a22bb7b385363d08142cb503d6c4",
+          "source_sha256": "3e0b0c6363b232eae74e6d27c01ab82b07c371cb8dcb3b0b70cd0b9a47494896",
+          "locator": "§1 Overview, disadvantages"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    },
+    {
+      "key": "fact-7e0dc73bf47c43a1a053d466581fc2e6",
+      "statement": "Transactions updating multiple ATTACHed SQLite databases are atomic per database in WAL mode, but not atomic across the database set.",
+      "questions": [
+        "limitations"
+      ],
+      "section": "deployment",
+      "subject": null,
+      "as_of": null,
+      "authored_by": "/root",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/checker_d",
+        "at": "2026-10-16T17:55:06.636Z",
+        "inspected_sources": [
+          {
+            "source": "source-d2c1df874e2ea89d1a6e",
+            "sha256": "3e0b0c6363b232eae74e6d27c01ab82b07c371cb8dcb3b0b70cd0b9a47494896",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-0380acd4a6185e35a128",
+            "sha256": "648178c56f253acf62775766be6aed13b5c2612acd7534ee21c300b567a13dce",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-0048a761d0314ee6ad82",
+            "sha256": "772d73f320208afefdeb7d016ba6f4b300606c18b02d96e8af7eb1a56a625a2a",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-c98007d7008f08208ab6",
+            "sha256": "097af401f50d951d83a2afd4358a28847812af73118dc0604f5bb92a9c9b6690",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-d2c1df874e2ea89d1a6e",
+          "quote": "Transactions that involve changes against multiple ATTACHed\n databases are atomic for each individual database, but are not\n atomic across all databases as a set.",
+          "start": 1886,
+          "quote_sha256": "231be24a3e633c1979f6bc4d59ca6470ef059744bda09ac1190df0411992ae5c",
+          "source_sha256": "3e0b0c6363b232eae74e6d27c01ab82b07c371cb8dcb3b0b70cd0b9a47494896",
+          "locator": "§1 Overview, disadvantages"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    },
+    {
+      "key": "fact-628f1e6e75b641c092c249492aca168b",
+      "statement": "SQLite cannot change page_size while in WAL mode; changing it requires a rollback journal mode.",
+      "questions": [
+        "limitations"
+      ],
+      "section": "deployment",
+      "subject": null,
+      "as_of": null,
+      "authored_by": "/root",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/checker_d",
+        "at": "2026-10-16T17:55:06.636Z",
+        "inspected_sources": [
+          {
+            "source": "source-d2c1df874e2ea89d1a6e",
+            "sha256": "3e0b0c6363b232eae74e6d27c01ab82b07c371cb8dcb3b0b70cd0b9a47494896",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-0380acd4a6185e35a128",
+            "sha256": "648178c56f253acf62775766be6aed13b5c2612acd7534ee21c300b567a13dce",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-0048a761d0314ee6ad82",
+            "sha256": "772d73f320208afefdeb7d016ba6f4b300606c18b02d96e8af7eb1a56a625a2a",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-c98007d7008f08208ab6",
+            "sha256": "097af401f50d951d83a2afd4358a28847812af73118dc0604f5bb92a9c9b6690",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-d2c1df874e2ea89d1a6e",
+          "quote": "It is not possible to change the page_size after entering WAL\n mode, either on an empty database or by using VACUUM or by restoring\n from a backup using the backup API. You must be in a rollback journal\n mode to change the page size.",
+          "start": 2050,
+          "quote_sha256": "ee87f3c63424389b56eb17930de3ffc59ff7f8dcf7a9c9b73ffd39eb382b619c",
+          "source_sha256": "3e0b0c6363b232eae74e6d27c01ab82b07c371cb8dcb3b0b70cd0b9a47494896",
+          "locator": "§1 Overview, disadvantages"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    },
+    {
+      "key": "fact-96e617b4c6f24ea59e804e696aea4311",
+      "statement": "Read-only WAL access requires readable existing sidecars, permission to create them, or an immutable connection; this support began in SQLite 3.22.0.",
+      "questions": [
+        "limitations"
+      ],
+      "section": "deployment",
+      "subject": null,
+      "as_of": null,
+      "authored_by": "/root",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/checker_d",
+        "at": "2026-10-16T17:55:06.636Z",
+        "inspected_sources": [
+          {
+            "source": "source-d2c1df874e2ea89d1a6e",
+            "sha256": "3e0b0c6363b232eae74e6d27c01ab82b07c371cb8dcb3b0b70cd0b9a47494896",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-0380acd4a6185e35a128",
+            "sha256": "648178c56f253acf62775766be6aed13b5c2612acd7534ee21c300b567a13dce",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-0048a761d0314ee6ad82",
+            "sha256": "772d73f320208afefdeb7d016ba6f4b300606c18b02d96e8af7eb1a56a625a2a",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-c98007d7008f08208ab6",
+            "sha256": "097af401f50d951d83a2afd4358a28847812af73118dc0604f5bb92a9c9b6690",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-d2c1df874e2ea89d1a6e",
+          "quote": "This constraint was relaxed beginning with\nSQLite version 3.22.0 (2018-01-22).\n\nOn newer versions of SQLite,\na WAL-mode database on read-only media, or a WAL-mode database that lacks\nwrite permission, can still be read as long as one or more of the following\nconditions are met:\n\nThe -shm and -wal files already exist and are readable.\n\nThere is write permission on the directory containing the database so\n that the -shm and -wal files can be created.\n\nThe database connection is opened using the\n immutable query parameter.",
+          "start": 17543,
+          "quote_sha256": "b1d880323cda69d280fdeeb994281cd6c4246f12522e972188f5c55b7dfdf76c",
+          "source_sha256": "3e0b0c6363b232eae74e6d27c01ab82b07c371cb8dcb3b0b70cd0b9a47494896",
+          "locator": "§5 Read-Only Databases"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    },
+    {
+      "key": "fact-c6df07cffe894ed7a461fd5013c2ed84",
+      "statement": "SQLite WAL's old large-transaction efficiency limitation was removed in 3.11.0, but large write transactions can still produce large WAL files before checkpointing.",
+      "questions": [
+        "limitations"
+      ],
+      "section": "deployment",
+      "subject": null,
+      "as_of": null,
+      "authored_by": "/root",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/checker_d",
+        "at": "2026-10-16T17:55:06.636Z",
+        "inspected_sources": [
+          {
+            "source": "source-d2c1df874e2ea89d1a6e",
+            "sha256": "3e0b0c6363b232eae74e6d27c01ab82b07c371cb8dcb3b0b70cd0b9a47494896",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-0380acd4a6185e35a128",
+            "sha256": "648178c56f253acf62775766be6aed13b5c2612acd7534ee21c300b567a13dce",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-0048a761d0314ee6ad82",
+            "sha256": "772d73f320208afefdeb7d016ba6f4b300606c18b02d96e8af7eb1a56a625a2a",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-c98007d7008f08208ab6",
+            "sha256": "097af401f50d951d83a2afd4358a28847812af73118dc0604f5bb92a9c9b6690",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-d2c1df874e2ea89d1a6e",
+          "quote": "Beginning with version 3.11.0 (2016-02-15), \n WAL mode works as efficiently with\n large transactions as does rollback mode.",
+          "start": 3715,
+          "quote_sha256": "93f18f5d240c47f1f67b70a05471271ee153b533ea49cdd310766bb339c68fbc",
+          "source_sha256": "3e0b0c6363b232eae74e6d27c01ab82b07c371cb8dcb3b0b70cd0b9a47494896",
+          "locator": "§1 Overview, updated large-transaction limitation"
+        },
+        {
+          "source": "source-d2c1df874e2ea89d1a6e",
+          "quote": "Very large write transactions.\nA checkpoint can only complete when no other transactions are running, \nwhich means the WAL file cannot be reset in the middle of a write\ntransaction. So a large change to a large database\nmight result in a large WAL file.",
+          "start": 21132,
+          "quote_sha256": "b97b957b2b84b0b0ee5f1d5503eade62f1d2fdf5969c8d5306ef161ba59d9807",
+          "source_sha256": "3e0b0c6363b232eae74e6d27c01ab82b07c371cb8dcb3b0b70cd0b9a47494896",
+          "locator": "§6 Avoiding Excessively Large WAL Files"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    },
+    {
+      "key": "fact-de3643a0e3cb42cf8ff03dbb6f25a654",
+      "statement": "SQLite WAL writes changes and a commit record to the WAL, allowing a commit without writing to the original database file.",
+      "questions": [
+        "mechanics",
+        "recovery-backup"
+      ],
+      "section": "concurrency",
+      "subject": null,
+      "as_of": null,
+      "authored_by": "/root/concurrency",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/checker_a",
+        "at": "2026-10-16T17:54:06.661Z",
+        "inspected_sources": [
+          {
+            "source": "source-10df15fcdda077049242",
+            "sha256": "7037d951bcc5a4c3c70105825c02aa2286a5752eb73d029bfa2a4f5d9c458626",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-cc732968c8eac4980a7a",
+            "sha256": "86def601fb3b0b2f00cc08ed04870478a779276ef3c5f130a61ba70c9c98e0ff",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-6320e865864ef8f81c44",
+            "sha256": "23f1d8cb37293a3fc96d78953c5c519edb63b90c28d9adbfdcb02b7b9eeb6550",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ],
+        "reason": "The source says a commit can happen without writing the database; automatic checkpointing can write the database during the commit path, so the unconditional original wording is too strong.",
+        "change": "narrowed"
+      },
+      "citations": [
+        {
+          "source": "source-10df15fcdda077049242",
+          "quote": "The original content is preserved\n\nin the database file and the changes are appended into a separate\n\nWAL file. A COMMIT occurs when a special record indicating a commit\n\nis appended to the WAL. Thus a COMMIT can happen without ever writing\n\nto the original database",
+          "start": 4329,
+          "quote_sha256": "360823e82b7be078de42bf31ff354387473f6e186222fd88595f8069ce4ae7ed",
+          "source_sha256": "7037d951bcc5a4c3c70105825c02aa2286a5752eb73d029bfa2a4f5d9c458626",
+          "locator": "2. How WAL Works"
+        },
+        {
+          "source": "source-df6ecfdf38647b2ab2db",
+          "quote": "A COMMIT occurs when a special record indicating a commit\nis appended to the WAL. Thus a COMMIT can happen without ever writing\nto the original database,",
+          "start": 4335,
+          "quote_sha256": "5485dc434360a1c1919512e9ca9389368ddfe84b427c380138bf24a37dc76b6c",
+          "source_sha256": "b26f7a935eaf42713229e38a40754b5c3bf67d36253e1a5b0e776596e5cd5211",
+          "locator": "2. How WAL Works"
+        },
+        {
+          "source": "source-df6ecfdf38647b2ab2db",
+          "quote": "Moving\nthe WAL file transactions back into the database is called a\n\"checkpoint\".",
+          "start": 4854,
+          "quote_sha256": "584c40d12041b5e198950c66f85c7c891301684b9e6441ddfcb79d1c51c2e4cd",
+          "source_sha256": "b26f7a935eaf42713229e38a40754b5c3bf67d36253e1a5b0e776596e5cd5211",
+          "locator": "2.1. Checkpointing"
+        }
+      ],
+      "original_statement": "SQLite WAL commits append changes and a commit record to the WAL without immediately modifying the original database file.",
+      "conflicts_with": [],
+      "superseded_by": null,
+      "support_checks": [
+        {
+          "result": "confirmed",
+          "by": "/root/checker_c",
+          "at": "2026-10-16T17:54:44.413Z",
+          "inspected_sources": [
+            {
+              "source": "source-df6ecfdf38647b2ab2db",
+              "sha256": "b26f7a935eaf42713229e38a40754b5c3bf67d36253e1a5b0e776596e5cd5211",
+              "original_sha256": null,
+              "read_original": true
+            },
+            {
+              "source": "source-4cee7aec84ba0abb3cdf",
+              "sha256": "2f5869d25b59a520e75747124dae55f379374f29f13da7644e72b25dc792c94d",
+              "original_sha256": null,
+              "read_original": true
+            },
+            {
+              "source": "source-465a9e7fe3d879584d45",
+              "sha256": "640eb0940beb7bd32146a416c79ee326b1ea2a32e05f134d43ea51ce50bee622",
+              "original_sha256": null,
+              "read_original": true
+            },
+            {
+              "source": "source-9a3681c381427ce152be",
+              "sha256": "08e859c0d598b1e60279292432d572ba8ce63eee7ef137ee12f54cf14186be42",
+              "original_sha256": null,
+              "read_original": true
+            }
+          ]
+        }
+      ],
+      "sources_count": 1,
+      "best_standing": "primary"
+    },
+    {
+      "key": "fact-0415e9580e9e46978877c9c56c586a68",
+      "statement": "SQLite PRAGMA wal_checkpoint returns a busy indicator, WAL page count and checkpointed page count for assessing checkpoint progress.",
+      "questions": [
+        "wal-growth"
+      ],
+      "section": "checkpoints",
+      "subject": null,
+      "as_of": null,
+      "authored_by": "/root/checkpoints",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/checker_b",
+        "at": "2026-10-16T17:54:44.856Z",
+        "inspected_sources": [
+          {
+            "source": "source-df6ecfdf38647b2ab2db",
+            "sha256": "b26f7a935eaf42713229e38a40754b5c3bf67d36253e1a5b0e776596e5cd5211",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-db013e8d9f9c664d5965",
+            "sha256": "1632c1114efe669256c68de4c179655ae6a37645374b754e0cded7cd1a39cad5",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-452c2d8dfbf813441a2f",
+            "sha256": "2f5869d25b59a520e75747124dae55f379374f29f13da7644e72b25dc792c94d",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ],
+        "reason": "The pragma returns progress counts, not the physical WAL file size; removing the ambiguous alongside-file-size wording keeps the assertion within its cited return-value documentation.",
+        "change": "narrowed"
+      },
+      "citations": [
+        {
+          "source": "source-452c2d8dfbf813441a2f",
+          "quote": "The wal_checkpoint pragma returns a single row with three\ninteger columns. The first column is usually 0 but will be\n1 if a RESTART or FULL or TRUNCATE checkpoint was blocked from completing,",
+          "start": 81922,
+          "quote_sha256": "b0447d2479a800444d20afbbd959522123a81e4cfb3039bddfc029a0f4186071",
+          "source_sha256": "2f5869d25b59a520e75747124dae55f379374f29f13da7644e72b25dc792c94d",
+          "locator": "PRAGMA wal_checkpoint return values"
+        },
+        {
+          "source": "source-452c2d8dfbf813441a2f",
+          "quote": "The second column is the number of modified pages that have been\nwritten to the write-ahead log file.\nThe third column is the number of pages in the write-ahead log file\nthat have been successfully moved back into the database file at\nthe conclusion of the checkpoint.",
+          "start": 82376,
+          "quote_sha256": "a411a07ec2e09099463190b2b135ac995f2baac2f67379ad775f4162725b6e85",
+          "source_sha256": "2f5869d25b59a520e75747124dae55f379374f29f13da7644e72b25dc792c94d",
+          "locator": "PRAGMA wal_checkpoint return values"
+        }
+      ],
+      "original_statement": "SQLite PRAGMA wal_checkpoint reports busy status, WAL page count and checkpointed page count, providing checkpoint progress information alongside the WAL file size.",
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    }
+  ],
+  "aliases": [
+    {
+      "key": "fact-b0d30ab5e38644c1b5589d99d8f45192",
+      "canonical": "fact-de3643a0e3cb42cf8ff03dbb6f25a654",
+      "original": {
+        "key": "fact-b0d30ab5e38644c1b5589d99d8f45192",
+        "statement": "A WAL transaction commits when its commit record is appended, without requiring a checkpoint or a write to the original database file.",
+        "questions": [
+          "recovery-backup"
+        ],
+        "section": "durability",
+        "subject": null,
+        "as_of": null,
+        "authored_by": "/root/durability",
+        "status": "confirmed",
+        "check": {
+          "result": "confirmed",
+          "by": "/root/checker_c",
+          "at": "2026-10-16T17:54:44.413Z",
+          "inspected_sources": [
+            {
+              "source": "source-df6ecfdf38647b2ab2db",
+              "sha256": "b26f7a935eaf42713229e38a40754b5c3bf67d36253e1a5b0e776596e5cd5211",
+              "original_sha256": null,
+              "read_original": true
+            },
+            {
+              "source": "source-4cee7aec84ba0abb3cdf",
+              "sha256": "2f5869d25b59a520e75747124dae55f379374f29f13da7644e72b25dc792c94d",
+              "original_sha256": null,
+              "read_original": true
+            },
+            {
+              "source": "source-465a9e7fe3d879584d45",
+              "sha256": "640eb0940beb7bd32146a416c79ee326b1ea2a32e05f134d43ea51ce50bee622",
+              "original_sha256": null,
+              "read_original": true
+            },
+            {
+              "source": "source-9a3681c381427ce152be",
+              "sha256": "08e859c0d598b1e60279292432d572ba8ce63eee7ef137ee12f54cf14186be42",
+              "original_sha256": null,
+              "read_original": true
+            }
+          ]
+        },
+        "citations": [
+          {
+            "source": "source-df6ecfdf38647b2ab2db",
+            "quote": "A COMMIT occurs when a special record indicating a commit\nis appended to the WAL. Thus a COMMIT can happen without ever writing\nto the original database,",
+            "start": 4335,
+            "quote_sha256": "5485dc434360a1c1919512e9ca9389368ddfe84b427c380138bf24a37dc76b6c",
+            "source_sha256": "b26f7a935eaf42713229e38a40754b5c3bf67d36253e1a5b0e776596e5cd5211",
+            "locator": "2. How WAL Works"
+          },
+          {
+            "source": "source-df6ecfdf38647b2ab2db",
+            "quote": "Moving\nthe WAL file transactions back into the database is called a\n\"checkpoint\".",
+            "start": 4854,
+            "quote_sha256": "584c40d12041b5e198950c66f85c7c891301684b9e6441ddfcb79d1c51c2e4cd",
+            "source_sha256": "b26f7a935eaf42713229e38a40754b5c3bf67d36253e1a5b0e776596e5cd5211",
+            "locator": "2.1. Checkpointing"
+          }
+        ],
+        "original_statement": null,
+        "conflicts_with": [],
+        "superseded_by": null
+      },
+      "by": "/root",
+      "reason": "Both describe the same WAL commit mechanism and the fact that copying WAL content into the main database (checkpointing) is not required to commit; contexts and SQLite modes match."
+    }
+  ],
+  "revisions": [
+    {
+      "previous": {
+        "key": "fact-26b92339b1944431a3b897868aa202bb",
+        "statement": "SQLite WAL commits append changes and a commit record to the WAL without immediately modifying the original database file.",
+        "questions": [
+          "mechanics"
+        ],
+        "section": "concurrency",
+        "subject": null,
+        "as_of": null,
+        "authored_by": "/root/concurrency",
+        "status": "candidate",
+        "check": null,
+        "citations": [
+          {
+            "source": "source-10df15fcdda077049242",
+            "quote": "The original content is preserved\n\nin the database file and the changes are appended into a separate\n\nWAL file. A COMMIT occurs when a special record indicating a commit\n\nis appended to the WAL. Thus a COMMIT can happen without ever writing\n\nto the original database",
+            "start": 4329,
+            "quote_sha256": "360823e82b7be078de42bf31ff354387473f6e186222fd88595f8069ce4ae7ed",
+            "source_sha256": "7037d951bcc5a4c3c70105825c02aa2286a5752eb73d029bfa2a4f5d9c458626",
+            "locator": "2. How WAL Works"
+          }
+        ],
+        "original_statement": null,
+        "conflicts_with": [],
+        "superseded_by": null
+      },
+      "current": "fact-de3643a0e3cb42cf8ff03dbb6f25a654",
+      "kind": "narrowed",
+      "reason": "The source says a commit can happen without writing the database; automatic checkpointing can write the database during the commit path, so the unconditional original wording is too strong."
+    },
+    {
+      "previous": {
+        "key": "fact-a7df2a880f8a442bbee1c55840448d19",
+        "statement": "SQLite PRAGMA wal_checkpoint reports busy status, WAL page count and checkpointed page count, providing checkpoint progress information alongside the WAL file size.",
+        "questions": [
+          "wal-growth"
+        ],
+        "section": "checkpoints",
+        "subject": null,
+        "as_of": null,
+        "authored_by": "/root/checkpoints",
+        "status": "candidate",
+        "check": null,
+        "citations": [
+          {
+            "source": "source-452c2d8dfbf813441a2f",
+            "quote": "The wal_checkpoint pragma returns a single row with three\ninteger columns. The first column is usually 0 but will be\n1 if a RESTART or FULL or TRUNCATE checkpoint was blocked from completing,",
+            "start": 81922,
+            "quote_sha256": "b0447d2479a800444d20afbbd959522123a81e4cfb3039bddfc029a0f4186071",
+            "source_sha256": "2f5869d25b59a520e75747124dae55f379374f29f13da7644e72b25dc792c94d",
+            "locator": "PRAGMA wal_checkpoint return values"
+          },
+          {
+            "source": "source-452c2d8dfbf813441a2f",
+            "quote": "The second column is the number of modified pages that have been\nwritten to the write-ahead log file.\nThe third column is the number of pages in the write-ahead log file\nthat have been successfully moved back into the database file at\nthe conclusion of the checkpoint.",
+            "start": 82376,
+            "quote_sha256": "a411a07ec2e09099463190b2b135ac995f2baac2f67379ad775f4162725b6e85",
+            "source_sha256": "2f5869d25b59a520e75747124dae55f379374f29f13da7644e72b25dc792c94d",
+            "locator": "PRAGMA wal_checkpoint return values"
+          }
+        ],
+        "original_statement": null,
+        "conflicts_with": [],
+        "superseded_by": null
+      },
+      "current": "fact-0415e9580e9e46978877c9c56c586a68",
+      "kind": "narrowed",
+      "reason": "The pragma returns progress counts, not the physical WAL file size; removing the ambiguous alongside-file-size wording keeps the assertion within its cited return-value documentation."
+    }
+  ],
+  "gaps": [],
+  "conflicts": [],
+  "superseded": [],
+  "missing": [],
+  "rejected": [],
+  "failed": [],
+  "counts": {
+    "questions": 8,
+    "facts": 38,
+    "checked": 38,
+    "sources": 14,
+    "narrowed": 2,
+    "rejected": 0,
+    "gaps": 0,
+    "conflicts": 0,
+    "superseded": 0,
+    "failed": 0
+  },
+  "block_reasons": [],
+  "stale_inputs": [],
+  "stale_questions": [],
+  "checkers": [
+    {
+      "id": "/root/checker_a",
+      "harness": "codex"
+    },
+    {
+      "id": "/root/checker_b",
+      "harness": "codex"
+    },
+    {
+      "id": "/root/checker_c",
+      "harness": "codex"
+    },
+    {
+      "id": "/root/checker_d",
+      "harness": "codex"
+    }
+  ],
+  "plan_warnings": [
+    "light depth usually plans 15 to 25 questions; this plan has 8. That suits a narrow request; otherwise add questions.",
+    "light depth usually covers 6 to 10 sections; this plan has 4."
+  ],
+  "reassessments": [],
+  "approval": null,
+  "approvals": [],
+  "origins": [],
+  "completed_at": "2026-10-16T17:56:54.893Z"
+}

@@ -229,7 +229,10 @@ Refresh `research status --project DIR`, open its actual report and verify the
 saved run/revision. `complete` and `complete-with-gaps` have finished assessments.
 Return `research/report.md` with the coverage by section, a short cited synthesis,
 the important gaps, and an offer to go deeper (standard or deep depth) when the
-topic deserves it. Facts, brief and plan live next to it. `research/output.json`
+topic deserves it. That saved report is the deliverable: link it, not a report
+of your own. The helper checks nothing you write outside `research/`; label any
+such summary or note as your own, unchecked, and still return `research/report.md`.
+Facts, brief and plan live next to it. `research/output.json`
 commits their shared run/revision and hashes; `status` repairs an interrupted
 export from durable state. The [facts export schema](facts.schema.json) documents
 the machine-readable contract.

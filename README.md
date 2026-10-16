@@ -18,8 +18,8 @@ saves a cited report in your project—ready to open, share, and continue later.
 | Check a set of claims | Supported, contradicted, or insufficient—with the evidence behind each verdict. |
 | Return to unfinished research | Saved progress, visible gaps, and a report that survives the chat. |
 
-> **Current release: [0.9.1](https://github.com/dbbaskette/harness-research-skill/releases/tag/v0.9.1).**
-> Install the tagged version below. Already using a preview that says 0.9.1?
+> **Current release: [0.9.2](https://github.com/dbbaskette/harness-research-skill/releases/tag/v0.9.2).**
+> Install the tagged version below. Already using a preview that says 0.9.2?
 > Rerun the installer from this tag to get the final release.
 > [Versions, updates, and troubleshooting →](docs/setup.md)
 
@@ -33,7 +33,7 @@ separate research account. Your agent also needs permission to start a separate
 checker for the evidence.
 
 ```sh
-git clone --branch v0.9.1 https://github.com/dbbaskette/harness-research-skill.git
+git clone --branch v0.9.2 https://github.com/dbbaskette/harness-research-skill.git
 cd harness-research-skill
 bash scripts/Install-Harness-Research.sh
 ```
@@ -153,7 +153,7 @@ your agent will explain what needs reassessment.
 | Understand helpers, schemas, or run tests | [Developer guide](docs/development.md) |
 | Continue older Tanzu Brand research | [Migration guide](references/migration.md) |
 | Inspect the agent's workflow | [Skill instructions](SKILL.md) and [research contract](references/research-run.md) |
-| See what has been verified | [0.9.1 verification](docs/verification/0.9.1/README.md); [0.9.0 evidence and release decision](docs/verification/0.9.0/README.md) |
+| See what has been verified | [0.9.2 verification](docs/verification/0.9.2/README.md); [0.9.1](docs/verification/0.9.1/README.md); [0.9.0 evidence and release decision](docs/verification/0.9.0/README.md) |
 
 ## Built for your agent, with the work kept in your project
 
@@ -178,26 +178,26 @@ representative guidance-start response. Bootstrap activation is shown separately
 | --- | ---: |
 | Discovery metadata | 38 |
 | Installed bootstrap | 490 |
-| Bootstrap + current guidance entry | 1,106 |
-| Skill research with independent checks and saved report | 4,524 |
-| Verify, research again, reuse or refresh | 1,883 |
-| Explicit chat-only cited answer | 2,060 |
-| Legacy manual research with saved report | 3,251 |
-| Status / resume without new findings | 1,661 |
-| Comparative routing only | 1,813 |
-| Codex comparative outline | 2,773 |
-| Codex add items | 1,978 |
-| Codex add fields | 1,998 |
-| Codex deep results | 2,661 |
-| Codex deep results + saved evidence | 3,852 |
-| Claude comparative outline | 2,790 |
-| Claude deep results | 2,683 |
-| Saved research + general web strategy | 5,021 |
-| Saved research + academic strategy | 5,113 |
-| Saved research + GitHub strategy | 4,908 |
-| Saved research + technical Q&A strategy | 4,813 |
-| Saved research + Chinese sources strategy | 5,038 |
-| Legacy migration | 1,455 |
+| Bootstrap + current guidance entry | 1,113 |
+| Skill research with independent checks and saved report | 4,583 |
+| Verify, research again, reuse or refresh | 1,890 |
+| Explicit chat-only cited answer | 2,067 |
+| Legacy manual research with saved report | 3,258 |
+| Status / resume without new findings | 1,668 |
+| Comparative routing only | 1,820 |
+| Codex comparative outline | 2,780 |
+| Codex add items | 1,985 |
+| Codex add fields | 2,005 |
+| Codex deep results | 2,668 |
+| Codex deep results + saved evidence | 3,859 |
+| Claude comparative outline | 2,797 |
+| Claude deep results | 2,690 |
+| Saved research + general web strategy | 5,080 |
+| Saved research + academic strategy | 5,172 |
+| Saved research + GitHub strategy | 4,967 |
+| Saved research + technical Q&A strategy | 4,872 |
+| Saved research + Chinese sources strategy | 5,097 |
+| Legacy migration | 1,462 |
 
 Comparative rows include the selected platform resource, not the complete bundle.
 Each strategy row includes one router and one strategy. Status/resume skips plan

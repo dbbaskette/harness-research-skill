@@ -1,0 +1,83 @@
+{
+  "run": "76c693a80fa045c6a7e090cf",
+  "output_revision": 29,
+  "scope": "Focused public-documentation research for an application team: explain WAL mechanics and reader/writer interaction, checkpoint policy and operations, durability settings, deployment limitations, safe enablement and version caveats. Prefer sqlite.org primary documentation; no workload benchmark or application-specific validation. Assumed local-host file-backed database. Eight questions across four sections keep this narrow request focused.",
+  "source_mode": "public-web",
+  "sections": [
+    {
+      "id": "concurrency",
+      "name": "How WAL changes reader and writer interaction"
+    },
+    {
+      "id": "checkpoints",
+      "name": "Checkpoints and WAL growth"
+    },
+    {
+      "id": "durability",
+      "name": "Durability and recovery"
+    },
+    {
+      "id": "deployment",
+      "name": "Enablement decision and limitations"
+    }
+  ],
+  "subjects": [],
+  "questions": [
+    {
+      "id": "mechanics",
+      "question": "How does a WAL commit work, what snapshot do readers see, and how many writers can run?",
+      "section": "concurrency",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "contention",
+      "question": "Which contention and stale-snapshot cases remain, and what transaction practices follow?",
+      "section": "concurrency",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "checkpoint-policy",
+      "question": "What does a checkpoint do, when do automatic checkpoints run, and how do PASSIVE, FULL, RESTART and TRUNCATE differ?",
+      "section": "checkpoints",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "wal-growth",
+      "question": "Why can WAL grow or commits stall, and what should a team monitor or tune?",
+      "section": "checkpoints",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "sync-durability",
+      "question": "How do synchronous FULL, NORMAL and OFF affect WAL durability and consistency after application crash versus power or operating-system failure?",
+      "section": "durability",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "recovery-backup",
+      "question": "What must the team know about recovery, sidecar files, backups and safe database copying?",
+      "section": "durability",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "enablement",
+      "question": "When is WAL a good fit, how is it enabled and verified, which connection settings need care, and which current version caveat matters?",
+      "section": "deployment",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "limitations",
+      "question": "What limitations affect network filesystems, multiple databases, page size, read-only use, transaction size and write-heavy workloads?",
+      "section": "deployment",
+      "subject": null,
+      "kind": "open"
+    }
+  ]
+}

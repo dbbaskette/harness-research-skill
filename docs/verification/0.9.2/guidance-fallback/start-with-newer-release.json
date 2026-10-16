@@ -1,0 +1,16 @@
+{
+  "freshness": "older-compatible-release",
+  "newerRelease": {
+    "ref": "refs/tags/v0.10.0",
+    "minimumRuntime": "0.10.0"
+  },
+  "notice": "Guidance v0.10.0 needs runtime 0.10.0; this task uses v0.9.2, the newest release runtime 0.9.2 supports. Update with this skill’s trusted installer to use the newer guidance.",
+  "channel": "release",
+  "ref": "refs/tags/v0.9.2",
+  "runtimeVersion": "0.9.2",
+  "guidanceVersion": "0.9.2",
+  "revision": "b6156d81669400cb50738c800cbd4350a4d1e8a9",
+  "task": "a1a2b10f75d44a288902438e34a0c051",
+  "guidance": "<work>/content/.harness-research/guidance/tasks/a1a2b10f75d44a288902438e34a0c051/SKILL.md",
+  "runtime": "<runtime>"
+}

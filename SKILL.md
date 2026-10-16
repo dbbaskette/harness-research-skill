@@ -5,7 +5,7 @@ description: Research topics, compare options and fact-check claims using select
 
 # Harness Research
 
-Guidance release: **0.9.1**. Report the installed runtime version, guidance
+Guidance release: **0.9.2**. Report the installed runtime version, guidance
 release/revision and freshness on start/resume; these identities can differ.
 
 You conduct the research with your harness's search, browser, document tools and
@@ -46,5 +46,6 @@ Read original supporting passages, seek contradictions, and retain dates,
 versions and limits. A search snippet or model memory is not inspected proof.
 Checked support does not prove source truth, live currency or semantic quality
 of unreviewed prose. Before finishing, refresh status, open the actual report,
-verify its saved revision and return its link with gaps. Continue only the
+verify its saved revision and return `research/report.md`, not a summary,
+with gaps. Continue only the
 requested deliverable; research does not authorize publishing.

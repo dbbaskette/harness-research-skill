@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.9.2 — 2026-10-16
+
+Fixes for the helper and guidance findings from the 0.9.1 live trials
+([findings](docs/verification/0.9.1/live-acceptance/README.md#findings)).
+[Evidence](docs/verification/0.9.2/README.md).
+
+- The number rule treats digits written straight after a letter or underscore
+  as part of a name (`sqlite3_wal_checkpoint_v2`, `SHA256`, `IPv6`), so naming
+  a function no longer needs its digits in the quotes. Counts, units such as
+  `4MB`, versions and names such as `COVID-19` are still checked.
+- A relative `--from` that finds nothing says where it looked and that it is
+  read relative to `--project`.
+- A project folder that does not exist is reported plainly instead of as `ENOENT`.
+- `research peek` accepts `--harness`, as `research next` does.
+- The guidance says to return `research/report.md` itself, not a summary of the
+  agent's own; anything written outside `research/` is unchecked.
+
 ## 0.9.1 — 2026-10-16
 
 Verification and reuse, the 0.9.x items of the

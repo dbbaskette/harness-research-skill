@@ -149,10 +149,10 @@ It uses the existing Tart/macOS test-suite wrapper and a disposable clone. Read
 and your host's local-CI instructions before running it. Preserve logs and confirm
 cleanup; never stop an unrelated VM. The 0.9.0
 [native evidence](verification/0.9.0/ci-acceptance-fixes/verification.json) covers
-88 tests with zero failures or skips under that gate. The 0.9.1
-[native evidence](verification/0.9.1/native/verification.json) is a host `npm test`
-run: 114 tests, 113 passed and the Python-gated test skipped. Live model
-acceptance is a separate outcome; see [the 0.9.1 record](verification/0.9.1/README.md)
+88 tests with zero failures or skips under that gate. The 0.9.2
+[native evidence](verification/0.9.2/native/verification.json) is a host `npm test`
+run: 117 tests, 116 passed and the Python-gated test skipped. Live model
+acceptance is a separate outcome; see [the 0.9.1 record](verification/0.9.1/README.md), [the 0.9.2 checks](verification/0.9.2/README.md)
 and [the 0.9.0 live results and release decision](verification/0.9.0/README.md).
 
 Instruction-context measurements are generated from current files by

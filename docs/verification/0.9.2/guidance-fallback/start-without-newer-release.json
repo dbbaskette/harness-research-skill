@@ -1,0 +1,11 @@
+{
+  "freshness": "current-at-start",
+  "channel": "release",
+  "ref": "refs/tags/v0.9.2",
+  "runtimeVersion": "0.9.2",
+  "guidanceVersion": "0.9.2",
+  "revision": "b6156d81669400cb50738c800cbd4350a4d1e8a9",
+  "task": "fb363edffb9344ccbadeff5c737d3304",
+  "guidance": "<work>/content/.harness-research/guidance/tasks/fb363edffb9344ccbadeff5c737d3304/SKILL.md",
+  "runtime": "<runtime>"
+}
