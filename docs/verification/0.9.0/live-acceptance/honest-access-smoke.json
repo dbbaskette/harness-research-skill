@@ -1,0 +1,18 @@
+{
+  "runtime_commit": "f6c15c9ef3e7ce6498d004188e23f7219826a30c",
+  "scope": "One actual independent checker task on scripted synthetic research; not a full research or quality acceptance run",
+  "run": "d04ff8a505c94860ad99a80e",
+  "checker": "cc-928e596b",
+  "check_status": "done",
+  "attempts": 1,
+  "refusals": 1,
+  "rejected_facts": 1,
+  "confirmed_facts": 0,
+  "original_read": false,
+  "access_gap_preserved": true,
+  "question_coverage": "not answered",
+  "wall_seconds": 32.018863677978516,
+  "claude_list_estimate_usd": 0.1291758,
+  "permission_denials": [],
+  "transcript_sha256": "d9b7768400b5f79d0464d0a53db086b2549f7e33fce7c8aab53e3122ca9af454"
+}
