@@ -103,7 +103,7 @@ The harness runs these; people do not.
 # Start a run with the topic and the person's sources (paths or links).
 node scripts/harness-research.mjs research start --project DIR --topic TEXT \
   [--source PATH_OR_URL ...] [--sources LIST_FILE] [--about FILE] [--allow-web] \
-  [--depth quick|standard|deep] [--plan-only]
+  [--depth light|standard|deep] [--plan-only]
 
 # Take the next task, then hand back its result.
 node scripts/harness-research.mjs research next --project DIR --worker NAME
@@ -129,7 +129,7 @@ node scripts/harness-research.mjs research status --project DIR
 | 2. Research | one per question | facts with quotes |
 | 3. Check | one per question, never to the worker that researched it | each fact confirmed, narrowed or rejected |
 | 4. Cross-check | one | duplicates, conflicts, superseded facts, missing angles |
-| 5. Fill gaps | the missing angles as new questions, researched, checked and cross-checked once | more facts, at `standard` and `deep` |
+| 5. Fill gaps | the missing angles as new questions, researched, checked and cross-checked once | more facts, at `standard` and `deep` only |
 | 6. Write | none: the helper | `research/report.md`, `facts.json`, `brief.md` |
 
 `research next` hands out tasks in that order, several at once where they are independent, so
@@ -184,20 +184,26 @@ For **a comparison**, the plan also names the **subjects**, and each section's q
 asked of every subject, so both sides get the same depth and their facts line up. Questions
 that belong to no single subject (how a fork happened, how to migrate) are asked once.
 
-Two examples, at `standard` depth:
+Two examples, at the default `light` depth:
 
 | | "A report on LLMs" | "Redis vs Valkey" |
 | --- | --- | --- |
 | Scope | Large language models as of late 2026: what they are, how they are built and run, the main models and vendors, what they can and cannot do, cost, risks and regulation, and how organisations use them. Not the mathematics in depth. | The two engines as products: technology, licensing, ecosystem and migration, as of late 2026. Not every managed service's pricing. |
 | Subjects | none | Redis, Valkey |
 | Sections | What an LLM is; how they work; history and milestones; main model families and vendors; capabilities and benchmarks; tools, context and agents; cost and pricing; running them; limitations; risks and security; regulation; how organisations use them; trends | Origin and governance; licensing; releases and versions; architecture; data types and commands; persistence and replication; clustering; performance; modules and vectors; security; clients and tooling; cloud offerings; enterprise support; compatibility and migration; community; known problems |
-| Questions | 2 to 4 per section, about 35 | 1 to 2 per section per subject, plus 4 cross-cutting, about 40 |
+| Sections at `light` | the 6 or 7 that matter most for the scope | the 6 or 7 that matter most, such as licensing, architecture, persistence, performance, compatibility and migration |
+| Questions at `light` | about 12 | about 14: one per section per subject, plus 2 cross-cutting |
+| Questions at `deep` | about 45 | about 45 |
 
-| `--depth` | Sections | Questions per section | Facts per question | Gap round |
-| --- | --- | --- | --- | --- |
-| `quick` | the 5 to 8 that matter most | 1 to 2 | up to 10 | no |
-| `standard` (default) | most that apply | 2 to 4 | up to 20 | yes |
-| `deep` | all that apply | 3 to 6 | up to 30 | yes |
+| `--depth` | Sections | Questions | Facts per question | Checking | Gap round |
+| --- | --- | --- | --- | --- | --- |
+| `light` (default) | the 5 to 8 that matter most | 8 to 15 | up to 8 | one checker per section | no |
+| `standard` | most that apply | 20 to 40 | up to 15 | one checker per question | yes |
+| `deep` | all that apply | 40 to 80 | up to 30 | one checker per question | yes |
+
+The default is deliberately light. Even at `light`, a run gives more than today's skill:
+more questions, several quoted facts per question instead of one paragraph, every fact
+checked, and a cross-check. A person asks for `standard` or `deep` when a topic needs it.
 
 - The plan is saved as today and written as `research/plan.json` and a readable
   `research/plan.md`: the scope, then the outline with its questions.
@@ -230,9 +236,11 @@ The helper refuses a submission, with a reason the harness can act on, when:
 - A statement is more than one sentence or 40 words, or does not name its subject.
 - There are more facts than the depth allows.
 
-### 3. Check a question's facts
+### 3. Check the facts
 
-Given only to a worker that did not research the question. Where the person has both Claude
+At `light`, one checker takes a whole section's questions at once; at `standard` and `deep`,
+each question gets its own. A checker is never given a question it researched. Where the
+person has both Claude
 Code and Codex, the brief suggests the other one checks: one model is more likely to miss its
 own kind of mistake.
 
@@ -343,7 +351,7 @@ its gates (with `--plan-only`), and what the facts feed.
 - **Sources:** registration, hashing, gaps, sources registered after planning.
 - **Output:** `facts.json` against its schema, coverage by section, the report's sections, links
   and numbering.
-- **Live trials,** recorded in `docs/verification/`: Redis vs Valkey at `deep` with a few given
+- **Live trials,** recorded in `docs/verification/`: Redis vs Valkey at `light` and at `deep` with a few given
   PDFs and links, in a person's Claude Code session with subagents, and again in Codex; and one
   narrow topic from given documents alone. Timed and costed, with the reports read by a person
   and a sample of facts checked by hand against their sources.
@@ -369,7 +377,8 @@ The design is ready to release when, on all three requests:
 - Every section of the outline has facts or a stated gap.
 - The new run is judged more useful as a reference by the person reading both.
 
-Time and cost are recorded, not limited; they decide the default depth.
+The three runs use the default `light` depth, plus Redis vs Valkey once at `deep`. Time and
+cost are recorded, not limited.
 
 ## Release and adoption
 
@@ -416,11 +425,12 @@ Time and cost are recorded, not limited; they decide the default depth.
    harness cannot, the run is sequential unless more sessions are started on the queue.
 5. **A harness reading the web can be misled by a page.** In a person's session it has
    whatever the person allowed it; a studio decides what its headless sessions may do.
-6. **Depth costs.** Redis vs Valkey at `deep` is about 42 questions, each researched and
-   checked, plus a gap round: very roughly $20 to $40 and 30 to 60 minutes, to be measured in
-   the trials. `quick` is a fraction of that.
-7. **The report is long.** A deep comparison can hold several hundred facts. The coverage grid
-   and `brief.md` are the way in.
+6. **Depth costs.** The default `light` run is about 12 questions with a checker per section:
+   very roughly $3 to $6 and 10 to 15 minutes, a little more than Training's measured $2.31 for
+   eight questions without checking. `deep` is about 45 questions, each checked, plus a gap
+   round: very roughly $20 to $40 and 30 to 60 minutes. All to be measured in the trials.
+7. **A deep report is long.** A `light` run gives roughly 50 to 100 facts; a deep comparison
+   can hold several hundred. Coverage by section and `brief.md` are the way in.
 
 ## Settled in review
 
@@ -429,8 +439,10 @@ Time and cost are recorded, not limited; they decide the default depth.
   source and citation.
 - **Topic and starting sources as input:** links and documents such as PDFs.
 - **Coverage scales with the topic:** a scope, an outline of sections with several questions
-  each, subjects only for comparisons, `--depth`, and one gap round, instead of a fixed 8 to 20
-  questions. Any topic works, not only comparisons.
+  each, subjects only for comparisons, and `--depth`, instead of a fixed 8 to 20 questions. Any
+  topic works, not only comparisons.
+- **A light default:** about 12 questions, a checker per section and no gap round. Anything
+  more than today's skill is an improvement; `standard` and `deep` are there when asked for.
 - **The harness does all the work.** The helper does no fetching, extraction or agent starting;
   it is a queue, a set of checks and the record. No `pdftotext` dependency.
 - **Private words in searches:** not a concern.
@@ -446,7 +458,7 @@ comparison, `subjects` is empty and every `subject` is null. The values are illu
   "run": "8f3c2a91d0e4b7a6c5f1e2d3",
   "topic": "Redis vs Valkey",
   "about": "For solutions architects advising customers on in-memory data stores.",
-  "depth": "deep",
+  "depth": "light",
   "scope": "public-web",
   "status": "complete",
   "created_at": "2026-10-16T14:00:03Z",
