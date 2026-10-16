@@ -400,9 +400,9 @@ test('isolated installation includes queued CLI, schema and skill guidance with 
   const installed=await install({source,home:join(f.project,'home'),shared:join(f.project,'shared')});
   const cli=join(installed.targets[2],'scripts/harness-research.mjs');
   const exec=promisify(execFile);
-  const version=await exec(process.execPath,[cli,'--version']);assert.equal(version.stdout.trim(),'harness-research 0.9.0');
+  const version=await exec(process.execPath,[cli,'--version']);assert.equal(version.stdout.trim(),'harness-research 0.9.1');
   const started=JSON.parse((await exec(process.execPath,[cli,'research','start','--project',f.project,'--topic','Installed skill flow'])).stdout);
-  assert.equal(started.runtimeVersion,'0.9.0');assert.equal(started.guidanceVersion,'0.9.0');assert.equal(started.guidanceRevision,null);
+  assert.equal(started.runtimeVersion,'0.9.1');assert.equal(started.guidanceVersion,'0.9.1');assert.equal(started.guidanceRevision,null);
   const task=JSON.parse((await exec(process.execPath,[cli,'research','next','--project',f.project,'--run',started.run,'--worker','installed-invocation'])).stdout).task;
   assert.equal(task.kind,'plan');
   assert.match(await readFile(join(installed.runtime,'references/research-run.md'),'utf8'),/helper is your ledger/);
@@ -424,7 +424,7 @@ test('new research records and verifies the saved bootstrap guidance identity of
   await exec('git',['-C',source,'-c','user.name=Fixture','-c','user.email=fixture@example.invalid','-c','commit.gpgsign=false','commit','-qm','Synthetic guidance']);
   const pin=await startGuidance({project:f.project,source,runtime});await rm(source,{recursive:true});
   const started=await startRun({project:f.project,topic:'Pinned identity',guidanceTask:pin.task});
-  assert.equal(started.guidanceTask,pin.task);assert.equal(started.guidanceRevision,pin.revision);assert.equal(started.guidanceVersion,'0.9.1');assert.equal(started.runtimeVersion,'0.9.0');
+  assert.equal(started.guidanceTask,pin.task);assert.equal(started.guidanceRevision,pin.revision);assert.equal(started.guidanceVersion,'0.9.1');assert.equal(started.runtimeVersion,'0.9.1');
   await chmod(pin.guidance,0o600);await writeFile(pin.guidance,'Changed guidance');
   await assert.rejects(startRun({project:f.project,topic:'Tampered pin',guidanceTask:pin.task}),/Saved guidance changed/);
 });

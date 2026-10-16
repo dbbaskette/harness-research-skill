@@ -1,0 +1,65 @@
+{
+  "source_commit": "55d1695147f5d18dabc7ba0318073e0e92d138b3",
+  "source_tree": "e6de9ca8ecd5b40c2e59a137cfc28cc0a30d3c45",
+  "source_was_clean": true,
+  "gate": "host npm test in a clean worktree (not the Tart VM gate)",
+  "environment": {
+    "os": "macOS 27.0.1",
+    "node": "v22.23.1",
+    "npm": "10.9.8",
+    "python": "3.14.5 without PyYAML"
+  },
+  "tests": {
+    "total": 114,
+    "passed": 113,
+    "failed": 0,
+    "skipped": 1,
+    "skipped_test": "preserved comparative validator detects missing fields without requiring system Python changes (needs HARNESS_RESEARCH_PYTHON with PyYAML)"
+  },
+  "audit": "0 vulnerabilities (sandbox certificate-trust noise removed from the log)",
+  "context": "passed",
+  "installer": "passed",
+  "installed_version": "harness-research 0.9.1 (all three discovery links)",
+  "installed_content_digest": "282e147e9e753a145fe2df76d46a7e6b5622d973f23d18e0dd460e2de5116ebe",
+  "installed_command_checks": {
+    "passed": 45,
+    "failed": 0,
+    "cli_calls": 130,
+    "driver": "installed/drive.mjs",
+    "disposable_state_removed": true
+  },
+  "guidance_fallback": {
+    "freshness": "older-compatible-release",
+    "pinned_ref": "refs/tags/v0.9.1 (disposable tag)",
+    "newer_release": {
+      "ref": "refs/tags/v0.10.0",
+      "minimumRuntime": "0.10.0"
+    },
+    "control_without_newer_tag": "current-at-start"
+  },
+  "log_sha256": {
+    "environment.txt": "6c0565873f0c33a96178ea12b2db136206e673125a9c8c1dfc20048e321b9200",
+    "tests.log": "c7ce27b4d97ade0aa027bffa9b693ac213cf9934f80bdcd2cf8dd66439835552",
+    "audit.log": "6d8c5c8f3d7684adb070417bd608d01ae90aa3dc26a65af03ffda4955f38d9a3",
+    "context.log": "e5f8ab38bc30d7461d2af287cadbb1c0421da94a4b2d58846caaf5daf484a0d5",
+    "result.txt": "c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431"
+  },
+  "installed_sha256": {
+    "checks.json": "79a2912d3b9ae28d6f0217b29eaf263292aacf98a0cb68941a746cad4b869139",
+    "cleanup.log": "440ee13fc55e3b40ce35cba6cc6e630302113e65b1d572c8c638694bd0c8b6cc",
+    "drive.mjs": "9487b2ed1ffa77ff89f1950e3b11d21faf2751ab9712b772d6a3ecacf1377c83",
+    "installed-research-help.log": "a546daea063d0d28b14249f5da24bbc702215d1dd3c0d1f7bb5141a7cf64d891",
+    "installed-version.log": "ccc23a166343678e6b61dd87146743c1b648ff6725d867e6b3cae759c4f6b4ec",
+    "installer.log": "d69adb43d69fba9a1444e700d336dc3c6d7eca5b259fc3bf7f4af8c0b8873b19",
+    "result.txt": "ad33d10f455a5161d853e45b302271fec9d6126b30e5d5cdfe91cee6a22e1b1d",
+    "transcript.jsonl": "f0b2265b74049c7a309e19d4775a7bb2af9d3c814c213d1433043fbb8f696501"
+  },
+  "guidance_fallback_sha256": {
+    "pinned-guidance.txt": "26beabe9da909616a45761533da5cd3fa701ef85d05f932e0084916ab480b85b",
+    "repository.txt": "50d102310d3ec4e46ea09268a9268db2c935b04986fe6c12f6b69107a2b25b7f",
+    "start-with-newer-release.json": "4cb9c09663f4dcaa457f28b36304b552a766ad6d31ad8e48eb75e22a6e63337c",
+    "start-without-newer-release.json": "68cac657cf5f5c03c802354ddd3ac701d1ae6d9eee228f27c619d1ccefc83c65",
+    "sync-check.sh": "b2b4a1e0774193d3c92d1d8c84a67a6d6aa698ca613cc352e1baf808b18f43de"
+  },
+  "not_run": "npm run ci:local (Tart VM) was not run; PyYAML could not be installed inside the session sandbox, so the Python-gated test was skipped."
+}

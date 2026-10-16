@@ -1,0 +1,1 @@
+I've drafted slides that cite this research in <live>/codex/sqlite-wal/deck/draft.md. Before I publish them, check that every fact they cite still holds, and tell me about any that don't.

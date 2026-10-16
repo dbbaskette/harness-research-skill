@@ -97,7 +97,7 @@ export function factFor(state, supplied) {
 // The helper keeps its own copy of every registered text, named by its hash, and checks quotes
 // against that copy. The harness's working file can then change without silently changing evidence.
 export const PINNED_DIRECTORY = 'research/sources/revisions';
-async function pin(root, sha256, content) {
+export async function pin(root, sha256, content) {
   for (const part of ['research', 'research/sources', PINNED_DIRECTORY]) await directory(join(root, part));
   const name = `${PINNED_DIRECTORY}/${sha256}.txt`, path = join(root, name);
   if (!await exists(path)) await writeFile(path, content, { flag: 'wx', mode: 0o444 }).catch(error => { if (error.code !== 'EEXIST') throw error; });
@@ -111,8 +111,11 @@ async function readPinnable(root, file, sha256) {
 }
 // The text a citation is checked against: the pinned copy, or the working file for runs saved before pinning.
 export const evidenceFile = source => source.pinned ?? source.file;
-export async function sourceRecord(root, state, supplied, task) {
-  const givenId = supplied.given ?? task?.given;
+// revisionOf: a refresh registers the current text of a source already in the run. It keeps that
+// source's origin, standing and provenance, and needs no new permission to use it.
+export async function sourceRecord(root, state, supplied, task, revisionOf = null) {
+  if (revisionOf) supplied = { ...supplied, given: revisionOf.given ?? undefined, origin: revisionOf.origin, title: supplied.title ?? revisionOf.title, publisher: supplied.publisher ?? revisionOf.publisher ?? undefined, standing: revisionOf.standing, source_date: supplied.source_date ?? null };
+  const givenId = supplied.given ?? (revisionOf ? undefined : task?.given);
   const given = state.givenSources.find(item => item.id === givenId);
   if (givenId && !given) throw new Error('Unknown selected reference.');
   // A selected original edited before anything was registered from it is simply read as it is now.
@@ -124,7 +127,7 @@ export async function sourceRecord(root, state, supplied, task) {
       state.inputs = state.inputs.map(input => input.file === current.file ? current : input);
     }
   }
-  if (!given && state.sourceMode !== 'public-web') throw new Error('Found sources require explicit public-web permission.');
+  if (!given && !revisionOf && state.sourceMode !== 'public-web') throw new Error('Found sources require explicit public-web permission.');
   const origin = given?.origin ?? text(supplied.origin, 'Source origin');
   if (given && supplied.origin && supplied.origin !== given.origin) throw new Error('Source origin does not match the selected reference.');
   if (!given && !/^https?:\/\//i.test(origin)) throw new Error('Found source origins must be public HTTP(S) URLs.');
@@ -146,12 +149,16 @@ export async function sourceRecord(root, state, supplied, task) {
   // Capturing only part of a source changes its provenance, not its saved bytes.
   // Issue a new revision for that metadata while preserving existing full-source IDs.
   // A changed original with unchanged extracted text is still a new revision.
-  const identity = [origin, sha256, ...(original && original.sha256 !== sha256 ? [original.sha256] : []), ...(capture ? [capture] : [])];
+  // A refreshed revision is a new node in its page's history even when the page returns to earlier
+  // text, so the chain of revisions never loops back on itself.
+  const identity = [origin, sha256, ...(original && original.sha256 !== sha256 ? [original.sha256] : []), ...(capture ? [capture] : []), ...(revisionOf ? ['revision-of', revisionOf.id] : [])];
   const id = identifier(supplied.id ?? 'source-' + hash(stable(identity)).slice(0, 20));
   const previous = state.sources.find(source => source.id === id);
   if (previous && (previous.sha256 !== sha256 || previous.origin !== origin)) throw new Error('Source IDs identify immutable revisions; register a new ID.');
   const pinned = await pin(root, sha256, await readPinnable(root, supplied.file, sha256));
-  return { id, given: given?.id ?? null, title, origin, publisher: supplied.publisher ? text(supplied.publisher, 'Publisher') : null, standing, provenance: supplied.transcribed ? 'transcribed' : given ? 'given' : 'found', capture, pages: supplied.pages ?? null, file: supplied.file, pinned, sha256, original_file: originalFile, original_sha256: original?.sha256 ?? null, limits, source_date: supplied.source_date ?? null, saved_at: previous?.saved_at ?? new Date().toISOString() };
+  const provenance = revisionOf ? revisionOf.provenance : supplied.transcribed ? 'transcribed' : given ? 'given' : 'found';
+  const lineage = revisionOf ? { revision_of: revisionOf.id, ...(revisionOf.imported ? { imported: (({ unusable, ...rest }) => rest)(revisionOf.imported) } : {}) } : {};
+  return { id, given: given?.id ?? null, title, origin, publisher: supplied.publisher ? text(supplied.publisher, 'Publisher') : null, standing, provenance, capture, pages: supplied.pages ?? null, file: supplied.file, pinned, sha256, original_file: originalFile, original_sha256: original?.sha256 ?? null, limits, source_date: supplied.source_date ?? null, saved_at: previous?.saved_at ?? new Date().toISOString(), ...lineage };
 }
 export async function citations(root, state, supplied, question) {
   if (!Array.isArray(supplied) || supplied.length < 1 || supplied.length > 5) throw new Error('A fact needs 1 to 5 registered-source quotes.');

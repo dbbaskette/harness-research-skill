@@ -1,15 +1,28 @@
 # Versioned releases
 
-The current release is **0.9.0**. Package/lockfile versions,
+The current release is **0.9.1**. Package/lockfile versions,
 `guidance/manifest.json`, the guidance release label in `SKILL.md`, and current
 install examples identify this software release. Earlier changelog entries and
 saved tasks retain their recorded versions.
 
-The checked standalone workflow needs runtime 0.9.0. Guidance refresh cannot
-upgrade executable helpers, so the guidance keeps a minimum runtime of 0.8.1 and
-routes older runtimes to the manual workflow. Raise the minimum only when that
-manual path is retired. Preview users must reinstall from `v0.9.0` even if their
-helper already reports 0.9.0: the immutable content digest distinguishes the bits.
+The checked standalone workflow needs runtime 0.9.0; its verification and reuse
+commands (`verify`, `reassess --again`, `start --from`, `find`, `approve`,
+`refresh`) need runtime 0.9.1. Guidance refresh cannot upgrade executable
+helpers, so the guidance keeps a minimum runtime of 0.8.1 and routes older
+runtimes to the manual workflow. Raise the minimum only when that manual path is
+retired. Preview users must reinstall from `v0.9.1` even if their helper already
+reports 0.9.1: the immutable content digest distinguishes the bits.
+
+**0.9.1 acceptance scope (2026-10-16).** Native verification passed 113 of 114
+tests with the one Python-gated test skipped; the installed helper drove every
+new command through 45 checks; and a disposable repository showed the disclosed
+older-compatible-release fallback. Before live trials the owner chose the
+acceptance scope: one fresh narrow light run per harness, followed by plain-language
+follow-up requests that verify, research again, approve, refresh, find and reuse
+it, in Claude Code and Codex. The design's full matrix (broad, deep, fact-check
+and supplied-only reports) and its human sample scoring were not rerun for 0.9.1;
+the 0.9.0 record still holds those results and limits. The
+[0.9.1 record](verification/0.9.1/README.md) keeps the evidence and findings.
 
 **0.9.0 release decision (2026-10-16).** Native verification passed 88 tests;
 13 eligible report cases finished across the two harnesses. The owner accepted
@@ -27,11 +40,13 @@ explicit owner-approved change to the acceptance scope.
 **Where guidance is served from.** From runtime 0.9.0, new tasks take guidance
 from the newest `vMAJOR.MINOR.PATCH` tag whose `minimumRuntime` the installed
 helper meets, falling back to `main` only when the repository has no release tags.
-Tagging a release is therefore what publishes its guidance. Installed helpers up
+Tagging a release is therefore what publishes its guidance. From runtime 0.9.1,
+a task that skips a newer release because it needs a newer runtime reports
+`freshness: older-compatible-release` and a notice naming that release. Installed helpers up
 to 0.8.1 still read `main` directly: until they are updated, keep `main` at
 released guidance and develop on branches, merging to `main` when the release is
 tagged.
-[Development verification](verification/0.9.0/README.md) records completed examples
+[Release verification](verification/0.9.1/README.md) records completed checks
 and the scope of the recorded acceptance evidence. Do not cut the release from
 narrow examples alone.
 
@@ -44,14 +59,14 @@ repeat an unchanged suite merely because the merge SHA differs.
 Archive the exact verified merge commit, never a mutable working directory:
 
 ```sh
-git archive --format=zip --prefix=harness-research-v0.9.0/ --output /private/tmp/harness-research-v0.9.0.zip COMMIT
-shasum -a 256 /private/tmp/harness-research-v0.9.0.zip
+git archive --format=zip --prefix=harness-research-v0.9.1/ --output /private/tmp/harness-research-v0.9.1.zip COMMIT
+shasum -a 256 /private/tmp/harness-research-v0.9.1.zip
 ```
 
 Extract into disposable state, compare every file with the tagged tree, run its
 installer with disposable `--home`/`--shared` paths, and verify the installed
-`--version` reports 0.9.0. Publish the ZIP and checksum at an unused immutable
-`v0.9.0` tag, then download and verify both assets. Keep logs, exact commits,
+`--version` reports 0.9.1. Publish the ZIP and checksum at an unused immutable
+`v0.9.1` tag, then download and verify both assets. Keep logs, exact commits,
 artifact hashes and cleanup results. No model or real-account access is needed.
 
 Installing updates the entrypoint for new tasks. Existing tasks keep their saved

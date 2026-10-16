@@ -1,0 +1,65 @@
+{
+  "run": "4448974aa66e4d969fb9d588",
+  "output_revision": 36,
+  "scope": "Focused, public-source research with sqlite.org documentation first. Explain WAL mechanics and reader/writer interaction, checkpoint behavior, durability choices, and deployment/operational limits. Assume ordinary SQLite connections on one host; distinguish documented behavior from workload-dependent performance. No application-specific benchmarks or deployment changes.",
+  "source_mode": "public-web",
+  "sections": [
+    {
+      "id": "concurrency",
+      "name": "WAL mechanics and concurrency"
+    },
+    {
+      "id": "checkpoint-durability",
+      "name": "Checkpoints and durability"
+    },
+    {
+      "id": "limits",
+      "name": "Deployment limits and enablement decision"
+    }
+  ],
+  "subjects": [],
+  "questions": [
+    {
+      "id": "mechanism",
+      "question": "How do WAL commits and reader snapshots work, and what concurrency does WAL permit?",
+      "section": "concurrency",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "contention",
+      "question": "What contention and stale-snapshot failures remain, and how should transaction design account for them?",
+      "section": "concurrency",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "checkpoint",
+      "question": "How do automatic and manual checkpoints work, and how do long-lived readers affect WAL growth and latency?",
+      "section": "checkpoint-durability",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "durability",
+      "question": "What crash and power-loss durability do synchronous FULL and NORMAL provide in WAL mode?",
+      "section": "checkpoint-durability",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "deployment",
+      "question": "Which deployment, file-handling, read-only, attached-database and compatibility limits matter before enabling WAL, including current relevant version caveats?",
+      "section": "limits",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "enablement",
+      "question": "How is WAL enabled and verified, which settings persist or are per connection, and what documented tradeoffs inform the decision?",
+      "section": "limits",
+      "subject": null,
+      "kind": "open"
+    }
+  ]
+}

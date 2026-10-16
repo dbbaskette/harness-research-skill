@@ -236,5 +236,6 @@ the machine-readable contract.
 
 `blocked` and `stale` are incomplete: name the cause and link the partial report.
 Manual `plan`/`record` runs retain their own references and semantics but cannot
-bypass a queued run's checking. Reuse/verify/refresh commands remain later
-milestones; do not claim them in 0.9.0.
+bypass a queued run's checking. To verify cited keys, research chosen questions
+again, start from earlier research, approve or refresh, read
+[reuse and verification](reuse.md).

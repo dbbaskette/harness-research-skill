@@ -1,0 +1,147 @@
+{
+  "run": "39994b37a5054110959c469f",
+  "output_revision": 27,
+  "scope": "How SQLite's write-ahead logging (WAL) journal mode works, for an application team deciding whether to enable it: reader/writer concurrency, checkpoints, durability and crash recovery, and limitations. Public sources, sqlite.org documentation first; current documentation as of October 2026.",
+  "source_mode": "public-web",
+  "sections": [
+    {
+      "id": "concurrency",
+      "name": "Readers and writers"
+    },
+    {
+      "id": "checkpoints",
+      "name": "Checkpoints"
+    },
+    {
+      "id": "durability",
+      "name": "Durability and recovery"
+    },
+    {
+      "id": "limits",
+      "name": "Limitations and enabling"
+    },
+    {
+      "id": "tuning",
+      "name": "Tuning checkpoints in production"
+    },
+    {
+      "id": "monitoring",
+      "name": "Monitoring checkpoints in production"
+    }
+  ],
+  "subjects": [],
+  "questions": [
+    {
+      "id": "reader-writer",
+      "question": "In WAL mode, do readers and writers block each other, and what does a reader see while a write is in progress?",
+      "section": "concurrency",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "single-writer",
+      "question": "How many writers can be active at once in WAL mode, and what happens when another connection tries to write?",
+      "section": "concurrency",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "checkpoint-auto",
+      "question": "What is a WAL checkpoint and when does SQLite run one automatically?",
+      "section": "checkpoints",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "checkpoint-starvation",
+      "question": "What can prevent a checkpoint from completing or the WAL file from being reset, and what are the consequences?",
+      "section": "checkpoints",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "sync-durability",
+      "question": "How durable is a committed transaction in WAL mode under synchronous=NORMAL compared with synchronous=FULL?",
+      "section": "durability",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "crash-recovery",
+      "question": "What happens to committed and uncommitted transactions in the WAL after a crash or power loss?",
+      "section": "durability",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "network-fs",
+      "question": "Can WAL mode be used when the database is on a network filesystem or accessed from several machines, and why?",
+      "section": "limits",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "other-limits",
+      "question": "What other limitations does WAL mode have compared with rollback-journal mode (for example read-only access, very large transactions or ATTACHed databases)?",
+      "section": "limits",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "enable-persist",
+      "question": "How is WAL mode enabled, and does the setting persist across connections and database closes?",
+      "section": "limits",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "gap-question-1",
+      "question": "What performance advantages and disadvantages does SQLite's documentation give for WAL compared with rollback-journal mode, and for which workloads?",
+      "section": "limits",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "checkpoint-modes",
+      "question": "How do the PASSIVE, FULL, RESTART and TRUNCATE checkpoint modes differ in what they wait for, what they block, and how they interact with the busy handler and with concurrent readers and writers?",
+      "section": "checkpoints",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "checkpoint-manual",
+      "question": "How can an application run checkpoints itself (PRAGMA wal_checkpoint, sqlite3_wal_checkpoint_v2, a separate thread or process), and what does the documentation say about when to do that instead of relying on automatic checkpoints?",
+      "section": "checkpoints",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "autocheckpoint-tuning",
+      "question": "How is the automatic checkpoint threshold configured with PRAGMA wal_autocheckpoint and sqlite3_wal_autocheckpoint, what are its default, units and scope, what happens when it is disabled, and what trade-offs does the documentation describe for larger or smaller values?",
+      "section": "tuning",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "journal-size-limit",
+      "question": "What does PRAGMA journal_size_limit do to a WAL file, when is the limit applied, what is its default, and how does it relate to checkpoints and WAL resets?",
+      "section": "tuning",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "checkpoint-results",
+      "question": "What does a checkpoint report back (PRAGMA wal_checkpoint result columns, sqlite3_wal_checkpoint_v2 output parameters and return codes), and how can those values show that a checkpoint was incomplete, blocked or starved?",
+      "section": "monitoring",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "wal-growth-signals",
+      "question": "How can an operator or application observe WAL growth and checkpoint activity as it happens, for example with sqlite3_wal_hook or the WAL file size, and how do these mechanisms interact with automatic checkpointing?",
+      "section": "monitoring",
+      "subject": null,
+      "kind": "open"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{"title":"SQLite WAL mode for application teams",
+ "scope":"How SQLite's write-ahead logging (WAL) journal mode works, for an application team deciding whether to enable it: reader/writer concurrency, checkpoints, durability and crash recovery, and limitations. Public sources, sqlite.org documentation first; current documentation as of October 2026.",
+ "sections":[{"id":"concurrency","name":"Readers and writers"},{"id":"checkpoints","name":"Checkpoints"},{"id":"durability","name":"Durability and recovery"},{"id":"limits","name":"Limitations and enabling"}],
+ "subjects":[],
+ "questions":[
+  {"id":"reader-writer","section":"concurrency","kind":"open","question":"In WAL mode, do readers and writers block each other, and what does a reader see while a write is in progress?"},
+  {"id":"single-writer","section":"concurrency","kind":"open","question":"How many writers can be active at once in WAL mode, and what happens when another connection tries to write?"},
+  {"id":"checkpoint-auto","section":"checkpoints","kind":"open","question":"What is a WAL checkpoint and when does SQLite run one automatically?"},
+  {"id":"checkpoint-starvation","section":"checkpoints","kind":"open","question":"What can prevent a checkpoint from completing or the WAL file from being reset, and what are the consequences?"},
+  {"id":"sync-durability","section":"durability","kind":"open","question":"How durable is a committed transaction in WAL mode under synchronous=NORMAL compared with synchronous=FULL?"},
+  {"id":"crash-recovery","section":"durability","kind":"open","question":"What happens to committed and uncommitted transactions in the WAL after a crash or power loss?"},
+  {"id":"network-fs","section":"limits","kind":"open","question":"Can WAL mode be used when the database is on a network filesystem or accessed from several machines, and why?"},
+  {"id":"other-limits","section":"limits","kind":"open","question":"What other limitations does WAL mode have compared with rollback-journal mode (for example read-only access, very large transactions or ATTACHed databases)?"},
+  {"id":"enable-persist","section":"limits","kind":"open","question":"How is WAL mode enabled, and does the setting persist across connections and database closes?"}
+ ]}

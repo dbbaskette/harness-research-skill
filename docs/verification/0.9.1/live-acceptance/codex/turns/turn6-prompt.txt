@@ -1,0 +1,1 @@
+I'm starting an operations runbook in a new project, <live>/codex/wal-runbook. Find my earlier SQLite research somewhere under <live>/codex and start from it, adding how to monitor and tune WAL checkpoints in production (wal_autocheckpoint, checkpoint modes, journal_size_limit). Save the cited report there.

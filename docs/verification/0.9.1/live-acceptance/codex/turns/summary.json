@@ -1,0 +1,127 @@
+[
+ {
+  "turn": 1,
+  "wall_seconds": 397,
+  "exit": 0,
+  "usage": {
+   "input_tokens": 2878734,
+   "cached_input_tokens": 2760320,
+   "cache_write_input_tokens": 0,
+   "output_tokens": 14376,
+   "reasoning_output_tokens": 3042
+  },
+  "helper_commands": {
+   "research start (exit 1)": 1,
+   "research start (exit 0)": 1,
+   "research next (exit 1)": 1,
+   "research next (exit 0)": 11,
+   "research submit (exit 0)": 5,
+   "research status (exit 0)": 4,
+   "research verify (exit 0)": 2
+  },
+  "curl_calls": 0,
+  "web_searches": 1
+ },
+ {
+  "turn": 2,
+  "wall_seconds": 71,
+  "exit": 0,
+  "usage": {
+   "input_tokens": 3520943,
+   "cached_input_tokens": 3376640,
+   "cache_write_input_tokens": 0,
+   "output_tokens": 17125,
+   "reasoning_output_tokens": 4052
+  },
+  "helper_commands": {
+   "research status (exit 0)": 1,
+   "research verify (exit 0)": 2
+  },
+  "curl_calls": 2,
+  "web_searches": 2
+ },
+ {
+  "turn": 3,
+  "wall_seconds": 19,
+  "exit": 0,
+  "usage": {
+   "input_tokens": 3977841,
+   "cached_input_tokens": 3819648,
+   "cache_write_input_tokens": 0,
+   "output_tokens": 17639,
+   "reasoning_output_tokens": 4067
+  },
+  "helper_commands": {
+   "research status (exit 0)": 2,
+   "research approve (exit 0)": 1
+  },
+  "curl_calls": 0,
+  "web_searches": 0
+ },
+ {
+  "turn": 4,
+  "wall_seconds": 315,
+  "exit": 0,
+  "usage": {
+   "input_tokens": 7212664,
+   "cached_input_tokens": 6996736,
+   "cache_write_input_tokens": 0,
+   "output_tokens": 28772,
+   "reasoning_output_tokens": 7515
+  },
+  "helper_commands": {
+   "research status (exit 0)": 3,
+   "research reassess (exit 0)": 1,
+   "research next (exit 0)": 3,
+   "research submit (exit 0)": 1,
+   "research verify (exit 0)": 1
+  },
+  "curl_calls": 0,
+  "web_searches": 2
+ },
+ {
+  "turn": 5,
+  "wall_seconds": 166,
+  "exit": 0,
+  "usage": {
+   "input_tokens": 9861822,
+   "cached_input_tokens": 9595392,
+   "cache_write_input_tokens": 0,
+   "output_tokens": 36240,
+   "reasoning_output_tokens": 10268
+  },
+  "helper_commands": {
+   "research refresh (exit 0)": 1,
+   "research next (exit 0)": 2,
+   "research submit (exit 0)": 2,
+   "research status (exit 0)": 1,
+   "research verify (exit 0)": 1
+  },
+  "curl_calls": 0,
+  "web_searches": 0
+ },
+ {
+  "turn": 6,
+  "wall_seconds": 407,
+  "exit": 0,
+  "usage": {
+   "input_tokens": 17625033,
+   "cached_input_tokens": 17289600,
+   "cache_write_input_tokens": 0,
+   "output_tokens": 51738,
+   "reasoning_output_tokens": 15273
+  },
+  "helper_commands": {
+   "research find (exit 0)": 1,
+   "research start (exit 1)": 1,
+   "research start (exit 0)": 1,
+   "research next (exit 0)": 9,
+   "research submit (exit 0)": 4,
+   "research submit (exit 1)": 1,
+   "research status (exit 0)": 2,
+   "research verify (exit 0)": 1
+  },
+  "curl_calls": 0,
+  "web_searches": 1
+ }
+]

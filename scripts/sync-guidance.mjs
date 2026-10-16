@@ -77,7 +77,7 @@ function version(value) {
 }
 function compatible(required, actual) {
   const a = version(required), b = version(actual);
-  if (a.some((n, i) => n > b[i] && a.slice(0, i).every((v, j) => v === b[j]))) throw new Error('Current guidance needs a newer installed runtime. Update with this skill’s trusted installer.');
+  if (a.some((n, i) => n > b[i] && a.slice(0, i).every((v, j) => v === b[j]))) throw Object.assign(new Error('Current guidance needs a newer installed runtime. Update with this skill’s trusted installer.'), { minimumRuntime: required });
 }
 async function runtimeHashes(runtime) {
   const hashes = {};
@@ -137,6 +137,7 @@ export async function start({ project, runtime = root, source, revision } = {}) 
     const shallow = (await git(repository, 'rev-parse', '--is-shallow-repository')).toString().trim() === 'true';
     const head = async () => (await git(repository, 'rev-parse', '--verify', 'FETCH_HEAD^{commit}')).toString().trim();
     let commit, inspected, channel = 'main', ref = 'refs/heads/main';
+    const skipped = [];
     if (revision) {
       await git(repository, 'fetch', '--quiet', '--no-tags', ...(shallow ? ['--unshallow'] : []), trustedSource, ref);
       await git(repository, 'merge-base', '--is-ancestor', revision, await head()); commit = revision;
@@ -148,7 +149,7 @@ export async function start({ project, runtime = root, source, revision } = {}) 
         await git(repository, 'fetch', '--quiet', '--no-tags', '--depth=1', trustedSource, release.ref);
         const candidate = await head();
         try { inspected = await inspectCommit(repository, candidate, config); commit = candidate; channel = 'release'; ref = release.ref; break; }
-        catch (error) { if (!/newer installed runtime/.test(error.message)) throw error; }
+        catch (error) { if (!/newer installed runtime/.test(error.message)) throw error; skipped.push({ ref: release.ref, minimumRuntime: error.minimumRuntime }); }
       }
       if (!commit && releases.length) throw new Error('No guidance release supports this installed runtime; it needs a newer installed runtime. Update with this skill’s trusted installer.');
       if (!commit) { await git(repository, 'fetch', '--quiet', '--no-tags', '--depth=1', trustedSource, ref); commit = await head(); }
@@ -170,7 +171,11 @@ export async function start({ project, runtime = root, source, revision } = {}) 
     const pin = { schema: 1, skill: config.skill, repository: config.repository, revision: commit, channel, ref, guidanceVersion, task, createdAt: new Date().toISOString(), runtime: config.runtime, runtimeVersion: config.version, runtimeFiles: await runtimeHashes(config.runtime), files: hashes };
     await writeFile(join(stage, 'pin.json'), JSON.stringify(pin, null, 2) + '\n', { flag: 'wx', mode: 0o400 });
     const snapshot = join(cache, 'tasks', task); await rename(stage, snapshot); stage = null;
-    return { freshness: 'current-at-start', channel, ref, runtimeVersion: config.version, guidanceVersion, revision: commit, task, guidance: join(snapshot, 'SKILL.md'), runtime: config.runtime };
+    // Falling back to an older release because a newer one needs a newer runtime is disclosed, so the
+    // agent can tell the person and offer the update; it is never reported as the current guidance.
+    const tag = name => name.slice('refs/tags/'.length), newer = skipped[0];
+    const disclosure = newer ? { freshness: 'older-compatible-release', newerRelease: newer, notice: `Guidance ${tag(newer.ref)} needs runtime ${newer.minimumRuntime}; this task uses ${tag(ref)}, the newest release runtime ${config.version} supports. Update with this skill’s trusted installer to use the newer guidance.` } : { freshness: 'current-at-start' };
+    return { ...disclosure, channel, ref, runtimeVersion: config.version, guidanceVersion, revision: commit, task, guidance: join(snapshot, 'SKILL.md'), runtime: config.runtime };
   } finally { if (stage) await rm(stage, { recursive: true, force: true }); await lock.close(); await rm(join(cache, '.sync-lock')); }
 }
 export async function resume({ project, task, runtime = root, cached = false } = {}) {

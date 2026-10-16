@@ -1,0 +1,210 @@
+{
+  "cli": "<disposable>/home/.claude/skills/harness-research/scripts/harness-research.mjs",
+  "steps": 130,
+  "passed": 45,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "start creates an in-progress run",
+      "pass": true,
+      "detail": "in-progress"
+    },
+    {
+      "name": "first pass completes",
+      "pass": true,
+      "detail": "complete"
+    },
+    {
+      "name": "verify reads [R:key] markers from a draft, deduplicated",
+      "pass": true
+    },
+    {
+      "name": "verify reports both cited keys confirmed",
+      "pass": true
+    },
+    {
+      "name": "verify reports unknown keys as gone",
+      "pass": true
+    },
+    {
+      "name": "verify is read-only",
+      "pass": true
+    },
+    {
+      "name": "approval applies to the revision approved",
+      "pass": true,
+      "detail": "{\"by\":\"Synthetic Reviewer\",\"at\":\"2026-10-16T16:38:35.834Z\",\"output_revision\":19,\"current\":true}"
+    },
+    {
+      "name": "report records the approval",
+      "pass": true
+    },
+    {
+      "name": "again opens a round for the chosen question only",
+      "pass": true,
+      "detail": "{\"round\":1,\"kind\":\"again\",\"at\":\"2026-10-16T16:38:35.935Z\",\"sources\":[],\"questions\":[\"writers\"],\"rewrite\":[\"writers\"],\"done\":false,\"again\":[\"writers\"],\"reason\":\"Also say whether readers wait for the writer.\"}"
+    },
+    {
+      "name": "checked fact stays confirmed during the round",
+      "pass": true
+    },
+    {
+      "name": "again researched only writers, with the reason",
+      "pass": true
+    },
+    {
+      "name": "again round completes",
+      "pass": true
+    },
+    {
+      "name": "again round tasks covered one question",
+      "pass": true,
+      "detail": "[[\"research\",[\"writers\"]],[\"check\",[\"writers\"]],[\"write\",[\"writers\"]]]"
+    },
+    {
+      "name": "writers now has two confirmed facts",
+      "pass": true
+    },
+    {
+      "name": "facts.json lists the again round",
+      "pass": true
+    },
+    {
+      "name": "report discloses the again round",
+      "pass": true
+    },
+    {
+      "name": "earlier approval no longer applies after the round",
+      "pass": true,
+      "detail": "{\"by\":\"Synthetic Reviewer\",\"at\":\"2026-10-16T16:38:35.834Z\",\"output_revision\":19,\"current\":false,\"reason\":\"The research changed since it was approved.\"}"
+    },
+    {
+      "name": "re-approval applies",
+      "pass": true
+    },
+    {
+      "name": "refresh opens a reading round",
+      "pass": true,
+      "detail": "{\"round\":2,\"kind\":\"refresh\",\"at\":\"2026-10-16T16:38:36.621Z\",\"sources\":[\"source-68aba2349267b3ded74b\"],\"questions\":[],\"rewrite\":[],\"done\":false,\"phase\":\"reading\"}"
+    },
+    {
+      "name": "refresh task lists only the cited web source and its quoted passage",
+      "pass": true,
+      "detail": "[{\"id\":\"source-68aba2349267b3ded74b\",\"origin\":\"https://fixture.invalid/oriondb/durability\",\"title\":\"OrionDB durability overview\",\"publisher\":\"Fixture web\",\"saved_at\":\"2026-10-16T16:38:34.882Z\",\"source_date\":\"2026-10-01\",\"pinned\":\"research/sources/revisions/a4d56be922efea4c830ad7635ec2d04fc84ea5c90220379cfdab56179b5724a6.txt\",\"quotes\":[\"The engine keeps a write-ahead log, so a crash loses no committed transaction.\"]}]"
+    },
+    {
+      "name": "refresh researched again only the question whose passage is gone",
+      "pass": true,
+      "detail": "[[\"refresh\",[]],[\"research\",[\"crash\"]],[\"check\",[\"crash\"]],[\"write\",[\"crash\"]]]"
+    },
+    {
+      "name": "refresh round completes",
+      "pass": true
+    },
+    {
+      "name": "old crash fact is stale; writers still confirmed",
+      "pass": true,
+      "detail": "[[\"stale\",\"A quoted passage is no longer in the current original.\"],[\"confirmed\",null]]"
+    },
+    {
+      "name": "report discloses the refresh round",
+      "pass": true
+    },
+    {
+      "name": "approval no longer applies after refresh",
+      "pass": true
+    },
+    {
+      "name": "reuse from another project completes at once",
+      "pass": true,
+      "detail": "complete"
+    },
+    {
+      "name": "a reused run starts unapproved",
+      "pass": true,
+      "detail": "null"
+    },
+    {
+      "name": "reuse keeps the same confirmed fact keys",
+      "pass": true
+    },
+    {
+      "name": "origin approval is kept as history",
+      "pass": true
+    },
+    {
+      "name": "report says the origin approval is history",
+      "pass": true
+    },
+    {
+      "name": "verify in the reusing project: current key confirmed, stale key stays non-confirmed",
+      "pass": true,
+      "detail": "[[\"fact-dacc651\",\"confirmed\"],[\"fact-16ce654\",\"stale\"]]"
+    },
+    {
+      "name": "supplied-only reuse warns that public-web facts were left out",
+      "pass": true,
+      "detail": "[\"../../team/alpha: 1 fact resting on public-web sources was left out: this run uses selected sources only. Their questions are researched again.\"]"
+    },
+    {
+      "name": "supplied-only reuse researches the affected question again in an import round",
+      "pass": true,
+      "detail": "{\"round\":1,\"kind\":\"import\",\"done\":false,\"questions\":[\"crash\"],\"rewrite\":[\"crash\"]}"
+    },
+    {
+      "name": "supplied-only reuse finishes with gaps",
+      "pass": true,
+      "detail": "complete-with-gaps"
+    },
+    {
+      "name": "extension planner sees the reused questions",
+      "pass": true,
+      "detail": "[{\"id\":\"writers\",\"question\":\"How many writers does OrionDB permit?\",\"section\":\"deployment\",\"subject\":null,\"coverage\":\"answered\"},{\"id\":\"crash\",\"question\":\"Does OrionDB lose committed transactions in a crash?\",\"section\":\"safety\",\"subject\":null,\"coverage\":\"answered\"}]"
+    },
+    {
+      "name": "only the new question was researched",
+      "pass": true
+    },
+    {
+      "name": "extended run completes with reused and new sections",
+      "pass": true,
+      "detail": "deployment,safety,replication"
+    },
+    {
+      "name": "extended run keeps reused keys",
+      "pass": true
+    },
+    {
+      "name": "reuse from the same project starts a new run that completes at once",
+      "pass": true,
+      "detail": "282ca66e80c4415eb5a0f2a6 complete"
+    },
+    {
+      "name": "same-project reuse keeps the same keys and records the earlier run as origin",
+      "pass": true
+    },
+    {
+      "name": "same-project reuse is unapproved",
+      "pass": true
+    },
+    {
+      "name": "find lists every project with research, skipping node_modules",
+      "pass": true,
+      "detail": "team/alpha,decks/gamma,blog/delta,blog/beta"
+    },
+    {
+      "name": "find reports status, depth and counts",
+      "pass": true,
+      "detail": "{\"path\":\"decks/gamma\",\"absolute\":\"<disposable>/work/projects/decks/gamma\",\"run\":\"fbe22fcd645143c9b0450b2e\",\"output_revision\":11,\"title\":\"OrionDB writers, crash safety and replication scope\",\"topic\":\"OrionDB writers, crash safety and replication scope\",\"status\":\"complete\",\"depth\":\"light\",\"source_mode\":\"public-web\",\"created_at\":\"2026-10-16T16:38:38.016Z\",\"updated_at\":\"2026-10-16T16:38:38.743Z\",\"counts\":{\"questions\":3,\"facts\":4,\"sources\":3,\"gaps\":0},\"approval\":null,\"sources_saved\":{\"oldest\":\"2026-10-16T16:38:34.427Z\",\"newest\":\"2026-10-16T16:38:36.769Z\"},\"source_dates\":{\"oldest\":\"2026-10-01\",\"newest\":\"2026-10-01\"},\"sources_age_days\":0,\"reused_from\":[\"../../team/alpha\"]}"
+    },
+    {
+      "name": "find reports source age",
+      "pass": true
+    },
+    {
+      "name": "find --query matches case-insensitively",
+      "pass": true,
+      "detail": "decks/gamma"
+    }
+  ]
+}

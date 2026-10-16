@@ -9,15 +9,17 @@ belong in your content project; the skill installation is shared across projects
 
 | Version | What you get | Install from |
 | --- | --- | --- |
-| **0.9.0 release** | The task workflow, independent evidence checks, and visible `research/` outputs. | The immutable `v0.9.0` tag. |
-| **0.8.1 previous release** | The earlier manual plan/finding workflow and a saved report in `.harness-research/`. | The immutable `v0.8.1` tag. |
+| **0.9.1 release** | The task workflow, independent evidence checks and visible `research/` outputs, plus checking cited facts, researching questions again, reusing, approving and refreshing research. | The immutable `v0.9.1` tag. |
+| **0.9.0 previous release** | The task workflow without the 0.9.1 verification and reuse commands. | The immutable `v0.9.0` tag. |
+| **0.8.1 earlier release** | The earlier manual plan/finding workflow and a saved report in `.harness-research/`. | The immutable `v0.8.1` tag. |
 | **Development** | Unreleased work; guidance must be selected explicitly for testing. | `main` or a development branch; see the [developer guide](development.md). |
 
-The README and user guide describe 0.9.0. The
-[release page](https://github.com/dbbaskette/harness-research-skill/releases/tag/v0.9.0)
-has its ZIP and checksum. The [verification record](verification/0.9.0/README.md)
-separates native results, live trials and the owner's decision to refine quality
-through ongoing use rather than complete formal human sampling.
+The README and user guide describe 0.9.1. The
+[release page](https://github.com/dbbaskette/harness-research-skill/releases/tag/v0.9.1)
+has its ZIP and checksum. The [verification record](verification/0.9.1/README.md)
+separates native results, installed-helper checks and live trials. The
+[0.9.0 record](verification/0.9.0/README.md) keeps the owner's decision to refine
+quality through ongoing use rather than complete formal human sampling.
 
 ### Install the release
 
@@ -27,7 +29,7 @@ model access, and permission to create a separate checker invocation. The helper
 does not supply those capabilities or require another research account.
 
 ```sh
-git clone --branch v0.9.0 https://github.com/dbbaskette/harness-research-skill.git
+git clone --branch v0.9.1 https://github.com/dbbaskette/harness-research-skill.git
 cd harness-research-skill
 bash scripts/Install-Harness-Research.sh
 ```
@@ -44,14 +46,15 @@ An actual installation returns JSON with `"status": "installed"`,
 agent session, open the project where you want research saved, and invoke the
 skill using the [first-session prompts](../README.md#get-started).
 
-**Preview users:** reinstall from `v0.9.0` even if `--version` already reports
-0.9.0. Preview and final helpers can have the same version label with different
+**Preview users:** reinstall from `v0.9.1` even if `--version` already reports
+0.9.1. Preview and final helpers can have the same version label with different
 contents; a guidance refresh does not replace executable helpers.
 
-### Use the previous release
+### Use a previous release
 
-Replace `v0.9.0` with `v0.8.1` in the clone command to install the older release.
-Its manual workflow is documented in the [legacy evidence contract](../references/evidence.md)
+Replace `v0.9.1` with `v0.9.0` or `v0.8.1` in the clone command to install an
+older release. 0.9.0 lacks the verification and reuse commands. 0.8.1's
+manual workflow is documented in the [legacy evidence contract](../references/evidence.md)
 and [workflow reference](../references/workflow.md). It does not gain task commands
 or independent-checking stages merely by loading newer guidance.
 
@@ -102,8 +105,8 @@ With the default discovery link, this works offline and needs no content project
 node "$HOME/.agents/skills/harness-research/scripts/harness-research.mjs" --version
 ```
 
-The current release reports `harness-research 0.9.0`. The previous release reports
-`harness-research 0.8.1`; a preview can also report 0.9.0, so reinstall it from the tag.
+The current release reports `harness-research 0.9.1`. Previous releases report
+`harness-research 0.9.0` or `0.8.1`; a preview can also report 0.9.1, so reinstall it from the tag.
 
 When work starts or resumes, the agent should also report the installed runtime,
 guidance release, exact guidance revision, and freshness. These identities can
@@ -111,14 +114,14 @@ differ. A newly loaded instruction set is not proof of a newer executable.
 
 ## Update an existing installation
 
-### Update to 0.9.0 for new work
+### Update to 0.9.1 for new work
 
 From your skill repository checkout, with your own changes committed or otherwise
 preserved:
 
 ```sh
-git fetch origin tag v0.9.0
-git switch --detach v0.9.0
+git fetch origin tag v0.9.1
+git switch --detach v0.9.1
 bash scripts/Install-Harness-Research.sh
 ```
 
@@ -150,8 +153,12 @@ executable scripts. Resuming uses its pin without fetching again.
 
 Executable updates happen only when you rerun the trusted installer. Current
 guidance accepts runtime 0.8.1 and routes it to the manual workflow; the checked
-task workflow needs runtime 0.9.0. An incompatible runtime or failed refresh is
-reported instead of being described as current.
+task workflow needs runtime 0.9.0, and its verification and reuse commands need
+0.9.1. An incompatible runtime or failed refresh is reported instead of being
+described as current. From runtime 0.9.1, a task that uses an older release
+because a newer one needs a newer runtime reports
+`freshness: older-compatible-release` with a notice naming that release; rerun
+the installer from the newer tag to use it.
 
 To explicitly adopt newer guidance for existing work, ask the agent to do so.
 That creates a new guidance task and requires rechecking affected conclusions;
@@ -169,7 +176,7 @@ it is not ordinary resume. [Task and evidence recovery →](using-harness-resear
 | A saved task reports changed guidance or runtime files | Preserve its state and restore the intact runtime/snapshot with the trusted installer or backup. Do not edit a pin to make the check pass. |
 | The installer finds an unrelated existing skill | Inspect and preserve that location before choosing where to install. It will not replace an unrelated skill automatically. |
 | A PDF, slide deck, or page cannot be read | Supply a readable source if possible. The agent can preserve an access/extraction gap; the helper itself does not extract documents or browse pages. |
-| Independent checking is unavailable | The 0.9.0 run remains blocked with a partial report. Use an authorized separate invocation, or keep the partial result with its limitation. |
+| Independent checking is unavailable | The run remains blocked with a partial report. Use an authorized separate invocation, or keep the partial result with its limitation. |
 | Research storage is busy | Let the active save finish. For a suspected abandoned lock, inspect its recorded process before recovery; do not remove another worker's live lock. |
 
 For older `.tanzu-research` records, use the explicit

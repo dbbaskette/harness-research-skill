@@ -1,0 +1,7 @@
+OS: macOS 27.0.1 (26A434)
+Node: v22.23.1
+npm: 10.9.8
+Python: 3.14.5 (no PyYAML; HARNESS_RESEARCH_PYTHON unset)
+Source: 55d1695147f5d18dabc7ba0318073e0e92d138b3
+Source tree: e6de9ca8ecd5b40c2e59a137cfc28cc0a30d3c45
+Source clean: yes

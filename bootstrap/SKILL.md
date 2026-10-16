@@ -31,8 +31,9 @@ Existing work retains its instructions and runtime. Explicitly adopting new
 guidance starts a new task and requires rechecking affected review conclusions.
 
 New tasks use the newest release this runtime supports (main only when the
-repository has no release tags). A failed fetch or incompatible runtime is reported,
-not described as current. An existing task can resume without fetching. For an
+repository has no release tags). When a newer release needs a newer runtime,
+`freshness` is `older-compatible-release`: tell the user its `notice`. A failed
+fetch or incompatible runtime is reported, not described as current. An existing task can resume without fetching. For an
 agent sandbox DNS/network failure, retry the same command through the host's
 available network-permission flow. Report a denied or unavailable retry; do not
 switch entrypoints expecting a separate runtime or silently bypass the refresh.

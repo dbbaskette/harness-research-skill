@@ -39,6 +39,7 @@ export async function measureContext() {
   const readingPaths = {
     queued: path(queued), focused: path(focused), quick: path([...entry, 'references/workflow.md']),
     resume: path([...entry, 'references/resume.md']),
+    reuse: path([...entry, 'references/reuse.md']),
     comparative: path(compare), migration: path([...entry, 'references/migration.md']),
   };
   for (const platform of ['codex', 'claude']) {
@@ -55,7 +56,7 @@ export async function measureContext() {
   if (!description) throw new Error('Missing skill metadata');
   const activation = files['bootstrap/SKILL.md'] + files['SKILL.md'];
   const routes = { 'Discovery metadata': count(description), 'Installed bootstrap': files['bootstrap/SKILL.md'], 'Bootstrap + current guidance entry': activation,
-    ...Object.fromEntries(Object.entries({ queued: 'Skill research with independent checks and saved report', quick: 'Explicit chat-only cited answer', focused: 'Legacy manual research with saved report', resume: 'Status / resume without new findings', comparative: 'Comparative routing only', codexoutline: 'Codex comparative outline', codexitems: 'Codex add items', codexfields: 'Codex add fields', codexdeep: 'Codex deep results', codexdeepSaved: 'Codex deep results + saved evidence', claudeoutline: 'Claude comparative outline', claudedeep: 'Claude deep results', general: 'Saved research + general web strategy', academic: 'Saved research + academic strategy', github: 'Saved research + GitHub strategy', technical: 'Saved research + technical Q&A strategy', chinese: 'Saved research + Chinese sources strategy', migration: 'Legacy migration' }).map(([name, label]) => [label, standalone[name].total])) };
+    ...Object.fromEntries(Object.entries({ queued: 'Skill research with independent checks and saved report', reuse: 'Verify, research again, reuse or refresh', quick: 'Explicit chat-only cited answer', focused: 'Legacy manual research with saved report', resume: 'Status / resume without new findings', comparative: 'Comparative routing only', codexoutline: 'Codex comparative outline', codexitems: 'Codex add items', codexfields: 'Codex add fields', codexdeep: 'Codex deep results', codexdeepSaved: 'Codex deep results + saved evidence', claudeoutline: 'Claude comparative outline', claudedeep: 'Claude deep results', general: 'Saved research + general web strategy', academic: 'Saved research + academic strategy', github: 'Saved research + GitHub strategy', technical: 'Saved research + technical Q&A strategy', chinese: 'Saved research + Chinese sources strategy', migration: 'Legacy migration' }).map(([name, label]) => [label, standalone[name].total])) };
   const hashes = Object.fromEntries(paths.map(path => [path, createHash('sha256').update(contents[path]).digest('hex')]));
   const inputDigest = createHash('sha256').update(JSON.stringify({ hashes, outputs, readingPaths, routes })).digest('hex');
   return { tokenizer: 'cl100k_base', inputDigest, files, samples, readingPaths, standalone, routes };
