@@ -1,5 +1,38 @@
 # Changelog
 
+## 0.9.1 — unreleased
+
+Verification and reuse, the 0.9.x items of the
+[direction](docs/superpowers/specs/2026-10-15-harness-research-direction.md#roadmap).
+Not released until native tests, installed checks and the live acceptance matrix
+pass (or the owner approves a narrower scope). The guidance still accepts runtime
+0.8.1; the new commands need runtime 0.9.1.
+
+- `research verify` reports what became of each cited fact key: confirmed,
+  narrowed, superseded, rejected, stale, unchecked or gone, with the replacement
+  assertion and source revisions. It reads keys from a JSON list or any file
+  citing them, writes nothing, and says live sources were not re-read.
+- `research reassess --again ID,... [--reason TEXT]` researches, checks and
+  rewrites chosen questions again; their checked facts stay current.
+- `research start --from PATH` (repeatable) begins a run from earlier research,
+  reading only its `research/` folder. Checked work keeps its keys; missing saved
+  text, unchecked candidates and public sources in a supplied-only run are
+  researched again; edited research is refused. A new topic, context, sources or
+  several origins ask the planner to extend the plan, and new questions are
+  cross-checked. Colliding IDs are renamed. Origin approvals are history.
+- `research find --in DIR [--query TEXT]` lists research folders with status,
+  depth, counts, approval and source age.
+- `research approve --by NAME [--revision N]` records an approval of exactly the
+  content shown; status, the report, `facts.json`, `verify` and `find` say
+  whether it still applies.
+- `research refresh` re-reads the cited web sources of a finished run. Facts whose
+  quoted passages are gone become stale and only their questions are researched
+  again; changed text becomes a new source revision.
+- Rounds after the first pass record their kind (`reassess`, `again`, `refresh`,
+  `import`), shown in the report and `facts.json`.
+- New guidance tasks that fall back to an older release because a newer one needs
+  a newer runtime report `freshness: older-compatible-release` with a notice.
+
 ## 0.9.0 — 2026-10-16
 
 Release validation: 88 native tests passed; 13 eligible live report cases completed.

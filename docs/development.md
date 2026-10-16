@@ -49,13 +49,21 @@ fact check for a legacy manual run.
 
 | Actions | Purpose |
 | --- | --- |
-| `research start` | Create a run with a topic, selected sources, source permissions, depth, optional context/claims, and optional plan-only hold. |
+| `research start` | Create a run with a topic, selected sources, source permissions, depth, optional context/claims, and optional plan-only hold. `--from PATH` (repeatable) starts from earlier research instead. |
 | `research next`, `peek` | Lease eligible work, or inspect what would be next without taking it. |
 | `research source`, `submit` | Register inspected source text or submit results under the run/task/worker/attempt/lease tuple. |
 | `research heartbeat`, `release` | Renew a lease or return a task. Releasing research retains checker exclusion. |
 | `research retry`, `continue`, `block` | Reopen exhausted attempts, release a plan hold/block, or record an execution block. |
-| `research reassess` | Reopen only the questions affected by changed evidence; retain old facts as stale history. |
+| `research reassess` | Reopen only the questions affected by changed evidence; retain old facts as stale history. `--again ID,... [--reason TEXT]` researches chosen questions again and keeps their checked facts. |
 | `research status` | Inspect progress, expire leases, and repair derived exports. |
+| `research verify` | Report what became of cited fact keys (`--keys FILE` or `--key KEY`): confirmed, narrowed, superseded, rejected, stale, unchecked or gone. Read-only. |
+| `research approve` | Record who approved the finished research (`--by NAME`, optional `--revision N`) and whether that approval still applies. |
+| `research refresh` | Re-read the cited web sources of a finished run; facts whose quoted passages are gone are researched again. |
+| `research find` | List the research folders under `--in DIR`, optionally matching `--query`. |
+
+Rounds after the first pass (`reassess`, `again`, `refresh`, and `import` for
+work a reused run must redo) research and check only their questions, rewrite
+only their answers, and are listed in `facts.json` under `reassessments`.
 
 Read the [research contract](../references/research-run.md) for flags, input
 shapes, source registration, partial-capture corrections, independent checker
@@ -105,10 +113,16 @@ source limits as well as fact status before treating data as current support.
 The brief excludes candidate, rejected, superseded, and stale facts from its
 current-reference list.
 
-This version does not provide `research verify`, `refresh`, `approve`, or `find`
-commands. The [standalone design](superpowers/specs/2026-10-15-research-with-agents-design.md)
-and [direction](superpowers/specs/2026-10-15-harness-research-direction.md)
-distinguish implemented behavior from later consumer migrations.
+Before publishing content that cites fact keys, run `research verify` on them.
+A narrowed or superseded key reports its replacement but is never reported as
+confirmed. `facts.json` also carries `approval` (whether the latest approval
+still applies), `approvals`, and `origins` for research started with `--from`;
+an origin's approval is history, not approval of the new run. Reuse reads only
+an origin's `research/` folder, so commit `research/sources/revisions/` with
+it: facts whose saved text is missing come across stale and are researched
+again. The [direction](superpowers/specs/2026-10-15-harness-research-direction.md)
+and the [0.9.1 plan](superpowers/plans/2026-10-16-research-0.9.1.md) record the
+decisions behind these commands; consumer migrations remain separate.
 
 ## Run verification
 

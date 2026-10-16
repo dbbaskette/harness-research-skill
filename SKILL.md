@@ -5,7 +5,7 @@ description: Research topics, compare options and fact-check claims using select
 
 # Harness Research
 
-Guidance release: **0.9.0**. Report the installed runtime version, guidance
+Guidance release: **0.9.1**. Report the installed runtime version, guidance
 release/revision and freshness on start/resume; these identities can differ.
 
 You conduct the research with your harness's search, browser, document tools and
@@ -27,7 +27,7 @@ requested chat-only answer omits saved artifacts.
 
 | Task | Read |
 | --- | --- |
-| Research a topic, comparison or claims; continue or reassess a queued run | [Skill research workflow](references/research-run.md) |
+| Research a topic, comparison or claims; continue, reassess, verify, reuse or refresh a run | [Skill research workflow](references/research-run.md), [reuse](references/reuse.md) |
 | Continue a manual plan, use legacy commands, or research with a 0.8.x runtime | [Workflow](references/workflow.md), [evidence](references/evidence.md) and [resume](references/resume.md) as needed |
 | Extend a retained item/field outline | [Comparative research](references/comparative.md) |
 | Search a specialized source domain | One strategy from [source routing](references/strategies.md) |

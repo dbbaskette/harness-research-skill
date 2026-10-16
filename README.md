@@ -178,25 +178,26 @@ representative guidance-start response. Bootstrap activation is shown separately
 | --- | ---: |
 | Discovery metadata | 38 |
 | Installed bootstrap | 490 |
-| Bootstrap + current guidance entry | 1,093 |
-| Skill research with independent checks and saved report | 4,506 |
-| Explicit chat-only cited answer | 2,047 |
-| Legacy manual research with saved report | 3,238 |
-| Status / resume without new findings | 1,648 |
-| Comparative routing only | 1,800 |
-| Codex comparative outline | 2,760 |
-| Codex add items | 1,965 |
-| Codex add fields | 1,985 |
-| Codex deep results | 2,648 |
-| Codex deep results + saved evidence | 3,839 |
-| Claude comparative outline | 2,777 |
-| Claude deep results | 2,670 |
-| Saved research + general web strategy | 5,003 |
-| Saved research + academic strategy | 5,095 |
-| Saved research + GitHub strategy | 4,890 |
-| Saved research + technical Q&A strategy | 4,795 |
-| Saved research + Chinese sources strategy | 5,020 |
-| Legacy migration | 1,442 |
+| Bootstrap + current guidance entry | 1,106 |
+| Skill research with independent checks and saved report | 4,524 |
+| Verify, research again, reuse or refresh | 1,880 |
+| Explicit chat-only cited answer | 2,060 |
+| Legacy manual research with saved report | 3,251 |
+| Status / resume without new findings | 1,661 |
+| Comparative routing only | 1,813 |
+| Codex comparative outline | 2,773 |
+| Codex add items | 1,978 |
+| Codex add fields | 1,998 |
+| Codex deep results | 2,661 |
+| Codex deep results + saved evidence | 3,852 |
+| Claude comparative outline | 2,790 |
+| Claude deep results | 2,683 |
+| Saved research + general web strategy | 5,021 |
+| Saved research + academic strategy | 5,113 |
+| Saved research + GitHub strategy | 4,908 |
+| Saved research + technical Q&A strategy | 4,813 |
+| Saved research + Chinese sources strategy | 5,038 |
+| Legacy migration | 1,455 |
 
 Comparative rows include the selected platform resource, not the complete bundle.
 Each strategy row includes one router and one strategy. Status/resume skips plan

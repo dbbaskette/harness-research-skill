@@ -5,6 +5,11 @@ The current release is **0.9.0**. Package/lockfile versions,
 install examples identify this software release. Earlier changelog entries and
 saved tasks retain their recorded versions.
 
+**0.9.1 in development.** The development branch labels its package and guidance
+0.9.1 (verification and reuse, see the [changelog](../CHANGELOG.md)). The current
+release stays 0.9.0 until `v0.9.1` is tagged after its own verification; keep
+the 0.9.1 branch off `main` until then.
+
 The checked standalone workflow needs runtime 0.9.0. Guidance refresh cannot
 upgrade executable helpers, so the guidance keeps a minimum runtime of 0.8.1 and
 routes older runtimes to the manual workflow. Raise the minimum only when that

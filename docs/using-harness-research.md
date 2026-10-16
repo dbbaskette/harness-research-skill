@@ -2,8 +2,9 @@
 
 [← README](../README.md) · [Setup & updates](setup.md) · [Developer guide](development.md)
 
-This guide describes **0.9.0**. Version 0.8.1 retains the earlier
-manual workflow; see [version choices](setup.md#choose-your-version).
+This guide describes **0.9.0**, plus [using research again](#use-research-again),
+which arrives in 0.9.1. Version 0.8.1 retains the earlier manual workflow; see
+[version choices](setup.md#choose-your-version).
 
 ## Start with the question and the boundary
 
@@ -220,7 +221,10 @@ lease tokens or supply a new plan merely to inspect progress.
   reread the changed source, research and check only affected questions, and
   rewrite their answers.
 - **Changed claim target:** start a new run with the updated claims, because the
-  exact original claim no longer matches. There is no `research refresh` command.
+  exact original claim no longer matches.
+- **A question needs another look:** ask for it to be researched again, saying
+  what to look for. Its checked facts stay; it is researched, checked and
+  rewritten on its own.
 - **Failed task:** other independent tasks at that stage can continue. The agent
   addresses the cause and explicitly retries exhausted work.
 - **No independent checker:** keep the partial report and the execution block,
@@ -231,9 +235,26 @@ lease tokens or supply a new plan merely to inspect progress.
 The helper retains previous records in `.harness-research/history/` when starting
 another run. Keep the same registered source files unchanged while finishing one.
 
-Cross-project reuse, approval, automated refresh, and standalone verification
-commands are later milestones. You can read or share the saved report today;
-that does not imply those library-management commands already exist.
+## Use research again
+
+These need version 0.9.1.
+
+- **Start from earlier research:** "Start from the research in ../decks/valkey and
+  add what our architects need about migration." Checked facts keep their keys,
+  so anything citing them still works. Only new questions, and anything the
+  earlier research could not carry, are researched. Your agent can list the
+  research folders in a directory, with their age and approval, to choose from.
+- **Check citations before publishing:** "Verify the facts this deck cites." Each
+  cited fact is reported as still confirmed, narrowed, superseded, rejected or
+  stale; a narrowed fact's new wording does not confirm the old one.
+- **Approve:** "I approve this research." The approval records who approved which
+  version; any later change to the research means it no longer applies.
+- **Refresh:** "Refresh this research before we rely on it." Web sources are read
+  again; facts whose quoted passages are gone are researched and checked again,
+  and everything else is kept.
+
+Reuse reads the `research/` folder, including the saved source text under
+`research/sources/revisions/`. Keep that folder with the work when you commit it.
 
 For mechanics, see the [task/evidence contract](../references/research-run.md).
 For setup failures, use [troubleshooting](setup.md#troubleshooting).
