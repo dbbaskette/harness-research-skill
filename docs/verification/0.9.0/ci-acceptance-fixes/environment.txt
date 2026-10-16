@@ -1,0 +1,4 @@
+OS: 27.0
+Node: v22.23.2
+Python: Python 3.9.6
+Source: f6c15c9ef3e7ce6498d004188e23f7219826a30c

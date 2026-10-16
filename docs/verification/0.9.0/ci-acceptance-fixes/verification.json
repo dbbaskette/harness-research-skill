@@ -1,0 +1,36 @@
+{
+  "source_commit": "f6c15c9ef3e7ce6498d004188e23f7219826a30c",
+  "source_tree": "64d68bd9f933ae882a9a1d25c8fb781f8caf36f8",
+  "source_was_clean": true,
+  "environment": {
+    "os": "macOS 27.0",
+    "node": "v22.23.2",
+    "python": "3.9.6"
+  },
+  "tests": {
+    "passed": 88,
+    "failed": 0,
+    "skipped": 0
+  },
+  "targeted_tests": 47,
+  "audit": "0 vulnerabilities",
+  "context": "passed",
+  "installer": "passed",
+  "installed_version": "harness-research 0.9.0",
+  "owned_vm": "harness-research-test-20261016143027-23409-d44cd0a5",
+  "owned_vm_deleted": true,
+  "owned_vm_files_absent": true,
+  "host_logs": "/Users/dbbaskette/Library/Logs/MacOS Test Suite/harness-research/harness-research-test-20261016143027-23409-d44cd0a5",
+  "log_sha256": {
+    "environment.txt": "3d0033db80ea9b76d72b373517346a6281712179d7a84b0b4d19fc3700a10a0a",
+    "tests.log": "0a5452dbf3e1c1ab9c3a7926258d38879316057a40e70bd54efd8e1a6ac4dcad",
+    "audit.log": "6d8c5c8f3d7684adb070417bd608d01ae90aa3dc26a65af03ffda4955f38d9a3",
+    "context.log": "50b8de7cc35d5b65d9ebd9db847044ca19b552ae08d4ecfc498c0cd94deeb021",
+    "installer.log": "45cb8b328aa30c69c9ebc0616135c67deb26c7f5505114160f617fe25b958fe7",
+    "installed-version.log": "38be90bc72a08dc548dc1054adce9b1cfe5c8f1f7baea1c173c1a9363820aea2",
+    "result.txt": "c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431",
+    "run.txt": "0bf4ae2dc3e8d8f242fc58e76e6701d407007556af9ec5d9ba8a2cb4e147e16f",
+    "cleanup.log": "92cf2bf0b2b12b1a9038cc223f7fdde9537dae8ca3e1e5fed69c8eb07ed65802"
+  },
+  "release_acceptance": "Live corrected Codex trial and human sampling pending; native tests alone are insufficient for stable publication."
+}
