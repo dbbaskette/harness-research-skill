@@ -145,6 +145,13 @@ test('new work takes the newest release its runtime supports, so unreleased guid
   const started = await start(f);
   assert.equal(started.revision, f.first); assert.equal(started.channel, 'release'); assert.equal(started.ref, 'refs/tags/v0.3.0');
   assert.match(await readFile(started.guidance, 'utf8'), /First guidance/);
+  // Using an older release because a newer one needs a newer runtime is disclosed, never silent.
+  assert.equal(started.freshness, 'older-compatible-release');
+  assert.deepEqual(started.newerRelease, { ref: 'refs/tags/v9.0.0', minimumRuntime: '9.0.0' });
+  assert.match(started.notice, /v9\.0\.0 needs runtime 9\.0\.0.*trusted installer/);
+  await exec('git', ['-C', f.source, 'tag', '-d', 'v9.0.0']);
+  const newest = await start(f);
+  assert.equal(newest.freshness, 'current-at-start'); assert.equal(newest.newerRelease, undefined); assert.equal(newest.notice, undefined);
   await exec('git', ['-C', f.source, 'tag', '-d', 'v0.3.0']);
   await assert.rejects(start(f), /newer installed runtime/);
 });

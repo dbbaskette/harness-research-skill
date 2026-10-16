@@ -177,26 +177,26 @@ representative guidance-start response. Bootstrap activation is shown separately
 | Reading path | Tokens |
 | --- | ---: |
 | Discovery metadata | 38 |
-| Installed bootstrap | 463 |
-| Bootstrap + current guidance entry | 1,066 |
-| Skill research with independent checks and saved report | 4,479 |
-| Explicit chat-only cited answer | 2,020 |
-| Legacy manual research with saved report | 3,211 |
-| Status / resume without new findings | 1,621 |
-| Comparative routing only | 1,773 |
-| Codex comparative outline | 2,733 |
-| Codex add items | 1,938 |
-| Codex add fields | 1,958 |
-| Codex deep results | 2,621 |
-| Codex deep results + saved evidence | 3,812 |
-| Claude comparative outline | 2,750 |
-| Claude deep results | 2,643 |
-| Saved research + general web strategy | 4,976 |
-| Saved research + academic strategy | 5,068 |
-| Saved research + GitHub strategy | 4,863 |
-| Saved research + technical Q&A strategy | 4,768 |
-| Saved research + Chinese sources strategy | 4,993 |
-| Legacy migration | 1,415 |
+| Installed bootstrap | 490 |
+| Bootstrap + current guidance entry | 1,093 |
+| Skill research with independent checks and saved report | 4,506 |
+| Explicit chat-only cited answer | 2,047 |
+| Legacy manual research with saved report | 3,238 |
+| Status / resume without new findings | 1,648 |
+| Comparative routing only | 1,800 |
+| Codex comparative outline | 2,760 |
+| Codex add items | 1,965 |
+| Codex add fields | 1,985 |
+| Codex deep results | 2,648 |
+| Codex deep results + saved evidence | 3,839 |
+| Claude comparative outline | 2,777 |
+| Claude deep results | 2,670 |
+| Saved research + general web strategy | 5,003 |
+| Saved research + academic strategy | 5,095 |
+| Saved research + GitHub strategy | 4,890 |
+| Saved research + technical Q&A strategy | 4,795 |
+| Saved research + Chinese sources strategy | 5,020 |
+| Legacy migration | 1,442 |
 
 Comparative rows include the selected platform resource, not the complete bundle.
 Each strategy row includes one router and one strategy. Status/resume skips plan
