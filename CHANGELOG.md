@@ -23,7 +23,10 @@
   Leases last 30 minutes, and a lapsed lease may still submit until the task is
   taken by someone else. A failed task holds up only later stages.
 - `research peek` shows the next task without taking it; `research release` gives a
-  task back without counting a failed attempt.
+  task back without counting a failed attempt and retains researcher/checker separation.
+- Partial-capture corrections receive a new source revision automatically while old
+  metadata and citations remain immutable. Comparison tables retain facts shared by
+  questions in different sections after duplicate merging.
 - Reports take a short title; comparisons show each section's facts side by side;
   `facts.json` leaves out worker bookkeeping; `--sources` also reads one path or
   link per line.

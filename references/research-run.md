@@ -51,6 +51,8 @@ comes next without taking it, use `research peek` with the same arguments as
 `next`. A task taken by mistake goes back with `research release` and the lease
 tuple; that does not count as a failed attempt. Independent
 tasks may run in authorized subagents or sequential separate invocations.
+A released research task still records your participation; you cannot check that
+question later. Use `peek` to inspect upcoming work without taking a research role.
 A null task means inspect `waiting_for` and status: it can mean a live lease,
 plan hold or the need for an eligible checker, not completed research.
 
@@ -83,6 +85,11 @@ shorter than 280 characters, or a quote that is most of its saved source, is
 refused. When a tool returns only part of a page, or the source really is that
 short, register it with `--partial "reason"`; its facts are labelled. Register
 through the current source/research task's lease. Mark chart/scan transcriptions.
+If a quote-share refusal occurs after registration, register the same file with
+`--partial` and a concrete reason. Retain `--given` for a selected reference, and
+omit `--id` to receive a new revision automatically (or supply a fresh ID). Update
+the refused finding's source references to that returned ID and resubmit with the
+same lease. Existing source metadata and its earlier citations remain unchanged.
 
 ```sh
 node scripts/harness-research.mjs research source --project DIR --run RUN \

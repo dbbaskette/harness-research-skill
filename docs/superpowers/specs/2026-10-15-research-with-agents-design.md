@@ -196,6 +196,8 @@ register sources until another worker takes the task: its attempt is then revive
 than wasted. Once a newer lease exists, the old one is refused. Expiry is decided by the
 helper rather than by a worker's clock. `peek` shows the task a worker would get without
 taking it, and `release` gives a taken task back without counting a failed attempt.
+Release retains the invocation's research participation, so it cannot later check
+the same question; `peek` is the way to inspect a task without becoming its researcher.
 
 Every task submission is checked under the record lock against that entire lease identity.
 New results from replaced leases and submissions for old runs are refused before any
@@ -257,6 +259,9 @@ Files supplied as claim targets are pinned separately and are not evidence-sourc
   its saved source, is refused. When a tool returns only part of a page, or the source
   really is that short, the harness registers it with `--partial` and the reason; the
   source and every fact quoting it are labelled as a partial capture.
+  Registering a partial capture after an earlier full capture issues a new default
+  source revision ID even when the saved bytes match. Existing revisions remain immutable;
+  update the refused candidate's citations to the new returned ID before resubmission.
 - **Documents:** the harness reads PDFs, Word files and slides itself. It may use whatever
   extraction it has; Claude Code and Codex can both read these formats.
 - **What has no plain text,** such as a chart, a scanned page or a table, the harness reads and

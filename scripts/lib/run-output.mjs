@@ -14,6 +14,10 @@ export function titleOf(state) {
 // Worker bookkeeping stays in the run record; the export carries what a reader or caller needs.
 const exported = ({ researchWorkers, provisionalCoverage, writtenBy, ...question }) => question;
 const current = (fact, view) => fact.status === 'confirmed' && !fact.superseded_by && !view?.staleInputs?.length;
+function sectionFacts(state, view, section) {
+  const questions = new Set(state.questions.filter(question => question.section === section).map(question => question.id));
+  return state.facts.filter(fact => current(fact, view) && fact.questions.some(id => questions.has(id)));
+}
 export function sourceCount(state, fact) {
   const publishers = fact.citations.map(citation => sourceFor(state, citation.source).publisher);
   return publishers.some(publisher => !publisher) ? null : new Set(publishers.map(publisher => publisher.toLowerCase())).size;
@@ -64,7 +68,7 @@ export function renderReport(state, view) {
   const lines = ['# ' + literal(titleOf(state)), '', ...(titleOf(state) !== state.topic ? ['Request: ' + literal(state.topic), ''] : []), `Run: ${state.run}; output revision: ${state.revision}.`, `Status: ${view.status}. Depth: ${state.depth}.`, `Runtime: ${state.runtimeVersion}; guidance: ${state.guidanceVersion ?? 'unknown'} (${state.guidanceRevision ?? 'local runtime guidance'}).`, '', literal(state.scope ?? 'Research plan pending.'), '', 'Facts are checked for source support, not certified as true or live-current. ' + (state.depth === 'light' ? 'Prose has citation/number validation but no independent semantic writing review at light depth.' : 'Writing review is required before completion.'), '', '## Coverage', ''];
   for (const section of state.sections) {
     const questions = state.questions.filter(question => question.section === section.id);
-    const facts = state.facts.filter(fact => current(fact, view) && fact.questions.some(id => questions.some(question => question.id === id)));
+    const facts = sectionFacts(state, view, section.id);
     lines.push(`- ${literal(section.name)}: ${facts.length} current checked facts; ${view.staleInputs.length ? 0 : questions.filter(q => q.coverage === 'answered' && q.assessment).length}/${questions.length} questions answered with current evidence.`);
   }
   if (!state.sections.length) lines.push('Plan not yet submitted.');
@@ -76,7 +80,8 @@ export function renderReport(state, view) {
     lines.push('', '## ' + literal(section.name), '');
     // When comparing, each subject's current facts in this section side by side, before the questions.
     if (state.subjects.length > 1) {
-      const columns = state.subjects.map(subject => state.facts.filter(fact => current(fact, view) && fact.section === section.id && fact.subject === subject.id));
+      const facts = sectionFacts(state, view, section.id);
+      const columns = state.subjects.map(subject => facts.filter(fact => fact.subject === subject.id));
       if (columns.some(column => column.length)) {
         lines.push('| ' + state.subjects.map(subject => cell(subject.name)).join(' | ') + ' |', '|' + state.subjects.map(() => ' --- |').join(''));
         for (let row = 0; row < Math.max(...columns.map(column => column.length)); row++) lines.push('| ' + columns.map(column => column[row] ? `${cell(column[row].statement)} ${cite([column[row].key])}` : '').join(' | ') + ' |');

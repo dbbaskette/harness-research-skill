@@ -84,7 +84,10 @@ export async function sourceRecord(root, state, supplied, task) {
   if (given?.sha256 && original?.sha256 !== (given.original_sha256 ?? given.sha256)) throw new Error('Selected original changed; start a new run.');
   const standing = given ? 'primary' : supplied.standing ?? 'secondary';
   if (!['primary', 'secondary', 'community'].includes(standing)) throw new Error('Invalid source standing.');
-  const id = identifier(supplied.id ?? 'source-' + hash(stable([origin, sha256])).slice(0, 20));
+  // Capturing only part of a source changes its provenance, not its saved bytes.
+  // Issue a new revision for that metadata while preserving existing full-source IDs.
+  const identity = capture ? [origin, sha256, capture] : [origin, sha256];
+  const id = identifier(supplied.id ?? 'source-' + hash(stable(identity)).slice(0, 20));
   const previous = state.sources.find(source => source.id === id);
   if (previous && (previous.sha256 !== sha256 || previous.origin !== origin)) throw new Error('Source IDs identify immutable revisions; register a new ID.');
   return { id, given: given?.id ?? null, title, origin, publisher: supplied.publisher ? text(supplied.publisher, 'Publisher') : null, standing, provenance: supplied.transcribed ? 'transcribed' : given ? 'given' : 'found', capture, pages: supplied.pages ?? null, file: supplied.file, sha256, original_file: originalFile, original_sha256: original?.sha256 ?? null, limits, source_date: supplied.source_date ?? null, saved_at: previous?.saved_at ?? new Date().toISOString() };

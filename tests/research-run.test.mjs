@@ -405,6 +405,25 @@ test('peek shows the next task without taking it, and release gives it back with
   const state = JSON.parse(await readFile((await runStatus(f)).file, 'utf8'));
   assert.equal(state.tasks[0].attempts.length, 1); assert.ok(state.tasks[0].attemptHistory[0].released);
 });
+test('releasing research preserves checker exclusion, including after a refused finding', async t => {
+  for (const refused of [false, true]) {
+    const f = await fixture(t), source = await setup(f), researcher = await take(f, 'first-researcher');
+    if (refused) {
+      const result = await submitTask(argsFor(f, researcher, { data: finding(source, 'OrionDB permits 999 writers.') }));
+      assert.equal(result.accepted, false); assert.equal(result.lease_kept, true);
+    }
+    await releaseTask(argsFor(f, researcher));
+    const replacement = await take(f, 'replacement-researcher');
+    await submit(f, replacement, finding(source));
+    const excluded = await nextTask({ ...f, worker: researcher.worker });
+    assert.equal(excluded.task, null); assert.match(excluded.waiting_for, /separate eligible invocation/);
+    const state = JSON.parse(await readFile(excluded.file, 'utf8'));
+    assert.ok(state.questions[0].researchWorkers.includes(researcher.worker));
+    const history = state.tasks.find(task => task.id === researcher.id).attemptHistory;
+    assert.ok(history[0].released); assert.equal(history[0].refusals ?? 0, refused ? 1 : 0);
+    assert.equal((await finish(f)).status, 'complete');
+  }
+});
 test('saved source text must carry its surroundings unless registered as a partial capture', async t => {
   const f = await fixture(t, { sources: [] });
   await writeFile(join(f.project, 'sources/excerpt.txt'), quote + '\n');
@@ -426,6 +445,20 @@ test('saved source text must carry its surroundings unless registered as a parti
   await submit(g, s, { sources: [registered.source.id] }); await submit(g, await take(g), plan);
   const r = await take(g), refused = await submitTask(argsFor(g, r, { data: { coverage: 'answered', facts: [{ statement: 'OrionDB keeps every committed transaction in a write-ahead log.', as_of: null, quotes: [{ source: registered.source.id, quote: longQuote }] }], gaps: [] } }));
   assert.equal(refused.accepted, false); assert.match(refused.errors[0], /most of its saved source/);
+  assert.equal(refused.lease_kept, true);
+  const correctedData = { file: 'sources/log.txt', title: 'Log', given: registered.source.given, partial: 'The tool returned only this section excerpt.' };
+  const corrected = await registerSource(argsFor(g, r, { data: correctedData }));
+  assert.notEqual(corrected.source.id, registered.source.id);
+  assert.equal(corrected.source.sha256, registered.source.sha256);
+  assert.equal((await registerSource(argsFor(g, r, { data: correctedData }))).source.id, corrected.source.id);
+  await assert.rejects(registerSource(argsFor(g, r, { data: { ...correctedData, id: registered.source.id } })), /metadata is immutable/);
+  const state = JSON.parse(await readFile((await runStatus(g)).file, 'utf8'));
+  assert.deepEqual(state.sources.find(source => source.id === registered.source.id), registered.source);
+  assert.equal(state.sources.length, 2);
+  await submit(g, r, { coverage: 'answered', facts: [{ statement: 'OrionDB keeps every committed transaction in a write-ahead log.', as_of: null, quotes: [{ source: corrected.source.id, quote: longQuote }] }], gaps: [] });
+  const completed = await finish(g), facts = JSON.parse(await readFile(completed.facts, 'utf8'));
+  assert.equal(facts.facts[0].citations[0].source, corrected.source.id);
+  assert.match(await readFile(completed.report, 'utf8'), /\(partial capture\)/);
 });
 test('reports take a short title, compare subjects side by side, and export no worker bookkeeping', async t => {
   const topic = 'Compare OrionDB and NovaDB for a small internal app. Cover writers only, in two questions, using the selected reference.';
@@ -444,6 +477,35 @@ test('reports take a short title, compare subjects side by side, and export no w
   assert.match(report, /\| OrionDB \| NovaDB \|\n\| --- \| --- \|\n\| OrionDB permits a single writer for each database\. \[1\] \|  \|/);
   assert.equal(exported.title, 'OrionDB and NovaDB writers');
   for (const question of exported.questions) for (const field of ['researchWorkers', 'provisionalCoverage', 'writtenBy']) assert.equal(Object.hasOwn(question, field), false, field);
+});
+test('comparison tables keep merged facts in every linked question section', async t => {
+  const sections = [{ id: 'architecture', name: 'Architecture' }, { id: 'capacity', name: 'Capacity' }];
+  const comparison = { scope: 'Writer models in OrionDB and NovaDB, across architecture and capacity.', sections,
+    subjects: [{ id: 'orion', name: 'OrionDB' }, { id: 'nova', name: 'NovaDB' }],
+    questions: sections.flatMap(section => ['orion', 'nova'].map(subject => ({ id: section.id + '-' + subject, section: section.id, subject, question: 'What writer model does ' + subject + ' use for ' + section.name + '?' }))) };
+  const f = await fixture(t), source = await setup(f, comparison);
+  for (let i = 0; i < 4; i++) {
+    const task = await take(f);
+    await submit(f, task, task.questions[0].subject === 'orion' ? finding(source) : { coverage: 'not answered', facts: [], gaps: [{ kind: 'insufficient', reason: 'The selected reference does not establish NovaDB writer behavior.', sources: [source.id] }] });
+  }
+  for (let i = 0; i < sections.length; i++) {
+    const task = await take(f, 'checker-invocation'), result = checked(task);
+    result.assessments.forEach(assessment => { assessment.coverage = task.questions.find(q => q.id === assessment.id).subject === 'orion' ? 'answered' : 'not answered'; });
+    await submit(f, task, result);
+  }
+  const cross = await take(f, 'cross-checker');
+  await submit(f, cross, { merges: [{ canonical: cross.facts[0].key, duplicates: [cross.facts[1].key] }] });
+  const done = await finish(f), report = await readFile(done.report, 'utf8');
+  const exported = JSON.parse(await readFile(done.facts, 'utf8'));
+  assert.equal(exported.facts.length, 1); assert.equal(exported.aliases.length, 1);
+  for (const section of sections) {
+    assert.match(report, new RegExp('- ' + section.name + ': 1 current checked facts'));
+    const table = report.split('## ' + section.name + '\n')[1].split('### ')[0];
+    assert.match(table, /\| OrionDB \| NovaDB \|/);
+    assert.ok(table.includes(quote));
+    const question = exported.questions.find(q => q.id === section.id + '-orion');
+    assert.deepEqual(question.facts, [exported.facts[0].key]);
+  }
 });
 test('the sources list reads one path or link per line, and peek and release work from the command line', async t => {
   const f = await fixture(t, { sources: [] });

@@ -225,10 +225,8 @@ export async function releaseTask(args) {
     requireState(state, args.run); const now = args.now ?? Date.now(), task = leaseFor(state, args, now);
     const released = task.attempts.pop();
     task.attemptHistory = [...(task.attemptHistory ?? []), { ...released, released: now }];
-    if (baseKind(task.kind) === 'research') for (const id of task.questions) {
-      const workers = byId(state.questions, id, 'question').researchWorkers, index = workers.lastIndexOf(args.worker);
-      if (index >= 0 && !task.sourceIds?.length) workers.splice(index, 1);
-    }
+    // Releasing a task does not erase the invocation's research context. Keep it
+    // ineligible to check these questions, including after refused submissions.
     task.status = 'ready'; task.lease = null;
     return { ...(await save(locations, state)), released: task.id };
   });
