@@ -18,11 +18,10 @@ saves a cited report in your project—ready to open, share, and continue later.
 | Check a set of claims | Supported, contradicted, or insufficient—with the evidence behind each verdict. |
 | Return to unfinished research | Saved progress, visible gaps, and a report that survives the chat. |
 
-> **You're reading the 0.9.0 preview.** The setup below installs the current code
-> from `main`. Until 0.9.0 is tagged, its checked workflow needs the explicit
-> development prompt below: ordinary installed use loads **0.8.1** guidance and
-> its earlier manual workflow.
-> [Choose a version or update an existing installation →](docs/setup.md#choose-your-version)
+> **Current release: [0.9.0](https://github.com/dbbaskette/harness-research-skill/releases/tag/v0.9.0).**
+> Install the tagged version below. Already using a preview that says 0.9.0?
+> Rerun the installer from this tag to get the final release.
+> [Versions, updates, and troubleshooting →](docs/setup.md)
 
 ## Get started
 
@@ -34,7 +33,7 @@ separate research account. Your agent also needs permission to start a separate
 checker for the evidence.
 
 ```sh
-git clone --branch main https://github.com/dbbaskette/harness-research-skill.git
+git clone --branch v0.9.0 https://github.com/dbbaskette/harness-research-skill.git
 cd harness-research-skill
 bash scripts/Install-Harness-Research.sh
 ```
@@ -50,16 +49,7 @@ You can work with public sources, selected documents, or both.
 
 ### 3. Ask in plain language
 
-**For this unreleased preview**, first tell your agent to use the development
-checkout explicitly (replace the path):
-
-```text
-Use /absolute/path/harness-research-skill/SKILL.md and its local runtime at
-/absolute/path/harness-research-skill/scripts/harness-research.mjs for this
-0.9.0 development test. Do not refresh the installed release guidance.
-```
-
-Then give your research request:
+Give your agent a research request:
 
 **Codex**
 
@@ -163,7 +153,7 @@ your agent will explain what needs reassessment.
 | Understand helpers, schemas, or run tests | [Developer guide](docs/development.md) |
 | Continue older Tanzu Brand research | [Migration guide](references/migration.md) |
 | Inspect the agent's workflow | [Skill instructions](SKILL.md) and [research contract](references/research-run.md) |
-| See what has been verified | [Development evidence and remaining release gates](docs/verification/0.9.0/README.md) |
+| See what has been verified | [Development evidence and release decision](docs/verification/0.9.0/README.md) |
 
 ## Built for your agent, with the work kept in your project
 

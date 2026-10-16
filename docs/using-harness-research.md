@@ -2,7 +2,7 @@
 
 [← README](../README.md) · [Setup & updates](setup.md) · [Developer guide](development.md)
 
-This guide describes the **0.9.0 preview**. Version 0.8.1 retains the earlier
+This guide describes **0.9.0**. Version 0.8.1 retains the earlier
 manual workflow; see [version choices](setup.md#choose-your-version).
 
 ## Start with the question and the boundary

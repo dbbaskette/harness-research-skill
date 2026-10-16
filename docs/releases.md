@@ -1,18 +1,28 @@
 # Versioned releases
 
-The current release is **0.8.1**, a Research update to the 0.8.0 release
-coordinated with Tanzu Brand and Harness Slides. Package/lockfile versions,
+The current release is **0.9.0**. Package/lockfile versions,
 `guidance/manifest.json`, the guidance release label in `SKILL.md`, and current
 install examples identify this software release. Earlier changelog entries and
 saved tasks retain their recorded versions.
 
-The development candidate is **0.9.0 (unreleased)**. Its new standalone workflow
-needs runtime 0.9.0; guidance refresh cannot upgrade executable helpers, so the
-guidance keeps a minimum runtime of 0.8.1 and routes older runtimes to the manual
-workflow. Raise the minimum only when the manual path is retired.
-Before publishing its guidance, complete the native tests, installed CLI/skill
-checks and the live acceptance matrix in the
-[design](superpowers/specs/2026-10-15-research-with-agents-design.md).
+The checked standalone workflow needs runtime 0.9.0. Guidance refresh cannot
+upgrade executable helpers, so the guidance keeps a minimum runtime of 0.8.1 and
+routes older runtimes to the manual workflow. Raise the minimum only when that
+manual path is retired. Preview users must reinstall from `v0.9.0` even if their
+helper already reports 0.9.0: the immutable content digest distinguishes the bits.
+
+**0.9.0 release decision (2026-10-16).** Native verification passed 88 tests;
+13 eligible report cases finished across the two harnesses. The owner accepted
+the candidate for ongoing-use refinement rather than completing the design's
+formal human sample scoring. Those checks are recorded as incomplete, not passed.
+The [live record](verification/0.9.0/live-acceptance/README.md) retains the decision,
+measurements and limitations. This is a scoped release exception, not removal of
+future acceptance criteria or evidence-validation requirements.
+
+For subsequent releases, complete native tests, installed CLI/skill checks and
+the live acceptance matrix in the
+[design](superpowers/specs/2026-10-15-research-with-agents-design.md), or record an
+explicit owner-approved change to the acceptance scope.
 
 **Where guidance is served from.** From runtime 0.9.0, new tasks take guidance
 from the newest `vMAJOR.MINOR.PATCH` tag whose `minimumRuntime` the installed
@@ -22,7 +32,8 @@ to 0.8.1 still read `main` directly: until they are updated, keep `main` at
 released guidance and develop on branches, merging to `main` when the release is
 tagged.
 [Development verification](verification/0.9.0/README.md) records completed examples
-and outstanding harness trials. Do not cut the release from narrow examples alone.
+and the scope of the recorded acceptance evidence. Do not cut the release from
+narrow examples alone.
 
 After the relevant full native gate passes, merge the PR and verify its merged
 tree matches the tested tree. Brand's combined macOS gate can own shared
@@ -33,14 +44,14 @@ repeat an unchanged suite merely because the merge SHA differs.
 Archive the exact verified merge commit, never a mutable working directory:
 
 ```sh
-git archive --format=zip --prefix=harness-research-v0.8.1/ --output /private/tmp/harness-research-v0.8.1.zip COMMIT
-shasum -a 256 /private/tmp/harness-research-v0.8.1.zip
+git archive --format=zip --prefix=harness-research-v0.9.0/ --output /private/tmp/harness-research-v0.9.0.zip COMMIT
+shasum -a 256 /private/tmp/harness-research-v0.9.0.zip
 ```
 
 Extract into disposable state, compare every file with the tagged tree, run its
 installer with disposable `--home`/`--shared` paths, and verify the installed
-`--version` reports 0.8.1. Publish the ZIP and checksum at an unused immutable
-`v0.8.1` tag, then download and verify both assets. Keep logs, exact commits,
+`--version` reports 0.9.0. Publish the ZIP and checksum at an unused immutable
+`v0.9.0` tag, then download and verify both assets. Keep logs, exact commits,
 artifact hashes and cleanup results. No model or real-account access is needed.
 
 Installing updates the entrypoint for new tasks. Existing tasks keep their saved
