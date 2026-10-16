@@ -161,14 +161,50 @@ The skill uses your harness's tools and judgement. A Node.js helper tracks tasks
 evidence, and saved outputs. Core use needs no new service, research subscription,
 or Python environment. Your normal agent/model usage still applies.
 
+**What it loads.** The skill reads about 1,100 tokens of instructions when it
+starts. For a full checked run the coordinator reads about 4,800. Each worker
+subagent reads only its own contract: 542 tokens for a checker, 580 for a writer
+and 1,133 for a researcher. A helper reply is 150–900 tokens. The real cost is the
+reading your agent does. In the 0.9.4 Claude Code trial each subagent used
+77,000–101,000 tokens, mostly on the source pages themselves. A 10-question light
+run used about 1.2 million subagent tokens, against 1.7 million under 0.9.1's
+larger light limits. Fewer facts per question and smaller sources cost less; see
+the measured figures below (for maintainers) and the
+[0.9.3 review](docs/reviews/2026-10-16-skill-review.md) for what drives them.
+
 MIT licensed. See [the license](LICENSE), [credits and adaptations](NOTICE.md),
 and [the changelog](CHANGELOG.md). Maintainers: [release procedure](docs/releases.md).
 
 <details>
 <summary>For maintainers: measured instruction context</summary>
 
-The skill loads the references needed for the selected workflow. These generated
-measurements cover instructions, excluding source content and conversation.
+The skill loads the references needed for the selected workflow. The generated
+table below counts instruction files and one representative start reply for each
+reading path; it is regenerated from the current files and checked by the tests.
+
+It leaves out what a run costs beyond instructions. Measured on 2026-10-16 with
+0.9.4 ([installed checks](docs/verification/0.9.4/installed/transcript.jsonl),
+[live trials](docs/verification/0.9.4/live/README.md)):
+
+| Runtime cost | Measured |
+| --- | ---: |
+| Helper reply, mean over 130 calls (`next` 693, `status` 320) | 401 tokens |
+| Task file a worker reads (Claude Code trial; checks and cross-checks carry the cited source records) | 450–9,900 tokens |
+| Brief the helper writes into each task | 59–280 tokens |
+| `brief.md` for 60 checked facts | 3,495 tokens |
+| One researcher, checker or writer subagent (Claude Code trial) | 77,000–101,000 tokens |
+| 10-question light run, 14 subagents (Claude Code trial) | about 1.2 million tokens |
+
+The trial ran with a light limit of 6 facts per question. 0.9.4 ships 8, which
+has not been measured live. Under 0.9.1's limits the same plan used about 1.7
+million subagent tokens, 80,000–155,000 per subagent.
+
+Each worker reads only the task contract its task's `guide` names (542–1,133
+tokens), not the 3,395-token run guidance that every worker read in 0.9.3. The
+coordinator reads the run guidance plus the research and writing contracts.
+Fifteen of the 26 rows below are legacy or comparative paths that no current
+caller uses; the [0.9.3 review](docs/reviews/2026-10-16-skill-review.md) proposes
+retiring them.
 
 <!-- CONTEXT-USAGE:START -->
 Measured with `cl100k_base`; cumulative instruction counts, including a normalized
