@@ -1,12 +1,18 @@
 # Changelog
 
-## 0.9.1 — unreleased
+## 0.9.1 — 2026-10-16
 
 Verification and reuse, the 0.9.x items of the
 [direction](docs/superpowers/specs/2026-10-15-harness-research-direction.md#roadmap).
-Not released until native tests, installed checks and the live acceptance matrix
-pass (or the owner approves a narrower scope). The guidance still accepts runtime
-0.8.1; the new commands need runtime 0.9.1.
+The guidance still accepts runtime 0.8.1; the new commands need runtime 0.9.1.
+
+Release validation: 113 of 114 native tests passed (one Python-gated test
+skipped); the installed helper drove every new command through 45 checks; the
+guidance fallback was shown against a disposable repository. Under the
+owner-approved acceptance scope, a fresh narrow run in each of Claude Code and
+Codex was followed by plain-language requests to verify, research again,
+approve, refresh, find and reuse it. The design's full live matrix was not
+rerun. [Evidence and findings](docs/verification/0.9.1/README.md).
 
 - `research verify` reports what became of each cited fact key: confirmed,
   narrowed, superseded, rejected, stale, unchecked or gone, with the replacement

@@ -147,11 +147,13 @@ npm run ci:local
 It uses the existing Tart/macOS test-suite wrapper and a disposable clone. Read
 [the wrapper](../scripts/ci/tart-macos.sh), [guest script](../scripts/ci/guest-test.sh),
 and your host's local-CI instructions before running it. Preserve logs and confirm
-cleanup; never stop an unrelated VM. Recorded
+cleanup; never stop an unrelated VM. The 0.9.0
 [native evidence](verification/0.9.0/ci-acceptance-fixes/verification.json) covers
-88 tests with zero failures or skips, including source-pinning, queue recovery,
-and honest rejection when an original is inaccessible. Live model acceptance is a separate outcome; see
-[the live trial results and release decision](verification/0.9.0/README.md).
+88 tests with zero failures or skips under that gate. The 0.9.1
+[native evidence](verification/0.9.1/native/verification.json) is a host `npm test`
+run: 114 tests, 113 passed and the Python-gated test skipped. Live model
+acceptance is a separate outcome; see [the 0.9.1 record](verification/0.9.1/README.md)
+and [the 0.9.0 live results and release decision](verification/0.9.0/README.md).
 
 Instruction-context measurements are generated from current files by
 [context-usage.mjs](../tools/context-usage.mjs). After changing agent instructions:
