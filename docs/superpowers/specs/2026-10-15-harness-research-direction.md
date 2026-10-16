@@ -1,6 +1,6 @@
 # harness-research: one research component, three ways in
 
-Date: 2026-10-15. Status: draft 2; the owner confirmed the aim and asked for saved research. Builds on
+Date: 2026-10-15. Status: draft 3; the owner confirmed the aim and wants research kept with the work. Builds on
 [the run design](2026-10-15-research-with-agents-design.md).
 
 ## What this is for
@@ -16,8 +16,8 @@ The longer-term aim, as confirmed by the owner:
   be checked again later, when a source changes or before publishing.
 - **Research is done once per piece of work and reused** by everything downstream: the outline,
   the slides and speaker notes, the learner guide, the blog draft, the fact-check.
-- **Research is kept.** A finished run can be saved to a library and used again later, by a
-  person or by any studio, instead of being researched from scratch.
+- **Research is kept with the work,** in the project's folder, locally or in a repository, and
+  any later piece of work can start from it instead of researching from scratch.
 - **One implementation.** A person asking for research directly, Brand, and every studio use
   the same component, not three copies of it.
 - **The agents do the work at full strength,** and the code keeps them honest.
@@ -125,7 +125,6 @@ The studios keep what is theirs and hand over what is not:
   | `research/brief.md` | Every fact with its key, one per line |
   | `research/sources/` | The saved text of every source |
   | `.harness-research/` | The record, its history, the queue and each task's folder |
-| the library | Saved runs, outside any one project (see below) |
 
 - **`facts.json`** has a `schema` number. Fields are only ever added within a schema; a change
   that removes or renames one is a new schema, and the helper can still read the old one.
@@ -141,77 +140,60 @@ The studios keep what is theirs and hand over what is not:
   a release. As Harness Slides now does, an older runtime falls back to the last guidance it
   supports instead of being refused.
 
-## Saving research for later
+## Keeping research and using it again
 
-A run belongs to one deck, training or blog while it is made. Once it is done, it can be saved
-to a **research library** and used again: the facts about Valkey gathered for a deck can start
-a blog a month later.
+There is no separate library. Research is saved where the work is: the `research/` folder of
+the project, which is a local folder or part of a repository. Committing the project commits
+its research, and whoever can see the repository can use it.
 
-### The library
-
-- A folder of saved runs. Each person has one by default, in the same place the runtime is
-  installed; `--library DIR` or `HARNESS_RESEARCH_LIBRARY` points at another, such as a team's
-  shared folder or repository. Who can see a library is decided by where it is.
-- **A saved entry** is a copy of the finished run: the plan, the report, `facts.json`,
-  `brief.md`, the saved text of every source, and the record. It also holds a title, the topic,
-  the scope, tags, the depth, the date it was made, the date each source was saved, and, when a
-  person approved it at a gate, who approved it and when.
-- The saved text of documents the person gave is part of the entry, because their facts cannot
-  be checked without it. Saving to a shared library shares them; the save says so before it
-  happens.
-
-### Commands
-
-```sh
-node scripts/harness-research.mjs research save --project DIR [--title TEXT] [--tag WORD ...] [--library DIR]
-node scripts/harness-research.mjs research library [--query WORDS] [--library DIR]
-node scripts/harness-research.mjs research start --project DIR --from ENTRY [--topic TEXT] ...
-node scripts/harness-research.mjs research refresh --project DIR
-```
-
-- **`save`** copies a complete run into the library and returns its entry ID. An incomplete run
-  is refused unless saved as a draft, which is marked as one.
-- **`library`** lists entries with their title, topic, scope, date, depth, fact count, approval
-  and how old their sources are; `--query` matches the title, topic, tags and questions.
-- **`start --from`** begins a new run from a saved entry instead of from nothing:
+- **Using it again:** `research start --from PATH` begins a new run from an existing research
+  folder, in this project or any other, local or in the repository.
   - Its plan, facts, checks and sources come across with their keys unchanged, so citations
-    made against the entry still work. The new run records which entry it came from.
-  - A new topic or `--about` text adds questions where the saved plan does not cover it; only
+    made against it still work. The new run records where it came from.
+  - A new topic or `--about` text adds questions where the earlier plan does not cover it; only
     those are researched. With no change, the run is complete as soon as it starts.
-  - Several entries can be combined with `--from` more than once. The same fact found in two
-    entries has the same key and is merged.
-- **`refresh`** has the harness look at every source again. A source that changed makes its
-  facts stale; their questions are researched and checked again, and everything else is kept.
-  Use it before relying on an entry that is months old.
+  - Several folders can be combined with `--from` more than once. The same fact found in two
+    has the same key and is merged.
+- **Finding it:** `research find --in DIR` lists the research folders under a directory, such
+  as a repository or a studio's workspace, with each one's topic, date, depth, fact count,
+  approval and the age of its sources. `--query` matches topics and questions.
+- **Approval:** `research approve --project DIR --by NAME` records who approved the research and
+  when. Studios call it at their research gate; `find` and the report show it.
+- **Refreshing it:** `research refresh --project DIR` has the harness look at every source
+  again. A source that changed makes its facts stale; their questions are researched and
+  checked again, and everything else is kept. Use it before relying on research that is months
+  old.
+- **What is in the folder:** the saved text of every source, including documents the person
+  gave, because their facts cannot be checked without it. Committing research to a shared
+  repository shares that text.
 
 ### In the studios
 
-- The research gate offers **Save to library** once research is approved, with a title and tags
-  the studio suggests from the item.
-- The research step offers **Start from saved research,** listing library entries that match
-  the item's topic, with their age and approval. Choosing one runs `start --from`, then only
-  what the new item needs.
-- Before publishing, `research verify` checks the item's citations whether its facts were
-  researched for it or brought from the library.
-- A team that shares a library sees each other's saved research. Blog Studio's Team Hub and,
-  later, the monorepo's data root are natural places for it.
+- Each item's research stays in the item's folder in the studio's workspace, and goes wherever
+  the item goes.
+- The research step offers **Start from existing research,** listing the research folders in
+  the workspace that match the item's topic, with their age and approval. Choosing one runs
+  `start --from`, then only what the new item needs.
+- The research gate records approval with `research approve`.
+- Before publishing, `research verify` checks the item's citations, wherever their facts came
+  from.
 
 ## Roadmap
 
 | Release | What | For |
 | --- | --- | --- |
 | **0.9.0** | The run design: queue, sources, facts, checks, cross-check, the Q/A report, `facts.json`, the light default; guidance for a person's own Claude Code; the acceptance comparison with today's skill | Standalone |
-| **0.9.x** | Codex trial and fixes; `research verify`; the library: `save`, `library`, `start --from`, `refresh`; the guidance fallback for older runtimes | Standalone, Brand |
+| **0.9.x** | Codex trial and fixes; `research verify`; reuse: `start --from`, `find`, `approve`, `refresh`; the guidance fallback for older runtimes | Standalone, Brand |
 | **Brand 0.14** | The research handoff as one call; plan shown with the deck; Slides draft citing fact keys; `verify` before delivery; the new pin | Tanzu Brand |
 | **Slides** | `outline check` warns on uncited content slides in a researched deck | Tanzu Brand |
-| **Studios** | Blog first, then Presentation, Training and Marketing move to the run, with Save to library and Start from saved research at their gates; `studio_research` shrinks | Studios |
-| **Later** | A team library behind the studios' shared data; searching the library by fact, not only by topic | Everyone |
+| **Studios** | Blog first, then Presentation, Training and Marketing move to the run, with Start from existing research and approval at their gates; `studio_research` shrinks | Studios |
+| **Later** | Finding research by fact, not only by topic | Everyone |
 
 ## Settled
 
 - **The aim** above, including citing fact keys and checking them before publishing.
-- **Saved research:** a library, with save, list, start-from and refresh, used by the studios'
-  gates and by people directly.
+- **Keeping research:** saved with the work, locally or in the repository, not in a separate
+  library. Any later work can start from it with `start --from`.
 
 ## Defaults taken unless the owner says otherwise
 
