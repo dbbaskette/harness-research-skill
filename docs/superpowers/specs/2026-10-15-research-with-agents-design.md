@@ -14,8 +14,9 @@ studios to use as references:
 - Each fact has been checked by a second agent that did not write it.
 - Nothing is concluded from the facts. There is no answer, summary or recommendation: the
   caller decides what the facts mean.
-- Coverage is planned and shown: for a comparison, every subject is researched on every
-  dimension, and the report shows where the facts are thin.
+- Coverage is planned and shown: the plan is an outline of the topic, and the report shows
+  which parts of it have few facts. Any topic works: a broad one ("a report on LLMs"), one
+  product, a comparison, or a set of claims to check.
 
 "Vetted" means traceable and checked for support. It does not mean true: a fact quoted
 correctly from a wrong or out-of-date source is still wrong. Each fact therefore shows where
@@ -34,7 +35,7 @@ referees:
 | --- | --- |
 | Reads the person's sources and finds new ones | Holds the run, its stages and its tasks, and hands out the next one |
 | Saves each source's text and registers it | Pins each registered text by hash |
-| Plans the questions | Lays the plan out as a grid of subjects and dimensions |
+| Plans the scope, the outline and the questions | Keeps the outline and counts coverage by section |
 | Writes the facts | Refuses a quote that is not in its source's text, and a number that is not in its quote |
 | Checks other workers' facts against the originals | Makes sure no worker checks its own facts |
 | Finds duplicates, conflicts and missing angles | Refuses references to facts that do not exist |
@@ -73,7 +74,7 @@ quote is "Valkey is a data structure server." The checks passed.
 | --- | --- | --- |
 | **What goes in** | A plan the calling agent writes: topic, purpose, scope, any supplied documents it has already turned into text, and 1 to 30 questions | A topic, the person's links and documents, a depth and a note on who it is for. The harness writes the plan |
 | **Who researches** | The calling agent, however it likes, in turn or with helpers it starts itself | The same harness, task by task from a queue, with several subagents at once |
-| **The plan** | Any 1 to 30 questions, unstructured | A grid of subjects by dimensions, sized by depth, up to 80 questions, plus one round for missing angles |
+| **The plan** | Any 1 to 30 questions, unstructured | A stated scope and an outline of sections, each with several questions, sized by depth, up to 80 questions; subjects side by side when comparing; plus one round for missing angles |
 | **What a question produces** | One finding: a verdict (supported, contradicted, insufficient, unavailable), an optional headline, a summary of up to 12,000 characters, limits and up to 20 quotes | Many one-sentence facts, each with its own quotes; "answered / partly / not" for open questions and a verdict only for claims; no summary |
 | **Evidence check** | The quote must appear, exactly, at the offset the agent gives, in any file in the project, including one the agent wrote itself | The quote must be in a registered source's saved text; the helper finds it, allowing for spacing, quote-mark and dash differences; every number in the fact must be in its quotes |
 | **Support** | Not checked: "semantic support is the researcher's assessment" | Every fact checked by a worker that did not write it, ideally the other harness, against the original source: confirmed, narrowed or rejected |
@@ -81,7 +82,7 @@ quote is "Valkey is a data structure server." The checks passed.
 | **Sources** | Supplied documents are registered with a hash; web pages are files the agent saves, with no register or label | Every source registered with a hash, a title, a publisher and a standing; the person's own sources are always primary; text read from charts or scans is marked transcribed |
 | **When it is done** | When no question is pending; the guidance asks the agent to open the report and check it | When every stage is done; the helper will not say complete before then |
 | **Working in parallel** | Allowed when the host permits; saves are one at a time, with "busy, retry" errors | Tasks are leased to workers, so subagents and sessions do not collide |
-| **Output** | `.harness-research/research-report.md`, a per-question list in a hidden folder, and the record | `research/report.md` with a coverage grid, facts side by side by dimension, conflicts, gaps, numbered sources and rejected facts; `research/facts.json`; `research/brief.md`. The record stays |
+| **Output** | `.harness-research/research-report.md`, a per-question list in a hidden folder, and the record | `research/report.md` with coverage by section, facts in outline order (side by side when comparing), conflicts, gaps, numbered sources and rejected facts; `research/facts.json`; `research/brief.md`. The record stays |
 | **Citations** | By question; no stable IDs | Stable fact keys, with a hash of each quote, that a deck, training or blog can cite and check later |
 | **Studios** | Each builds its own research loop and confined worker tools (three copies) | One instruction to the harness; they read `facts.json` |
 
@@ -91,7 +92,7 @@ migration; staleness from changed inputs and sources; supplied-only versus publi
 and `migrate` commands for anyone researching by hand.
 
 **What becomes redundant:** the comparative path (`outline.yaml` and `fields.yaml` from the
-retained upstream skills) does what the subject and dimension grid now does, and could be
+retained upstream skills) does what sections and subjects now do, and could be
 retired once the grid has been tried.
 
 ## Commands
@@ -124,7 +125,7 @@ node scripts/harness-research.mjs research status --project DIR
 | Stage | Tasks | Produces |
 | --- | --- | --- |
 | 0. Sources | one per source the person gave | the saved text of each, registered |
-| 1. Plan | one | subjects, dimensions and questions |
+| 1. Plan | one | the scope, an outline of sections, and their questions |
 | 2. Research | one per question | facts with quotes |
 | 3. Check | one per question, never to the worker that researched it | each fact confirmed, narrowed or rejected |
 | 4. Cross-check | one | duplicates, conflicts, superseded facts, missing angles |
@@ -163,40 +164,47 @@ Each source the person gave becomes a task: read it, save its text, register it.
 - Without `--allow-web`, only the given sources are used. With it, the harness may also search
   and fetch.
 
-### 1. Plan: subjects, dimensions and questions
+### 1. Plan: scope, outline and questions
 
-A fixed number of questions does not fit every topic. "Redis vs Valkey" needs a technical
-dive into two products and a comparison; a narrow fact-check needs five questions. So the
-plan is built from the shape of the topic:
+A fixed number of questions does not fit every topic, and neither does a grid. "A report on
+LLMs" is broad; "Valkey" is one product; "Redis vs Valkey" is a comparison; "check these
+claims in our deck" is a list. The plan task first decides what kind of topic it has, then
+writes three things:
 
-- **Subjects:** the things researched. One for a dive ("Valkey"), two or more for a
-  comparison.
-- **Dimensions:** the aspects every subject is researched on. For Redis vs Valkey: origin and
-  governance; licensing and its history; release history and versions; architecture and
-  threading; data types and commands; persistence; replication and failover; clustering;
-  memory efficiency; performance claims and benchmarks; modules, search, JSON and vectors;
-  security; client and tooling support; managed cloud offerings; enterprise features and
-  support; compatibility and migration; community and contributors; known problems.
-- **Questions:** one per subject and dimension, so both products get the same depth and their
-  facts line up, plus cross-cutting questions that belong to neither alone (how the fork
-  happened, how to migrate between them, what the major cloud providers changed).
+- **The scope:** one paragraph saying what is in and what is out, and the date the research
+  is as of. A broad topic needs this most: "LLMs" could mean the mathematics, the market or
+  the regulation. The scope comes from the topic, the `--about` text (who the research is for
+  and why) and the person's sources, and is shown at the top of the report so a reader knows
+  what was not covered on purpose.
+- **The outline:** the sections the topic breaks into, in a sensible reading order.
+- **The questions:** several per section, as many as the section's importance and the depth
+  need. Each is `open` (most) or a `claim` to test.
 
-Redis vs Valkey at `deep` comes to about 2 × 18 + 6 = 42 questions.
+For **a comparison**, the plan also names the **subjects**, and each section's questions are
+asked of every subject, so both sides get the same depth and their facts line up. Questions
+that belong to no single subject (how a fork happened, how to migrate) are asked once.
 
-| `--depth` | Dimensions | Facts per question | Gap round |
-| --- | --- | --- | --- |
-| `quick` | the 6 to 8 that matter most | up to 10 | no |
-| `standard` (default) | 10 to 14 | up to 20 | yes |
-| `deep` | all that apply | up to 30 | yes |
+Two examples, at `standard` depth:
 
-- The plan task uses the topic, the `--about` text (who the research is for and why) and the
-  saved sources. It drops dimensions the topic does not need and adds ones the sources raise.
-- Each question is `open` (most) or a `claim` to test.
+| | "A report on LLMs" | "Redis vs Valkey" |
+| --- | --- | --- |
+| Scope | Large language models as of late 2026: what they are, how they are built and run, the main models and vendors, what they can and cannot do, cost, risks and regulation, and how organisations use them. Not the mathematics in depth. | The two engines as products: technology, licensing, ecosystem and migration, as of late 2026. Not every managed service's pricing. |
+| Subjects | none | Redis, Valkey |
+| Sections | What an LLM is; how they work; history and milestones; main model families and vendors; capabilities and benchmarks; tools, context and agents; cost and pricing; running them; limitations; risks and security; regulation; how organisations use them; trends | Origin and governance; licensing; releases and versions; architecture; data types and commands; persistence and replication; clustering; performance; modules and vectors; security; clients and tooling; cloud offerings; enterprise support; compatibility and migration; community; known problems |
+| Questions | 2 to 4 per section, about 35 | 1 to 2 per section per subject, plus 4 cross-cutting, about 40 |
+
+| `--depth` | Sections | Questions per section | Facts per question | Gap round |
+| --- | --- | --- | --- | --- |
+| `quick` | the 5 to 8 that matter most | 1 to 2 | up to 10 | no |
+| `standard` (default) | most that apply | 2 to 4 | up to 20 | yes |
+| `deep` | all that apply | 3 to 6 | up to 30 | yes |
+
 - The plan is saved as today and written as `research/plan.json` and a readable
-  `research/plan.md`, laid out as the subject and dimension grid.
-- `--plan-only` stops after planning, so a person or a studio can approve the grid and
-  continue.
-- The plan limit of 30 questions rises to 80.
+  `research/plan.md`: the scope, then the outline with its questions.
+- `--plan-only` stops after planning, so a person or a studio can change the scope or the
+  outline and continue. This matters most for broad topics.
+- The plan limit of 30 questions rises to 80. A topic that needs more than that at `deep` is
+  too broad for one run; the scope says what was left out.
 
 ### 2. Research a question
 
@@ -238,7 +246,7 @@ own kind of mistake.
 
 ### 4. Cross-check the set
 
-One task reads every checked fact: statements, keys, subjects, dimensions, sources, dates and
+One task reads every checked fact: statements, keys, sections, subjects, sources, dates and
 standing. It hands back references to existing facts only:
 
 - **Duplicates,** merged into one fact that keeps every quote, so it shows how many
@@ -259,20 +267,21 @@ checked and cross-checked once. Only one round, so a run always ends.
 All in `research/`, where a person will look:
 
 - **`research/report.md`**, a reference document:
-  - A header: topic, date, depth, scope, the sources given, how many facts and sources, and how
-    the facts were checked.
-  - **A coverage grid** for subjects and dimensions: how many checked facts each cell has, and
-    which cells are partly or not answered.
-  - The facts, by dimension, with each subject's facts side by side so a comparison can be read
-    across. Each fact shows its citation numbers, its as-of date, whether it was narrowed or
-    transcribed, and "one source" when only one publisher backs it.
+  - A header: topic, date, depth, the scope paragraph, the sources given, how many facts and
+    sources, and how the facts were checked.
+  - **Coverage by section:** how many checked facts each section has (each subject's, when
+    comparing), and which questions are partly or not answered.
+  - The facts, in outline order, under their sections and questions. When comparing, each
+    subject's facts sit side by side so they can be read across. Each fact shows its citation
+    numbers, its as-of date, whether it was narrowed or transcribed, and "one source" when only
+    one publisher backs it.
   - Conflicts, superseded facts and missing angles.
-  - Gaps: unanswered cells, failed tasks and sources that could not be read, with why.
+  - Gaps: unanswered questions, failed tasks and sources that could not be read, with why.
   - Sources, numbered: title, a clickable URL or the file name, publisher, standing, and
     "given" or the date saved.
   - Rejected facts, with the checker's reasons, for anyone auditing the run.
-- **`research/facts.json`**, schema 1, the same content for programs: subjects, dimensions,
-  questions, sources with their provenance (`given`, `found` or `transcribed`, or `caller`
+- **`research/facts.json`**, schema 1, the same content for programs: the scope, sections,
+  subjects when comparing, questions, sources with their provenance (`given`, `found` or `transcribed`, or `caller`
   for a file quoted through `record`), facts with their checks and citations, conflicts,
   superseded, missing, rejected and counts. A fact's `key` is its question ID and a short hash
   of its statement, such as `valkey.licensing.3fa9c2`. It stays the same when the run is
@@ -289,7 +298,7 @@ When a person asks their Claude Code or Codex to research a topic, the skill's g
 it to:
 
 1. Run `research start` with the topic and the person's sources.
-2. Show the plan grid when the person wants to approve it.
+2. Show the plan (scope and outline) when the person wants to approve it.
 3. Work the queue: start several subagents where it can, each taking tasks with `research
    next`, doing them and submitting them, until none are left. Without subagents, work
    through the tasks in turn.
@@ -332,7 +341,7 @@ its gates (with `--plan-only`), and what the facts feed.
 - **Submissions:** each refusal; quote placing; the number rule; transcribed sources; key
   stability across runs; merging and conflict links; references to facts that do not exist.
 - **Sources:** registration, hashing, gaps, sources registered after planning.
-- **Output:** `facts.json` against its schema, the coverage grid, the report's sections, links
+- **Output:** `facts.json` against its schema, coverage by section, the report's sections, links
   and numbering.
 - **Live trials,** recorded in `docs/verification/`: Redis vs Valkey at `deep` with a few given
   PDFs and links, in a person's Claude Code session with subagents, and again in Codex; and one
@@ -366,8 +375,8 @@ its gates (with `--plan-only`), and what the facts feed.
 - **Every fact traces to saved text,** and a checker confirms that text against the original.
 - **Every fact is checked by a worker that did not write it,** ideally the other harness.
 - **Made-up numbers are refused mechanically.**
-- **Coverage is planned as a grid and reported as one,** so a comparison has both sides
-  researched to the same depth and thin cells are visible.
+- **Coverage is planned as an outline and reported by section,** so thin parts are visible,
+  and a comparison has both sides researched to the same depth.
 - **The steps cannot be skipped:** the queue, not the agent, decides when the run is done.
 - **Far less code than the studios carry today,** and none of it duplicates the harness.
 
@@ -396,15 +405,17 @@ its gates (with `--plan-only`), and what the facts feed.
 - **Support check** per fact, by another worker; **question kinds**; **provenance** on every
   source and citation.
 - **Topic and starting sources as input:** links and documents such as PDFs.
-- **Coverage scales with the topic:** subjects × dimensions, `--depth`, and one gap round,
-  instead of a fixed 8 to 20 questions.
+- **Coverage scales with the topic:** a scope, an outline of sections with several questions
+  each, subjects only for comparisons, `--depth`, and one gap round, instead of a fixed 8 to 20
+  questions. Any topic works, not only comparisons.
 - **The harness does all the work.** The helper does no fetching, extraction or agent starting;
   it is a queue, a set of checks and the record. No `pdftotext` dependency.
 - **Private words in searches:** not a concern.
 
 ## Appendix: `facts.json`, by example
 
-Shortened, with one entry of each kind. The values are illustrative.
+Shortened, with one entry of each kind, for a comparison. For a topic that is not a
+comparison, `subjects` is empty and every `subject` is null. The values are illustrative.
 
 ```json
 {
@@ -420,16 +431,17 @@ Shortened, with one entry of each kind. The values are illustrative.
   "counts": {"questions": 42, "facts": 318, "narrowed": 41, "rejected": 27,
              "sources": 96, "conflicts": 6, "superseded": 4, "failed": 0},
 
-  "subjects":   [{"id": "redis", "name": "Redis"}, {"id": "valkey", "name": "Valkey"}],
-  "dimensions": [{"id": "licensing", "name": "Licensing and its history"}],
+  "scope": "The two engines as products: technology, licensing, ecosystem and migration, as of late 2026. Not every managed service's pricing.",
+  "sections": [{"id": "licensing", "name": "Licensing"}, {"id": "origin", "name": "Origin and governance"}],
+  "subjects": [{"id": "redis", "name": "Redis"}, {"id": "valkey", "name": "Valkey"}],
 
   "questions": [
-    {"id": "valkey.licensing", "subject": "valkey", "dimension": "licensing",
+    {"id": "valkey.licensing", "section": "licensing", "subject": "valkey",
      "kind": "open", "round": 1,
      "question": "Under what licence is Valkey released, and has that changed?",
      "coverage": "answered", "gaps": "",
      "facts": ["valkey.licensing.3fa9c2"]},
-    {"id": "fork-history", "subject": null, "dimension": "origin", "kind": "open", "round": 1,
+    {"id": "fork-history", "section": "origin", "subject": null, "kind": "open", "round": 1,
      "question": "How and when was Valkey forked from Redis?",
      "coverage": "partly answered",
      "gaps": "No primary source gives the date the first Valkey release was tagged.",
@@ -451,7 +463,7 @@ Shortened, with one entry of each kind. The values are illustrative.
   "facts": [
     {"key": "valkey.licensing.3fa9c2",
      "statement": "Valkey is licensed under the BSD 3-Clause licence.",
-     "subject": "valkey", "dimension": "licensing", "questions": ["valkey.licensing"],
+     "section": "licensing", "subject": "valkey", "questions": ["valkey.licensing"],
      "as_of": null,
      "check": {"result": "confirmed", "by": "codex", "at": "2026-10-16T14:31:05Z"},
      "original_statement": null,
