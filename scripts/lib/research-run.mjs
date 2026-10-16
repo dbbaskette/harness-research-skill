@@ -1,4 +1,4 @@
-import { readFile, realpath } from 'node:fs/promises';
+import { readFile, readdir, realpath } from 'node:fs/promises';
 import { join, isAbsolute, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { resume as resumeGuidance } from '../sync-guidance.mjs';
@@ -619,6 +619,73 @@ export async function reassessRun({ project, run, now = Date.now() }) {
     state.reassess = { round, at, sources: [...changed], questions: [...research], rewrite: [...changes.rewrite], done: false };
     advance(state);
     return { ...(await save(locations, state)), reassessing: state.reassess };
+  });
+}
+// What became of each cited fact key. Read-only: it checks the saved record and evidence, not whether
+// a live source still says the same thing; that is research refresh.
+const FACT_KEY = /^fact-[a-f0-9]{32}$/;
+function factResult(fact, staleNow) {
+  if (fact.status === 'rejected') return 'rejected';
+  if (fact.status === 'stale' || staleNow.has(fact.key)) return 'stale';
+  if (fact.status === 'candidate') return 'unchecked';
+  return fact.superseded_by ? 'superseded' : 'confirmed';
+}
+// Follow narrowing, merging and supersession to the assertion that stands now.
+function standing(state, key) {
+  for (const seen = new Set(); ; seen.add(key)) {
+    if (seen.has(key)) return null;
+    const narrowed = state.factRevisions.find(item => item.kind === 'narrowed' && item.previous.key === key);
+    if (narrowed) { key = narrowed.current; continue; }
+    let fact; try { fact = factFor(state, key); } catch { return null; }
+    if (!fact.superseded_by) return fact;
+    key = fact.superseded_by;
+  }
+}
+function verifyKey(state, key, staleNow) {
+  if (typeof key !== 'string' || !FACT_KEY.test(key)) return { key, result: 'gone', reason: 'Not a fact key.' };
+  const cited = fact => [...new Set(fact.citations.map(citation => citation.source))].map(id => {
+    const source = state.sources.find(item => item.id === id);
+    return { id, title: source?.title ?? null, sha256: source?.sha256 ?? null, ...(source?.stale_since ? { superseded_since: source.stale_since } : {}), ...(source?.refreshed ? { refreshed: source.refreshed } : {}) };
+  });
+  const replacement = fact => fact ? { key: fact.key, statement: fact.statement, result: factResult(fact, staleNow) } : null;
+  const alias = state.aliases.find(item => item.key === key), direct = state.facts.find(item => item.key === key);
+  if (direct || alias) {
+    const fact = direct ?? factFor(state, key), recorded = alias ? alias.original : fact, result = factResult(fact, staleNow);
+    const entry = { key, result, statement: recorded.statement, as_of: recorded.as_of ?? null, questions: fact.questions, sources: cited(recorded) };
+    if (alias) Object.assign(entry, { canonical: fact.key, merged_into: fact.key, ...(fact.statement !== recorded.statement ? { canonical_statement: fact.statement } : {}) });
+    if (['confirmed', 'unchecked'].includes(result)) entry.check = fact.check ? { by: fact.check.by, at: fact.check.at } : null;
+    if (result === 'rejected') entry.reason = fact.check?.reason ?? null;
+    if (result === 'stale') entry.reason = fact.stale?.reason ?? (staleNow.has(fact.key) ? 'A cited source changed; run research reassess.' : 'A cited source changed.');
+    if (result === 'superseded') Object.assign(entry, { revision: { kind: 'superseded', reason: state.superseded.find(item => item.fact === fact.key)?.note ?? null }, replacement: replacement(standing(state, fact.superseded_by)) });
+    return entry;
+  }
+  const narrowed = state.factRevisions.find(item => item.kind === 'narrowed' && item.previous.key === key);
+  if (narrowed) return { key, result: 'narrowed', statement: narrowed.previous.statement, as_of: narrowed.previous.as_of ?? null, questions: narrowed.previous.questions, sources: cited(narrowed.previous), revision: { kind: 'narrowed', reason: narrowed.reason }, replacement: replacement(standing(state, narrowed.current)) };
+  return { key, result: 'gone', reason: 'Not in this run.' };
+}
+// A gone key may come from an earlier run in this project, kept under .harness-research/history.
+async function earlierRuns(locations, keys) {
+  const found = new Map(), folder = join(locations.derived, 'history');
+  const names = await readdir(folder).catch(error => { if (error.code === 'ENOENT') return []; throw error; });
+  for (const name of names.filter(item => item.endsWith('.run.json')).sort()) {
+    let old; try { old = JSON.parse(await readFile(join(folder, name), 'utf8')); } catch { continue; }
+    const known = new Set([...(old.facts ?? []).map(fact => fact.key), ...(old.aliases ?? []).map(alias => alias.key), ...(old.factRevisions ?? []).map(item => item.previous?.key)]);
+    for (const key of keys) if (known.has(key)) found.set(key, old.run);
+  }
+  return found;
+}
+export async function verifyKeys({ project, run, keys }) {
+  return withStore(project, async (locations, state) => {
+    requireState(state, run);
+    if (!Array.isArray(keys) || !keys.length) throw new Error('Supply the fact keys to verify (--keys FILE or --key KEY).');
+    const view = await viewFor(locations, state), staleNow = new Set(view.stale.facts);
+    const results = [...new Set(keys)].map(key => verifyKey(state, key, staleNow));
+    const previous = await earlierRuns(locations, results.filter(item => item.result === 'gone' && FACT_KEY.test(item.key)).map(item => item.key));
+    for (const item of results) if (previous.has(item.key)) Object.assign(item, { previous_run: previous.get(item.key), reason: 'Not in this run; it belongs to an earlier run in this project.' });
+    const counts = {};
+    for (const item of results) counts[item.result] = (counts[item.result] ?? 0) + 1;
+    return { run: state.run, output_revision: state.revision, status: view.status, approval: view.approval ?? null, all_confirmed: results.every(item => item.result === 'confirmed'), counts, keys: results,
+      note: 'Checked against this run\'s saved record and pinned evidence. Live sources were not re-read; use research refresh for that.' };
   });
 }
 export async function managedLegacyStatus(project) {
