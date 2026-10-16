@@ -315,15 +315,17 @@ export async function startRun(args) {
     if (guidance && guidance.runtime !== await realpath(fileURLToPath(packageRoot))) throw new Error('Use the saved guidance task\'s installed runtime.');
     const inputs = [], givenSources = [];
     if (!Array.isArray(args.sources ?? []) || (args.sources ?? []).length > 100) throw new Error('Select at most 100 starting sources.');
-    for (const [i, supplied] of (args.sources ?? []).entries()) {
+    for (const supplied of args.sources ?? []) {
       const item = typeof supplied === 'string' ? { origin: supplied } : supplied;
       const origin = text(item.origin ?? item.file, 'Selected source');
       const file = item.file ?? (!/^https?:\/\//i.test(origin) ? origin : null);
+      // The same file or link selected twice is one selected source.
+      if (givenSources.some(given => (given.file ?? given.origin) === (file ?? origin))) continue;
       const input = file ? await snapshot(locations.root, file) : null;
       if (input) inputs.push(input);
       const original = item.original_file ? await snapshot(locations.root, item.original_file) : null;
       if (original) inputs.push(original);
-      givenSources.push({ id: 'given-' + (i + 1), origin, title: item.title ?? origin, ...(input ?? {}), ...(original ? { original_file: original.file, original_sha256: original.sha256 } : {}) });
+      givenSources.push({ id: 'given-' + (givenSources.length + 1), origin, title: item.title ?? origin, ...(input ?? {}), ...(original ? { original_file: original.file, original_sha256: original.sha256 } : {}) });
     }
     let about = args.about ?? '';
     if (args.aboutFile) { about = await readText(locations.root, args.aboutFile); inputs.push(await snapshot(locations.root, args.aboutFile)); }
@@ -353,6 +355,7 @@ export async function startRun(args) {
       reopen(state, imported.research, imported.rewrite, at);
       // A selected original that changed since it was checked is read again as a selected source.
       for (const item of imported.reselect) {
+        if (givenSources.some(given => given.file === item.file)) continue;
         const current = await snapshot(locations.root, item.file);
         givenSources.push({ id: 'given-' + (givenSources.length + 1), origin: item.origin, title: item.title, ...current }); state.inputs.push(current);
       }
@@ -462,6 +465,12 @@ async function register(locations, state, task, supplied, revisionOf = null) {
   const record = await sourceRecord(locations.root, state, supplied, task, revisionOf);
   const old = state.sources.find(source => source.id === record.id);
   if (old && supplied.id && stable(old) !== stable(record)) throw new Error('Registered source metadata is immutable; use a new revision ID.');
+  // A selected file whose text came across from earlier research is the same source: it becomes this
+  // selection, with its saved text restored if the reused research had lost it.
+  if (old && record.given && !old.given) {
+    Object.assign(old, { given: record.given, provenance: record.provenance, standing: record.standing, original_file: record.original_file, original_sha256: record.original_sha256 });
+    if (!old.file) { Object.assign(old, { file: record.file, pinned: record.pinned }); delete old.stale_since; if (old.imported) delete old.imported.unusable; }
+  }
   if (!old) state.sources.push(record);
   task.sourceIds = [...new Set([...(task.sourceIds ?? []), record.id])];
   return old ?? record;

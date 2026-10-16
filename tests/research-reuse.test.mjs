@@ -465,3 +465,49 @@ test('claim questions come across only when their exact target is in the new pro
   const carried = await startRun({ project: withDraft, from: [origin] });
   assert.equal(carried.status, 'complete'); assert.equal((await factsOf(carried)).questions[0].verdict, 'supported');
 });
+
+test('a file selected again, or already carried over by reuse, is one selected source and never stalls the run', async t => {
+  const researchWithNewSource = item => ({ coverage: 'answered', facts: [{ statement: 'OrionDB permits a single primary writer.', as_of: null, quotes: [{ source: item.sources.find(source => source.given && !source.stale_since).id, quote: 'OrionDB permits a single primary writer for each database.' }] }], gaps: [] });
+  const changedText = reference.replace('single writer', 'single primary writer') + '\n';
+  const readSelected = async (f, task) => submit(f, task, { register: [{ file: task.selected.file, title: 'Reference', publisher: 'Fixture' }] });
+  async function drive(f) {
+    const tasks = [];
+    for (let step = 0; step < 40; step++) {
+      const status = await runStatus(f);
+      if (status.status.startsWith('complete')) return { status, tasks };
+      const task = await take(f, `w-${step}`); assert.ok(task, `stalled: ${JSON.stringify(status.blockReasons)}`); tasks.push(task.kind);
+      if (task.kind === 'source') await readSelected(f, task);
+      else if (task.kind === 'plan') await submit(f, task, { questions: [] });
+      else if (task.kind === 'research') await submit(f, task, researchWithNewSource(task));
+      else if (task.kind.endsWith('check') && !task.kind.endsWith('cross')) await submit(f, task, checked(task));
+      else if (task.kind.endsWith('cross')) await submit(f, task, { merges: [], conflicts: [], superseded: [], missing: [] });
+      else await submit(f, task, writing(task));
+    }
+    throw new Error('Run did not finish.');
+  }
+  // Changed original, also selected with --source: one source task.
+  const a = await completed(t);
+  await writeFile(join(a.project, 'sources/reference.txt'), changedText);
+  const fromA = await startRun({ project: a.project, from: ['.'], sources: ['sources/reference.txt'] });
+  const driven = await drive({ project: a.project, run: fromA.run });
+  assert.equal(driven.tasks.filter(kind => kind === 'source').length, 1); assert.equal(driven.status.status, 'complete');
+
+  // Unchanged original selected again: the carried-over source becomes the selected one.
+  const b = await completed(t);
+  const fromB = await startRun({ project: b.project, from: ['.'], sources: ['sources/reference.txt'] });
+  const plain = await drive({ project: b.project, run: fromB.run });
+  assert.deepEqual(plain.tasks, ['source', 'plan']); assert.equal(plain.status.status, 'complete');
+
+  // Two origins selected different versions of one file; this project holds a third.
+  const one = await completed(t), two = await project(t);
+  await writeFile(join(two, 'sources/reference.txt'), reference.replace('Replication', 'Replication and failover') + '\n');
+  const twoRun = await fixture(t, { project: two }), twoSource = await setup(twoRun);
+  await submit(twoRun, await take(twoRun), finding(twoSource)); await finish(twoRun);
+  const target = await newProject(t); await writeFile(join(target, 'sources/reference.txt'), changedText);
+  const both = await startRun({ project: target, from: [one.project, two] });
+  assert.equal((await drive({ project: target, run: both.run })).tasks.filter(kind => kind === 'source').length, 1);
+
+  // The same file selected twice on a new run.
+  const twice = await startRun({ project: await newProject(t), topic: 'Twice', sources: ['sources/reference.txt', 'sources/reference.txt'] });
+  assert.equal(JSON.parse(await readFile(twice.file, 'utf8')).givenSources.length, 1);
+});
