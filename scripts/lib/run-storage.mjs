@@ -66,17 +66,46 @@ export async function load(locations) {
   if (state.owner !== 'harness-research-run' || state.schema !== 1 || !Array.isArray(state.tasks) || !Array.isArray(state.questions) || !Array.isArray(state.facts) || !Array.isArray(state.sources)) throw new Error('Unrecognized research run record; preserve it.');
   return state;
 }
-export async function withStore(project, action, { create = false } = {}) {
+// Saves are short, but parallel workers often arrive together, so a busy store is waited for rather
+// than refused. A lock left by a process that no longer exists is recovered once it is old enough.
+const lockWait = () => Number(process.env.HARNESS_RESEARCH_LOCK_WAIT_MS ?? 30000);
+const STALE_LOCK_MS = 60000;
+const pause = ms => new Promise(done => setTimeout(done, ms));
+function alive(pid) {
+  if (!Number.isInteger(pid) || pid <= 0) return false;
+  try { process.kill(pid, 0); return true; } catch (error) { return error.code === 'EPERM'; }
+}
+export async function acquireLock(lock, { wait = lockWait(), now = Date.now, busy = 'Research storage is busy' } = {}) {
+  const deadline = now() + wait;
+  for (let delay = 20; ; delay = Math.min(delay * 2, 400)) {
+    try { await writeFile(lock, String(process.pid), { flag: 'wx', mode: 0o600 }); return await lstat(lock); }
+    catch (error) { if (error.code !== 'EEXIST') throw error; }
+    const held = await exists(lock);
+    if (held?.isFile() && !held.isSymbolicLink() && now() - held.mtimeMs > STALE_LOCK_MS) {
+      const owner = Number((await readFile(lock, 'utf8').catch(() => '')).trim());
+      const again = await exists(lock);
+      // Remove only the same abandoned lock file we inspected, never a newer owner's.
+      if (!alive(owner) && again && again.ino === held.ino && again.dev === held.dev) { await unlink(lock).catch(() => {}); continue; }
+    }
+    if (now() >= deadline) throw new Error(`${busy} after waiting ${Math.round(wait / 1000)}s; retry. If no other research command is running, the lock's process has exited and it will be recovered automatically after ${STALE_LOCK_MS / 1000}s.`);
+    await pause(delay / 2 + Math.random() * delay);
+  }
+}
+export async function releaseLock(lock, owned) {
+  const current = await exists(lock);
+  if (!current || !current.isFile() || current.isSymbolicLink() || current.ino !== owned.ino || current.dev !== owned.dev) throw new Error('Research lock changed; inspect storage before retrying.');
+  await unlink(lock);
+}
+export async function withStore(project, action, { create = false, wait } = {}) {
   const locations = await paths(project, create);
   if (!await exists(locations.derived)) return action(locations, null);
-  try { await writeFile(locations.lock, String(process.pid), { flag: 'wx', mode: 0o600 }); }
-  catch (error) { if (error.code === 'EEXIST') throw new Error('Research storage is busy; retry after the current save. Inspect a dead process before recovering its lock.'); throw error; }
-  const owned = await lstat(locations.lock);
+  const owned = await acquireLock(locations.lock, wait === undefined ? {} : { wait });
+  let failure = null;
   try { return await action(locations, await load(locations)); }
+  catch (error) { failure = error; throw error; }
   finally {
-    const current = await lstat(locations.lock);
-    if (!current.isFile() || current.isSymbolicLink() || current.ino !== owned.ino || current.dev !== owned.dev) throw new Error('Research lock changed; inspect storage before retrying.');
-    await unlink(locations.lock);
+    // Report the action's own error rather than masking it with a lock problem.
+    try { await releaseLock(locations.lock, owned); } catch (error) { if (!failure) throw error; }
   }
 }
 export async function preserveRun(locations, state) {

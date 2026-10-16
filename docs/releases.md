@@ -10,9 +10,17 @@ The development candidate is **0.9.0 (unreleased)**. Its new standalone workflow
 needs runtime 0.9.0; guidance refresh cannot upgrade executable helpers, so the
 guidance keeps a minimum runtime of 0.8.1 and routes older runtimes to the manual
 workflow. Raise the minimum only when the manual path is retired.
-Before publishing its guidance to `main`, complete the native tests, installed
-CLI/skill checks and the live acceptance matrix in the
+Before publishing its guidance, complete the native tests, installed CLI/skill
+checks and the live acceptance matrix in the
 [design](superpowers/specs/2026-10-15-research-with-agents-design.md).
+
+**Where guidance is served from.** From runtime 0.9.0, new tasks take guidance
+from the newest `vMAJOR.MINOR.PATCH` tag whose `minimumRuntime` the installed
+helper meets, falling back to `main` only when the repository has no release tags.
+Tagging a release is therefore what publishes its guidance. Installed helpers up
+to 0.8.1 still read `main` directly: until they are updated, keep `main` at
+released guidance and develop on branches, merging to `main` when the release is
+tagged.
 [Development verification](verification/0.9.0/README.md) records completed examples
 and outstanding harness trials. Do not cut the release from narrow examples alone.
 

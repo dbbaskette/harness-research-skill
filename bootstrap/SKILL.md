@@ -30,7 +30,8 @@ start a new task merely to resume, inspect status, or revise the same work.
 Existing work retains its instructions and runtime. Explicitly adopting new
 guidance starts a new task and requires rechecking affected review conclusions.
 
-New tasks check public main. A failed fetch or incompatible runtime is reported,
+New tasks use the newest release this runtime supports (main only when the
+repository has no release tags). A failed fetch or incompatible runtime is reported,
 not described as current. An existing task can resume without fetching. For an
 agent sandbox DNS/network failure, retry the same command through the host's
 available network-permission flow. Report a denied or unavailable retry; do not

@@ -54,6 +54,7 @@ fact check for a legacy manual run.
 | `research source`, `submit` | Register inspected source text or submit results under the run/task/worker/attempt/lease tuple. |
 | `research heartbeat`, `release` | Renew a lease or return a task. Releasing research retains checker exclusion. |
 | `research retry`, `continue`, `block` | Reopen exhausted attempts, release a plan hold/block, or record an execution block. |
+| `research reassess` | Reopen only the questions affected by changed evidence; retain old facts as stale history. |
 | `research status` | Inspect progress, expire leases, and repair derived exports. |
 
 Read the [research contract](../references/research-run.md) for flags, input
@@ -61,6 +62,12 @@ shapes, source registration, partial-capture corrections, independent checker
 attestations, and writing results. Result-file paths resolve against `--project`.
 Found sources require explicit public-web permission; a claim target cannot be
 its own sole evidence.
+
+`next` returns a compact summary and writes the full task to the file it names;
+use `--verbose` for diagnostics. At light depth research tasks cover sections;
+standard and deep use question-level research. Results can register source text
+inline and cite it by file. Independent sections are pipelined, and busy saves
+wait up to thirty seconds for the shared store lock.
 
 The current queue uses thirty-minute renewable leases, monotonically increasing
 attempt generations, and idempotent accepted submission replays. A refusal keeps
@@ -127,9 +134,9 @@ It uses the existing Tart/macOS test-suite wrapper and a disposable clone. Read
 [the wrapper](../scripts/ci/tart-macos.sh), [guest script](../scripts/ci/guest-test.sh),
 and your host's local-CI instructions before running it. Preserve logs and confirm
 cleanup; never stop an unrelated VM. Recorded
-[native evidence](verification/0.9.0/review-fixes.md) covers 77 tests on the
-implementation merged into `main`, with later archive-token redactions checked
-separately. Live model acceptance is a separate outcome; see
+[native evidence](verification/0.9.0/review-fixes.md) covers 77 tests on an earlier
+implementation. Subsequent queue, source-pinning and guidance changes require
+fresh verification before release. Live model acceptance is a separate outcome; see
 [the remaining release matrix](verification/0.9.0/README.md).
 
 Instruction-context measurements are generated from current files by

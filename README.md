@@ -19,8 +19,9 @@ saves a cited report in your project—ready to open, share, and continue later.
 | Return to unfinished research | Saved progress, visible gaps, and a report that survives the chat. |
 
 > **You're reading the 0.9.0 preview.** The setup below installs the current code
-> from `main`, including the checked research workflow. The latest tagged release
-> is **0.8.1**, which uses the earlier manual workflow.
+> from `main`. Until 0.9.0 is tagged, its checked workflow needs the explicit
+> development prompt below: ordinary installed use loads **0.8.1** guidance and
+> its earlier manual workflow.
 > [Choose a version or update an existing installation →](docs/setup.md#choose-your-version)
 
 ## Get started
@@ -48,6 +49,17 @@ Use your own content or code project. This is where the report will be saved.
 You can work with public sources, selected documents, or both.
 
 ### 3. Ask in plain language
+
+**For this unreleased preview**, first tell your agent to use the development
+checkout explicitly (replace the path):
+
+```text
+Use /absolute/path/harness-research-skill/SKILL.md and its local runtime at
+/absolute/path/harness-research-skill/scripts/harness-research.mjs for this
+0.9.0 development test. Do not refresh the installed release guidance.
+```
+
+Then give your research request:
 
 **Codex**
 
@@ -103,6 +115,9 @@ your-project/
 ```
 
 Open a recorded development example:
+
+- **[Redis vs Valkey](docs/verification/0.9.0/claude-code-redis-valkey/new/research/report.md)** —
+  a broader Claude Code trial with 113 checked facts; [comparison notes](docs/verification/0.9.0/claude-code-redis-valkey/README.md) explain its limits.
 
 - **[PostgreSQL vs SQLite](docs/verification/0.9.0/public/research/report.md)** —
   a narrow comparison using public primary documentation.
@@ -172,26 +187,26 @@ representative guidance-start response. Bootstrap activation is shown separately
 | Reading path | Tokens |
 | --- | ---: |
 | Discovery metadata | 38 |
-| Installed bootstrap | 448 |
-| Bootstrap + current guidance entry | 1,038 |
-| Skill research with independent checks and saved report | 3,483 |
-| Explicit chat-only cited answer | 1,992 |
-| Legacy manual research with saved report | 3,183 |
-| Status / resume without new findings | 1,593 |
-| Comparative routing only | 1,745 |
-| Codex comparative outline | 2,705 |
-| Codex add items | 1,910 |
-| Codex add fields | 1,930 |
-| Codex deep results | 2,593 |
-| Codex deep results + saved evidence | 3,784 |
-| Claude comparative outline | 2,722 |
-| Claude deep results | 2,615 |
-| Saved research + general web strategy | 3,980 |
-| Saved research + academic strategy | 4,072 |
-| Saved research + GitHub strategy | 3,867 |
-| Saved research + technical Q&A strategy | 3,772 |
-| Saved research + Chinese sources strategy | 3,997 |
-| Legacy migration | 1,387 |
+| Installed bootstrap | 463 |
+| Bootstrap + current guidance entry | 1,066 |
+| Skill research with independent checks and saved report | 4,257 |
+| Explicit chat-only cited answer | 2,020 |
+| Legacy manual research with saved report | 3,211 |
+| Status / resume without new findings | 1,621 |
+| Comparative routing only | 1,773 |
+| Codex comparative outline | 2,733 |
+| Codex add items | 1,938 |
+| Codex add fields | 1,958 |
+| Codex deep results | 2,621 |
+| Codex deep results + saved evidence | 3,812 |
+| Claude comparative outline | 2,750 |
+| Claude deep results | 2,643 |
+| Saved research + general web strategy | 4,754 |
+| Saved research + academic strategy | 4,846 |
+| Saved research + GitHub strategy | 4,641 |
+| Saved research + technical Q&A strategy | 4,546 |
+| Saved research + Chinese sources strategy | 4,771 |
+| Legacy migration | 1,415 |
 
 Comparative rows include the selected platform resource, not the complete bundle.
 Each strategy row includes one router and one strategy. Status/resume skips plan

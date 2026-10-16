@@ -91,8 +91,8 @@ and questions, then stop before researching them.
 ```
 
 After reviewing the saved plan, ask the agent to continue with it or revise it.
-This is an optional boundary you choose; it is not an extra approval step added
-to every research request.
+Broad-topic requests also show a plan and wait for your word before research.
+Focused comparisons proceed directly unless you ask to review the plan first.
 
 ### Ask for deeper checking
 
@@ -148,6 +148,11 @@ a blocked partial report rather than labelling the research independently checke
 7. **Review prose when required.** Standard and deep use a separate writing
    reviewer. Light discloses that this stage was omitted.
 
+Independent sections can progress in parallel when your host permits subagents.
+A section can enter checking while another is still being researched. Registered
+source text is pinned to a revision so changing a working copy does not silently
+change old evidence.
+
 The helper checks exact source revisions, quote placement, numeric presence, and
 valid citation references. Semantic support still depends on the agents reading
 the evidence well. An independently checked fact is not a certificate that a
@@ -169,7 +174,8 @@ side by side. It records gaps, conflicts, rejected facts, and failed tasks.
 | `.harness-research/research-run.json` | Internal task state for the checked workflow. |
 | `.harness-research/research.json` and `research-report.md` | Compatibility record/report used by older callers. |
 
-Source files are retained in the project at their registered paths. The
+Source files are retained in the project, with immutable registered copies under
+`research/sources/revisions/`. The
 `.harness-research/` directory also holds guidance pins and history. Keep this
 state and the referenced sources if you want to resume and inspect the research.
 The visible report alone is useful to read, but is not the whole resumable run.
@@ -207,9 +213,12 @@ lease tokens or supply a new plan merely to inspect progress.
 
 - **Interrupted chat or save:** durable state is kept. Status regenerates derived
   exports from that state and restores a consistent manifest.
-- **Changed source or target:** status becomes stale. Current checked facts are
-  excluded from the brief. In 0.9.0, start a new run to reassess the changed inputs;
-  there is no automatic `research refresh` command.
+- **Changed source:** status names the affected facts and questions as stale;
+  unrelated evidence stays current. Your agent can use `research reassess` to
+  reread the changed source, research and check only affected questions, and
+  rewrite their answers.
+- **Changed claim target:** start a new run with the updated claims, because the
+  exact original claim no longer matches. There is no `research refresh` command.
 - **Failed task:** other independent tasks at that stage can continue. The agent
   addresses the cause and explicitly retries exhausted work.
 - **No independent checker:** keep the partial report and the execution block,

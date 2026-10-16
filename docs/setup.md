@@ -37,6 +37,12 @@ before installation, run this from the checkout first:
 bash scripts/Install-Harness-Research.sh --dry-run
 ```
 
+Until 0.9.0 is tagged, ordinary installed use still loads released 0.8.1
+guidance. To exercise the preview workflow, use the explicit development
+prompt in [Get started](../README.md#get-started), pointing at this checkout
+and its local runtime. Installing preview helpers alone does not select preview
+instructions.
+
 An actual installation returns JSON with `"status": "installed"`,
 `runtimeVersion`, installation locations, and the content digest. Start a new
 agent session, open the project where you want research saved, and invoke the
@@ -142,10 +148,13 @@ Do not edit files in `versions/` or remove a saved run's runtime to update it.
 
 ## Instructions and executables update differently
 
-The installed entrypoint calls the local guidance helper. New tasks fetch public
-`main`, verify compatibility, and save an exact guidance snapshot in the content
-project. The snapshot contains instructions and references, not executable
-scripts. Resuming a saved task uses its pin without fetching again.
+The installed entrypoint calls the local guidance helper. From runtime 0.9.0,
+new tasks fetch the newest numeric release tag whose guidance supports the
+installed runtime, falling back to `main` only when no release tags exist.
+Unreleased instructions on `main` are therefore not normally selected. Helpers
+through 0.8.1 still fetch `main` directly. Each task saves an exact guidance
+snapshot in the content project containing instructions and references, not
+executable scripts. Resuming uses its pin without fetching again.
 
 Executable updates happen only when you rerun the trusted installer. Current
 guidance accepts runtime 0.8.1 and routes it to the manual workflow; the checked

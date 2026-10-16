@@ -36,8 +36,11 @@ runtime now refuses saved text that short, or a quote that is most of its source
 source is registered as a partial capture with its reason; the example predates that rule
 and is kept as it was recorded.
 
-Before release, the spec's broader Claude/Codex topics, supplied PDF/link trials and
-matched 0.8.1 comparisons remain required. These narrow live examples and deterministic
+A [Claude Code trial](claude-code-redis-valkey/README.md) (2026-10-16) ran Redis vs
+Valkey at light depth side by side with the 0.8.1 skill: 13 min 50 s against 4 min 59 s,
+for 20 questions and 113 independently checked facts against 8 unchecked findings.
+Before release, a person's 30-assertion quality sample, the Codex trials, the deep and
+broad-topic runs, supplied PDF/link trials and the fact-check comparison remain required. These narrow live examples and deterministic
 tests establish implementation evidence, not the entire release acceptance matrix.
 
 Full native CI passed on commit `d0a865b1fbe15922b42aa87ea0bc4070b76ee023` (clean tree), using the existing
