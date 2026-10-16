@@ -1,5 +1,17 @@
 # Harness Research 0.9.0 development verification
 
+**Current status (2026-10-16):** stable 0.9.0 is not published. The current
+implementation passed [88 native tests](ci-acceptance-fixes/verification.json),
+zero failures or skips, plus audit, context, installer and installed-version checks.
+The [live acceptance record](live-acceptance/README.md) tracks the broader harness
+trials, corrected failures, measured limitations and outstanding human review.
+
+Earlier checkpoints below are historical evidence; their narrower test counts
+and then-outstanding trials do not supersede the current record.
+
+<details>
+<summary>Earlier development checkpoints</summary>
+
 These are actual skill-guided examples using an explicitly selected local development
 runtime and guidance, not a published 0.9.0 release or a public-main refresh. The agent
 read the skill, used its harness tools, arranged a fresh independent checker, wrote the
@@ -78,3 +90,5 @@ The consolidated fixes passed the full native gate on `f6c15c9ef3e7ce6498d004188
 installation and installed version checks. Cleanup was independently verified.
 [Current native evidence](ci-acceptance-fixes/verification.json) retains exact
 source identity and logs; human semantic acceptance is still pending.
+
+</details>

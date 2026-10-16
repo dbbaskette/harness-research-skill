@@ -1,0 +1,496 @@
+{
+  "schema": "harness-research-release-acceptance/1",
+  "candidate": "0.9.0 unreleased",
+  "code_tested": "f6c15c9ef3e7ce6498d004188e23f7219826a30c",
+  "merged_equivalent": "39b6f243c5b24fa787aa074005ee5a359878ce08",
+  "initial_live_runtime": "db98116c3bc6d356ed8cd6c4de28c3d42e56fc10",
+  "corrective_runtime": "f6c15c9ef3e7ce6498d004188e23f7219826a30c",
+  "native": {
+    "passed": 88,
+    "failed": 0,
+    "skipped": 0,
+    "audit_vulnerabilities": 0,
+    "installer": "passed"
+  },
+  "human_acceptance": "pending",
+  "measurements_note": "Single observed trials on existing subscription access; USD is CLI API-equivalent/list estimate, not invoice. Missing telemetry is null. Baseline findings and new facts are different units; atomic assertions are used for sampling. Corrective LLM trials reused disclosed authored candidate material; they are not cold-start timing comparisons.",
+  "excluded_trials": [
+    {
+      "case": "llm/claude-090",
+      "reason": "secondary FLI mirror in primary-only scope",
+      "blocked_revision": 85
+    },
+    {
+      "case": "llm/codex-090",
+      "reason": "false original-read attestations after 403; old validator refused honest rejection",
+      "blocked_revision": 60
+    }
+  ],
+  "runs": [
+    {
+      "case": "deck/claude-081",
+      "kind": "baseline 0.8.1",
+      "wall_seconds": 292.09,
+      "claude_list_estimate_usd": 1.0742263,
+      "measurement_scope": "whole invocation",
+      "human_acceptance": "pending",
+      "sample": {
+        "assertions": 19,
+        "sentences": 22,
+        "assertions_required": 18,
+        "sentences_required": 20,
+        "all_sampled_quotes_required": true
+      },
+      "run": "6002dfab70b778765a8ecc60",
+      "questions": 8,
+      "findings": 8,
+      "atomic_assertion_population": 19,
+      "status": "baseline saved",
+      "atomic_mapping_sha256": "b2cd24caae573952da6ff8453a4aefa95b2f72fbf91e3edc100ded32e6286b1e",
+      "observed_cli_models": [
+        "claude-sonnet-5-5"
+      ]
+    },
+    {
+      "case": "deck/claude-090",
+      "kind": "new 0.9.0",
+      "wall_seconds": 237.18,
+      "claude_list_estimate_usd": 1.9600192,
+      "measurement_scope": "whole invocation",
+      "human_acceptance": "pending",
+      "sample": {
+        "assertions": 13,
+        "sentences": 20,
+        "assertions_required": 12,
+        "sentences_required": 18,
+        "all_sampled_quotes_required": true
+      },
+      "run": "fc97ca7d6e4741fdb82ebec6",
+      "revision": 32,
+      "status": "complete-with-gaps",
+      "questions": 8,
+      "current_confirmed_facts": 13,
+      "registered_sources": 7,
+      "sources_with_original_hash": 0,
+      "partial_captures": 6,
+      "source_standings": {
+        "primary": 7
+      },
+      "gaps": 1,
+      "coverage": {
+        "answered": 7,
+        "not answered": 1
+      },
+      "facts_sha256": "7aae7b0556edaabc39763f6635063060a5551c6b8cc3b8c9de135925247bfcac",
+      "report_sha256": "cf5f39fff6eae1b43b7e9e7c386823a34f01d3ab7ffc2d7aba90ed53aecc6ae9",
+      "report_words": 2124,
+      "mechanical_validation": "passed",
+      "observed_cli_models": [
+        "claude-sonnet-5-5"
+      ]
+    },
+    {
+      "case": "deck/codex-090",
+      "kind": "new 0.9.0",
+      "wall_seconds": null,
+      "claude_list_estimate_usd": 0.6772403,
+      "measurement_scope": "Claude checker only; 208.09 seconds; Codex researcher wall/usage unavailable",
+      "human_acceptance": "pending",
+      "sample": {
+        "assertions": 7,
+        "sentences": 14,
+        "assertions_required": 7,
+        "sentences_required": 13,
+        "all_sampled_quotes_required": true
+      },
+      "run": "82fa87b848d64ae2a7d8e28d",
+      "revision": 29,
+      "status": "complete-with-gaps",
+      "questions": 8,
+      "current_confirmed_facts": 7,
+      "registered_sources": 7,
+      "sources_with_original_hash": 0,
+      "partial_captures": 0,
+      "source_standings": {
+        "primary": 7
+      },
+      "gaps": 1,
+      "coverage": {
+        "answered": 7,
+        "not answered": 1
+      },
+      "facts_sha256": "32f89a2bcfc1990fd4950ff1d8a8a8860edc86fb359504c353ed5c401113663d",
+      "report_sha256": "89bfc18673f63bc8d9747005238fc741b01feaf0a9f12146693d74831b4fbec1",
+      "report_words": 1612,
+      "mechanical_validation": "passed",
+      "observed_cli_models": [
+        "claude-sonnet-5-5"
+      ]
+    },
+    {
+      "case": "redis/claude-081",
+      "kind": "baseline 0.8.1",
+      "wall_seconds": 911.22,
+      "claude_list_estimate_usd": 7.8074166,
+      "measurement_scope": "whole invocation; atomic mapping excluded",
+      "human_acceptance": "pending",
+      "sample": {
+        "assertions": 30,
+        "sentences": 30,
+        "assertions_required": 27,
+        "sentences_required": 27,
+        "all_sampled_quotes_required": true
+      },
+      "run": "38bb606d8d754899a5c691c5",
+      "questions": 21,
+      "findings": 21,
+      "atomic_assertion_population": 201,
+      "status": "baseline saved",
+      "atomic_mapping_sha256": "2be7061ea0419a83686267603f18f8353b5287877e418342ad31342b99c58c3f",
+      "observed_cli_models": [
+        "claude-haiku-4-5-20251001",
+        "claude-opus-5-5"
+      ]
+    },
+    {
+      "case": "redis/claude-light",
+      "kind": "new 0.9.0",
+      "wall_seconds": 875.14,
+      "claude_list_estimate_usd": 19.0499998,
+      "measurement_scope": "whole invocation",
+      "human_acceptance": "pending",
+      "sample": {
+        "assertions": 30,
+        "sentences": 30,
+        "assertions_required": 27,
+        "sentences_required": 27,
+        "all_sampled_quotes_required": true
+      },
+      "run": "8adf0bb256194522b992be52",
+      "revision": 94,
+      "status": "complete-with-gaps",
+      "questions": 23,
+      "current_confirmed_facts": 200,
+      "registered_sources": 28,
+      "sources_with_original_hash": 4,
+      "partial_captures": 0,
+      "source_standings": {
+        "primary": 28
+      },
+      "gaps": 29,
+      "coverage": {
+        "answered": 19,
+        "partly answered": 4
+      },
+      "facts_sha256": "be9800f938ce7040bcf5434619a4d6df6230fbf07519b48dc9887986f02de92e",
+      "report_sha256": "da99882754c0fcbcd1cdcda9c8dcd9fe39625424979a9866339eee05b73ee210",
+      "report_words": 32187,
+      "mechanical_validation": "passed",
+      "observed_cli_models": [
+        "claude-haiku-4-5-20251001",
+        "claude-opus-5-5"
+      ]
+    },
+    {
+      "case": "redis/claude-deep",
+      "kind": "new 0.9.0",
+      "wall_seconds": 2074.31,
+      "claude_list_estimate_usd": 85.2364616,
+      "measurement_scope": "whole invocation",
+      "human_acceptance": "pending",
+      "sample": {
+        "assertions": 30,
+        "sentences": 30,
+        "assertions_required": 27,
+        "sentences_required": 27,
+        "all_sampled_quotes_required": true
+      },
+      "run": "184fb37e759f4df98aeb438d",
+      "revision": 219,
+      "status": "complete-with-gaps",
+      "questions": 30,
+      "current_confirmed_facts": 588,
+      "registered_sources": 93,
+      "sources_with_original_hash": 4,
+      "partial_captures": 66,
+      "source_standings": {
+        "primary": 93
+      },
+      "gaps": 86,
+      "coverage": {
+        "partly answered": 9,
+        "answered": 21
+      },
+      "facts_sha256": "4fe553714a36e232bada29502e916df3365a8a40c39d35666960fdf2b22845f9",
+      "report_sha256": "39e427e71784b40c3ba5f799d38f16dab8aed4ee0773c643f5eed6eb5e501d31",
+      "report_words": 91552,
+      "mechanical_validation": "passed",
+      "observed_cli_models": [
+        "claude-haiku-4-5-20251001",
+        "claude-opus-5-5"
+      ]
+    },
+    {
+      "case": "redis/codex-light",
+      "kind": "new 0.9.0",
+      "wall_seconds": 927.99,
+      "claude_list_estimate_usd": null,
+      "measurement_scope": "native Codex; cost unavailable",
+      "human_acceptance": "pending",
+      "sample": {
+        "assertions": 30,
+        "sentences": 30,
+        "assertions_required": 27,
+        "sentences_required": 27,
+        "all_sampled_quotes_required": true
+      },
+      "run": "9638dc33ee1b4d24a29bb002",
+      "revision": 85,
+      "status": "complete-with-gaps",
+      "questions": 20,
+      "current_confirmed_facts": 85,
+      "registered_sources": 19,
+      "sources_with_original_hash": 2,
+      "partial_captures": 4,
+      "source_standings": {
+        "primary": 19
+      },
+      "gaps": 21,
+      "coverage": {
+        "answered": 18,
+        "partly answered": 2
+      },
+      "facts_sha256": "51ea9e29400e4b911e4e533f58b7f7375b30b28b792e1600d94194935cca7977",
+      "report_sha256": "05c935fae6c5e219b911851896a3385637553f987c44b1d9ca8433070dd6d5f0",
+      "report_words": 12033,
+      "mechanical_validation": "passed",
+      "observed_cli_models": null
+    },
+    {
+      "case": "redis/codex-deep",
+      "kind": "new 0.9.0",
+      "wall_seconds": 929.12,
+      "claude_list_estimate_usd": null,
+      "measurement_scope": "native Codex; cost unavailable",
+      "human_acceptance": "pending",
+      "sample": {
+        "assertions": 30,
+        "sentences": 30,
+        "assertions_required": 27,
+        "sentences_required": 27,
+        "all_sampled_quotes_required": true
+      },
+      "run": "7c26801bfee24de583a53c7e",
+      "revision": 251,
+      "status": "complete-with-gaps",
+      "questions": 24,
+      "current_confirmed_facts": 132,
+      "registered_sources": 30,
+      "sources_with_original_hash": 2,
+      "partial_captures": 0,
+      "source_standings": {
+        "primary": 30
+      },
+      "gaps": 28,
+      "coverage": {
+        "answered": 24
+      },
+      "facts_sha256": "f27819adb4e77ad7c3e1a5e6a06bf6dd3549892d095d770c08582cfb5661cf15",
+      "report_sha256": "55a09f87ad4050949a083e06ba6dc47d71c95f10cd06559a796163fc61fc989c",
+      "report_words": 16251,
+      "mechanical_validation": "passed",
+      "observed_cli_models": null
+    },
+    {
+      "case": "llm/claude-090-corrected",
+      "kind": "new 0.9.0",
+      "wall_seconds": 1070.5761170387268,
+      "claude_list_estimate_usd": 12.9841099,
+      "measurement_scope": "whole replacement invocation; reused primary candidate notes and captures, all research reassessed and all independent checks/writing fresh",
+      "human_acceptance": "pending",
+      "sample": {
+        "assertions": 30,
+        "sentences": 30,
+        "assertions_required": 27,
+        "sentences_required": 27,
+        "all_sampled_quotes_required": true
+      },
+      "run": "c6578b0348e64e2a8929ba52",
+      "revision": 99,
+      "status": "complete-with-gaps",
+      "questions": 25,
+      "current_confirmed_facts": 127,
+      "registered_sources": 28,
+      "sources_with_original_hash": 0,
+      "partial_captures": 12,
+      "source_standings": {
+        "primary": 28
+      },
+      "gaps": 19,
+      "coverage": {
+        "answered": 6,
+        "partly answered": 19
+      },
+      "facts_sha256": "c364b77393c652b4c60ee4cab7649d0b61f85f995d986b3d7334bd712f77ee20",
+      "report_sha256": "e94c79a6eb33fcffde5505b5a44728cb6b22039939216b9e887bab8f1ec6da3a",
+      "report_words": 17822,
+      "mechanical_validation": "passed",
+      "observed_cli_models": [
+        "claude-haiku-4-5-20251001",
+        "claude-sonnet-5-5"
+      ],
+      "original_read_trace_audit": {
+        "checker_tasks": 11,
+        "unmapped_workers": [],
+        "inspected_source_occurrences": 36,
+        "status_counts": {
+          "original_pdf_read_fallback_observed": 21,
+          "original_pdf_text_decode_and_read_observed": 4,
+          "original_fetch_observed": 11
+        },
+        "limitations": "Tool-trace audit only. A successful WebFetch may return selected/processed text, not a byte-identical whole original. ArXiv URL variants are matched by paper ID; exact revision equivalence still needs inspected wording/version context. A partial abstract source can be valid primary evidence for bounded claims. Fields alone are not proof of an original read. No new model calls or human grades."
+      }
+    },
+    {
+      "case": "llm/claude-081",
+      "kind": "baseline 0.8.1",
+      "wall_seconds": 629.07,
+      "claude_list_estimate_usd": 8.2035907,
+      "measurement_scope": "planning and research; atomic mapping 276.6 seconds / $0.8511004 separately",
+      "human_acceptance": "pending",
+      "sample": {
+        "assertions": 30,
+        "sentences": 30,
+        "assertions_required": 27,
+        "sentences_required": 27,
+        "all_sampled_quotes_required": true
+      },
+      "run": "7a8109c367d230a7c1aabd7d",
+      "questions": 22,
+      "findings": 22,
+      "atomic_assertion_population": 342,
+      "status": "baseline saved",
+      "atomic_mapping_sha256": "05a4c6e36713e974dbd4accf3505d2612d80a0f9b1948ad34e72c0f766fa9db0",
+      "observed_cli_models": [
+        "claude-haiku-4-5-20251001",
+        "claude-sonnet-5-5"
+      ]
+    },
+    {
+      "case": "llm/codex-090-corrected",
+      "kind": "new 0.9.0",
+      "wall_seconds": null,
+      "claude_list_estimate_usd": 3.5208906,
+      "measurement_scope": "three fresh Claude checker phases only, 563.43 seconds; Codex/browser checker time/usage unavailable; reused actual authored candidates, all checks/writing fresh",
+      "human_acceptance": "pending",
+      "sample": {
+        "assertions": 30,
+        "sentences": 30,
+        "assertions_required": 27,
+        "sentences_required": 27,
+        "all_sampled_quotes_required": true
+      },
+      "run": "7a2f8c6d17fa4042a6d3beff",
+      "revision": 64,
+      "status": "complete-with-gaps",
+      "questions": 25,
+      "current_confirmed_facts": 69,
+      "registered_sources": 17,
+      "sources_with_original_hash": 16,
+      "partial_captures": 1,
+      "source_standings": {
+        "primary": 17
+      },
+      "gaps": 19,
+      "coverage": {
+        "answered": 6,
+        "partly answered": 19
+      },
+      "facts_sha256": "6be57d975f18c119c8db74febfe719e49ee9940b3c82c35834c3092857f4b3d1",
+      "report_sha256": "d5db24fcb2fe6e11c0bfbfef634597239d196b016cd14bd013955cc29e4fed19",
+      "report_words": 11295,
+      "mechanical_validation": "passed",
+      "observed_cli_models": [
+        "claude-sonnet-5-5"
+      ]
+    },
+    {
+      "case": "narrow/claude-090",
+      "kind": "new 0.9.0",
+      "wall_seconds": 321.39,
+      "claude_list_estimate_usd": 1.3588741,
+      "measurement_scope": "whole invocation",
+      "human_acceptance": "pending",
+      "sample": {
+        "assertions": 6,
+        "sentences": 12,
+        "assertions_required": 6,
+        "sentences_required": 11,
+        "all_sampled_quotes_required": true
+      },
+      "run": "e340fd00f3b949e9946a3b20",
+      "revision": 36,
+      "status": "complete-with-gaps",
+      "questions": 6,
+      "current_confirmed_facts": 6,
+      "registered_sources": 2,
+      "sources_with_original_hash": 2,
+      "partial_captures": 2,
+      "source_standings": {
+        "primary": 2
+      },
+      "gaps": 2,
+      "coverage": {
+        "answered": 4,
+        "partly answered": 2
+      },
+      "facts_sha256": "09cd2ca855b16159e44c3be8d94a28e63536e2446469e2a83699e18aadba9260",
+      "report_sha256": "63bc4da156f6c10b5f5978292eba9146709f816101e448068a8af78ca720ec4e",
+      "report_words": 1145,
+      "mechanical_validation": "passed",
+      "observed_cli_models": [
+        "claude-sonnet-5-5"
+      ]
+    },
+    {
+      "case": "narrow/codex-090",
+      "kind": "new 0.9.0",
+      "wall_seconds": 341.15,
+      "claude_list_estimate_usd": 0.2630604,
+      "measurement_scope": "wall whole run; cost Claude checker only, Codex researcher unavailable",
+      "human_acceptance": "pending",
+      "sample": {
+        "assertions": 7,
+        "sentences": 8,
+        "assertions_required": 7,
+        "sentences_required": 8,
+        "all_sampled_quotes_required": true
+      },
+      "run": "99c42d3d8cb944d8a94960d9",
+      "revision": 31,
+      "status": "complete-with-gaps",
+      "questions": 6,
+      "current_confirmed_facts": 7,
+      "registered_sources": 2,
+      "sources_with_original_hash": 2,
+      "partial_captures": 0,
+      "source_standings": {
+        "primary": 2
+      },
+      "gaps": 2,
+      "coverage": {
+        "answered": 4,
+        "not answered": 2
+      },
+      "facts_sha256": "6fd6a0fa878ab70fc481d5b4e7036977b228686d3a31295882c18d95ab3dc2a2",
+      "report_sha256": "5bd5b4c01a88d37ec6189609337586ca0e25baa1e2262434685badfc9169b500",
+      "report_words": 979,
+      "mechanical_validation": "passed",
+      "observed_cli_models": [
+        "claude-sonnet-5-5"
+      ]
+    }
+  ],
+  "completed_eligible_report_cases": 13,
+  "human_feedback": "Positive aggregate feedback received before the final corrected Claude report completed; no per-item scores or threshold attestation inferred. Final case sampling remains pending."
+}
