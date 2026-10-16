@@ -1,0 +1,1 @@
+All processes using a database must be on the same host computer; WAL does not work over a network filesystem.

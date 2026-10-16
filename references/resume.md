@@ -3,6 +3,16 @@
 Use the saved guidance task/runtime from the installed bootstrap. Do not refresh
 guidance or create another plan merely to inspect status or continue the same work.
 
+For queued runs (a saved `.harness-research/research-run.json`), use `research
+status --project DIR`, resume its `guidanceTask` through the bootstrap when present,
+and follow [the skill research workflow](research-run.md). Keep its current run ID,
+task leases, source restrictions and independent-checking requirements. A null
+next task can mean waiting or an ineligible checker. `blocked` and `stale` are not
+finished research; retain and link the partial report while resolving the cause.
+Status repairs derived exports from durable state. Its report is `research/report.md`.
+
+The remaining instructions apply to existing manual `plan`/`record` runs:
+
 ```sh
 node scripts/harness-research.mjs status --project DIR
 ```

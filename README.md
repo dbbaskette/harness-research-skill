@@ -6,7 +6,17 @@ topics, compare options and fact-check claims. It keeps findings, conflicting
 evidence and unanswered questions so you can pick up the work later.
 
 You describe what you need in plain language. The agent plans the research,
-reads sources and automatically saves a cited report in your project.
+reads sources and automatically saves a cited report in your project. It remains
+a skill: your agent uses its own research tools and judgement. The local helper
+tracks tasks, evidence and saved output; you do not operate a research service or
+prepare helper commands.
+
+**Development version: 0.9.0 (unreleased).** This branch adds independent evidence
+checking, durable tasks and visible reports in `research/`. The installation
+examples below use the published 0.8.1 release. To test this development checkout,
+point your agent at its `SKILL.md` and local runtime, or install this checkout with
+the same shell installer. Guidance 0.9.0 requires runtime 0.9.0; publishing guidance
+does not update an older executable automatically.
 
 ## 1. Install once
 
@@ -111,11 +121,20 @@ or follow-up request to write it is needed. The agent returns a synthesis and a 
 which is saved at:
 
 ```text
-your-project/.harness-research/research-report.md
+your-project/research/report.md                    # new 0.9.0 skill runs
+your-project/.harness-research/research-report.md   # 0.8.1 / manual runs; compatibility copy
 ```
 
 It includes findings, citations, contradictions, document coverage gaps and
 pending or unresolved questions. The agent updates it as findings are saved.
+In 0.9.0, a separate invocation checks evidence against the originals. Light depth
+discloses that the written prose has no separate semantic review. If checking
+cannot run, the agent returns a partial report with the execution block. Honest
+unanswered questions finish as visible gaps, with no invented findings.
+`research/facts.json` contains the evidence and assertion history;
+`research/brief.md` contains current checked facts. `research/output.json` records
+the matching export revision and hashes for consumers. These files are produced
+by the skill without extra prompt wording.
 Before returning the research result or starting dependent content, the agent
 opens the report and checks that the agreed findings, citations and gaps
 are saved. A partial handoff requires your explicit direction. Only an explicitly
@@ -130,9 +149,11 @@ $harness-research Continue the saved research in this project.
 Check for changed source files and work through the remaining questions.
 ```
 
-Matching plans reuse saved findings. Changes to selected local sources mark
+Existing manual matching plans reuse saved findings. Changes to selected local sources mark
 affected findings stale so they can be reassessed. Saved snapshots do not prove
-that a live web page is still current.
+that a live web page is still current. A 0.9.0 queued run resumes its saved tasks;
+changed sources block current use and require a new run to reassess. Cross-project
+reuse, approval and automated refresh commands are later milestones.
 
 ## Setup help
 
@@ -231,30 +252,31 @@ representative guidance-start response. Bootstrap activation is shown separately
 | --- | ---: |
 | Discovery metadata | 38 |
 | Installed bootstrap | 448 |
-| Bootstrap + current guidance entry | 1,059 |
-| Explicit chat-only cited answer | 2,013 |
-| Focused research with saved report | 3,204 |
-| Status / resume without new findings | 1,476 |
-| Comparative routing only | 1,766 |
-| Codex comparative outline | 2,726 |
-| Codex add items | 1,931 |
-| Codex add fields | 1,951 |
-| Codex deep results | 2,614 |
-| Codex deep results + saved evidence | 3,805 |
-| Claude comparative outline | 2,743 |
-| Claude deep results | 2,636 |
-| Saved research + general web strategy | 3,701 |
-| Saved research + academic strategy | 3,793 |
-| Saved research + GitHub strategy | 3,588 |
-| Saved research + technical Q&A strategy | 3,493 |
-| Saved research + Chinese sources strategy | 3,718 |
-| Legacy migration | 1,408 |
+| Bootstrap + current guidance entry | 1,006 |
+| Skill research with independent checks and saved report | 3,140 |
+| Explicit chat-only cited answer | 1,960 |
+| Legacy manual research with saved report | 3,151 |
+| Status / resume without new findings | 1,561 |
+| Comparative routing only | 1,713 |
+| Codex comparative outline | 2,673 |
+| Codex add items | 1,878 |
+| Codex add fields | 1,898 |
+| Codex deep results | 2,561 |
+| Codex deep results + saved evidence | 3,752 |
+| Claude comparative outline | 2,690 |
+| Claude deep results | 2,583 |
+| Saved research + general web strategy | 3,637 |
+| Saved research + academic strategy | 3,729 |
+| Saved research + GitHub strategy | 3,524 |
+| Saved research + technical Q&A strategy | 3,429 |
+| Saved research + Chinese sources strategy | 3,654 |
+| Legacy migration | 1,355 |
 
 Comparative rows include the selected platform resource, not the complete bundle.
 Each strategy row includes one router and one strategy. Status/resume skips plan
 and finding schemas until a new save is needed. Only explicitly requested chat-only
-answers omit the saved queue; default research uses the evidence contract. Source
-content, images, research helper results and conversation add separately. The JSON
+answers omit saved artifacts; default research uses the skill task/evidence workflow. Source
+content, images, research task responses and conversation add separately. The JSON
 report also exposes direct-handoff paths without the bootstrap/start response.
 <!-- CONTEXT-USAGE:END -->
 

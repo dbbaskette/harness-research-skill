@@ -1,0 +1,1123 @@
+{
+  "schema": 1,
+  "owner": "harness-research-run",
+  "run": "4da5c841fb274fbcb5781e2c",
+  "revision": 28,
+  "runtimeVersion": "0.9.0",
+  "guidanceVersion": "0.9.0",
+  "guidanceRevision": null,
+  "topic": "Compare PostgreSQL and SQLite for a small internal app, narrowly covering deployment and write concurrency. Exactly four focused questions, two per database; public primary documentation only; light depth; no extra gap round unless necessary.",
+  "about": "",
+  "sourceMode": "public-web",
+  "depth": "light",
+  "planOnly": false,
+  "inputs": [],
+  "givenSources": [],
+  "claims": [],
+  "sources": [
+    {
+      "id": "source-303f8083252aa8330ea1",
+      "given": null,
+      "title": "PostgreSQL Architectural Fundamentals (short excerpts)",
+      "origin": "https://www.postgresql.org/docs/current/tutorial-arch.html",
+      "publisher": "PostgreSQL Global Development Group",
+      "standing": "primary",
+      "provenance": "found",
+      "pages": null,
+      "file": "sources/pg-architecture.txt",
+      "sha256": "03223986253b1da11575ace05628e3ae4097f96bd9bc3b3fbebda6505008b8dc",
+      "original_file": null,
+      "original_sha256": null,
+      "limits": "Short verbatim excerpts only, 22 words; not a full extraction. Public original inspected using native web tool on 2026-10-16; current page identifies PostgreSQL 18. Original complete-document hash unavailable.",
+      "source_date": null,
+      "saved_at": "2026-10-16T04:15:29.530Z"
+    },
+    {
+      "id": "source-8c4adeaae6681b9dfc59",
+      "given": null,
+      "title": "PostgreSQL Concurrency Control Introduction (short excerpts)",
+      "origin": "https://www.postgresql.org/docs/current/mvcc-intro.html",
+      "publisher": "PostgreSQL Global Development Group",
+      "standing": "primary",
+      "provenance": "found",
+      "pages": null,
+      "file": "sources/pg-mvcc.txt",
+      "sha256": "b2cdd4c4cf2695d38ea823f1aa7e4e4f937cfff24560e4017f4c6a7a2df67d7d",
+      "original_file": null,
+      "original_sha256": null,
+      "limits": "Short verbatim excerpts only; not a full extraction. Public original and surrounding context inspected with native web tool on 2026-10-16. Complete-document original hash unavailable.",
+      "source_date": null,
+      "saved_at": "2026-10-16T04:16:02.231Z"
+    },
+    {
+      "id": "source-c32b94cccaed8ea361dc",
+      "given": null,
+      "title": "PostgreSQL Explicit Locking (short excerpts)",
+      "origin": "https://www.postgresql.org/docs/current/explicit-locking.html",
+      "publisher": "PostgreSQL Global Development Group",
+      "standing": "primary",
+      "provenance": "found",
+      "pages": null,
+      "file": "sources/pg-locks.txt",
+      "sha256": "5b847847df3f9135d164d3398ade61c68b6b9d2af7140b6a778d16bb7ab27cce",
+      "original_file": null,
+      "original_sha256": null,
+      "limits": "Short verbatim excerpts only; not a full extraction. Public original and surrounding context inspected with native web tool on 2026-10-16. Complete-document original hash unavailable.",
+      "source_date": null,
+      "saved_at": "2026-10-16T04:16:02.271Z"
+    },
+    {
+      "id": "source-4ce90be2597ca4deb67b",
+      "given": null,
+      "title": "SQLite Is Serverless (short excerpts)",
+      "origin": "https://www.sqlite.org/serverless.html",
+      "publisher": "SQLite Project",
+      "standing": "primary",
+      "provenance": "found",
+      "pages": null,
+      "file": "sources/sqlite-serverless.txt",
+      "sha256": "c29da7bc717cb54401cc631dd1ec8a842bbc42893a7cb3521bc36cb12687152b",
+      "original_file": null,
+      "original_sha256": null,
+      "limits": "Short verbatim excerpts only; not a full extraction. Public original and surrounding context inspected with native web tool on 2026-10-16. Complete-document original hash unavailable.",
+      "source_date": null,
+      "saved_at": "2026-10-16T04:16:02.380Z"
+    },
+    {
+      "id": "source-de24e99fd42c9d4f9188",
+      "given": null,
+      "title": "Isolation In SQLite (short excerpts)",
+      "origin": "https://www.sqlite.org/isolation.html",
+      "publisher": "SQLite Project",
+      "standing": "primary",
+      "provenance": "found",
+      "pages": null,
+      "file": "sources/sqlite-isolation.txt",
+      "sha256": "be0be4284b401f5b4a4911ac889dbf596191df824b03efd91fd17b98b85360f8",
+      "original_file": null,
+      "original_sha256": null,
+      "limits": "Short verbatim excerpts only; not a full extraction. Public original and surrounding context inspected with native web tool on 2026-10-16. Complete-document original hash unavailable.",
+      "source_date": "2022-04-18",
+      "saved_at": "2026-10-16T04:16:02.485Z"
+    },
+    {
+      "id": "source-3dbe8c3756fe4025120d",
+      "given": null,
+      "title": "Write-Ahead Logging (short excerpts)",
+      "origin": "https://www.sqlite.org/wal.html",
+      "publisher": "SQLite Project",
+      "standing": "primary",
+      "provenance": "found",
+      "pages": null,
+      "file": "sources/sqlite-wal.txt",
+      "sha256": "3b11b4208f776b09724aea29281c0d3df27e10de8cb83c401bba826a88d1d518",
+      "original_file": null,
+      "original_sha256": null,
+      "limits": "Short verbatim excerpts only; not a full extraction. Public original and surrounding context inspected with native web tool on 2026-10-16. Complete-document original hash unavailable.",
+      "source_date": null,
+      "saved_at": "2026-10-16T04:16:02.519Z"
+    }
+  ],
+  "sections": [
+    {
+      "id": "postgresql",
+      "name": "PostgreSQL"
+    },
+    {
+      "id": "sqlite",
+      "name": "SQLite"
+    }
+  ],
+  "subjects": [
+    {
+      "id": "postgresql",
+      "name": "PostgreSQL"
+    },
+    {
+      "id": "sqlite",
+      "name": "SQLite"
+    }
+  ],
+  "questions": [
+    {
+      "id": "pg-deployment",
+      "question": "What deployment architecture does PostgreSQL require?",
+      "section": "postgresql",
+      "subject": "postgresql",
+      "kind": "open",
+      "round": 1,
+      "coverage": "answered",
+      "gaps": [],
+      "researchWorkers": [
+        "/root/skill_example_public"
+      ],
+      "assessment": {
+        "by": "/root/skill_example_public/checker",
+        "at": "2026-10-16T04:16:47.002Z"
+      },
+      "provisionalCoverage": "answered",
+      "verdict": null,
+      "headline": {
+        "sentence": "PostgreSQL uses a client/server deployment model.",
+        "facts": [
+          "fact-91a5c0a22ff840aa87a745a0c75de008"
+        ]
+      },
+      "answer": [
+        {
+          "sentence": "Clients and the database server may run on different hosts.",
+          "facts": [
+            "fact-91a5c0a22ff840aa87a745a0c75de008"
+          ],
+          "paragraph": 1
+        }
+      ],
+      "writtenBy": "/root/skill_example_public"
+    },
+    {
+      "id": "pg-writes",
+      "question": "How does PostgreSQL coordinate concurrent reads and writes, including writes to the same row?",
+      "section": "postgresql",
+      "subject": "postgresql",
+      "kind": "open",
+      "round": 1,
+      "coverage": "answered",
+      "gaps": [],
+      "researchWorkers": [
+        "/root/skill_example_public"
+      ],
+      "assessment": {
+        "by": "/root/skill_example_public/checker",
+        "at": "2026-10-16T04:16:47.002Z"
+      },
+      "provisionalCoverage": "answered",
+      "verdict": null,
+      "headline": {
+        "sentence": "PostgreSQL MVCC read/write locks do not conflict, while row locks coordinate competing writers.",
+        "facts": [
+          "fact-0ee80ddd8ee74f8b954108ed9fd3cae2",
+          "fact-80cc052b00ec44a7b04f914b98b0eeb3"
+        ]
+      },
+      "answer": [
+        {
+          "sentence": "Under MVCC, locks acquired for querying data do not conflict with write locks.",
+          "facts": [
+            "fact-0ee80ddd8ee74f8b954108ed9fd3cae2"
+          ],
+          "paragraph": 1
+        },
+        {
+          "sentence": "Row-level locks can block competing writers and lockers on the same row without blocking ordinary data queries.",
+          "facts": [
+            "fact-80cc052b00ec44a7b04f914b98b0eeb3"
+          ],
+          "paragraph": 1
+        }
+      ],
+      "writtenBy": "/root/skill_example_public"
+    },
+    {
+      "id": "sqlite-deployment",
+      "question": "What deployment architecture does SQLite use?",
+      "section": "sqlite",
+      "subject": "sqlite",
+      "kind": "open",
+      "round": 1,
+      "coverage": "answered",
+      "gaps": [],
+      "researchWorkers": [
+        "/root/skill_example_public"
+      ],
+      "assessment": {
+        "by": "/root/skill_example_public/checker",
+        "at": "2026-10-16T04:17:11.172Z"
+      },
+      "provisionalCoverage": "answered",
+      "verdict": null,
+      "headline": {
+        "sentence": "SQLite runs its database engine inside the application process.",
+        "facts": [
+          "fact-67565f7bc4e64b29a3cf4884eb160102"
+        ]
+      },
+      "answer": [
+        {
+          "sentence": "SQLite has no intermediary server process.",
+          "facts": [
+            "fact-469ff01539bb48c7bb52ea39823b2f9c"
+          ],
+          "paragraph": 1
+        }
+      ],
+      "writtenBy": "/root/skill_example_public"
+    },
+    {
+      "id": "sqlite-writes",
+      "question": "What write concurrency does SQLite permit, and how does WAL affect readers?",
+      "section": "sqlite",
+      "subject": "sqlite",
+      "kind": "open",
+      "round": 1,
+      "coverage": "answered",
+      "gaps": [],
+      "researchWorkers": [
+        "/root/skill_example_public"
+      ],
+      "assessment": {
+        "by": "/root/skill_example_public/checker",
+        "at": "2026-10-16T04:17:11.172Z"
+      },
+      "provisionalCoverage": "answered",
+      "verdict": null,
+      "headline": {
+        "sentence": "SQLite allows a single writer per database, including when WAL permits concurrent reading and writing.",
+        "facts": [
+          "fact-05c3180a1cab418d859780aa17d39532",
+          "fact-56144cd0878b41b7ae203d9ffd23d635"
+        ]
+      },
+      "answer": [
+        {
+          "sentence": "WAL mode allows readers to operate concurrently with the writer, while the single-writer constraint remains.",
+          "facts": [
+            "fact-05c3180a1cab418d859780aa17d39532",
+            "fact-56144cd0878b41b7ae203d9ffd23d635"
+          ],
+          "paragraph": 1
+        },
+        {
+          "sentence": "All processes accessing a WAL database must be on the same host; WAL does not work over a network filesystem.",
+          "facts": [
+            "fact-b38d5613137c4af8a1e43c21f142ca75"
+          ],
+          "paragraph": 2
+        }
+      ],
+      "writtenBy": "/root/skill_example_public"
+    }
+  ],
+  "facts": [
+    {
+      "key": "fact-91a5c0a22ff840aa87a745a0c75de008",
+      "statement": "PostgreSQL uses a client/server deployment model, with clients and the server optionally on different hosts.",
+      "questions": [
+        "pg-deployment"
+      ],
+      "section": "postgresql",
+      "subject": "postgresql",
+      "as_of": null,
+      "authored_by": "/root/skill_example_public",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/skill_example_public/checker",
+        "at": "2026-10-16T04:16:47.000Z",
+        "inspected_sources": [
+          {
+            "source": "source-303f8083252aa8330ea1",
+            "sha256": "03223986253b1da11575ace05628e3ae4097f96bd9bc3b3fbebda6505008b8dc",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-8c4adeaae6681b9dfc59",
+            "sha256": "b2cdd4c4cf2695d38ea823f1aa7e4e4f937cfff24560e4017f4c6a7a2df67d7d",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-c32b94cccaed8ea361dc",
+            "sha256": "5b847847df3f9135d164d3398ade61c68b6b9d2af7140b6a778d16bb7ab27cce",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-303f8083252aa8330ea1",
+          "quote": "In database jargon, PostgreSQL uses a client/server model.",
+          "start": 0,
+          "quote_sha256": "295149a81a78b369d9373a0ad3f1c10691535c990ca47af885a718b26b45e70e",
+          "source_sha256": "03223986253b1da11575ace05628e3ae4097f96bd9bc3b3fbebda6505008b8dc",
+          "locator": "Architectural Fundamentals, client/server model"
+        },
+        {
+          "source": "source-303f8083252aa8330ea1",
+          "quote": "the client and the server can be on different hosts.",
+          "start": 60,
+          "quote_sha256": "baa7a728b9a21dbaa144b336392b62ef72887ed872f89374e93903e6156570a3",
+          "source_sha256": "03223986253b1da11575ace05628e3ae4097f96bd9bc3b3fbebda6505008b8dc",
+          "locator": "Architectural Fundamentals, host placement"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null
+    },
+    {
+      "key": "fact-0ee80ddd8ee74f8b954108ed9fd3cae2",
+      "statement": "PostgreSQL MVCC query locks do not conflict with write locks.",
+      "questions": [
+        "pg-writes"
+      ],
+      "section": "postgresql",
+      "subject": "postgresql",
+      "as_of": null,
+      "authored_by": "/root/skill_example_public",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/skill_example_public/checker",
+        "at": "2026-10-16T04:16:47.000Z",
+        "inspected_sources": [
+          {
+            "source": "source-303f8083252aa8330ea1",
+            "sha256": "03223986253b1da11575ace05628e3ae4097f96bd9bc3b3fbebda6505008b8dc",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-8c4adeaae6681b9dfc59",
+            "sha256": "b2cdd4c4cf2695d38ea823f1aa7e4e4f937cfff24560e4017f4c6a7a2df67d7d",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-c32b94cccaed8ea361dc",
+            "sha256": "5b847847df3f9135d164d3398ade61c68b6b9d2af7140b6a778d16bb7ab27cce",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-8c4adeaae6681b9dfc59",
+          "quote": "in MVCC locks acquired for querying (reading) data do not conflict with locks acquired for writing data",
+          "start": 0,
+          "quote_sha256": "cfd075300aeac26a9b304ac6264efabcb355b3864ef5a584c86135a7195ce218",
+          "source_sha256": "b2cdd4c4cf2695d38ea823f1aa7e4e4f937cfff24560e4017f4c6a7a2df67d7d",
+          "locator": "Concurrency Control Introduction, MVCC read/write locks"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null
+    },
+    {
+      "key": "fact-80cc052b00ec44a7b04f914b98b0eeb3",
+      "statement": "PostgreSQL row-level locks block competing writers and lockers on the same row without blocking ordinary data queries.",
+      "questions": [
+        "pg-writes"
+      ],
+      "section": "postgresql",
+      "subject": "postgresql",
+      "as_of": null,
+      "authored_by": "/root/skill_example_public",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/skill_example_public/checker",
+        "at": "2026-10-16T04:16:47.000Z",
+        "inspected_sources": [
+          {
+            "source": "source-303f8083252aa8330ea1",
+            "sha256": "03223986253b1da11575ace05628e3ae4097f96bd9bc3b3fbebda6505008b8dc",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-8c4adeaae6681b9dfc59",
+            "sha256": "b2cdd4c4cf2695d38ea823f1aa7e4e4f937cfff24560e4017f4c6a7a2df67d7d",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-c32b94cccaed8ea361dc",
+            "sha256": "5b847847df3f9135d164d3398ade61c68b6b9d2af7140b6a778d16bb7ab27cce",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-c32b94cccaed8ea361dc",
+          "quote": "Row-level locks do not affect data querying; they block only writers and lockers to the same row.",
+          "start": 0,
+          "quote_sha256": "22dbac2d0b1e69e58accfd7bfcd1ec5b8020f472c2cf87c73f2c0950b5b8e0ff",
+          "source_sha256": "5b847847df3f9135d164d3398ade61c68b6b9d2af7140b6a778d16bb7ab27cce",
+          "locator": "Explicit Locking, Row-Level Locks"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null
+    },
+    {
+      "key": "fact-469ff01539bb48c7bb52ea39823b2f9c",
+      "statement": "SQLite has no intermediary server process.",
+      "questions": [
+        "sqlite-deployment"
+      ],
+      "section": "sqlite",
+      "subject": "sqlite",
+      "as_of": null,
+      "authored_by": "/root/skill_example_public",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/skill_example_public/checker",
+        "at": "2026-10-16T04:17:11.165Z",
+        "inspected_sources": [
+          {
+            "source": "source-4ce90be2597ca4deb67b",
+            "sha256": "c29da7bc717cb54401cc631dd1ec8a842bbc42893a7cb3521bc36cb12687152b",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-de24e99fd42c9d4f9188",
+            "sha256": "be0be4284b401f5b4a4911ac889dbf596191df824b03efd91fd17b98b85360f8",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-3dbe8c3756fe4025120d",
+            "sha256": "3b11b4208f776b09724aea29281c0d3df27e10de8cb83c401bba826a88d1d518",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-4ce90be2597ca4deb67b",
+          "quote": "There is no intermediary server process.",
+          "start": 97,
+          "quote_sha256": "fc747a75302f2e70734f169ef2537663a6f41a509e606c4d1d542582c28bb20f",
+          "source_sha256": "c29da7bc717cb54401cc631dd1ec8a842bbc42893a7cb3521bc36cb12687152b",
+          "locator": "SQLite Is Serverless, first paragraph"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null
+    },
+    {
+      "key": "fact-05c3180a1cab418d859780aa17d39532",
+      "statement": "SQLite permits only a single writer at a time per database.",
+      "questions": [
+        "sqlite-writes"
+      ],
+      "section": "sqlite",
+      "subject": "sqlite",
+      "as_of": null,
+      "authored_by": "/root/skill_example_public",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/skill_example_public/checker",
+        "at": "2026-10-16T04:17:11.165Z",
+        "inspected_sources": [
+          {
+            "source": "source-4ce90be2597ca4deb67b",
+            "sha256": "c29da7bc717cb54401cc631dd1ec8a842bbc42893a7cb3521bc36cb12687152b",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-de24e99fd42c9d4f9188",
+            "sha256": "be0be4284b401f5b4a4911ac889dbf596191df824b03efd91fd17b98b85360f8",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-3dbe8c3756fe4025120d",
+            "sha256": "3b11b4208f776b09724aea29281c0d3df27e10de8cb83c401bba826a88d1d518",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-de24e99fd42c9d4f9188",
+          "quote": "There can only be a single writer at a time to an SQLite database.",
+          "start": 0,
+          "quote_sha256": "690e11329ea6597eb09f4bbf9bf06adebc55840794e5ebce6a08f611c944e032",
+          "source_sha256": "be0be4284b401f5b4a4911ac889dbf596191df824b03efd91fd17b98b85360f8",
+          "locator": "Isolation Between Database Connections"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null
+    },
+    {
+      "key": "fact-56144cd0878b41b7ae203d9ffd23d635",
+      "statement": "SQLite WAL mode allows simultaneous readers and writers.",
+      "questions": [
+        "sqlite-writes"
+      ],
+      "section": "sqlite",
+      "subject": "sqlite",
+      "as_of": null,
+      "authored_by": "/root/skill_example_public",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/skill_example_public/checker",
+        "at": "2026-10-16T04:17:11.165Z",
+        "inspected_sources": [
+          {
+            "source": "source-4ce90be2597ca4deb67b",
+            "sha256": "c29da7bc717cb54401cc631dd1ec8a842bbc42893a7cb3521bc36cb12687152b",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-de24e99fd42c9d4f9188",
+            "sha256": "be0be4284b401f5b4a4911ac889dbf596191df824b03efd91fd17b98b85360f8",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-3dbe8c3756fe4025120d",
+            "sha256": "3b11b4208f776b09724aea29281c0d3df27e10de8cb83c401bba826a88d1d518",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-de24e99fd42c9d4f9188",
+          "quote": "WAL mode permits simultaneous readers and writers.",
+          "start": 68,
+          "quote_sha256": "689dd23b5ea51741e946ff8fed3d18e844c79d485364154797c1a0cb30ae36a7",
+          "source_sha256": "be0be4284b401f5b4a4911ac889dbf596191df824b03efd91fd17b98b85360f8",
+          "locator": "Isolation And Concurrency"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null
+    },
+    {
+      "key": "fact-b38d5613137c4af8a1e43c21f142ca75",
+      "statement": "SQLite WAL requires all processes accessing a database to share a host and does not work over a network filesystem.",
+      "questions": [
+        "sqlite-writes"
+      ],
+      "section": "sqlite",
+      "subject": "sqlite",
+      "as_of": null,
+      "authored_by": "/root/skill_example_public",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/skill_example_public/checker",
+        "at": "2026-10-16T04:17:11.165Z",
+        "inspected_sources": [
+          {
+            "source": "source-4ce90be2597ca4deb67b",
+            "sha256": "c29da7bc717cb54401cc631dd1ec8a842bbc42893a7cb3521bc36cb12687152b",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-de24e99fd42c9d4f9188",
+            "sha256": "be0be4284b401f5b4a4911ac889dbf596191df824b03efd91fd17b98b85360f8",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-3dbe8c3756fe4025120d",
+            "sha256": "3b11b4208f776b09724aea29281c0d3df27e10de8cb83c401bba826a88d1d518",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-3dbe8c3756fe4025120d",
+          "quote": "All processes using a database must be on the same host computer; WAL does not work over a network filesystem.",
+          "start": 0,
+          "quote_sha256": "9177b3c26bf447d60329665ece73557a30a156c661c80f6205acff283df7b089",
+          "source_sha256": "3b11b4208f776b09724aea29281c0d3df27e10de8cb83c401bba826a88d1d518",
+          "locator": "Write-Ahead Logging, Overview disadvantages"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null
+    },
+    {
+      "key": "fact-67565f7bc4e64b29a3cf4884eb160102",
+      "statement": "SQLite runs its database engine inside the application process.",
+      "questions": [
+        "sqlite-deployment"
+      ],
+      "section": "sqlite",
+      "subject": "sqlite",
+      "as_of": null,
+      "authored_by": "/root/skill_example_public",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/skill_example_public/checker",
+        "at": "2026-10-16T04:17:11.165Z",
+        "inspected_sources": [
+          {
+            "source": "source-4ce90be2597ca4deb67b",
+            "sha256": "c29da7bc717cb54401cc631dd1ec8a842bbc42893a7cb3521bc36cb12687152b",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-de24e99fd42c9d4f9188",
+            "sha256": "be0be4284b401f5b4a4911ac889dbf596191df824b03efd91fd17b98b85360f8",
+            "original_sha256": null,
+            "read_original": true
+          },
+          {
+            "source": "source-3dbe8c3756fe4025120d",
+            "sha256": "3b11b4208f776b09724aea29281c0d3df27e10de8cb83c401bba826a88d1d518",
+            "original_sha256": null,
+            "read_original": true
+          }
+        ],
+        "reason": "Keep the fact atomic and confined to its attached quote about engine location; the independently supported absence of an intermediary server is covered by the separate deployment fact.",
+        "change": "narrowed"
+      },
+      "citations": [
+        {
+          "source": "source-4ce90be2597ca4deb67b",
+          "quote": "The database engine runs within the same process, thread, and address space as the application.",
+          "start": 0,
+          "quote_sha256": "449217ff8beed5a0733d2b771c4479cf82dd79f7b8d86626c94324966a21be05",
+          "source_sha256": "c29da7bc717cb54401cc631dd1ec8a842bbc42893a7cb3521bc36cb12687152b",
+          "locator": "SQLite Is Serverless, Classic Serverless definition"
+        }
+      ],
+      "original_statement": "SQLite runs its database engine inside the application process and has no intermediary server process.",
+      "conflicts_with": [],
+      "superseded_by": null
+    }
+  ],
+  "aliases": [],
+  "factRevisions": [
+    {
+      "previous": {
+        "key": "fact-bbe4964b399740b2a81375e8988d629a",
+        "statement": "SQLite runs its database engine inside the application process and has no intermediary server process.",
+        "questions": [
+          "sqlite-deployment"
+        ],
+        "section": "sqlite",
+        "subject": "sqlite",
+        "as_of": null,
+        "authored_by": "/root/skill_example_public",
+        "status": "candidate",
+        "check": null,
+        "citations": [
+          {
+            "source": "source-4ce90be2597ca4deb67b",
+            "quote": "The database engine runs within the same process, thread, and address space as the application.",
+            "start": 0,
+            "quote_sha256": "449217ff8beed5a0733d2b771c4479cf82dd79f7b8d86626c94324966a21be05",
+            "source_sha256": "c29da7bc717cb54401cc631dd1ec8a842bbc42893a7cb3521bc36cb12687152b",
+            "locator": "SQLite Is Serverless, Classic Serverless definition"
+          }
+        ],
+        "original_statement": null,
+        "conflicts_with": [],
+        "superseded_by": null
+      },
+      "current": "fact-67565f7bc4e64b29a3cf4884eb160102",
+      "kind": "narrowed",
+      "reason": "Keep the fact atomic and confined to its attached quote about engine location; the independently supported absence of an intermediary server is covered by the separate deployment fact."
+    }
+  ],
+  "gaps": [],
+  "conflicts": [],
+  "superseded": [],
+  "missing": [],
+  "tasks": [
+    {
+      "id": "task-0d56e9174033448fa1358e4ca5a76eda",
+      "kind": "plan",
+      "rank": 10,
+      "status": "done",
+      "attempts": [
+        {
+          "attempt": 1,
+          "worker": "/root/skill_example_public",
+          "started": 1792124091559,
+          "finished": 1792124107171
+        }
+      ],
+      "generation": 1,
+      "accepted": {
+        "token": "lease-1473d955dc8d4baf96591adc2c57102c",
+        "worker": "/root/skill_example_public",
+        "attempt": 1,
+        "digest": "ba7eeb8fef533edbdcdda29c764df943a70c493014418340ad772fd3c728ea60",
+        "result": {
+          "kind": "plan",
+          "questions": []
+        }
+      },
+      "lease": null
+    },
+    {
+      "id": "task-6a2c3ee4f0764bb6a5e80e03d14856bb",
+      "kind": "research",
+      "rank": 20,
+      "status": "done",
+      "attempts": [
+        {
+          "attempt": 1,
+          "worker": "/root/skill_example_public",
+          "started": 1792124115153,
+          "finished": 1792124141037
+        }
+      ],
+      "generation": 1,
+      "accepted": {
+        "token": "lease-7e2380557ce34497aa1c824eb34c668f",
+        "worker": "/root/skill_example_public",
+        "attempt": 1,
+        "digest": "f5991bfe90c5d1970ccb42b79f1b4387558a11dac7bf1961190b2bfc2ffe7e71",
+        "result": {
+          "kind": "research",
+          "questions": [
+            "pg-deployment"
+          ],
+          "facts": [
+            "fact-91a5c0a22ff840aa87a745a0c75de008"
+          ]
+        }
+      },
+      "questions": [
+        "pg-deployment"
+      ],
+      "lease": null,
+      "sourceIds": [
+        "source-303f8083252aa8330ea1"
+      ]
+    },
+    {
+      "id": "task-7fdd1b3e3ec349e8a3b2d7059f97afda",
+      "kind": "research",
+      "rank": 20,
+      "status": "done",
+      "attempts": [
+        {
+          "attempt": 1,
+          "worker": "/root/skill_example_public",
+          "started": 1792124141077,
+          "finished": 1792124162306
+        }
+      ],
+      "generation": 1,
+      "accepted": {
+        "token": "lease-ca500b2b9edc43a48048b0360c642638",
+        "worker": "/root/skill_example_public",
+        "attempt": 1,
+        "digest": "029ce1de84d0c560e0b2673422a77e6a0393202ba5ff44d3cd630fdcc59f0f75",
+        "result": {
+          "kind": "research",
+          "questions": [
+            "pg-writes"
+          ],
+          "facts": [
+            "fact-0ee80ddd8ee74f8b954108ed9fd3cae2",
+            "fact-80cc052b00ec44a7b04f914b98b0eeb3"
+          ]
+        }
+      },
+      "questions": [
+        "pg-writes"
+      ],
+      "lease": null,
+      "sourceIds": [
+        "source-8c4adeaae6681b9dfc59",
+        "source-c32b94cccaed8ea361dc"
+      ]
+    },
+    {
+      "id": "task-eb8afde212024b679a7884a176e7ba46",
+      "kind": "research",
+      "rank": 20,
+      "status": "done",
+      "attempts": [
+        {
+          "attempt": 1,
+          "worker": "/root/skill_example_public",
+          "started": 1792124162346,
+          "finished": 1792124162412
+        }
+      ],
+      "generation": 1,
+      "accepted": {
+        "token": "lease-39441407b0e741ff8e5c581e721a3baf",
+        "worker": "/root/skill_example_public",
+        "attempt": 1,
+        "digest": "ddd25fa0fa9440a2c4c0baa25ffe475afe3a321039faaf7c9f315d4d917e0bd7",
+        "result": {
+          "kind": "research",
+          "questions": [
+            "sqlite-deployment"
+          ],
+          "facts": [
+            "fact-bbe4964b399740b2a81375e8988d629a",
+            "fact-469ff01539bb48c7bb52ea39823b2f9c"
+          ]
+        }
+      },
+      "questions": [
+        "sqlite-deployment"
+      ],
+      "lease": null,
+      "sourceIds": [
+        "source-4ce90be2597ca4deb67b"
+      ]
+    },
+    {
+      "id": "task-878bb809fc4141fb996b9979dfe7530d",
+      "kind": "research",
+      "rank": 20,
+      "status": "done",
+      "attempts": [
+        {
+          "attempt": 1,
+          "worker": "/root/skill_example_public",
+          "started": 1792124162451,
+          "finished": 1792124162554
+        }
+      ],
+      "generation": 1,
+      "accepted": {
+        "token": "lease-b955db08f97947d8bec47d9063a071bd",
+        "worker": "/root/skill_example_public",
+        "attempt": 1,
+        "digest": "5ae15e1232eb8073be39b97d0ee954df3e39087bda30dc5435129a8566a1bb69",
+        "result": {
+          "kind": "research",
+          "questions": [
+            "sqlite-writes"
+          ],
+          "facts": [
+            "fact-05c3180a1cab418d859780aa17d39532",
+            "fact-56144cd0878b41b7ae203d9ffd23d635",
+            "fact-b38d5613137c4af8a1e43c21f142ca75"
+          ]
+        }
+      },
+      "questions": [
+        "sqlite-writes"
+      ],
+      "lease": null,
+      "sourceIds": [
+        "source-de24e99fd42c9d4f9188",
+        "source-3dbe8c3756fe4025120d"
+      ]
+    },
+    {
+      "id": "task-03c80adff58043efabd26c0a62cd7dc7",
+      "kind": "check",
+      "rank": 30,
+      "status": "done",
+      "attempts": [
+        {
+          "attempt": 1,
+          "worker": "/root/skill_example_public/checker",
+          "started": 1792124170878,
+          "finished": 1792124207000
+        }
+      ],
+      "generation": 1,
+      "accepted": {
+        "token": "lease-536b554b72ca4306b19586f2d10324f5",
+        "worker": "/root/skill_example_public/checker",
+        "attempt": 1,
+        "digest": "7636ebe96e900abb98e8d0bbb4bcd380522dc7e08b98fd173fc39ea3af7d346f",
+        "result": {
+          "kind": "check",
+          "questions": [
+            "pg-deployment",
+            "pg-writes"
+          ]
+        }
+      },
+      "questions": [
+        "pg-deployment",
+        "pg-writes"
+      ],
+      "lease": null
+    },
+    {
+      "id": "task-398a180d6b4f41c1953fbed935b88b76",
+      "kind": "check",
+      "rank": 30,
+      "status": "done",
+      "attempts": [
+        {
+          "attempt": 1,
+          "worker": "/root/skill_example_public/checker",
+          "started": 1792124207104,
+          "finished": 1792124231165
+        }
+      ],
+      "generation": 1,
+      "accepted": {
+        "token": "lease-ed48eecd57ec48748e7cca55cc550f95",
+        "worker": "/root/skill_example_public/checker",
+        "attempt": 1,
+        "digest": "7ce98513f5257581c6b9f45540d2f71162161d85fe76bc1687251afe18a9a229",
+        "result": {
+          "kind": "check",
+          "questions": [
+            "sqlite-deployment",
+            "sqlite-writes"
+          ]
+        }
+      },
+      "questions": [
+        "sqlite-deployment",
+        "sqlite-writes"
+      ],
+      "lease": null
+    },
+    {
+      "id": "task-cb1adac901fc4ae0aec413e0459aed5b",
+      "kind": "cross",
+      "rank": 40,
+      "status": "done",
+      "attempts": [
+        {
+          "attempt": 1,
+          "worker": "/root/skill_example_public/checker",
+          "started": 1792124231270,
+          "finished": 1792124273906
+        }
+      ],
+      "generation": 1,
+      "accepted": {
+        "token": "lease-1997b74efc994b71a70063014c69ea17",
+        "worker": "/root/skill_example_public/checker",
+        "attempt": 1,
+        "digest": "de2f69806a61bd5180e55fe1f9b4829c6f314dea232a34ad3ae2101996a46705",
+        "result": {
+          "kind": "cross",
+          "questions": []
+        }
+      },
+      "lease": null
+    },
+    {
+      "id": "task-3f186b510bfb49df9dc13f35ebdd7fbb",
+      "kind": "write",
+      "rank": 60,
+      "status": "done",
+      "attempts": [
+        {
+          "attempt": 1,
+          "worker": "/root/skill_example_public",
+          "started": 1792124280654,
+          "finished": 1792124293445
+        }
+      ],
+      "generation": 1,
+      "accepted": {
+        "token": "lease-eb1de51eab434b29ab596e51978b761a",
+        "worker": "/root/skill_example_public",
+        "attempt": 1,
+        "digest": "6ef1dca540eb83227505b7958614e31acb0ccf03e57e8ef2fa76739f07d151f9",
+        "result": {
+          "kind": "write",
+          "questions": [
+            "pg-deployment",
+            "pg-writes"
+          ]
+        }
+      },
+      "section": "postgresql",
+      "questions": [
+        "pg-deployment",
+        "pg-writes"
+      ],
+      "lease": null
+    },
+    {
+      "id": "task-df4bdef122804ee0a6bd51a08b22089b",
+      "kind": "write",
+      "rank": 60,
+      "status": "done",
+      "attempts": [
+        {
+          "attempt": 1,
+          "worker": "/root/skill_example_public",
+          "started": 1792124293486,
+          "finished": 1792124293522
+        }
+      ],
+      "generation": 1,
+      "accepted": {
+        "token": "lease-69d64eea10644e499c321dd5779eaa44",
+        "worker": "/root/skill_example_public",
+        "attempt": 1,
+        "digest": "96e3b5b0fa4f19d5ff1dfa80d67e7f995890bae6f1b9411f5906569f721afb75",
+        "result": {
+          "kind": "write",
+          "questions": [
+            "sqlite-deployment",
+            "sqlite-writes"
+          ]
+        }
+      },
+      "section": "sqlite",
+      "questions": [
+        "sqlite-deployment",
+        "sqlite-writes"
+      ],
+      "lease": null
+    }
+  ],
+  "workers": [
+    {
+      "id": "/root/skill_example_public",
+      "harness": "host-attested",
+      "registered_at": "2026-10-16T04:14:51.559Z"
+    },
+    {
+      "id": "/root/skill_example_public/checker",
+      "harness": "host-attested",
+      "registered_at": "2026-10-16T04:16:10.878Z"
+    }
+  ],
+  "generated": [
+    0,
+    10,
+    20,
+    30,
+    40,
+    50,
+    51,
+    52,
+    60,
+    70
+  ],
+  "manualBlock": null,
+  "createdAt": "2026-10-16T04:14:48.157Z",
+  "updatedAt": "2026-10-16T04:22:29.556Z",
+  "ownsOutput": true,
+  "scope": "Compare PostgreSQL and SQLite for a small internal application using public primary documentation; deployment architecture and write concurrency only; four questions; light depth. No performance benchmark, cost comparison, or specific workload sizing.",
+  "exportStatus": "complete-with-gaps",
+  "exportStaleInputs": []
+}

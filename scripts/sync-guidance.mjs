@@ -171,4 +171,5 @@ async function main() {
   const result = ['start', 'pin'].includes(action) ? await start({ project: values.project, revision: values.revision }) : await resume({ project: values.project, task: values.task, cached: action === 'cached' });
   console.log(JSON.stringify(result, null, 2));
 }
-if (process.argv[1] && import.meta.url === pathToFileURL(await realpath(resolve(process.argv[1]))).href) main().catch(error => { console.error(error.message); process.exitCode = 1; });
+const invokedPath = process.argv[1] && process.argv[1] !== '-' ? await realpath(resolve(process.argv[1])).catch(() => null) : null;
+if (invokedPath && import.meta.url === pathToFileURL(invokedPath).href) main().catch(error => { console.error(error.message); process.exitCode = 1; });

@@ -1,0 +1,531 @@
+{
+  "schema": 1,
+  "run": "15fd7b055f744d61b0eb14ae",
+  "output_revision": 38,
+  "runtime_version": "0.9.0",
+  "guidance_version": "0.9.0",
+  "guidance_revision": null,
+  "guidance_task": null,
+  "topic": "Compare AsterDB and BirchDB for a small internal application: deployment, concurrent writes and backup retention; use only the two supplied synthetic references.",
+  "about": "",
+  "depth": "light",
+  "source_mode": "supplied-only",
+  "scope": "Compare AsterDB and BirchDB for a small internal application using only the two supplied synthetic notes, revised 2026-10-15. Cover deployment, concurrent writes and backup retention. Do not infer performance, production suitability or retention periods from backup mechanics.",
+  "status": "complete-with-gaps",
+  "created_at": "2026-10-16T04:08:51.952Z",
+  "updated_at": "2026-10-16T04:22:29.545Z",
+  "prose_review": "not independently reviewed at light depth",
+  "sections": [
+    {
+      "id": "deployment",
+      "name": "Deployment"
+    },
+    {
+      "id": "writes",
+      "name": "Concurrent writes"
+    },
+    {
+      "id": "retention",
+      "name": "Backup retention"
+    }
+  ],
+  "subjects": [
+    {
+      "id": "aster",
+      "name": "AsterDB"
+    },
+    {
+      "id": "birch",
+      "name": "BirchDB"
+    }
+  ],
+  "questions": [
+    {
+      "id": "aster-deployment",
+      "question": "How is AsterDB deployed?",
+      "section": "deployment",
+      "subject": "aster",
+      "kind": "open",
+      "round": 1,
+      "coverage": "answered",
+      "gaps": [],
+      "researchWorkers": [
+        "/root/skill_example_supplied"
+      ],
+      "assessment": {
+        "by": "/root/skill_example_supplied/independent_checker",
+        "at": "2026-10-16T04:10:42.029Z"
+      },
+      "provisionalCoverage": "answered",
+      "verdict": null,
+      "headline": {
+        "sentence": "AsterDB uses an in-process deployment with one database file.",
+        "facts": [
+          "fact-74bc22e1b40d49469dc45e487229cb93"
+        ]
+      },
+      "answer": [
+        {
+          "sentence": "AsterDB runs inside the application process and stores its database in one file.",
+          "facts": [
+            "fact-74bc22e1b40d49469dc45e487229cb93"
+          ],
+          "paragraph": 1
+        }
+      ],
+      "writtenBy": "/root/skill_example_supplied",
+      "facts": [
+        "fact-74bc22e1b40d49469dc45e487229cb93"
+      ]
+    },
+    {
+      "id": "birch-deployment",
+      "question": "How is BirchDB deployed?",
+      "section": "deployment",
+      "subject": "birch",
+      "kind": "open",
+      "round": 1,
+      "coverage": "answered",
+      "gaps": [],
+      "researchWorkers": [
+        "/root/skill_example_supplied"
+      ],
+      "assessment": {
+        "by": "/root/skill_example_supplied/independent_checker",
+        "at": "2026-10-16T04:10:42.029Z"
+      },
+      "provisionalCoverage": "answered",
+      "verdict": null,
+      "headline": {
+        "sentence": "BirchDB uses a separate server accessed over a network.",
+        "facts": [
+          "fact-a94b2941faff4b339722a1d491fa7a64"
+        ]
+      },
+      "answer": [
+        {
+          "sentence": "BirchDB runs as a separate server that applications connect to over a network.",
+          "facts": [
+            "fact-a94b2941faff4b339722a1d491fa7a64"
+          ],
+          "paragraph": 1
+        }
+      ],
+      "writtenBy": "/root/skill_example_supplied",
+      "facts": [
+        "fact-a94b2941faff4b339722a1d491fa7a64"
+      ]
+    },
+    {
+      "id": "aster-writes",
+      "question": "What concurrent-write behavior is specified for AsterDB?",
+      "section": "writes",
+      "subject": "aster",
+      "kind": "open",
+      "round": 1,
+      "coverage": "answered",
+      "gaps": [],
+      "researchWorkers": [
+        "/root/skill_example_supplied"
+      ],
+      "assessment": {
+        "by": "/root/skill_example_supplied/independent_checker",
+        "at": "2026-10-16T04:10:46.871Z"
+      },
+      "provisionalCoverage": "answered",
+      "verdict": null,
+      "headline": {
+        "sentence": "AsterDB permits one writer transaction per database at a time.",
+        "facts": [
+          "fact-f6758e02506f41a483d4c3c368b6ef1b"
+        ]
+      },
+      "answer": [
+        {
+          "sentence": "AsterDB permits one writer transaction at a time for each database.",
+          "facts": [
+            "fact-f6758e02506f41a483d4c3c368b6ef1b"
+          ],
+          "paragraph": 1
+        }
+      ],
+      "writtenBy": "/root/skill_example_supplied",
+      "facts": [
+        "fact-f6758e02506f41a483d4c3c368b6ef1b"
+      ]
+    },
+    {
+      "id": "birch-writes",
+      "question": "What concurrent-write behavior is specified for BirchDB?",
+      "section": "writes",
+      "subject": "birch",
+      "kind": "open",
+      "round": 1,
+      "coverage": "answered",
+      "gaps": [],
+      "researchWorkers": [
+        "/root/skill_example_supplied"
+      ],
+      "assessment": {
+        "by": "/root/skill_example_supplied/independent_checker",
+        "at": "2026-10-16T04:10:46.871Z"
+      },
+      "provisionalCoverage": "answered",
+      "verdict": null,
+      "headline": {
+        "sentence": "BirchDB allows concurrent writers to different rows.",
+        "facts": [
+          "fact-6cb09e5bdc234a48b8ddd423998b90cb"
+        ]
+      },
+      "answer": [
+        {
+          "sentence": "BirchDB allows concurrent writers to different rows, with row locks controlling conflicts.",
+          "facts": [
+            "fact-6cb09e5bdc234a48b8ddd423998b90cb"
+          ],
+          "paragraph": 1
+        }
+      ],
+      "writtenBy": "/root/skill_example_supplied",
+      "facts": [
+        "fact-6cb09e5bdc234a48b8ddd423998b90cb"
+      ]
+    },
+    {
+      "id": "aster-retention",
+      "question": "What backup retention period is specified for AsterDB?",
+      "section": "retention",
+      "subject": "aster",
+      "kind": "open",
+      "round": 1,
+      "coverage": "not answered",
+      "gaps": [
+        "gap-2296fe980c1d4931a1b7b6f7e98ba391"
+      ],
+      "researchWorkers": [
+        "/root/skill_example_supplied"
+      ],
+      "assessment": {
+        "by": "/root/skill_example_supplied/independent_checker",
+        "at": "2026-10-16T04:10:58.258Z"
+      },
+      "provisionalCoverage": "not answered",
+      "verdict": null,
+      "headline": {
+        "kind": "gap",
+        "gaps": [
+          "gap-2296fe980c1d4931a1b7b6f7e98ba391"
+        ]
+      },
+      "answer": [],
+      "writtenBy": "/root/skill_example_supplied",
+      "facts": []
+    },
+    {
+      "id": "birch-retention",
+      "question": "What backup retention period is specified for BirchDB?",
+      "section": "retention",
+      "subject": "birch",
+      "kind": "open",
+      "round": 1,
+      "coverage": "not answered",
+      "gaps": [
+        "gap-72a317fb16b14db3bbc8dbf51927ac6d"
+      ],
+      "researchWorkers": [
+        "/root/skill_example_supplied"
+      ],
+      "assessment": {
+        "by": "/root/skill_example_supplied/independent_checker",
+        "at": "2026-10-16T04:10:58.259Z"
+      },
+      "provisionalCoverage": "not answered",
+      "verdict": null,
+      "headline": {
+        "kind": "gap",
+        "gaps": [
+          "gap-72a317fb16b14db3bbc8dbf51927ac6d"
+        ]
+      },
+      "answer": [],
+      "writtenBy": "/root/skill_example_supplied",
+      "facts": []
+    }
+  ],
+  "sources": [
+    {
+      "id": "source-65610dbc909398e57c19",
+      "given": "given-1",
+      "title": "AsterDB vendor notes (synthetic test document)",
+      "origin": "sources/asterdb.md",
+      "publisher": "AsterDB project",
+      "standing": "primary",
+      "provenance": "given",
+      "pages": null,
+      "file": "sources/asterdb.md",
+      "sha256": "5cb1bb71c7eb66288ae8d2ec83a7333b95b30fbf3785f0b228dc7326f5acf041",
+      "original_file": "sources/asterdb.md",
+      "original_sha256": "5cb1bb71c7eb66288ae8d2ec83a7333b95b30fbf3785f0b228dc7326f5acf041",
+      "limits": "none",
+      "source_date": "2026-10-15",
+      "saved_at": "2026-10-16T04:09:01.500Z"
+    },
+    {
+      "id": "source-34f7c28a187f3ca2b548",
+      "given": "given-2",
+      "title": "BirchDB vendor notes (synthetic test document)",
+      "origin": "sources/birchdb.md",
+      "publisher": "BirchDB project",
+      "standing": "primary",
+      "provenance": "given",
+      "pages": null,
+      "file": "sources/birchdb.md",
+      "sha256": "b212cf8ca3bd28ee5bcbd8e73a025d21ff72e45e579235645a516a2fbdc87d1c",
+      "original_file": "sources/birchdb.md",
+      "original_sha256": "b212cf8ca3bd28ee5bcbd8e73a025d21ff72e45e579235645a516a2fbdc87d1c",
+      "limits": "none",
+      "source_date": "2026-10-15",
+      "saved_at": "2026-10-16T04:09:16.144Z"
+    }
+  ],
+  "facts": [
+    {
+      "key": "fact-74bc22e1b40d49469dc45e487229cb93",
+      "statement": "AsterDB runs inside the application process and stores its database in one file.",
+      "questions": [
+        "aster-deployment"
+      ],
+      "section": "deployment",
+      "subject": "aster",
+      "as_of": "2026-10-15",
+      "authored_by": "/root/skill_example_supplied",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/skill_example_supplied/independent_checker",
+        "at": "2026-10-16T04:10:42.027Z",
+        "inspected_sources": [
+          {
+            "source": "source-65610dbc909398e57c19",
+            "sha256": "5cb1bb71c7eb66288ae8d2ec83a7333b95b30fbf3785f0b228dc7326f5acf041",
+            "original_sha256": "5cb1bb71c7eb66288ae8d2ec83a7333b95b30fbf3785f0b228dc7326f5acf041",
+            "read_original": true
+          },
+          {
+            "source": "source-34f7c28a187f3ca2b548",
+            "sha256": "b212cf8ca3bd28ee5bcbd8e73a025d21ff72e45e579235645a516a2fbdc87d1c",
+            "original_sha256": "b212cf8ca3bd28ee5bcbd8e73a025d21ff72e45e579235645a516a2fbdc87d1c",
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-65610dbc909398e57c19",
+          "quote": "AsterDB runs inside the application process and stores its database in one file.",
+          "start": 101,
+          "quote_sha256": "9c0db36581c648f386c5cc48a013fc90c2b2d0905f8de9198c815f7634beafdd",
+          "source_sha256": "5cb1bb71c7eb66288ae8d2ec83a7333b95b30fbf3785f0b228dc7326f5acf041",
+          "locator": "Body, first paragraph"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    },
+    {
+      "key": "fact-a94b2941faff4b339722a1d491fa7a64",
+      "statement": "BirchDB runs as a separate server that applications connect to over a network.",
+      "questions": [
+        "birch-deployment"
+      ],
+      "section": "deployment",
+      "subject": "birch",
+      "as_of": "2026-10-15",
+      "authored_by": "/root/skill_example_supplied",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/skill_example_supplied/independent_checker",
+        "at": "2026-10-16T04:10:42.027Z",
+        "inspected_sources": [
+          {
+            "source": "source-65610dbc909398e57c19",
+            "sha256": "5cb1bb71c7eb66288ae8d2ec83a7333b95b30fbf3785f0b228dc7326f5acf041",
+            "original_sha256": "5cb1bb71c7eb66288ae8d2ec83a7333b95b30fbf3785f0b228dc7326f5acf041",
+            "read_original": true
+          },
+          {
+            "source": "source-34f7c28a187f3ca2b548",
+            "sha256": "b212cf8ca3bd28ee5bcbd8e73a025d21ff72e45e579235645a516a2fbdc87d1c",
+            "original_sha256": "b212cf8ca3bd28ee5bcbd8e73a025d21ff72e45e579235645a516a2fbdc87d1c",
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-34f7c28a187f3ca2b548",
+          "quote": "BirchDB runs as a separate server that applications connect to over a network.",
+          "start": 101,
+          "quote_sha256": "eb7c0ebb78985ecfcfb35432110c9e2106fd5f74717783350a139df53ba9257d",
+          "source_sha256": "b212cf8ca3bd28ee5bcbd8e73a025d21ff72e45e579235645a516a2fbdc87d1c",
+          "locator": "Body, first paragraph"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    },
+    {
+      "key": "fact-f6758e02506f41a483d4c3c368b6ef1b",
+      "statement": "AsterDB permits one writer transaction at a time for each database.",
+      "questions": [
+        "aster-writes"
+      ],
+      "section": "writes",
+      "subject": "aster",
+      "as_of": "2026-10-15",
+      "authored_by": "/root/skill_example_supplied",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/skill_example_supplied/independent_checker",
+        "at": "2026-10-16T04:10:46.869Z",
+        "inspected_sources": [
+          {
+            "source": "source-65610dbc909398e57c19",
+            "sha256": "5cb1bb71c7eb66288ae8d2ec83a7333b95b30fbf3785f0b228dc7326f5acf041",
+            "original_sha256": "5cb1bb71c7eb66288ae8d2ec83a7333b95b30fbf3785f0b228dc7326f5acf041",
+            "read_original": true
+          },
+          {
+            "source": "source-34f7c28a187f3ca2b548",
+            "sha256": "b212cf8ca3bd28ee5bcbd8e73a025d21ff72e45e579235645a516a2fbdc87d1c",
+            "original_sha256": "b212cf8ca3bd28ee5bcbd8e73a025d21ff72e45e579235645a516a2fbdc87d1c",
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-65610dbc909398e57c19",
+          "quote": "AsterDB permits one writer transaction at a time for each database.",
+          "start": 182,
+          "quote_sha256": "f50db14fbcc5cce91ca2e4121f033f0124ce3ca814af37653b3ebaf40c3f48be",
+          "source_sha256": "5cb1bb71c7eb66288ae8d2ec83a7333b95b30fbf3785f0b228dc7326f5acf041",
+          "locator": "Body, second paragraph"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    },
+    {
+      "key": "fact-6cb09e5bdc234a48b8ddd423998b90cb",
+      "statement": "BirchDB allows concurrent writers to different rows, with row locks controlling conflicts.",
+      "questions": [
+        "birch-writes"
+      ],
+      "section": "writes",
+      "subject": "birch",
+      "as_of": "2026-10-15",
+      "authored_by": "/root/skill_example_supplied",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/skill_example_supplied/independent_checker",
+        "at": "2026-10-16T04:10:46.869Z",
+        "inspected_sources": [
+          {
+            "source": "source-65610dbc909398e57c19",
+            "sha256": "5cb1bb71c7eb66288ae8d2ec83a7333b95b30fbf3785f0b228dc7326f5acf041",
+            "original_sha256": "5cb1bb71c7eb66288ae8d2ec83a7333b95b30fbf3785f0b228dc7326f5acf041",
+            "read_original": true
+          },
+          {
+            "source": "source-34f7c28a187f3ca2b548",
+            "sha256": "b212cf8ca3bd28ee5bcbd8e73a025d21ff72e45e579235645a516a2fbdc87d1c",
+            "original_sha256": "b212cf8ca3bd28ee5bcbd8e73a025d21ff72e45e579235645a516a2fbdc87d1c",
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-34f7c28a187f3ca2b548",
+          "quote": "BirchDB allows concurrent writers to different rows, with row locks controlling conflicts.",
+          "start": 180,
+          "quote_sha256": "4a0af7ec1e7a737050e28842c3f8c86b0cbe2bf1579ea717bc6556c3437d89ee",
+          "source_sha256": "b212cf8ca3bd28ee5bcbd8e73a025d21ff72e45e579235645a516a2fbdc87d1c",
+          "locator": "Body, second paragraph"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null,
+      "sources_count": 1,
+      "best_standing": "primary"
+    }
+  ],
+  "aliases": [],
+  "revisions": [],
+  "gaps": [
+    {
+      "id": "gap-2296fe980c1d4931a1b7b6f7e98ba391",
+      "question": "aster-retention",
+      "kind": "insufficient",
+      "reason": "The complete supplied AsterDB document explicitly says that it does not specify a backup retention period. Its backup operation requirement supplies no duration.",
+      "sources": [
+        "source-65610dbc909398e57c19"
+      ],
+      "attempts": null,
+      "assessed_by": "/root/skill_example_supplied/independent_checker",
+      "check": {
+        "by": "/root/skill_example_supplied/independent_checker",
+        "result": "confirmed"
+      }
+    },
+    {
+      "id": "gap-72a317fb16b14db3bbc8dbf51927ac6d",
+      "question": "birch-retention",
+      "kind": "insufficient",
+      "reason": "The complete supplied BirchDB document explicitly says that it does not specify a backup retention period. Its backup operation requirement supplies no duration.",
+      "sources": [
+        "source-34f7c28a187f3ca2b548"
+      ],
+      "attempts": null,
+      "assessed_by": "/root/skill_example_supplied/independent_checker",
+      "check": {
+        "by": "/root/skill_example_supplied/independent_checker",
+        "result": "confirmed"
+      }
+    }
+  ],
+  "conflicts": [],
+  "superseded": [],
+  "missing": [],
+  "rejected": [],
+  "failed": [],
+  "counts": {
+    "questions": 6,
+    "facts": 4,
+    "checked": 4,
+    "sources": 2,
+    "narrowed": 0,
+    "rejected": 0,
+    "gaps": 2,
+    "conflicts": 0,
+    "superseded": 0,
+    "failed": 0
+  },
+  "block_reasons": [],
+  "stale_inputs": []
+}

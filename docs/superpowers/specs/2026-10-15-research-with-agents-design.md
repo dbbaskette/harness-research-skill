@@ -1,6 +1,6 @@
 # Research a topic with Claude Code or Codex: a thoroughly researched, cited report
 
-Date: 2026-10-15. Status: draft 6, after the owner's review. Issue:
+Date: 2026-10-15. Status: draft 7, revised after the design review. Issue:
 [harness-research-skill#9](https://github.com/dbbaskette/harness-research-skill/issues/9).
 
 ## What it is for
@@ -12,8 +12,9 @@ references:
 
 - The report follows the plan: sections, each with its questions, each question answered in
   plain prose, starting with a one-line answer.
-- Every sentence of an answer cites the facts it rests on and says nothing they do not say.
-  Where sources disagree, or a question is only partly answered, the answer says so.
+- Every factual sentence, including the one-line answer, cites the facts it rests on and
+  says nothing they do not say. Questions without checked support get a structured gap
+  answer, not an invented fact. Where sources disagree or an answer is partial, it says so.
 - Each fact is one sentence, quotes exactly the saved text of a source, and has been checked
   by a second agent that did not write it.
 - The report explains what the facts establish. It does not recommend or decide anything
@@ -28,6 +29,12 @@ it came from, what kind of source that is, and the date it holds for, so the rea
 
 ## The split: the harness does the work, the helper keeps the books
 
+**This remains a skill at heart.** The person invokes it with a plain-language
+research request. Its guidance owns planning, source selection, research judgement,
+independent checking and writing through the harness's native tools. Helper commands and
+JSON are implementation details for the agent; a person is not asked to run a workflow
+engine. Acceptance includes invoking the skill itself, not only scripted CLI tests.
+
 Claude Code or Codex (the harness) does all the work, with everything it has: web search and
 fetch, reading PDFs, Word files, slides, charts and scanned pages, its browser and other
 connections, its subagents running side by side, and its own judgement.
@@ -41,12 +48,12 @@ referees:
 | Saves each source's text and registers it | Pins each registered text by hash |
 | Plans the scope, the outline and the questions | Keeps the outline and counts coverage by section |
 | Writes the facts | Refuses a quote that is not in its source's text, and a number that is not in its quote |
-| Checks other workers' facts against the originals | Makes sure no worker checks its own facts |
+| Checks facts in a separate agent invocation against the originals | Enforces the recorded author/checker invocation identities |
 | Finds duplicates, conflicts and missing angles | Refuses references to facts that do not exist |
 | Writes each question's answer from its checked facts | Refuses a sentence with no citation, a citation to a fact that was not confirmed, and a number that is not in the cited facts |
 | Runs several subagents at once | Leases tasks so they never collide, and returns abandoned ones |
-| | Refuses to call the run finished until every stage is done |
-| | Assembles the report, `facts.json` and `brief.md` |
+| | Separates finished coverage, evidence gaps and blocked execution |
+| | Refreshes the report, `facts.json` and `brief.md` after each accepted save |
 
 Agents are strong researchers and weak bookkeepers: they skip steps, stop early, paraphrase a
 quote or round a number. The helper is what keeps a run complete and its citations honest;
@@ -80,15 +87,15 @@ quote is "Valkey is a data structure server." The checks passed.
 | **What goes in** | A plan the calling agent writes: topic, purpose, scope, any supplied documents it has already turned into text, and 1 to 30 questions | A topic, the person's links and documents, a depth and a note on who it is for. The harness writes the plan |
 | **Who researches** | The calling agent, however it likes, in turn or with helpers it starts itself | The same harness, task by task from a queue, with several subagents at once |
 | **The plan** | Any 1 to 30 questions, unstructured | A stated scope and an outline of sections, each with several questions, sized by depth, up to 80 questions; subjects side by side when comparing; plus one round for missing angles |
-| **What a question produces** | One finding: a verdict (supported, contradicted, insufficient, unavailable), an optional headline, a summary of up to 12,000 characters, limits and up to 20 quotes | A written answer, starting with a one-line answer, every sentence cited; underneath it, many one-sentence facts, each with its own quotes; "answered / partly / not" for open questions and a verdict for claims |
+| **What a question produces** | One finding: a verdict (supported, contradicted, insufficient, unavailable), an optional headline, a summary of up to 12,000 characters, limits and up to 20 quotes | A cited one-line answer and prose, or a structured gap answer; checked atomic facts underneath; coverage for open questions and a checked verdict for exact claims |
 | **Evidence check** | The quote must appear, exactly, at the offset the agent gives, in any file in the project, including one the agent wrote itself | The quote must be in a registered source's saved text; the helper finds it, allowing for spacing, quote-mark and dash differences; every number in the fact must be in its quotes |
 | **Support** | Not checked: "semantic support is the researcher's assessment" | Every fact checked by a worker that did not write it, ideally the other harness, against the original source: confirmed, narrowed or rejected |
 | **Across questions** | Nothing | Duplicates merged, conflicts and superseded facts shown, missing angles researched |
 | **Sources** | Supplied documents are registered with a hash; web pages are files the agent saves, with no register or label | Every source registered with a hash, a title, a publisher and a standing; the person's own sources are always primary; text read from charts or scans is marked transcribed |
-| **When it is done** | When no question is pending; the guidance asks the agent to open the report and check it | When every stage is done; the helper will not say complete before then |
+| **When it is done** | When no question is pending; the guidance asks the agent to open the report and check it | When required stages are done, as `complete` or `complete-with-gaps`; execution failures remain `blocked` with saved partial output |
 | **Working in parallel** | Allowed when the host permits; saves are one at a time, with "busy, retry" errors | Tasks are leased to workers, so subagents and sessions do not collide |
 | **Output** | `.harness-research/research-report.md`, a per-question list in a hidden folder, and the record | `research/report.md`: a written report in questions and answers, in outline order, with coverage by section, conflicts, gaps, numbered sources, the facts behind each answer and the rejected facts; `research/facts.json`; `research/brief.md`. The record stays |
-| **Citations** | By question; no stable IDs | Stable fact keys, with a hash of each quote, that a deck, training or blog can cite and check later |
+| **Citations** | By question; no stable IDs | Immutable fact keys, quote hashes, merge aliases and revision links that callers can verify later |
 | **Studios** | Each builds its own research loop and confined worker tools (three copies) | One instruction to the harness; they read `facts.json` |
 
 **What stays the same:** the Node-only helper; the record, its history, locking and
@@ -108,22 +115,37 @@ The harness runs these; people do not.
 # Start a run with the topic and the person's sources (paths or links).
 node scripts/harness-research.mjs research start --project DIR --topic TEXT \
   [--source PATH_OR_URL ...] [--sources LIST_FILE] [--about FILE] [--allow-web] \
-  [--depth light|standard|deep] [--plan-only]
+  [--claims FILE] [--depth light|standard|deep] [--plan-only]
 
 # Take the next task, then hand back its result.
-node scripts/harness-research.mjs research next --project DIR --worker NAME
-node scripts/harness-research.mjs research submit --project DIR --task ID --file result.json
+node scripts/harness-research.mjs research next --project DIR --run RUN --worker INVOCATION_ID
+node scripts/harness-research.mjs research submit --project DIR --run RUN \
+  --task ID --worker INVOCATION_ID --lease TOKEN --attempt N --file result.json
+
+# Renew a live lease; explicitly retry a failed task after its cause is addressed.
+node scripts/harness-research.mjs research heartbeat --project DIR --run RUN \
+  --task ID --worker INVOCATION_ID --lease TOKEN --attempt N
+node scripts/harness-research.mjs research retry --project DIR --run RUN --task ID
 
 # Register the text of a source the harness has saved.
 node scripts/harness-research.mjs research source --project DIR --file research/sources/NAME.md \
-  --origin URL_OR_PATH --title TEXT [--standing primary|secondary|community] \
-  [--transcribed --pages 4-6]
+  --origin URL_OR_PATH --title TEXT [--publisher TEXT] \
+  [--standing primary|secondary|community] [--transcribed --pages 4-6] \
+  --run RUN --task ID --worker INVOCATION_ID --lease TOKEN --attempt N
 
 # Where the run stands: stages, tasks, coverage, what is missing.
 node scripts/harness-research.mjs research status --project DIR
 ```
 
 `plan`, `record`, `status` and `migrate` stay as they are, for callers that research by hand.
+For a fact-check, `--claims FILE` supplies exact claim objects (`file`, `quote`, Unicode
+character `start`) in the existing format. The helper pins the target files separately
+from evidence sources. A target is not a research reference merely because it was uploaded;
+using it as evidence requires a separate, explicit source selection. Otherwise the helper
+refuses a citation to it. A target alone cannot establish its own claims. Changing a target
+invalidates its claim assessments and downstream answers. Even when separately selected as
+a contextual reference, repeating the target assertion is not independent support for that
+assertion. A requested internal-consistency check must be labelled as such.
 
 ## The stages
 
@@ -132,22 +154,87 @@ node scripts/harness-research.mjs research status --project DIR
 | 0. Sources | one per source the person gave | the saved text of each, registered |
 | 1. Plan | one | the scope, an outline of sections, and their questions |
 | 2. Research | one per question | facts with quotes |
-| 3. Check | one per question, never to the worker that researched it | each fact confirmed, narrowed or rejected |
+| 3. Check | one per section at `light`, otherwise per question; a separate invocation eligible for every question it receives | each fact checked, plus the final coverage and claim verdict |
 | 4. Cross-check | one | duplicates, conflicts, superseded facts, missing angles |
 | 5. Fill gaps | the missing angles as new questions, researched, checked and cross-checked once | more facts: up to 3 questions at `light`, all missing angles at `standard` and `deep` |
-| 6. Write | one per section | each question's answer in prose, every sentence citing confirmed facts |
+| 6. Write | one per section | cited factual headlines/prose or structured gap answers |
 | 7. Review the writing | at `standard` and `deep`, one per section, never the writer | sentences that say more than their facts, cut back or removed |
-| 8. Assemble | none: the helper | `research/report.md`, `facts.json`, `brief.md` |
+| 8. Finalize | none: the helper | one consistent output revision and a terminal status; partial outputs exist throughout |
 
-`research next` hands out tasks in that order, several at once where they are independent, so
-a harness can give one to each subagent. A task is leased to the worker that took it; if that
-worker does not submit in time, the task goes back on the queue. A task that fails three times
-is shown as `failed` with its reason; it is never recorded as a finding. `research status`
-says the run is complete only when every stage is done.
+`research next` hands out tasks in that order, several at once where they are independent.
+Stage barriers use accepted results, not merely whether the queue currently has work ready.
+
+### Worker identity and independent checking
+
+`--worker` is the harness's durable identifier for an actual agent invocation, not an
+editable role name. The coordinator records that invocation's harness/session identity and
+keeps it fixed when it researches, retries or resumes. This is a trusted-coordinator
+contract: the helper checks recorded identities; a different string alone does not prove a
+different agent ran. A checker receives the source, facts and question in a fresh invocation,
+not the researcher's private reasoning. The same model may be used.
+
+At `light`, a section checker must not have researched any question in that section.
+Writing reviewers must likewise differ from the writer. Separate invocations may run
+sequentially, so parallel execution is optional. If the host cannot start a separate
+invocation and no separately authorized session is available, checking is `blocked`.
+Candidate facts and a partial report remain available, clearly unchecked. Renaming the
+original invocation cannot turn its work into checked research. A second harness or account
+is optional; the skill must not silently start an unavailable or unauthorized one.
+
+### Leases, attempts and late submissions
+
+Taking a task returns its run ID, task ID, worker invocation, monotonically increasing
+attempt number, opaque lease token and expiry. An expired lease returns the task to the
+queue with a new token and attempt. `heartbeat` renews only a current unexpired lease.
+Durations are explicit in the returned task, long operations renew them, and expiry is
+decided by the helper rather than by a worker's clock.
+
+Every task submission is checked under the record lock against that entire lease identity.
+New results from expired/replaced leases and submissions for old runs are refused before
+any result is saved. Within the same run, repeating an already accepted submission with the
+same token and payload digest returns its recorded acknowledgement without a second write,
+even after that lease expired; a different payload is refused. Accepting the result, advancing the stage and
+recording the accepted digest are one durable state transition. Mutable source registration
+from a worker is bound to its current lease too; it cannot replace a source after losing its
+task. Sources are versioned rather than overwritten beneath another worker's quotes.
+
+After three unsuccessful attempts, a task remains `failed` with its attempts and reasons.
+It is not converted into an `unavailable` finding. `research retry` explicitly reopens it
+with a new lease generation and retained history; starting another run also invalidates all
+earlier leases. Dependent tasks wait for the required successful result.
+
+### Completion and saved output
+
+| Run status | Meaning |
+| --- | --- |
+| `in-progress` | Required work is ready or leased; accepted results and partial output are saved |
+| `complete` | All required stages succeeded, all scoped questions are answered, and no coverage/source gaps remain |
+| `complete-with-gaps` | All required stages succeeded; assessed questions or unreadable sources leave explicit evidence gaps |
+| `blocked` | A required task exhausted retries, independent checking is unavailable, or another prerequisite prevents progress |
+| `stale` | A pinned input/source or a checked fact revision changed and dependent work needs reassessment |
+
+An honest `not answered` assessment with a concrete gap is successful research work. An
+agent crash, invalid submission or missing checker is an execution problem, not evidence of
+absence. Blocked runs show failed tasks and their dependent stages; they cannot claim either
+completion status. A paused or interrupted run resumes from durable task state, keeping the
+last accepted results. A person may use its explicitly partial report without relabelling
+that run complete.
+
+The helper materializes the report, `facts.json` and `brief.md` on start and after every
+accepted source, result, check, revision or status change. Pending/unchecked facts are
+labelled and excluded from the checked-facts digest in `brief.md`. All three artifacts name
+the same run and output revision. One committed record revision is authoritative; file
+replacement is atomic, and `research/output.json` commits their run/revision and file hashes
+only after all three are written. Consumers reject a missing manifest or mismatched hashes
+rather than accepting mixed or incomplete exports. `status` repairs an interrupted export
+from that record before returning an output revision. A failure before finalization must
+still leave an inspectable partial report, or report an explicit persistence error rather
+than success.
 
 ### 0. Sources
 
 Each source the person gave becomes a task: read it, save its text, register it.
+Files supplied as claim targets are pinned separately and are not evidence-source tasks.
 
 - **The harness saves the text, word for word,** as `research/sources/<name>.md`, and
   registers it with `research source`. The text must be the source's own words. A summary, a
@@ -168,6 +255,12 @@ Each source the person gave becomes a task: read it, save its text, register it.
 - A source that cannot be read is registered with its reason, so the report shows it as a gap
   rather than dropping it.
 - New sources found during research are saved and registered the same way.
+- Registration preserves the original document identity/hash and the extraction hash,
+  version/date when available, publisher and page/section locators. A checker records which
+  original revision it inspected. Changing either an original file or its saved extraction
+  invalidates affected facts, checks, answers and approvals. A changed live page cannot be
+  silently substituted for the revision quoted by a worker. Missing access or version
+  information is explicit; a saved-text hash alone does not prove current live content.
 - Without `--allow-web`, only the given sources are used. With it, the harness may also search
   and fetch.
 
@@ -229,7 +322,9 @@ brief. The harness researches it however it judges best, and hands back:
  "verdict": "supported | contradicted | insufficient   (claim questions only)",
  "facts": [{"statement": "...", "as_of": "2025-05-01",
             "quotes": [{"source": "NAME", "quote": "..."}]}],
- "gaps": "what the question still lacks"}
+ "gaps": [{"kind": "insufficient | unreadable | unavailable",
+           "reason": "what the inspected sources do not establish or why they could not be read",
+           "sources": ["NAME"]}]}
 ```
 
 The helper refuses a submission, with a reason the harness can act on, when:
@@ -243,10 +338,19 @@ The helper refuses a submission, with a reason the harness can act on, when:
 - A statement is more than one sentence or 40 words, or does not name its subject.
 - There are more facts than the depth allows.
 
+Research coverage and a claim verdict are provisional until checking. A `not answered`
+submission can contain zero facts, but must identify a concrete gap and the selected sources
+or assessed source-access limitations it rests on. Tool/worker crashes are failed attempts,
+not an invitation to submit invented `unavailable` evidence; a genuine access limitation can
+be an assessed source gap with its recorded reason. Numeric presence is a filter, not proof
+of the relationship or units; the semantic check still assesses those. Normalization must preserve
+decimal values and version boundaries.
+
 ### 3. Check the facts
 
 At `light`, one checker takes a whole section's questions at once; at `standard` and `deep`,
-each question gets its own. A checker is never given a question it researched. Where the
+each question gets its own. A checker invocation is never given a question it researched;
+a section checker must be eligible for every question in the section. Where the
 person has both Claude
 Code and Codex, the brief suggests the other one checks: one model is more likely to miss its
 own kind of mistake.
@@ -258,6 +362,13 @@ own kind of mistake.
   support, which must pass the number rule) or `rejected` (with a reason).
 - Narrowed facts replace the original, which is kept. Rejected facts move to a rejected list
   shown at the end of the report, never deleted.
+- A narrowed replacement that passes the checks is exported as a confirmed assertion with
+  `check.change: narrowed`; the old key/statement remain in the revision history.
+- The checker also assesses whether the remaining confirmed facts answer the question and,
+  for a claim, support or contradict the exact pinned claim. If all facts are rejected, an
+  earlier `answered`/`supported` cannot survive unchanged: coverage is `not answered` with a
+  gap and the claim is `insufficient` unless other confirmed evidence establishes a verdict.
+  Further fact revisions invalidate these assessments and the answers that depend on them.
 
 ### 4. Cross-check the set
 
@@ -272,6 +383,23 @@ standing. It hands back references to existing facts only:
   changed.
 - **Missing angles:** what the set does not cover that the topic needs.
 
+### Fact identity, revisions and aliases
+
+A fact key is an immutable helper-issued identifier, `fact-` plus 32 lowercase hexadecimal
+characters. It is independent of question IDs and fits existing citation-marker limits.
+Reusing a saved fact preserves its key. Independently researched duplicates may initially
+have different keys; cross-checking chooses a canonical key and retains permanent aliases
+for the other keys. Matching uses the statement and its subject/version/as-of context, not
+the question name alone. Unknown or incompatible contexts must not be merged automatically.
+
+Changing the assertion, including narrowing it, creates a new fact key and an explicit
+revision relationship to the old key and statement. The old assertion and its checks remain
+in history. Verification of the old key reports `narrowed`, `superseded` or `rejected` and
+the replacement where one exists; it never silently treats a new assertion as confirmation
+of the old one. Merge aliases resolve the same assertion; revisions record a changed one.
+Quote changes invalidate checks even if the fact key stays the same. The export contains
+the alias and revision records needed to resolve every previously published key.
+
 ### 5. Fill the gaps
 
 The missing angles become new questions: the 3 that matter most at `light`, all of them at
@@ -283,41 +411,57 @@ a run always ends.
 One task per section, given the section's questions and their confirmed facts (and the
 conflicts and superseded facts that touch them). For each question the writer hands back:
 
-- **A one-line answer:** the direct answer to the question, as far as the facts allow.
+- **A one-line answer:** `{ "sentence": "...", "facts": ["fact-key"] }`, the direct answer
+  as far as the facts allow. It is checked exactly like every other factual sentence.
 - **The answer:** one to four paragraphs of plain prose that explain the facts in a sensible
   order, compare subjects where the plan compares them, and say where sources disagree, where
   a fact is dated, and what the facts leave open.
 - Every sentence lists the fact keys it rests on. The writer may use facts from other
   sections by key when they bear on the question.
+- A `not answered` question instead has an empty prose answer, a headline of
+  `{ "kind": "gap", "gaps": ["gap-id"] }` and at least one recorded gap. The helper renders
+  a bounded message such as "Not established by the sources checked in this run" and links
+  the gap reasons and inspected sources. This is run-status metadata, not an uncited claim
+  that no evidence exists anywhere. Partial answers carry their factual sentences plus gap
+  references. Every question still appears in the report.
 
 The helper refuses the section, with reasons the writer can act on, when:
 
-- A sentence cites no facts. Only the question itself and headings may stand uncited.
+- A factual sentence or factual headline cites no facts. Questions, headings and generated
+  run-status/gap messages may stand without fact citations; gap messages must cite recorded
+  gap IDs. Arbitrary writer prose cannot use that exemption.
 - A sentence cites a fact that was rejected, superseded without saying so, or does not exist.
 - **A number in a sentence is not in any of its cited facts,** the same rule as for facts.
 - An answer leaves out a question in the section.
+- An empty prose answer has no checked gap assessment, a gap ID is missing, or a
+  `not answered` question nevertheless includes an unsupported factual headline.
 
 It does not judge whether the prose says more than its facts; at `light` that rests on the
 writer's brief, and at `standard` and `deep` on the review.
 
 ### 7. Review the writing
 
-At `standard` and `deep`, a worker that did not write the section reads each answer against
-its cited facts and cuts back or removes any sentence that says more than they do. It cannot
-add claims. At `light` this stage is skipped.
+At `standard` and `deep`, a separate invocation reads each answer and headline against its
+cited facts and cuts back or removes any sentence that says more than they do. It cannot add
+claims. At `light` this stage is skipped. The report explicitly distinguishes checked facts
+from independently reviewed prose: default-depth prose has citation/number validation and
+the writer's brief, but no independent semantic review. Acceptance sampling must include
+headlines and body sentences at that default depth. Completion is not a guarantee that all
+prose follows semantically from the facts.
 
 ### 8. Output
 
 All in `research/`, where a person will look:
 
 - **`research/report.md`**, the report:
-  - A header: topic, date, depth, the scope paragraph, the sources given, how many facts and
-    sources, and how the facts were checked; then the contents.
+  - A header: run/output revision, status, runtime/guidance identities, topic, date, depth,
+    the scope paragraph, the sources given, counts, how facts were checked and whether the
+    prose was independently reviewed; then the contents.
   - **Coverage by section:** how many checked facts each section has (each subject's, when
     comparing), and which questions are partly or not answered.
   - **The questions and answers,** in outline order: each section's questions, each with its
-    one-line answer and its paragraphs. Every sentence carries the numbers of the sources
-    behind its facts, like any well-cited report.
+    one-line answer and its paragraphs. Factual sentences carry the numbers of the sources
+    behind their facts; generated gap messages link to the assessed gaps.
   - **The facts behind each answer,** listed under it: each fact with its source numbers, its
     as-of date, whether it was narrowed or transcribed, and "one source" when only one
     publisher backs it. When comparing, each subject's facts sit side by side.
@@ -326,16 +470,16 @@ All in `research/`, where a person will look:
   - Sources, numbered: title, a clickable URL or the file name, publisher, standing, and
     "given" or the date saved.
   - Rejected facts, with the checker's reasons, for anyone auditing the run.
-- **`research/facts.json`**, schema 1, the same content for programs: the scope, sections,
+- **`research/facts.json`**, schema 1, the same content for programs: separate `source_mode`
+  (`supplied-only` or `public-web`) and narrative `scope`, sections,
   subjects when comparing, questions with their answers (each sentence with its fact keys), sources with their provenance (`given`, `found` or `transcribed`, or `caller`
   for a file quoted through `record`), facts with their checks and citations, conflicts,
-  superseded, missing, rejected and counts. A fact's `key` is its question ID and a short hash
-  of its statement, such as `valkey-licensing-3fa9c2`: lowercase letters, digits and hyphens
-  only, so it fits in citation markers, links and file names. It stays the same when the run is
-  repeated and the fact is found again, so a deck, a training or a blog can cite it and later
-  check it; each citation also carries the hash of its quote.
-- **`research/brief.md`**: every fact with its key, one per line, no quotes. The shortest
-  context to hand a downstream worker.
+  superseded, missing, rejected, gaps and counts. Fact keys, aliases and revision links follow
+  the identity contract above; each citation carries its source revision and quote hash.
+- **`research/brief.md`**: current checked facts with keys, one per line, no quotes, followed
+  by gaps, conflicts and run status. Pending, rejected, superseded or stale facts are not
+  presented as current reference material. This is the downstream context, including when
+  the run is partial.
 
 ## Running it
 
@@ -346,11 +490,13 @@ it to:
 
 1. Run `research start` with the topic and the person's sources.
 2. Show the plan (scope and outline) when the person wants to approve it.
-3. Work the queue: start several subagents where it can, each taking tasks with `research
-   next`, doing them and submitting them, until none are left. Without subagents, work
-   through the tasks in turn.
-4. Stop only when `research status` says the run is complete, then point the person to the
-   report.
+3. Work the queue through leased tasks, using actual invocation identities. Parallelism is
+   optional; separate researcher/checker invocations may run in turn. If independent
+   checking cannot run, report the block rather than self-checking under another name.
+4. On `complete` or `complete-with-gaps`, open the saved report, verify its output revision
+   and point the person to it with the gaps. On `blocked`, name the failed prerequisite and
+   link the saved partial report; do not loop forever or call it completed research. An
+   interrupted run retains its partial artifacts and resumes without discarding them.
 
 The briefs, one per stage, are in the runtime and come with each task, so every worker gets
 the same instructions however it was started.
@@ -368,15 +514,26 @@ its gates (with `--plan-only`), and what the facts feed.
 
 - `record` also accepts facts, coverage and verdicts, so callers that research by hand get the
   same checks. Its citations are marked `caller` unless the quoted file is a registered source.
+  Acceptance by `record` alone does not establish independent checking or satisfy a new
+  run's Check stage. Legacy-only runs retain their existing assessment semantics and caveat;
+  their unreviewed assertions are not exported as independently confirmed facts.
 - For readers that only know `status`, an open question's coverage maps to `supported` when
-  answered and `insufficient` otherwise.
+  answered by current confirmed facts and `insufficient` otherwise. Apply that mapping after
+  checking and fact revisions, not to the researcher's provisional coverage. Claim verdicts
+  stay tied to exact target claims. Preserve legacy `scope` as its existing source-mode enum;
+  only the new export separates that enum into `source_mode` and narrative `scope`.
 - `research` also fills each question's `headline` (the one-line answer) and `summary` (the
   answer's text) in the record, so callers that read today's findings keep working while they
-  move to `facts.json`.
+  move to `facts.json`. The legacy headline is the validated sentence or generated gap text,
+  not an additional unvalidated string. For runs using the new workflow, legacy completion
+  cannot precede the required stages. New `complete-with-gaps` maps to legacy `complete`
+  with unresolved IDs; `blocked` maps to legacy `in-progress` with a block reason, and
+  `stale` stays `stale`. Legacy-only manual runs keep their current completion semantics.
 
 ## Not changing
 
-- `plan`, `status` and `migrate`, staleness, locking and history.
+- The legacy interfaces of `plan`, `status` and `migrate`, with the explicit new-workflow
+  status mapping above; staleness, locking and history remain required.
 - The rule that only exact quotes from saved text count as evidence.
 - No new runtime dependencies: Node 20 or newer only. The helper does not fetch, extract or
   start agents.
@@ -384,17 +541,33 @@ its gates (with `--plan-only`), and what the facts feed.
 ## Testing
 
 - **The queue:** every stage in order; parallel workers; leases that expire and return a task;
-  three failures; a checker never given its own facts; the gap round run once; stop and
-  resume; `--plan-only`; and the refusal to call a run complete while any stage is unfinished.
+  heartbeat renewal; late submissions after reassignment or a new run; idempotent repeated
+  submissions and conflicting payloads; three failures followed by explicit retry; a checker
+  never given its own facts; section-wide eligibility; sequential separate invocations;
+  unavailable independent checking; the gap round run once; stop and resume; `--plan-only`;
+  and refusal to call a blocked run complete.
   Tested with scripted workers, no agent needed.
 - **Submissions:** each refusal; quote placing; the number rule; transcribed sources; key
-  stability across runs; merging and conflict links; references to facts that do not exist.
+  stability on reuse; same fact found under different question IDs; permanent merge aliases;
+  narrowed/superseded keys still resolving to their original assertions and replacements;
+  incompatible contexts kept separate; conflict links; references to facts that do not exist.
 - **Writing:** an uncited sentence, a citation to a rejected or missing fact, a number not in
-  the cited facts, and a missing question are each refused; the review stage runs only at
-  `standard` and `deep`.
-- **Sources:** registration, hashing, gaps, sources registered after planning.
-- **Output:** `facts.json` against its schema, coverage by section, the report's sections, links
-  and numbering.
+  the cited facts, an unsupported headline and a missing question are each refused. A
+  zero-fact question and an all-facts-rejected question produce gap answers and
+  `complete-with-gaps`, not invented citations or a deadlock. No `supported` verdict survives
+  removal of all its supporting facts. The review stage runs at `standard` and `deep`, and
+  the output discloses when prose was not independently reviewed.
+- **Sources:** registration, original and extraction hashes, gaps, new source versions,
+  sources registered after planning, and invalidation of checks/answers after a change.
+  A claim-target deck alone cannot confirm its own claim; exact target edits invalidate the
+  assessment. Supplied-only scope and explicit web permission survive retries and imports.
+- **Output:** a duplicate-key-rejecting JSON parse, `facts.json` against its schema,
+  source-mode/scope separation, reference closure, counts, quote/number checks, coverage,
+  links and numbering. The complete appendix fixture is validated, not only displayed.
+  Interrupt exports between each file replacement; `status` must recover one consistent
+  revision. Verify readable partial artifacts after a save, interruption and blocked task,
+  including zero sources or zero checked facts. Legacy callers keep their source-mode and
+  completion semantics.
 - **Live trials,** recorded in `docs/verification/`: Redis vs Valkey at `light` and at `deep` with a few given
   PDFs and links, in a person's Claude Code session with subagents, and again in Codex; and one
   narrow topic from given documents alone. Timed and costed, with the reports read by a person
@@ -410,37 +583,57 @@ design, in Claude Code, and the results compared:
 3. A fact-check: the claims in an existing deck.
 
 For each run, record the time, the cost, the number of facts (or findings), the sources
-used, and the questions left unanswered. Then a person checks a random sample of 30 facts
-from each run against their sources: is the quote in the source, and does it say what the
-fact says?
+used, and the questions left unanswered. Compare atomic factual assertions, not a new fact
+against an entire old summary: split the old findings into assertions for sampling. A
+person checks a random sample of 30 assertions per run, or every assertion if fewer than
+30, against the original source: is the quote present, and does it support the assertion?
 
 The design is ready to release when, on all three requests:
 
 - Every sampled quote is in its source.
-- At least 9 in 10 sampled facts say no more than their quotes, and at least 9 in 10 of 30
-  sampled answer sentences say no more than their facts.
+- At least 9 in 10 sampled assertions say no more than their quotes, and at least 9 in 10
+  sampled answer sentences say no more than their facts. Sample 30 answer sentences or all
+  of them if fewer, including headlines; record the actual denominator. Generated gap
+  messages are audited against the run's gap records rather than counted as checked facts.
 - Every section of the outline has facts or a stated gap.
 - The new run is judged more useful as a reference by the person reading both.
 
 The three runs use the default `light` depth, plus Redis vs Valkey once at `deep`. Time and
 cost are recorded, not limited.
 
+Before release, the deterministic acceptance cases must also pass: no facts found, every
+candidate rejected, no second invocation available, all three attempts failed, an expired
+worker submitting after reassignment, interruption during export, an unsupported headline,
+a target claim trying to cite itself, and a previously cited fact being narrowed or merged.
+These exercise the completion and trust contracts independently of the live quality sample.
+
 ## Release and adoption
 
-- harness-research 0.9.0, a runtime change: `minimumRuntime` moves to 0.9.0 and Brand's pin
-  follows.
-- Then the studios: Blog, Presentation, Training. Each replaces its research code with one
-  harness instruction and reads `research/facts.json`. Their citations move to fact keys.
-- Blog's uncommitted `studio_research/tools.py` and `steps.py` are not needed.
+- **0.9.0 is an explicit installed-runtime upgrade.** Guidance requiring the new commands
+  declares `minimumRuntime: 0.9.0`. An older Research bootstrap currently refuses incompatible
+  guidance before reading it; new instructions cannot teach that executable to fall back.
+  Keep old task/runtime pins intact and document the installer upgrade for new runs.
+- **Standalone acceptance in both harnesses is part of 0.9.0:** the Claude Code trials, the
+  Codex trials and the narrow supplied-only trial precede release. Do not advertise Codex
+  acceptance while deferring its trial to a later patch.
+- **0.9.x adds verification and reuse before caller migration.** It may add an explicit,
+  disclosed compatibility fallback to the executable bootstrap; that feature works only
+  after installing a helper that implements it. It is not a guarantee about already
+  installed older helpers or a silent substitute after a failed network fetch.
+- **Brand 0.14 follows that compatible 0.9.x release**, pinning a runtime with `verify` and
+  the other commands its handoff actually uses. Slides citation checks land before that
+  handoff requires them. Studios then migrate Blog, Presentation and Training, replacing
+  their loops and adapting their gates/citations together. Until each migration passes its
+  compatibility checks, its existing orchestration stays in use.
 
 ## Build order
 
 1. The queue: runs, stages, tasks, leases, `start`, `next`, `submit`, `source`, `status`, and
-   the completeness rule.
+   the completeness rule, invocation identities, lease renewal/fencing and explicit retry.
 2. Submissions: facts, the quote and number checks, checks, cross-check, the gap round, keys
-   and provenance.
+   and provenance, exact claim targets, immutable identities, aliases and revision records.
 3. Writing and output: the answers and their checks, the review, the report with coverage by
-   section, `facts.json` and `brief.md`.
+   section, gap answers, `facts.json` and `brief.md`, including partial exports and recovery.
 4. Briefs and guidance; a first live trial in Claude Code; fixes from it.
 5. The live trial in Codex, the narrow-topic trial, and the 0.9.0 release.
 
@@ -451,13 +644,15 @@ cost are recorded, not limited.
 - **The harness works at full strength:** its own search, fetch, document and chart reading,
   browser, subagents and judgement.
 - **Every fact traces to saved text,** and a checker confirms that text against the original.
-- **Every fact is checked by a worker that did not write it,** ideally the other harness.
-- **A report a person can read,** in questions and answers, where every sentence leads back
-  through its facts to a quoted source.
+- **Every published current fact is checked in a separate invocation,** ideally the other
+  harness; inability to do that is a visible block, not a renamed self-check.
+- **A report a person can read,** whose factual headlines and sentences lead through checked
+  facts to quoted sources, and whose gap messages lead to recorded assessments.
 - **Made-up numbers are refused mechanically.**
 - **Coverage is planned as an outline and reported by section,** so thin parts are visible,
   and a comparison has both sides researched to the same depth.
-- **The steps cannot be skipped:** the queue, not the agent, decides when the run is done.
+- **Completion is explicit:** required stages cannot be skipped; honest evidence gaps can
+  finish, execution failures block, and partial artifacts remain inspectable.
 - **Far less code than the studios carry today,** and none of it duplicates the harness.
 
 ### What will still go wrong
@@ -470,14 +665,15 @@ cost are recorded, not limited.
    own words; the checker re-reading the original is what catches it, and a missed case would
    pass. Transcribed charts and scans are the harness's reading, marked as such.
 4. **Parallelism depends on the harness.** Claude Code runs subagents side by side; where a
-   harness cannot, the run is sequential unless more sessions are started on the queue.
+   harness cannot, independent invocations may run sequentially. If the host cannot provide
+   a second invocation at all, checking blocks and the report remains partial.
 5. **A harness reading the web can be misled by a page.** In a person's session it has
    whatever the person allowed it; a studio decides what its headless sessions may do.
 6. **Depth costs.** The default `light` run is about 20 questions with a checker and a writer
    per section and up to 3 gap questions: very roughly $7 to $12 and 20 to 30 minutes, judged from
    Training's measured $2.31 for eight questions without checking. `deep` is about 45 questions, each checked, plus a gap
    round: very roughly $20 to $40 and 30 to 60 minutes. All to be measured in the trials.
-7. **Prose can still overstate.** The helper makes sure every sentence cites confirmed facts
+7. **Prose can still overstate.** The helper makes sure every factual sentence cites confirmed facts
    and invents no numbers, but only a reader can tell whether a sentence says more than its
    facts. At `light` nothing but the writer's brief prevents it; at `standard` and `deep` a
    reviewer cuts such sentences back.
@@ -486,8 +682,9 @@ cost are recorded, not limited.
 
 ## Settled in review
 
-- **A written report, in questions and answers,** built only from checked facts, every
-  sentence cited. It explains what the facts establish; it does not recommend or decide.
+- **A written report, in questions and answers,** whose factual prose cites checked facts
+  and whose gap messages cite the run's assessments. It explains what the facts establish;
+  it does not recommend or decide. Default-depth prose is not independently reviewed.
 - **Support check** per fact, by another worker; **question kinds**; **provenance** on every
   source and citation.
 - **Topic and starting sources as input:** links and documents such as PDFs.
@@ -503,100 +700,372 @@ cost are recorded, not limited.
 
 ## Appendix: `facts.json`, by example
 
-Shortened, with one entry of each kind, for a comparison. For a topic that is not a
-comparison, `subjects` is empty and every `subject` is null. The values are illustrative.
+This is a complete, small synthetic contract fixture, not live research or quoted product
+proof. Counts and references are closed. Both original fixture files and their saved
+extractions contain the exact text shown below, with one trailing newline. The example
+illustrates a narrowed assertion, a merge alias and a zero-fact gap; other audit lists are
+empty. Runtime/guidance identities below are synthetic too.
 
 ```json
 {
   "schema": 1,
   "run": "8f3c2a91d0e4b7a6c5f1e2d3",
-  "topic": "Redis vs Valkey",
-  "about": "For solutions architects advising customers on in-memory data stores.",
+  "output_revision": 12,
+  "topic": "Valkey: licensing, origin and support",
+  "about": "A minimal synthetic contract fixture, not a live product assessment.",
   "depth": "light",
-  "scope": "public-web",
-  "status": "complete",
-  "created_at": "2026-10-16T14:00:03Z",
-  "completed_at": "2026-10-16T14:21:15Z",
-  "counts": {"questions": 21, "facts": 152, "narrowed": 14, "rejected": 9,
-             "sources": 44, "conflicts": 3, "superseded": 1, "failed": 0},
-
-  "scope": "The two engines as products: technology, licensing, ecosystem and migration, as of late 2026. Not every managed service's pricing.",
-  "sections": [{"id": "licensing", "name": "Licensing"}, {"id": "origin", "name": "Origin and governance"}],
-  "subjects": [{"id": "redis", "name": "Redis"}, {"id": "valkey", "name": "Valkey"}],
-
+  "source_mode": "supplied-only",
+  "scope": "Licensing, fork origin and support as described by the selected fixture sources; no external research.",
+  "status": "complete-with-gaps",
+  "created_at": "2026-10-16T02:00:00Z",
+  "completed_at": "2026-10-16T02:06:00Z",
+  "prose_review": "not independently reviewed at light depth",
+  "counts": {
+    "questions": 3,
+    "facts": 2,
+    "narrowed": 1,
+    "rejected": 0,
+    "sources": 2,
+    "conflicts": 0,
+    "superseded": 0,
+    "gaps": 1,
+    "failed": 0,
+    "checked": 2
+  },
+  "sections": [
+    {
+      "id": "licensing",
+      "name": "Licensing"
+    },
+    {
+      "id": "origin",
+      "name": "Origin"
+    },
+    {
+      "id": "support",
+      "name": "Support"
+    }
+  ],
+  "subjects": [],
   "questions": [
-    {"id": "valkey-licensing", "section": "licensing", "subject": "valkey",
-     "kind": "open", "round": 1,
-     "question": "Under what licence is Valkey released, and has that changed?",
-     "coverage": "answered", "gaps": "",
-     "headline": "Valkey is licensed under the BSD 3-Clause licence and has kept that licence since the fork.",
-     "answer": [
-       {"sentence": "Valkey is licensed under the BSD 3-Clause licence.", "facts": ["valkey-licensing-3fa9c2"]},
-       {"sentence": "Valkey kept the licence Redis used before Redis changed its own.", "facts": ["fork-history-77d1e0", "redis-licensing-aa11bb"]}
-     ],
-     "facts": ["valkey-licensing-3fa9c2"]},
-    {"id": "fork-history", "section": "origin", "subject": null, "kind": "open", "round": 1,
-     "question": "How and when was Valkey forked from Redis?",
-     "coverage": "partly answered",
-     "gaps": "No primary source gives the date the first Valkey release was tagged.",
-     "facts": ["fork-history-77d1e0"]}
+    {
+      "id": "valkey-licensing",
+      "section": "licensing",
+      "subject": null,
+      "kind": "open",
+      "round": 1,
+      "question": "Under what licence is Valkey released?",
+      "coverage": "answered",
+      "gaps": [],
+      "headline": {
+        "sentence": "Valkey is licensed under the BSD 3-Clause licence.",
+        "facts": [
+          "fact-00000000000000000000000000000001"
+        ]
+      },
+      "answer": [
+        {
+          "sentence": "Valkey is licensed under the BSD 3-Clause licence.",
+          "facts": [
+            "fact-00000000000000000000000000000001"
+          ]
+        }
+      ],
+      "facts": [
+        "fact-00000000000000000000000000000001"
+      ],
+      "assessment": {
+        "by": "checker-invocation-02",
+        "at": "2026-10-16T02:05:00Z"
+      }
+    },
+    {
+      "id": "fork-origin",
+      "section": "origin",
+      "subject": null,
+      "kind": "open",
+      "round": 1,
+      "question": "Where did Valkey originate?",
+      "coverage": "answered",
+      "gaps": [],
+      "headline": {
+        "sentence": "Valkey was forked from Redis.",
+        "facts": [
+          "fact-00000000000000000000000000000002"
+        ]
+      },
+      "answer": [
+        {
+          "sentence": "Valkey was forked from Redis.",
+          "facts": [
+            "fact-00000000000000000000000000000002"
+          ]
+        }
+      ],
+      "facts": [
+        "fact-00000000000000000000000000000002"
+      ],
+      "assessment": {
+        "by": "checker-invocation-02",
+        "at": "2026-10-16T02:05:00Z"
+      }
+    },
+    {
+      "id": "support-lifecycle",
+      "section": "support",
+      "subject": null,
+      "kind": "open",
+      "round": 1,
+      "question": "What support lifecycle is established by the supplied sources?",
+      "coverage": "not answered",
+      "gaps": [
+        "gap-support"
+      ],
+      "headline": {
+        "kind": "gap",
+        "gaps": [
+          "gap-support"
+        ]
+      },
+      "answer": [],
+      "facts": [],
+      "assessment": {
+        "by": "checker-invocation-02",
+        "at": "2026-10-16T02:05:00Z"
+      }
+    }
   ],
-
   "sources": [
-    {"id": "s07", "title": "Valkey licence", "origin": "https://github.com/valkey-io/valkey/blob/unstable/COPYING",
-     "publisher": "valkey-io", "standing": "primary", "provenance": "found",
-     "saved_at": "2026-10-16T14:09:40Z", "source_date": null,
-     "file": "research/sources/valkey-copying.md", "sha256": "c41e…", "limits": "none"},
-    {"id": "s02", "title": "Platform architecture review", "origin": "given: docs/architecture-review.pdf",
-     "publisher": null, "standing": "primary", "provenance": "transcribed", "pages": "12-13",
-     "saved_at": "2026-10-16T14:01:12Z", "source_date": "2026-06-30",
-     "file": "research/sources/architecture-review-p12-13.md", "sha256": "9ab0…",
-     "limits": "Pages 12-13 are a chart; the text is the harness's reading of it."}
+    {
+      "id": "s01",
+      "title": "Synthetic valkey-license reference",
+      "origin": "supplied: fixtures/valkey-license.txt",
+      "publisher": "Fixture publisher",
+      "standing": "primary",
+      "provenance": "given",
+      "saved_at": "2026-10-16T02:00:00Z",
+      "source_date": "2026-10-15",
+      "original_file": "fixtures/valkey-license.txt",
+      "original_sha256": "e23f8af34cf93c760ca684f84280ff4471fdedfaa181473c7f971b045b60c03d",
+      "file": "research/sources/valkey-license.md",
+      "sha256": "e23f8af34cf93c760ca684f84280ff4471fdedfaa181473c7f971b045b60c03d",
+      "limits": "none"
+    },
+    {
+      "id": "s02",
+      "title": "Synthetic fork-origin reference",
+      "origin": "supplied: fixtures/fork-origin.txt",
+      "publisher": "Fixture publisher",
+      "standing": "primary",
+      "provenance": "given",
+      "saved_at": "2026-10-16T02:00:00Z",
+      "source_date": "2026-10-15",
+      "original_file": "fixtures/fork-origin.txt",
+      "original_sha256": "8e21024acf4c842093e3b71c0b358ba68e5a37856a1ed1367e0bed17ff260220",
+      "file": "research/sources/fork-origin.md",
+      "sha256": "8e21024acf4c842093e3b71c0b358ba68e5a37856a1ed1367e0bed17ff260220",
+      "limits": "none"
+    }
   ],
-
   "facts": [
-    {"key": "valkey-licensing-3fa9c2",
-     "statement": "Valkey is licensed under the BSD 3-Clause licence.",
-     "section": "licensing", "subject": "valkey", "questions": ["valkey-licensing"],
-     "as_of": null,
-     "check": {"result": "confirmed", "by": "codex", "at": "2026-10-16T14:31:05Z"},
-     "original_statement": null,
-     "sources_count": 2, "best_standing": "primary",
-     "conflicts_with": [], "superseded_by": null,
-     "citations": [
-       {"source": "s07", "quote": "Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met",
-        "quote_sha256": "5d2f…", "start": 118, "locator": "COPYING, opening paragraph"}
-     ]}
+    {
+      "key": "fact-00000000000000000000000000000001",
+      "statement": "Valkey is licensed under the BSD 3-Clause licence.",
+      "section": "licensing",
+      "subject": null,
+      "questions": [
+        "valkey-licensing"
+      ],
+      "as_of": "2026-10-15",
+      "check": {
+        "result": "confirmed",
+        "by": "checker-invocation-02",
+        "at": "2026-10-16T02:05:00Z",
+        "change": null
+      },
+      "original_statement": null,
+      "sources_count": 1,
+      "best_standing": "primary",
+      "conflicts_with": [],
+      "superseded_by": null,
+      "citations": [
+        {
+          "source": "s01",
+          "source_sha256": "e23f8af34cf93c760ca684f84280ff4471fdedfaa181473c7f971b045b60c03d",
+          "quote": "Valkey is licensed under the BSD 3-Clause licence.",
+          "quote_sha256": "3a3f0e02bdbea8b65a114e5ac6d694302ab0caf99ee886d83ab20bca5b02ca04",
+          "start": 0,
+          "locator": "Line 1"
+        }
+      ],
+      "authored_by": "researcher-invocation-01",
+      "status": "confirmed"
+    },
+    {
+      "key": "fact-00000000000000000000000000000002",
+      "statement": "Valkey was forked from Redis.",
+      "section": "origin",
+      "subject": null,
+      "questions": [
+        "fork-origin"
+      ],
+      "as_of": "2026-10-15",
+      "check": {
+        "result": "confirmed",
+        "by": "checker-invocation-02",
+        "at": "2026-10-16T02:05:00Z",
+        "change": "narrowed"
+      },
+      "original_statement": "Valkey was forked from Redis and preserves all Redis behavior.",
+      "sources_count": 1,
+      "best_standing": "primary",
+      "conflicts_with": [],
+      "superseded_by": null,
+      "citations": [
+        {
+          "source": "s02",
+          "source_sha256": "8e21024acf4c842093e3b71c0b358ba68e5a37856a1ed1367e0bed17ff260220",
+          "quote": "Valkey was forked from Redis.",
+          "quote_sha256": "793db2185c21cd8f963a9ee075dee8ef07e0279731a2da7da2d7a2b05a3258ee",
+          "start": 0,
+          "locator": "Line 1"
+        }
+      ],
+      "authored_by": "researcher-invocation-01",
+      "status": "confirmed"
+    }
   ],
-
-  "conflicts": [
-    {"facts": ["redis-performance-1b2c3d", "valkey-performance-9e8f7a"],
-     "note": "Each vendor's benchmark uses a different instance size and client count."}
+  "aliases": [
+    {
+      "key": "fact-00000000000000000000000000000003",
+      "canonical": "fact-00000000000000000000000000000001",
+      "reason": "An independently recorded duplicate was merged; the assertion is unchanged.",
+      "original": {
+        "key": "fact-00000000000000000000000000000003",
+        "statement": "Valkey is licensed under the BSD 3-Clause licence.",
+        "section": "licensing",
+        "subject": null,
+        "questions": [
+          "valkey-licensing"
+        ],
+        "as_of": "2026-10-15",
+        "check": {
+          "result": "confirmed",
+          "by": "checker-invocation-02",
+          "at": "2026-10-16T02:05:00Z",
+          "change": null
+        },
+        "original_statement": null,
+        "sources_count": 1,
+        "best_standing": "primary",
+        "conflicts_with": [],
+        "superseded_by": null,
+        "citations": [
+          {
+            "source": "s01",
+            "source_sha256": "e23f8af34cf93c760ca684f84280ff4471fdedfaa181473c7f971b045b60c03d",
+            "quote": "Valkey is licensed under the BSD 3-Clause licence.",
+            "quote_sha256": "3a3f0e02bdbea8b65a114e5ac6d694302ab0caf99ee886d83ab20bca5b02ca04",
+            "start": 0,
+            "locator": "Line 1"
+          }
+        ],
+        "authored_by": "researcher-invocation-01",
+        "status": "confirmed"
+      },
+      "by": "cross-invocation-03"
+    }
   ],
-  "superseded": [
-    {"fact": "redis-licensing-aa11bb", "by": "redis-licensing-cc22dd",
-     "note": "A later release added another licence option."}
+  "revisions": [
+    {
+      "previous": {
+        "key": "fact-00000000000000000000000000000004",
+        "statement": "Valkey was forked from Redis and preserves all Redis behavior.",
+        "section": "origin",
+        "subject": null,
+        "questions": [
+          "fork-origin"
+        ],
+        "as_of": "2026-10-15",
+        "check": null,
+        "original_statement": null,
+        "sources_count": 1,
+        "best_standing": "primary",
+        "conflicts_with": [],
+        "superseded_by": null,
+        "citations": [
+          {
+            "source": "s02",
+            "source_sha256": "8e21024acf4c842093e3b71c0b358ba68e5a37856a1ed1367e0bed17ff260220",
+            "quote": "Valkey was forked from Redis.",
+            "quote_sha256": "793db2185c21cd8f963a9ee075dee8ef07e0279731a2da7da2d7a2b05a3258ee",
+            "start": 0,
+            "locator": "Line 1"
+          }
+        ],
+        "authored_by": "researcher-invocation-01",
+        "status": "candidate"
+      },
+      "current": "fact-00000000000000000000000000000002",
+      "kind": "narrowed",
+      "reason": "The source establishes fork origin but does not establish behavioral compatibility."
+    }
   ],
-  "missing": [
-    {"angle": "Support lifecycle and end-of-life policy", "became": ["redis-support", "valkey-support"]}
+  "gaps": [
+    {
+      "id": "gap-support",
+      "question": "support-lifecycle",
+      "kind": "insufficient",
+      "sources": [
+        "s01",
+        "s02"
+      ],
+      "reason": "The two selected sources do not establish a support lifecycle.",
+      "assessed_by": "researcher-invocation-01",
+      "check": {
+        "by": "checker-invocation-02",
+        "result": "confirmed"
+      }
+    }
   ],
-  "rejected": [
-    {"statement": "Redis Cluster supports active-active writes across regions.",
-     "question": "redis-clustering",
-     "reason": "The quote describes Redis Enterprise's Active-Active feature, not open-source Redis Cluster.",
-     "by": "codex", "citations": [{"source": "s31", "quote": "…"}]}
-  ],
-  "failed": []
+  "conflicts": [],
+  "superseded": [],
+  "missing": [],
+  "rejected": [],
+  "failed": [],
+  "runtime_version": "0.9.0",
+  "guidance_version": "0.9.0",
+  "guidance_revision": "0000000000000000000000000000000000000009",
+  "updated_at": "2026-10-16T02:06:00Z"
 }
 ```
 
-- **Keys** are stable: the question ID and a short hash of the statement. A deck, training or
-  blog cites `valkey-licensing-3fa9c2`, and can later look the key up to check the fact still
-  stands, unchanged (`quote_sha256`), not narrowed, rejected or superseded.
-- **`statement` is what a consumer uses;** `original_statement` shows what a narrowed fact said
-  before the checker cut it back.
-- **`sources_count` and `best_standing`** let a consumer prefer facts backed by more than one
-  publisher, or by primary sources. A source the person gave is always `primary`.
-- **Questions list their facts and facts list their questions,** because a merged duplicate can
-  answer more than one question.
-- **`rejected` and `failed`** are kept for auditing. Consumers should not cite them.
+### `research/sources/valkey-license.md`
+
+The original `fixtures/valkey-license.txt` has the same bytes.
+
+```text
+Valkey is licensed under the BSD 3-Clause licence.
+```
+
+### `research/sources/fork-origin.md`
+
+The original `fixtures/fork-origin.txt` has the same bytes.
+
+```text
+Valkey was forked from Redis.
+```
+
+- **Keys identify immutable assertions.** Reuse preserves a key; aliases resolve merged
+  duplicates. A narrowing relationship preserves the previous key and statement rather
+  than silently changing what an old citation means.
+- **Headlines and body sentences cite facts.** A zero-fact question uses a structured gap
+  headline, an empty answer and recorded gap IDs. The renderer writes its gap message.
+- **A narrowed replacement is confirmed on its own terms.** `original_statement` and
+  `revisions` retain the earlier, broader assertion for auditing and citation verification.
+- **`sources_count` counts distinct publishers**, not quotations or mirrored copies.
+  Unknown publisher identity is reported as unknown rather than inferred as independence.
+- **Question/fact links are reciprocal** for the current canonical facts; aliases remain
+  resolvable when a duplicate previously belonged to another question.
+- **`rejected` and `failed`** are audit records, not current reference material. A failed
+  required task would make this run `blocked`, rather than `complete-with-gaps`.

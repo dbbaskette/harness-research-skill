@@ -1,0 +1,1070 @@
+{
+  "schema": 1,
+  "owner": "harness-research-run",
+  "run": "15fd7b055f744d61b0eb14ae",
+  "revision": 38,
+  "runtimeVersion": "0.9.0",
+  "guidanceVersion": "0.9.0",
+  "guidanceRevision": null,
+  "topic": "Compare AsterDB and BirchDB for a small internal application: deployment, concurrent writes and backup retention; use only the two supplied synthetic references.",
+  "about": "",
+  "sourceMode": "supplied-only",
+  "depth": "light",
+  "planOnly": false,
+  "inputs": [
+    {
+      "file": "sources/asterdb.md",
+      "sha256": "5cb1bb71c7eb66288ae8d2ec83a7333b95b30fbf3785f0b228dc7326f5acf041"
+    },
+    {
+      "file": "sources/birchdb.md",
+      "sha256": "b212cf8ca3bd28ee5bcbd8e73a025d21ff72e45e579235645a516a2fbdc87d1c"
+    }
+  ],
+  "givenSources": [
+    {
+      "id": "given-1",
+      "origin": "sources/asterdb.md",
+      "title": "sources/asterdb.md",
+      "file": "sources/asterdb.md",
+      "sha256": "5cb1bb71c7eb66288ae8d2ec83a7333b95b30fbf3785f0b228dc7326f5acf041"
+    },
+    {
+      "id": "given-2",
+      "origin": "sources/birchdb.md",
+      "title": "sources/birchdb.md",
+      "file": "sources/birchdb.md",
+      "sha256": "b212cf8ca3bd28ee5bcbd8e73a025d21ff72e45e579235645a516a2fbdc87d1c"
+    }
+  ],
+  "claims": [],
+  "sources": [
+    {
+      "id": "source-65610dbc909398e57c19",
+      "given": "given-1",
+      "title": "AsterDB vendor notes (synthetic test document)",
+      "origin": "sources/asterdb.md",
+      "publisher": "AsterDB project",
+      "standing": "primary",
+      "provenance": "given",
+      "pages": null,
+      "file": "sources/asterdb.md",
+      "sha256": "5cb1bb71c7eb66288ae8d2ec83a7333b95b30fbf3785f0b228dc7326f5acf041",
+      "original_file": "sources/asterdb.md",
+      "original_sha256": "5cb1bb71c7eb66288ae8d2ec83a7333b95b30fbf3785f0b228dc7326f5acf041",
+      "limits": "none",
+      "source_date": "2026-10-15",
+      "saved_at": "2026-10-16T04:09:01.500Z"
+    },
+    {
+      "id": "source-34f7c28a187f3ca2b548",
+      "given": "given-2",
+      "title": "BirchDB vendor notes (synthetic test document)",
+      "origin": "sources/birchdb.md",
+      "publisher": "BirchDB project",
+      "standing": "primary",
+      "provenance": "given",
+      "pages": null,
+      "file": "sources/birchdb.md",
+      "sha256": "b212cf8ca3bd28ee5bcbd8e73a025d21ff72e45e579235645a516a2fbdc87d1c",
+      "original_file": "sources/birchdb.md",
+      "original_sha256": "b212cf8ca3bd28ee5bcbd8e73a025d21ff72e45e579235645a516a2fbdc87d1c",
+      "limits": "none",
+      "source_date": "2026-10-15",
+      "saved_at": "2026-10-16T04:09:16.144Z"
+    }
+  ],
+  "sections": [
+    {
+      "id": "deployment",
+      "name": "Deployment"
+    },
+    {
+      "id": "writes",
+      "name": "Concurrent writes"
+    },
+    {
+      "id": "retention",
+      "name": "Backup retention"
+    }
+  ],
+  "subjects": [
+    {
+      "id": "aster",
+      "name": "AsterDB"
+    },
+    {
+      "id": "birch",
+      "name": "BirchDB"
+    }
+  ],
+  "questions": [
+    {
+      "id": "aster-deployment",
+      "question": "How is AsterDB deployed?",
+      "section": "deployment",
+      "subject": "aster",
+      "kind": "open",
+      "round": 1,
+      "coverage": "answered",
+      "gaps": [],
+      "researchWorkers": [
+        "/root/skill_example_supplied"
+      ],
+      "assessment": {
+        "by": "/root/skill_example_supplied/independent_checker",
+        "at": "2026-10-16T04:10:42.029Z"
+      },
+      "provisionalCoverage": "answered",
+      "verdict": null,
+      "headline": {
+        "sentence": "AsterDB uses an in-process deployment with one database file.",
+        "facts": [
+          "fact-74bc22e1b40d49469dc45e487229cb93"
+        ]
+      },
+      "answer": [
+        {
+          "sentence": "AsterDB runs inside the application process and stores its database in one file.",
+          "facts": [
+            "fact-74bc22e1b40d49469dc45e487229cb93"
+          ],
+          "paragraph": 1
+        }
+      ],
+      "writtenBy": "/root/skill_example_supplied"
+    },
+    {
+      "id": "birch-deployment",
+      "question": "How is BirchDB deployed?",
+      "section": "deployment",
+      "subject": "birch",
+      "kind": "open",
+      "round": 1,
+      "coverage": "answered",
+      "gaps": [],
+      "researchWorkers": [
+        "/root/skill_example_supplied"
+      ],
+      "assessment": {
+        "by": "/root/skill_example_supplied/independent_checker",
+        "at": "2026-10-16T04:10:42.029Z"
+      },
+      "provisionalCoverage": "answered",
+      "verdict": null,
+      "headline": {
+        "sentence": "BirchDB uses a separate server accessed over a network.",
+        "facts": [
+          "fact-a94b2941faff4b339722a1d491fa7a64"
+        ]
+      },
+      "answer": [
+        {
+          "sentence": "BirchDB runs as a separate server that applications connect to over a network.",
+          "facts": [
+            "fact-a94b2941faff4b339722a1d491fa7a64"
+          ],
+          "paragraph": 1
+        }
+      ],
+      "writtenBy": "/root/skill_example_supplied"
+    },
+    {
+      "id": "aster-writes",
+      "question": "What concurrent-write behavior is specified for AsterDB?",
+      "section": "writes",
+      "subject": "aster",
+      "kind": "open",
+      "round": 1,
+      "coverage": "answered",
+      "gaps": [],
+      "researchWorkers": [
+        "/root/skill_example_supplied"
+      ],
+      "assessment": {
+        "by": "/root/skill_example_supplied/independent_checker",
+        "at": "2026-10-16T04:10:46.871Z"
+      },
+      "provisionalCoverage": "answered",
+      "verdict": null,
+      "headline": {
+        "sentence": "AsterDB permits one writer transaction per database at a time.",
+        "facts": [
+          "fact-f6758e02506f41a483d4c3c368b6ef1b"
+        ]
+      },
+      "answer": [
+        {
+          "sentence": "AsterDB permits one writer transaction at a time for each database.",
+          "facts": [
+            "fact-f6758e02506f41a483d4c3c368b6ef1b"
+          ],
+          "paragraph": 1
+        }
+      ],
+      "writtenBy": "/root/skill_example_supplied"
+    },
+    {
+      "id": "birch-writes",
+      "question": "What concurrent-write behavior is specified for BirchDB?",
+      "section": "writes",
+      "subject": "birch",
+      "kind": "open",
+      "round": 1,
+      "coverage": "answered",
+      "gaps": [],
+      "researchWorkers": [
+        "/root/skill_example_supplied"
+      ],
+      "assessment": {
+        "by": "/root/skill_example_supplied/independent_checker",
+        "at": "2026-10-16T04:10:46.871Z"
+      },
+      "provisionalCoverage": "answered",
+      "verdict": null,
+      "headline": {
+        "sentence": "BirchDB allows concurrent writers to different rows.",
+        "facts": [
+          "fact-6cb09e5bdc234a48b8ddd423998b90cb"
+        ]
+      },
+      "answer": [
+        {
+          "sentence": "BirchDB allows concurrent writers to different rows, with row locks controlling conflicts.",
+          "facts": [
+            "fact-6cb09e5bdc234a48b8ddd423998b90cb"
+          ],
+          "paragraph": 1
+        }
+      ],
+      "writtenBy": "/root/skill_example_supplied"
+    },
+    {
+      "id": "aster-retention",
+      "question": "What backup retention period is specified for AsterDB?",
+      "section": "retention",
+      "subject": "aster",
+      "kind": "open",
+      "round": 1,
+      "coverage": "not answered",
+      "gaps": [
+        "gap-2296fe980c1d4931a1b7b6f7e98ba391"
+      ],
+      "researchWorkers": [
+        "/root/skill_example_supplied"
+      ],
+      "assessment": {
+        "by": "/root/skill_example_supplied/independent_checker",
+        "at": "2026-10-16T04:10:58.258Z"
+      },
+      "provisionalCoverage": "not answered",
+      "verdict": null,
+      "headline": {
+        "kind": "gap",
+        "gaps": [
+          "gap-2296fe980c1d4931a1b7b6f7e98ba391"
+        ]
+      },
+      "answer": [],
+      "writtenBy": "/root/skill_example_supplied"
+    },
+    {
+      "id": "birch-retention",
+      "question": "What backup retention period is specified for BirchDB?",
+      "section": "retention",
+      "subject": "birch",
+      "kind": "open",
+      "round": 1,
+      "coverage": "not answered",
+      "gaps": [
+        "gap-72a317fb16b14db3bbc8dbf51927ac6d"
+      ],
+      "researchWorkers": [
+        "/root/skill_example_supplied"
+      ],
+      "assessment": {
+        "by": "/root/skill_example_supplied/independent_checker",
+        "at": "2026-10-16T04:10:58.259Z"
+      },
+      "provisionalCoverage": "not answered",
+      "verdict": null,
+      "headline": {
+        "kind": "gap",
+        "gaps": [
+          "gap-72a317fb16b14db3bbc8dbf51927ac6d"
+        ]
+      },
+      "answer": [],
+      "writtenBy": "/root/skill_example_supplied"
+    }
+  ],
+  "facts": [
+    {
+      "key": "fact-74bc22e1b40d49469dc45e487229cb93",
+      "statement": "AsterDB runs inside the application process and stores its database in one file.",
+      "questions": [
+        "aster-deployment"
+      ],
+      "section": "deployment",
+      "subject": "aster",
+      "as_of": "2026-10-15",
+      "authored_by": "/root/skill_example_supplied",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/skill_example_supplied/independent_checker",
+        "at": "2026-10-16T04:10:42.027Z",
+        "inspected_sources": [
+          {
+            "source": "source-65610dbc909398e57c19",
+            "sha256": "5cb1bb71c7eb66288ae8d2ec83a7333b95b30fbf3785f0b228dc7326f5acf041",
+            "original_sha256": "5cb1bb71c7eb66288ae8d2ec83a7333b95b30fbf3785f0b228dc7326f5acf041",
+            "read_original": true
+          },
+          {
+            "source": "source-34f7c28a187f3ca2b548",
+            "sha256": "b212cf8ca3bd28ee5bcbd8e73a025d21ff72e45e579235645a516a2fbdc87d1c",
+            "original_sha256": "b212cf8ca3bd28ee5bcbd8e73a025d21ff72e45e579235645a516a2fbdc87d1c",
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-65610dbc909398e57c19",
+          "quote": "AsterDB runs inside the application process and stores its database in one file.",
+          "start": 101,
+          "quote_sha256": "9c0db36581c648f386c5cc48a013fc90c2b2d0905f8de9198c815f7634beafdd",
+          "source_sha256": "5cb1bb71c7eb66288ae8d2ec83a7333b95b30fbf3785f0b228dc7326f5acf041",
+          "locator": "Body, first paragraph"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null
+    },
+    {
+      "key": "fact-a94b2941faff4b339722a1d491fa7a64",
+      "statement": "BirchDB runs as a separate server that applications connect to over a network.",
+      "questions": [
+        "birch-deployment"
+      ],
+      "section": "deployment",
+      "subject": "birch",
+      "as_of": "2026-10-15",
+      "authored_by": "/root/skill_example_supplied",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/skill_example_supplied/independent_checker",
+        "at": "2026-10-16T04:10:42.027Z",
+        "inspected_sources": [
+          {
+            "source": "source-65610dbc909398e57c19",
+            "sha256": "5cb1bb71c7eb66288ae8d2ec83a7333b95b30fbf3785f0b228dc7326f5acf041",
+            "original_sha256": "5cb1bb71c7eb66288ae8d2ec83a7333b95b30fbf3785f0b228dc7326f5acf041",
+            "read_original": true
+          },
+          {
+            "source": "source-34f7c28a187f3ca2b548",
+            "sha256": "b212cf8ca3bd28ee5bcbd8e73a025d21ff72e45e579235645a516a2fbdc87d1c",
+            "original_sha256": "b212cf8ca3bd28ee5bcbd8e73a025d21ff72e45e579235645a516a2fbdc87d1c",
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-34f7c28a187f3ca2b548",
+          "quote": "BirchDB runs as a separate server that applications connect to over a network.",
+          "start": 101,
+          "quote_sha256": "eb7c0ebb78985ecfcfb35432110c9e2106fd5f74717783350a139df53ba9257d",
+          "source_sha256": "b212cf8ca3bd28ee5bcbd8e73a025d21ff72e45e579235645a516a2fbdc87d1c",
+          "locator": "Body, first paragraph"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null
+    },
+    {
+      "key": "fact-f6758e02506f41a483d4c3c368b6ef1b",
+      "statement": "AsterDB permits one writer transaction at a time for each database.",
+      "questions": [
+        "aster-writes"
+      ],
+      "section": "writes",
+      "subject": "aster",
+      "as_of": "2026-10-15",
+      "authored_by": "/root/skill_example_supplied",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/skill_example_supplied/independent_checker",
+        "at": "2026-10-16T04:10:46.869Z",
+        "inspected_sources": [
+          {
+            "source": "source-65610dbc909398e57c19",
+            "sha256": "5cb1bb71c7eb66288ae8d2ec83a7333b95b30fbf3785f0b228dc7326f5acf041",
+            "original_sha256": "5cb1bb71c7eb66288ae8d2ec83a7333b95b30fbf3785f0b228dc7326f5acf041",
+            "read_original": true
+          },
+          {
+            "source": "source-34f7c28a187f3ca2b548",
+            "sha256": "b212cf8ca3bd28ee5bcbd8e73a025d21ff72e45e579235645a516a2fbdc87d1c",
+            "original_sha256": "b212cf8ca3bd28ee5bcbd8e73a025d21ff72e45e579235645a516a2fbdc87d1c",
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-65610dbc909398e57c19",
+          "quote": "AsterDB permits one writer transaction at a time for each database.",
+          "start": 182,
+          "quote_sha256": "f50db14fbcc5cce91ca2e4121f033f0124ce3ca814af37653b3ebaf40c3f48be",
+          "source_sha256": "5cb1bb71c7eb66288ae8d2ec83a7333b95b30fbf3785f0b228dc7326f5acf041",
+          "locator": "Body, second paragraph"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null
+    },
+    {
+      "key": "fact-6cb09e5bdc234a48b8ddd423998b90cb",
+      "statement": "BirchDB allows concurrent writers to different rows, with row locks controlling conflicts.",
+      "questions": [
+        "birch-writes"
+      ],
+      "section": "writes",
+      "subject": "birch",
+      "as_of": "2026-10-15",
+      "authored_by": "/root/skill_example_supplied",
+      "status": "confirmed",
+      "check": {
+        "result": "confirmed",
+        "by": "/root/skill_example_supplied/independent_checker",
+        "at": "2026-10-16T04:10:46.869Z",
+        "inspected_sources": [
+          {
+            "source": "source-65610dbc909398e57c19",
+            "sha256": "5cb1bb71c7eb66288ae8d2ec83a7333b95b30fbf3785f0b228dc7326f5acf041",
+            "original_sha256": "5cb1bb71c7eb66288ae8d2ec83a7333b95b30fbf3785f0b228dc7326f5acf041",
+            "read_original": true
+          },
+          {
+            "source": "source-34f7c28a187f3ca2b548",
+            "sha256": "b212cf8ca3bd28ee5bcbd8e73a025d21ff72e45e579235645a516a2fbdc87d1c",
+            "original_sha256": "b212cf8ca3bd28ee5bcbd8e73a025d21ff72e45e579235645a516a2fbdc87d1c",
+            "read_original": true
+          }
+        ]
+      },
+      "citations": [
+        {
+          "source": "source-34f7c28a187f3ca2b548",
+          "quote": "BirchDB allows concurrent writers to different rows, with row locks controlling conflicts.",
+          "start": 180,
+          "quote_sha256": "4a0af7ec1e7a737050e28842c3f8c86b0cbe2bf1579ea717bc6556c3437d89ee",
+          "source_sha256": "b212cf8ca3bd28ee5bcbd8e73a025d21ff72e45e579235645a516a2fbdc87d1c",
+          "locator": "Body, second paragraph"
+        }
+      ],
+      "original_statement": null,
+      "conflicts_with": [],
+      "superseded_by": null
+    }
+  ],
+  "aliases": [],
+  "factRevisions": [],
+  "gaps": [
+    {
+      "id": "gap-2296fe980c1d4931a1b7b6f7e98ba391",
+      "question": "aster-retention",
+      "kind": "insufficient",
+      "reason": "The complete supplied AsterDB document explicitly says that it does not specify a backup retention period. Its backup operation requirement supplies no duration.",
+      "sources": [
+        "source-65610dbc909398e57c19"
+      ],
+      "attempts": null,
+      "assessed_by": "/root/skill_example_supplied/independent_checker",
+      "check": {
+        "by": "/root/skill_example_supplied/independent_checker",
+        "result": "confirmed"
+      }
+    },
+    {
+      "id": "gap-72a317fb16b14db3bbc8dbf51927ac6d",
+      "question": "birch-retention",
+      "kind": "insufficient",
+      "reason": "The complete supplied BirchDB document explicitly says that it does not specify a backup retention period. Its backup operation requirement supplies no duration.",
+      "sources": [
+        "source-34f7c28a187f3ca2b548"
+      ],
+      "attempts": null,
+      "assessed_by": "/root/skill_example_supplied/independent_checker",
+      "check": {
+        "by": "/root/skill_example_supplied/independent_checker",
+        "result": "confirmed"
+      }
+    }
+  ],
+  "conflicts": [],
+  "superseded": [],
+  "missing": [],
+  "tasks": [
+    {
+      "id": "task-5d2b9c2209d4410da84949b5ac19b650",
+      "kind": "source",
+      "rank": 0,
+      "status": "done",
+      "attempts": [
+        {
+          "attempt": 1,
+          "worker": "/root/skill_example_supplied",
+          "started": 1792123737845,
+          "finished": 1792123756045
+        }
+      ],
+      "generation": 1,
+      "accepted": {
+        "token": "lease-5400102cdf8549a09be7312f7bfd42aa",
+        "worker": "/root/skill_example_supplied",
+        "attempt": 1,
+        "digest": "7c91386e06fc0400181f0abe23f5ccfdee7682ccf9d7e912f317253c27917b9b",
+        "result": {
+          "kind": "source",
+          "questions": []
+        }
+      },
+      "given": "given-1",
+      "lease": null,
+      "sourceIds": [
+        "source-65610dbc909398e57c19"
+      ]
+    },
+    {
+      "id": "task-52136396e23e48a6a19e00878ddb409c",
+      "kind": "source",
+      "rank": 0,
+      "status": "done",
+      "attempts": [
+        {
+          "attempt": 1,
+          "worker": "/root/skill_example_supplied",
+          "started": 1792123749386,
+          "finished": 1792123761815
+        }
+      ],
+      "generation": 1,
+      "accepted": {
+        "token": "lease-ed271b16379f4a138d1b82a39bfecee1",
+        "worker": "/root/skill_example_supplied",
+        "attempt": 1,
+        "digest": "4813e2fb556b643ffeec729c4e592e859bc52b6b5aaaece3be748412ec1b39c4",
+        "result": {
+          "kind": "source",
+          "questions": []
+        }
+      },
+      "given": "given-2",
+      "lease": null,
+      "sourceIds": [
+        "source-34f7c28a187f3ca2b548"
+      ]
+    },
+    {
+      "id": "task-f02fe5d3a4344e4197387b4a34fa06ee",
+      "kind": "plan",
+      "rank": 10,
+      "status": "done",
+      "attempts": [
+        {
+          "attempt": 1,
+          "worker": "/root/skill_example_supplied",
+          "started": 1792123761914,
+          "finished": 1792123774469,
+          "error": "Question kind must be open or claim."
+        },
+        {
+          "attempt": 2,
+          "worker": "/root/skill_example_supplied",
+          "started": 1792123774567,
+          "finished": 1792123781067
+        }
+      ],
+      "generation": 2,
+      "accepted": {
+        "token": "lease-a0e0920353f647ab954f788d355424d7",
+        "worker": "/root/skill_example_supplied",
+        "attempt": 2,
+        "digest": "f7a0db0f96bd9d11cbfc028e144742fad1f77a466e51f99bdbcbe6bdee007f87",
+        "result": {
+          "kind": "plan",
+          "questions": []
+        }
+      },
+      "lease": null,
+      "lastError": "Question kind must be open or claim."
+    },
+    {
+      "id": "task-d21b53b03d3f4d7eabc191d961b630a1",
+      "kind": "research",
+      "rank": 20,
+      "status": "done",
+      "attempts": [
+        {
+          "attempt": 1,
+          "worker": "/root/skill_example_supplied",
+          "started": 1792123781164,
+          "finished": 1792123798314
+        }
+      ],
+      "generation": 1,
+      "accepted": {
+        "token": "lease-4410097ff23c4ecba7910482f8053116",
+        "worker": "/root/skill_example_supplied",
+        "attempt": 1,
+        "digest": "93c1bb954ca67670ae40866bfe01d2f8b57b4490af508dd9aa5260edb5ad4ed7",
+        "result": {
+          "kind": "research",
+          "questions": [
+            "aster-deployment"
+          ],
+          "facts": [
+            "fact-74bc22e1b40d49469dc45e487229cb93"
+          ]
+        }
+      },
+      "questions": [
+        "aster-deployment"
+      ],
+      "lease": null
+    },
+    {
+      "id": "task-640ae969051e4a0da2c964912cafdff0",
+      "kind": "research",
+      "rank": 20,
+      "status": "done",
+      "attempts": [
+        {
+          "attempt": 1,
+          "worker": "/root/skill_example_supplied",
+          "started": 1792123798454,
+          "finished": 1792123798516
+        }
+      ],
+      "generation": 1,
+      "accepted": {
+        "token": "lease-84b337143ec44657803d6208c8ac4854",
+        "worker": "/root/skill_example_supplied",
+        "attempt": 1,
+        "digest": "3060ec5171cbda19a28c3a4e7dd44fdb2598d143b41f7c1654d74320ef5f9a29",
+        "result": {
+          "kind": "research",
+          "questions": [
+            "birch-deployment"
+          ],
+          "facts": [
+            "fact-a94b2941faff4b339722a1d491fa7a64"
+          ]
+        }
+      },
+      "questions": [
+        "birch-deployment"
+      ],
+      "lease": null
+    },
+    {
+      "id": "task-88682b8101804232b1eb6adc77175709",
+      "kind": "research",
+      "rank": 20,
+      "status": "done",
+      "attempts": [
+        {
+          "attempt": 1,
+          "worker": "/root/skill_example_supplied",
+          "started": 1792123798583,
+          "finished": 1792123798643
+        }
+      ],
+      "generation": 1,
+      "accepted": {
+        "token": "lease-5f60c9cc59b74cf3ae4e3a7861420fe7",
+        "worker": "/root/skill_example_supplied",
+        "attempt": 1,
+        "digest": "279909921662cc789ddf721152e591928a606751743d6d17e5b32f914eddf083",
+        "result": {
+          "kind": "research",
+          "questions": [
+            "aster-writes"
+          ],
+          "facts": [
+            "fact-f6758e02506f41a483d4c3c368b6ef1b"
+          ]
+        }
+      },
+      "questions": [
+        "aster-writes"
+      ],
+      "lease": null
+    },
+    {
+      "id": "task-2bb3fc1de2904d769303350cac695fbd",
+      "kind": "research",
+      "rank": 20,
+      "status": "done",
+      "attempts": [
+        {
+          "attempt": 1,
+          "worker": "/root/skill_example_supplied",
+          "started": 1792123798709,
+          "finished": 1792123798771
+        }
+      ],
+      "generation": 1,
+      "accepted": {
+        "token": "lease-aeac22bda62a4f62aa3d322c64e45111",
+        "worker": "/root/skill_example_supplied",
+        "attempt": 1,
+        "digest": "66ed7c0d0e58fd8a6b056ce18af7184f20eb5f27615640f5345241c1b33a49b2",
+        "result": {
+          "kind": "research",
+          "questions": [
+            "birch-writes"
+          ],
+          "facts": [
+            "fact-6cb09e5bdc234a48b8ddd423998b90cb"
+          ]
+        }
+      },
+      "questions": [
+        "birch-writes"
+      ],
+      "lease": null
+    },
+    {
+      "id": "task-c8efe9b9e1104cdc86864adcf9c3e97e",
+      "kind": "research",
+      "rank": 20,
+      "status": "done",
+      "attempts": [
+        {
+          "attempt": 1,
+          "worker": "/root/skill_example_supplied",
+          "started": 1792123798838,
+          "finished": 1792123798905
+        }
+      ],
+      "generation": 1,
+      "accepted": {
+        "token": "lease-277e84e4b2fe44e3a3bcef85f2e7477b",
+        "worker": "/root/skill_example_supplied",
+        "attempt": 1,
+        "digest": "b3c3e80a117eaf7c1a1e03a33b3626c256b98a07c0147e357628b98313ec601b",
+        "result": {
+          "kind": "research",
+          "questions": [
+            "aster-retention"
+          ],
+          "facts": []
+        }
+      },
+      "questions": [
+        "aster-retention"
+      ],
+      "lease": null
+    },
+    {
+      "id": "task-58954f6749124671b314e83a6a02e589",
+      "kind": "research",
+      "rank": 20,
+      "status": "done",
+      "attempts": [
+        {
+          "attempt": 1,
+          "worker": "/root/skill_example_supplied",
+          "started": 1792123798968,
+          "finished": 1792123799029
+        }
+      ],
+      "generation": 1,
+      "accepted": {
+        "token": "lease-b6a192f3cc3247828d2d6f2b655998cf",
+        "worker": "/root/skill_example_supplied",
+        "attempt": 1,
+        "digest": "c7e7b77f2a0d9b50a7f12d2474c82d6ba057845b2797b82a23dce3cd01a97fc8",
+        "result": {
+          "kind": "research",
+          "questions": [
+            "birch-retention"
+          ],
+          "facts": []
+        }
+      },
+      "questions": [
+        "birch-retention"
+      ],
+      "lease": null
+    },
+    {
+      "id": "task-859828559d324619b4045c1118388dd0",
+      "kind": "check",
+      "rank": 30,
+      "status": "done",
+      "attempts": [
+        {
+          "attempt": 1,
+          "worker": "/root/skill_example_supplied/independent_checker",
+          "started": 1792123816855,
+          "finished": 1792123842027
+        }
+      ],
+      "generation": 1,
+      "accepted": {
+        "token": "lease-c8a48f8007404e75be5719b1b8d4ce79",
+        "worker": "/root/skill_example_supplied/independent_checker",
+        "attempt": 1,
+        "digest": "931d84068bb6f280e239cdfff57b038e3b41461c1ba15728a7a343e58651933f",
+        "result": {
+          "kind": "check",
+          "questions": [
+            "aster-deployment",
+            "birch-deployment"
+          ]
+        }
+      },
+      "questions": [
+        "aster-deployment",
+        "birch-deployment"
+      ],
+      "lease": null
+    },
+    {
+      "id": "task-7bc6bb6557394893b522b0f693c41c8e",
+      "kind": "check",
+      "rank": 30,
+      "status": "done",
+      "attempts": [
+        {
+          "attempt": 1,
+          "worker": "/root/skill_example_supplied/independent_checker",
+          "started": 1792123821394,
+          "finished": 1792123846869
+        }
+      ],
+      "generation": 1,
+      "accepted": {
+        "token": "lease-1a97ed86df9741feb42d9c9c10f83cde",
+        "worker": "/root/skill_example_supplied/independent_checker",
+        "attempt": 1,
+        "digest": "14c2e3c0ce18dd1e916b012ba766c990830a719a50d573013433f712921a2ddc",
+        "result": {
+          "kind": "check",
+          "questions": [
+            "aster-writes",
+            "birch-writes"
+          ]
+        }
+      },
+      "questions": [
+        "aster-writes",
+        "birch-writes"
+      ],
+      "lease": null
+    },
+    {
+      "id": "task-36f83ab1d6cb41ea944671df947bb962",
+      "kind": "check",
+      "rank": 30,
+      "status": "done",
+      "attempts": [
+        {
+          "attempt": 1,
+          "worker": "/root/skill_example_supplied/independent_checker",
+          "started": 1792123846907,
+          "finished": 1792123858256
+        }
+      ],
+      "generation": 1,
+      "accepted": {
+        "token": "lease-2176e933644e49c9a8e542c2d7a38d0e",
+        "worker": "/root/skill_example_supplied/independent_checker",
+        "attempt": 1,
+        "digest": "242845d74e327ef9a7a9584224d3db0f6e87f3d7de216ec3c3936eb3452c023e",
+        "result": {
+          "kind": "check",
+          "questions": [
+            "aster-retention",
+            "birch-retention"
+          ]
+        }
+      },
+      "questions": [
+        "aster-retention",
+        "birch-retention"
+      ],
+      "lease": null
+    },
+    {
+      "id": "task-737167ee7dac422ba74d24ad42c335c7",
+      "kind": "cross",
+      "rank": 40,
+      "status": "done",
+      "attempts": [
+        {
+          "attempt": 1,
+          "worker": "/root/skill_example_supplied",
+          "started": 1792123865479,
+          "finished": 1792123876777
+        }
+      ],
+      "generation": 1,
+      "accepted": {
+        "token": "lease-49015cbd92fe408cba1ef9b5b60189c4",
+        "worker": "/root/skill_example_supplied",
+        "attempt": 1,
+        "digest": "de2f69806a61bd5180e55fe1f9b4829c6f314dea232a34ad3ae2101996a46705",
+        "result": {
+          "kind": "cross",
+          "questions": []
+        }
+      },
+      "lease": null
+    },
+    {
+      "id": "task-50a32fc6e33e4b3d86d1df6fed35aaf9",
+      "kind": "write",
+      "rank": 60,
+      "status": "done",
+      "attempts": [
+        {
+          "attempt": 1,
+          "worker": "/root/skill_example_supplied",
+          "started": 1792123876884,
+          "finished": 1792123894104
+        }
+      ],
+      "generation": 1,
+      "accepted": {
+        "token": "lease-abfcbc2175c24dc4b2bde70dfc99759d",
+        "worker": "/root/skill_example_supplied",
+        "attempt": 1,
+        "digest": "166bfb09d88224a8851264e7299bcc21d14d64f71838e4a576c7566552fa88ca",
+        "result": {
+          "kind": "write",
+          "questions": [
+            "aster-deployment",
+            "birch-deployment"
+          ]
+        }
+      },
+      "section": "deployment",
+      "questions": [
+        "aster-deployment",
+        "birch-deployment"
+      ],
+      "lease": null
+    },
+    {
+      "id": "task-4055231741dc4457a963c43adc0e17a0",
+      "kind": "write",
+      "rank": 60,
+      "status": "done",
+      "attempts": [
+        {
+          "attempt": 1,
+          "worker": "/root/skill_example_supplied",
+          "started": 1792123894229,
+          "finished": 1792123894290
+        }
+      ],
+      "generation": 1,
+      "accepted": {
+        "token": "lease-3de3a14de72344f5b9b406e0b0d4de9f",
+        "worker": "/root/skill_example_supplied",
+        "attempt": 1,
+        "digest": "bb5dbf2d4b0a140b0d32cbc4405a4391a4809e2fe3f65562eedc6e24e6327523",
+        "result": {
+          "kind": "write",
+          "questions": [
+            "aster-writes",
+            "birch-writes"
+          ]
+        }
+      },
+      "section": "writes",
+      "questions": [
+        "aster-writes",
+        "birch-writes"
+      ],
+      "lease": null
+    },
+    {
+      "id": "task-af2ed62d6be54f7e86fad1a681fbc93b",
+      "kind": "write",
+      "rank": 60,
+      "status": "done",
+      "attempts": [
+        {
+          "attempt": 1,
+          "worker": "/root/skill_example_supplied",
+          "started": 1792123894356,
+          "finished": 1792123894417
+        }
+      ],
+      "generation": 1,
+      "accepted": {
+        "token": "lease-40285c346df24866ba30839a060967cd",
+        "worker": "/root/skill_example_supplied",
+        "attempt": 1,
+        "digest": "e75273b5df54b249cf55e105ef17cae7e0e5bd07cd6b8b63fe5be1842e4e9345",
+        "result": {
+          "kind": "write",
+          "questions": [
+            "aster-retention",
+            "birch-retention"
+          ]
+        }
+      },
+      "section": "retention",
+      "questions": [
+        "aster-retention",
+        "birch-retention"
+      ],
+      "lease": null
+    }
+  ],
+  "workers": [
+    {
+      "id": "/root/skill_example_supplied",
+      "harness": "host-attested",
+      "registered_at": "2026-10-16T04:08:57.845Z"
+    },
+    {
+      "id": "/root/skill_example_supplied/independent_checker",
+      "harness": "host-attested",
+      "registered_at": "2026-10-16T04:10:16.855Z"
+    }
+  ],
+  "generated": [
+    0,
+    10,
+    20,
+    30,
+    40,
+    50,
+    51,
+    52,
+    60,
+    70
+  ],
+  "manualBlock": null,
+  "createdAt": "2026-10-16T04:08:51.952Z",
+  "updatedAt": "2026-10-16T04:22:29.545Z",
+  "ownsOutput": true,
+  "scope": "Compare AsterDB and BirchDB for a small internal application using only the two supplied synthetic notes, revised 2026-10-15. Cover deployment, concurrent writes and backup retention. Do not infer performance, production suitability or retention periods from backup mechanics.",
+  "exportStatus": "complete-with-gaps",
+  "exportStaleInputs": []
+}

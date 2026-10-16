@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.9.0 (unreleased)
+
+- Keep plain-language skill invocation as the product interface; the agent researches
+  with its harness tools and uses the Node-only helper for bookkeeping and validation.
+- Add durable leased research tasks, separate evidence checks, one bounded gap round,
+  cited headlines and answers, and independent prose review at standard/deep depth.
+- Save partial and final reports under `research/`, alongside checked facts, a brief,
+  plan and revision/hash manifest. Preserve a legacy report/record projection.
+- Track immutable fact keys, narrowed assertion history, duplicate aliases, conflicts,
+  source revisions, exact quote offsets and honest unanswered gaps.
+- Fence stale leases, reject self-checking and unleased managed-run writes, repair
+  interrupted exports, and exclude changed evidence from the current facts brief.
+- Require runtime 0.9.0 for this guidance. Runtime installation remains explicit;
+  reuse/refresh/approval commands and consumer migrations remain later milestones.
+
 ## 0.8.1
 
 - A changed plan keeps the findings of questions whose definition is unchanged, when the topic, purpose, scope, selected sources and input files are unchanged. `plan` reports them in `carried`.
