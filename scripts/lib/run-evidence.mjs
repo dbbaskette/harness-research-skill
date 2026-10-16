@@ -2,7 +2,9 @@ import { writeFile, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { hash, stable, key, text, identifier, readText, snapshot, unchanged, exists, directory, localFile } from './run-storage.mjs';
 
-export const DEPTHS = { light: { facts: 12, gaps: 3 }, standard: { facts: 20, gaps: 80 }, deep: { facts: 30, gaps: 80 } };
+// Per question: candidate facts per research submission and cited body sentences per answer. Light keeps
+// both small so checkers and writers read less; standard and deep go further on request.
+export const DEPTHS = { light: { facts: 8, gaps: 3, sentences: 10 }, standard: { facts: 20, gaps: 80, sentences: 40 }, deep: { facts: 30, gaps: 80, sentences: 40 } };
 export const coverageValues = ['answered', 'partly answered', 'not answered'];
 // A quote is only checkable against the text around it. Saved text shorter than this, or a quote
 // that is most of its saved text, is refused unless the source is registered as a partial capture.
@@ -242,7 +244,8 @@ export function validateAnswer(state, question, supplied, options = {}) {
     if (supplied.answer.length || supplied.headline?.kind !== 'gap' || !gapIds.length || stable([...(supplied.headline.gaps ?? [])].sort()) !== stable([...gapIds].sort())) throw new Error('An unanswered question needs an empty answer and a structured gap headline.');
     return { id: question.id, headline: { kind: 'gap', gaps: gapIds }, answer: [], gaps: gapIds };
   }
-  if (!question.assessment || !supplied.answer.length || supplied.answer.length > 40) throw new Error('A checked answered question requires 1 to 40 cited sentences.');
+  const limit = DEPTHS[state.depth]?.sentences ?? 40;
+  if (!question.assessment || !supplied.answer.length || supplied.answer.length > limit) throw new Error(`A checked answered question requires 1 to ${limit} cited sentences at ${state.depth} depth.`);
   const headline = validateSentence(state, supplied.headline, options);
   const answer = supplied.answer.map(sentence => validateSentence(state, sentence, options));
   for (const sentence of answer) if (sentence.paragraph !== undefined && (!Number.isInteger(sentence.paragraph) || sentence.paragraph < 1 || sentence.paragraph > 4)) throw new Error('Answers use at most four paragraphs.');

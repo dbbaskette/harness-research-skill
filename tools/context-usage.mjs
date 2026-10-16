@@ -34,10 +34,12 @@ export async function measureContext() {
   const path = (paths, helpers = []) => readingPath(paths, files, samples, helpers);
   const entry = ['SKILL.md'];
   const focused = [...entry, 'references/workflow.md', 'references/evidence.md'];
-  const queued = [...entry, 'references/research-run.md'];
+  // The coordinator reads the run guidance and the contracts for the tasks it does itself (source,
+  // plan, cross-check); a worker subagent reads only the one file its task's guide names.
+  const queued = [...entry, 'references/research-run.md', 'references/task-research.md', 'references/task-write.md'];
   const compare = [...entry, 'references/comparative.md'];
   const readingPaths = {
-    queued: path(queued), focused: path(focused), quick: path([...entry, 'references/workflow.md']),
+    queued: path(queued), researchWorker: path(['references/task-research.md']), checkWorker: path(['references/task-check.md']), writeWorker: path(['references/task-write.md']), refreshWorker: path(['references/reuse.md']), focused: path(focused), quick: path([...entry, 'references/workflow.md']),
     resume: path([...entry, 'references/resume.md']),
     reuse: path([...entry, 'references/reuse.md']),
     comparative: path(compare), migration: path([...entry, 'references/migration.md']),
@@ -56,13 +58,14 @@ export async function measureContext() {
   if (!description) throw new Error('Missing skill metadata');
   const activation = files['bootstrap/SKILL.md'] + files['SKILL.md'];
   const routes = { 'Discovery metadata': count(description), 'Installed bootstrap': files['bootstrap/SKILL.md'], 'Bootstrap + current guidance entry': activation,
-    ...Object.fromEntries(Object.entries({ queued: 'Skill research with independent checks and saved report', reuse: 'Verify, research again, reuse or refresh', quick: 'Explicit chat-only cited answer', focused: 'Legacy manual research with saved report', resume: 'Status / resume without new findings', comparative: 'Comparative routing only', codexoutline: 'Codex comparative outline', codexitems: 'Codex add items', codexfields: 'Codex add fields', codexdeep: 'Codex deep results', codexdeepSaved: 'Codex deep results + saved evidence', claudeoutline: 'Claude comparative outline', claudedeep: 'Claude deep results', general: 'Saved research + general web strategy', academic: 'Saved research + academic strategy', github: 'Saved research + GitHub strategy', technical: 'Saved research + technical Q&A strategy', chinese: 'Saved research + Chinese sources strategy', migration: 'Legacy migration' }).map(([name, label]) => [label, standalone[name].total])) };
+    'Research worker subagent': readingPaths.researchWorker.total, 'Checker subagent': readingPaths.checkWorker.total, 'Writer or reviewer subagent': readingPaths.writeWorker.total, 'Refresh worker': readingPaths.refreshWorker.total,
+    ...Object.fromEntries(Object.entries({ queued: 'Coordinator: skill research with independent checks and saved report', reuse: 'Verify, research again, reuse or refresh', quick: 'Explicit chat-only cited answer', focused: 'Legacy manual research with saved report', resume: 'Status / resume without new findings', comparative: 'Comparative routing only', codexoutline: 'Codex comparative outline', codexitems: 'Codex add items', codexfields: 'Codex add fields', codexdeep: 'Codex deep results', codexdeepSaved: 'Codex deep results + saved evidence', claudeoutline: 'Claude comparative outline', claudedeep: 'Claude deep results', general: 'Saved research + general web strategy', academic: 'Saved research + academic strategy', github: 'Saved research + GitHub strategy', technical: 'Saved research + technical Q&A strategy', chinese: 'Saved research + Chinese sources strategy', migration: 'Legacy migration' }).map(([name, label]) => [label, standalone[name].total])) };
   const hashes = Object.fromEntries(paths.map(path => [path, createHash('sha256').update(contents[path]).digest('hex')]));
   const inputDigest = createHash('sha256').update(JSON.stringify({ hashes, outputs, readingPaths, routes })).digest('hex');
   return { tokenizer: 'cl100k_base', inputDigest, files, samples, readingPaths, standalone, routes };
 }
 export function renderReport(data) {
-  return 'Measured with `cl100k_base`; cumulative instruction counts, including a normalized\nrepresentative guidance-start response. Bootstrap activation is shown separately.\n\n| Reading path | Tokens |\n| --- | ---: |\n' + Object.entries(data.routes).map(([label, value]) => `| ${label} | ${value.toLocaleString('en-US')} |`).join('\n') + '\n\nComparative rows include the selected platform resource, not the complete bundle.\nEach strategy row includes one router and one strategy. Status/resume skips plan\nand finding schemas until a new save is needed. Only explicitly requested chat-only\nanswers omit saved artifacts; default research uses the skill task/evidence workflow. Source\ncontent, images, research task responses and conversation add separately. The JSON\nreport also exposes direct-handoff paths without the bootstrap/start response.\n';
+  return 'Measured with `cl100k_base`; cumulative instruction counts, including a normalized\nrepresentative guidance-start response. Bootstrap activation is shown separately.\n\n| Reading path | Tokens |\n| --- | ---: |\n' + Object.entries(data.routes).map(([label, value]) => `| ${label} | ${value.toLocaleString('en-US')} |`).join('\n') + '\n\nComparative rows include the selected platform resource, not the complete bundle.\nWorker rows count only the file a task\'s `guide` names, without the\nbootstrap or entry. Each strategy row includes one router and one strategy. Status/resume skips plan\nand finding schemas until a new save is needed. Only explicitly requested chat-only\nanswers omit saved artifacts; default research uses the skill task/evidence workflow. Source\ncontent, images, research task responses and conversation add separately. The JSON\nreport also exposes direct-handoff paths without the bootstrap/start response.\n';
 }
 export async function main() {
   const args = process.argv.slice(2);

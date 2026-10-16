@@ -18,8 +18,8 @@ saves a cited report in your project—ready to open, share, and continue later.
 | Check a set of claims | Supported, contradicted, or insufficient—with the evidence behind each verdict. |
 | Return to unfinished research | Saved progress, visible gaps, and a report that survives the chat. |
 
-> **Current release: [0.9.3](https://github.com/dbbaskette/harness-research-skill/releases/tag/v0.9.3).**
-> Install the tagged version below. Already using a preview that says 0.9.3?
+> **Current release: [0.9.4](https://github.com/dbbaskette/harness-research-skill/releases/tag/v0.9.4).**
+> Install the tagged version below. Already using a preview that says 0.9.4?
 > Rerun the installer from this tag to get the final release.
 > [Versions, updates, and troubleshooting →](docs/setup.md)
 
@@ -33,7 +33,7 @@ separate research account. Your agent also needs permission to start a separate
 checker for the evidence.
 
 ```sh
-git clone --branch v0.9.3 https://github.com/dbbaskette/harness-research-skill.git
+git clone --branch v0.9.4 https://github.com/dbbaskette/harness-research-skill.git
 cd harness-research-skill
 bash scripts/Install-Harness-Research.sh
 ```
@@ -153,7 +153,7 @@ your agent will explain what needs reassessment.
 | Understand helpers, schemas, or run tests | [Developer guide](docs/development.md) |
 | Continue older Tanzu Brand research | [Migration guide](references/migration.md) |
 | Inspect the agent's workflow | [Skill instructions](SKILL.md) and [research contract](references/research-run.md) |
-| See what has been verified | [0.9.3 checks](docs/verification/0.9.3/README.md); [0.9.2](docs/verification/0.9.2/README.md); [0.9.1](docs/verification/0.9.1/README.md); [0.9.0 evidence and release decision](docs/verification/0.9.0/README.md) |
+| See what has been verified | [0.9.4 checks and trials](docs/verification/0.9.4/README.md); [0.9.3](docs/verification/0.9.3/README.md); [0.9.2](docs/verification/0.9.2/README.md); [0.9.1](docs/verification/0.9.1/README.md); [0.9.0 evidence and release decision](docs/verification/0.9.0/README.md) |
 
 ## Built for your agent, with the work kept in your project
 
@@ -179,7 +179,11 @@ representative guidance-start response. Bootstrap activation is shown separately
 | Discovery metadata | 38 |
 | Installed bootstrap | 490 |
 | Bootstrap + current guidance entry | 1,113 |
-| Skill research with independent checks and saved report | 4,617 |
+| Research worker subagent | 1,133 |
+| Checker subagent | 541 |
+| Writer or reviewer subagent | 580 |
+| Refresh worker | 668 |
+| Coordinator: skill research with independent checks and saved report | 4,838 |
 | Verify, research again, reuse or refresh | 1,890 |
 | Explicit chat-only cited answer | 2,067 |
 | Legacy manual research with saved report | 3,258 |
@@ -192,15 +196,16 @@ representative guidance-start response. Bootstrap activation is shown separately
 | Codex deep results + saved evidence | 3,859 |
 | Claude comparative outline | 2,797 |
 | Claude deep results | 2,690 |
-| Saved research + general web strategy | 5,114 |
-| Saved research + academic strategy | 5,206 |
-| Saved research + GitHub strategy | 5,001 |
-| Saved research + technical Q&A strategy | 4,906 |
-| Saved research + Chinese sources strategy | 5,131 |
+| Saved research + general web strategy | 5,335 |
+| Saved research + academic strategy | 5,427 |
+| Saved research + GitHub strategy | 5,222 |
+| Saved research + technical Q&A strategy | 5,127 |
+| Saved research + Chinese sources strategy | 5,352 |
 | Legacy migration | 1,462 |
 
 Comparative rows include the selected platform resource, not the complete bundle.
-Each strategy row includes one router and one strategy. Status/resume skips plan
+Worker rows count only the file a task's `guide` names, without the
+bootstrap or entry. Each strategy row includes one router and one strategy. Status/resume skips plan
 and finding schemas until a new save is needed. Only explicitly requested chat-only
 answers omit saved artifacts; default research uses the skill task/evidence workflow. Source
 content, images, research task responses and conversation add separately. The JSON

@@ -1,0 +1,49 @@
+{
+  "steps": 13,
+  "passed": 9,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "missing project folder gets a plain message",
+      "pass": true,
+      "detail": "Project folder <work>/not-created does not exist; create it first or pass an existing --project."
+    },
+    {
+      "name": "peek accepts --harness",
+      "pass": true,
+      "detail": "{\"run\":\"958788dad73644488af78f8d\",\"status\":\"in-progress\",\"output_revision\":1,\"approval\":null,\"runtimeVersion\":\"0.9.4\",\"guidanceVersion\":\"0.9.4\",\"guidanceRevision\":null,\"guidanceTask\":null,\"report\":\"<work>/projects/checkpoint/research/report.md\",\"facts\":\"<work>/projects/checkpoint/research/facts.json\",\"brief\":\"<work>/projects/checkpoint/research/brief.md\",\"manifest\":\"<work>/projects/checkpoint/research/output.json\",\"file\":\"<work>/projects/checkpoint/.harness-research/research-run.json\",\"blockReasons\":[],\"staleInputs\":[],\"stale\":{\"sources\":[],\"facts\":[],\"questions\":[],\"rewrite\":[],\"claims\":[]},\"changedInputs\":[],\"reassess\":null,\"failedTasks\":[],\"planOnly\":false,\"warnings\":[],\"counts\":{\"questions\":0,\"assessed\":0,\"facts\":0,\"confirmed\":0,\"gaps\":0,\"failed\":0},\"task\":{\"id\":\"task-e676907f5c7b46fc9fcfc6c90c6b7cd9\",\"kind\":\"source\",\"questions\":[]},\"ready\":1,\"task_summary\":{\"ready\":1},\"active_tasks\":[{\"id\":\"task-e676907f5c7b46fc9fcfc6c90c6b7cd9\",\"kind\":\"source\",\"status\":\"ready\"}]}"
+    },
+    {
+      "name": "source task accepted",
+      "pass": true
+    },
+    {
+      "name": "plan accepted",
+      "pass": true
+    },
+    {
+      "name": "an unsupported count is still refused",
+      "pass": true,
+      "detail": "[\"Question frames: Numbers not present in the cited evidence: 1000\"]"
+    },
+    {
+      "name": "an identifier with digits is accepted without those digits in the quote",
+      "pass": true
+    },
+    {
+      "name": "relative --from refusal names the folder it looked in",
+      "pass": true,
+      "detail": "No saved research at checkpoint (looked in <work>/projects/reuse/checkpoint; a relative --from is read relative to --project)."
+    },
+    {
+      "name": "absolute --from refusal carries no relative-path hint",
+      "pass": true,
+      "detail": "No saved research at <work>/projects/nothing."
+    },
+    {
+      "name": "a correct relative --from resolves against --project",
+      "pass": true,
+      "detail": "{\"run\":\"f70f4db8e09b498a8b333c87\",\"status\":\"in-progress\",\"output_revision\":1,\"approval\":null,\"runtimeVersion\":\"0.9.4\",\"guidanceVersion\":\"0.9.4\",\"guidanceRevision\":null,\"guidanceTask\":null,\"report\":\"<work>/projects/reuse/research/report.md\",\"facts\":\"<work>/projects/reuse/research/facts.json\",\"brief\":\"<work>/projects/reuse/research/brief.md\",\"manifest\":\"<work>/projects/reuse/research/output.json\",\"file\":\"<work>/projects/reuse/.harness-research/research-run.json\",\"blockReasons\":[],\"staleInputs\":[],\"stale\":{\"sources\":[],\"facts\":[],\"questions\":[],\"rewrite\":[],\"claims\":[]},\"changedInputs\":[],\"reassess\":{\"round\":1,\"kind\":\"import\",\"done\":false,\"questions\":[\"frames\"],\"rewrite\":[\"frames\"]},\"failedTasks\":[],\"planOnly\":false,\"warnings\":[],\"counts\":{\"questions\":1,\"assessed\":0,\"facts\":0,\"confirmed\":0,\"gaps\":0,\"failed\":0},\"task_summary\":{\"ready\":1},\"active_tasks\":[{\"id\":\"task-3be72ba4b6a44a5da0714b34393a63f3\",\"kind\":\"research\",\"status\":\"ready\",\"questions\":[\"frames\"]}]}"
+    }
+  ]
+}

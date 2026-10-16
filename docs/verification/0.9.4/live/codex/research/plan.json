@@ -1,0 +1,72 @@
+{
+  "run": "84c16de8f7574291b49a6495",
+  "output_revision": 23,
+  "scope": "Focused decision support for a typical single-host application: reader/writer interaction, checkpoints, durability and operational limits. Public primary documentation first; no workload benchmarking or deployment changes. Seven questions in three sections keep this narrow request focused.",
+  "source_mode": "public-web",
+  "sections": [
+    {
+      "id": "concurrency",
+      "name": "How readers and writers interact"
+    },
+    {
+      "id": "checkpoints",
+      "name": "Checkpoints and WAL growth"
+    },
+    {
+      "id": "durability-limits",
+      "name": "Durability, limitations and enablement"
+    }
+  ],
+  "subjects": [],
+  "questions": [
+    {
+      "id": "mechanism",
+      "question": "How do WAL commits and reader snapshots work, and how many writers can proceed?",
+      "section": "concurrency",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "contention",
+      "question": "What contention and read-to-write transaction behavior must an application handle?",
+      "section": "concurrency",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "checkpoint",
+      "question": "What does a checkpoint do, when does automatic checkpointing run, and how do checkpoint modes differ?",
+      "section": "checkpoints",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "growth",
+      "question": "How do long readers, WAL growth and checkpoint scheduling affect operational performance?",
+      "section": "checkpoints",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "durability",
+      "question": "How do FULL, NORMAL and OFF synchronous settings affect WAL durability and crash safety?",
+      "section": "durability-limits",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "limits",
+      "question": "Which filesystem, multi-database, read-only, file-handling and version limitations matter before enabling WAL?",
+      "section": "durability-limits",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "enablement",
+      "question": "How is WAL enabled and verified, which settings need connection initialization, and what practical decision criteria follow?",
+      "section": "durability-limits",
+      "subject": null,
+      "kind": "open"
+    }
+  ]
+}
