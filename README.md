@@ -180,7 +180,7 @@ representative guidance-start response. Bootstrap activation is shown separately
 | Installed bootstrap | 490 |
 | Bootstrap + current guidance entry | 1,106 |
 | Skill research with independent checks and saved report | 4,524 |
-| Verify, research again, reuse or refresh | 1,880 |
+| Verify, research again, reuse or refresh | 1,883 |
 | Explicit chat-only cited answer | 2,060 |
 | Legacy manual research with saved report | 3,251 |
 | Status / resume without new findings | 1,661 |

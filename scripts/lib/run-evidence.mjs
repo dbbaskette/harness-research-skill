@@ -149,13 +149,15 @@ export async function sourceRecord(root, state, supplied, task, revisionOf = nul
   // Capturing only part of a source changes its provenance, not its saved bytes.
   // Issue a new revision for that metadata while preserving existing full-source IDs.
   // A changed original with unchanged extracted text is still a new revision.
-  const identity = [origin, sha256, ...(original && original.sha256 !== sha256 ? [original.sha256] : []), ...(capture ? [capture] : [])];
+  // A refreshed revision is a new node in its page's history even when the page returns to earlier
+  // text, so the chain of revisions never loops back on itself.
+  const identity = [origin, sha256, ...(original && original.sha256 !== sha256 ? [original.sha256] : []), ...(capture ? [capture] : []), ...(revisionOf ? ['revision-of', revisionOf.id] : [])];
   const id = identifier(supplied.id ?? 'source-' + hash(stable(identity)).slice(0, 20));
   const previous = state.sources.find(source => source.id === id);
   if (previous && (previous.sha256 !== sha256 || previous.origin !== origin)) throw new Error('Source IDs identify immutable revisions; register a new ID.');
   const pinned = await pin(root, sha256, await readPinnable(root, supplied.file, sha256));
   const provenance = revisionOf ? revisionOf.provenance : supplied.transcribed ? 'transcribed' : given ? 'given' : 'found';
-  const lineage = revisionOf ? { revision_of: revisionOf.id, ...(revisionOf.imported ? { imported: (({ missing_text, ...rest }) => rest)(revisionOf.imported) } : {}) } : {};
+  const lineage = revisionOf ? { revision_of: revisionOf.id, ...(revisionOf.imported ? { imported: (({ unusable, ...rest }) => rest)(revisionOf.imported) } : {}) } : {};
   return { id, given: given?.id ?? null, title, origin, publisher: supplied.publisher ? text(supplied.publisher, 'Publisher') : null, standing, provenance, capture, pages: supplied.pages ?? null, file: supplied.file, pinned, sha256, original_file: originalFile, original_sha256: original?.sha256 ?? null, limits, source_date: supplied.source_date ?? null, saved_at: previous?.saved_at ?? new Date().toISOString(), ...lineage };
 }
 export async function citations(root, state, supplied, question) {

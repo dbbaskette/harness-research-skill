@@ -33,9 +33,9 @@ checked and rewritten as a round. Work its tasks as usual: research tasks carry
 approval and source age, and let the person choose. Pass `--topic`, `--about` or
 `--source` when the new work differs; the planner then gets an extension task:
 return only new sections and questions (`[]` when covered). Work that cannot be
-carried (missing saved text, unchecked facts, public sources in a supplied-only
-run) is researched again in an import round. Read `warnings` and tell the person.
-An origin's approval is history, not approval of the new run.
+carried (missing saved text, changed originals, unchecked facts, public sources
+in a supplied-only run) is researched again in an import round. Read `warnings`
+and tell the person. An origin's approval is history, not approval of the new run.
 
 ## Approve at a gate
 

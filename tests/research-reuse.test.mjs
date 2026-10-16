@@ -4,7 +4,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { startRun, nextTask, runStatus, verifyKeys } from '../scripts/lib/research-run.mjs';
 import { runCli } from '../scripts/lib/run-cli.mjs';
-import { quote, reference, fixture, setup, take, submit, finding, checked, finish, completed } from './run-fixtures.mjs';
+import { quote, reference, surroundings, project, fixture, setup, take, submit, finding, checked, writing, finish, completed } from './run-fixtures.mjs';
 
 const readers = 'Readers never wait for that writer, because each query sees a consistent snapshot';
 const factsOf = async status => JSON.parse(await readFile(status.facts, 'utf8'));
@@ -132,7 +132,7 @@ test('approve records who approved which content, and a later change says it no 
 });
 
 const trial = new URL('../docs/verification/0.9.0/claude-code-redis-valkey/new', import.meta.url).pathname;
-async function newProject(t) { const { project } = await import('./run-fixtures.mjs'); return project(t, 'research-reuse-target-'); }
+const newProject = t => project(t, 'research-reuse-target-');
 
 test('start --from reuses finished research at once, with the same keys and the origin approval kept as history', async t => {
   const origin = await completed(t);
@@ -323,9 +323,145 @@ test('refresh keeps facts whose passages remain, records unreadable originals, a
 
   const local = await completed(t);
   const nothing = await runCli(['refresh', '--project', local.project, '--run', local.run]);
-  assert.equal(nothing.status, 'complete'); assert.equal(nothing.refreshing.done, true); assert.match(nothing.note, /local files/);
+  assert.equal(nothing.status, 'complete'); assert.equal(nothing.refreshing.done, true); assert.match(nothing.note, /no cited source is a readable web page/);
   const open = await fixture(t); await setup(open);
   await assert.rejects(runCli(['refresh', '--project', open.project, '--run', open.run]), /finished run/);
   await writeFile(join(local.project, 'sources/reference.txt'), reference.replace('single', 'sole') + '\n');
   await assert.rejects(runCli(['refresh', '--project', local.project, '--run', local.run]), /reassess first/);
+});
+
+// Regression tests from the 0.9.1 review.
+const twoQuestions = { scope: 'Synthetic OrionDB facts.', sections: [{ id: 'deployment', name: 'Deployment' }], subjects: [], questions: [{ id: 'writers', section: 'deployment', kind: 'open', question: 'How many writers does OrionDB permit?' }, { id: 'readers', section: 'deployment', kind: 'open', question: 'Do OrionDB readers wait for the writer?' }] };
+const readerFact = source => ({ statement: 'OrionDB readers never wait for the writer.', as_of: null, quotes: [{ source: source.id, quote: readers, locator: 'Line 1' }] });
+
+test('verify follows a narrowed assertion that was later superseded to the one standing now', async t => {
+  const f = await fixture(t), source = await setup(f), data = finding(source, 'OrionDB permits a single writer globally.');
+  data.facts.push(readerFact(source));
+  await submit(f, await take(f), data);
+  const before = (await factsOf(await runStatus(f))).facts.find(fact => /globally/.test(fact.statement)).key;
+  let replacement;
+  await finish(f, {
+    check: task => { const result = checked(task); result.facts = result.facts.map(item => item.key === before ? { ...item, result: 'narrowed', statement: quote, reason: 'Synthetic narrowing.' } : item); return result; },
+    cross: task => { const narrowed = task.facts.find(fact => fact.statement === quote), other = task.facts.find(fact => fact.statement !== quote); replacement = other.key; return { merges: [], conflicts: [], superseded: [{ fact: narrowed.key, by: other.key, note: 'Synthetic replacement.' }], missing: [] }; },
+  });
+  const entry = (await verifyKeys({ project: f.project, keys: [before] })).keys[0];
+  assert.equal(entry.result, 'narrowed'); assert.equal(entry.replacement.key, replacement); assert.equal(entry.replacement.result, 'confirmed');
+});
+
+test('a round that finishes before the first pass writes a section leaves that section to be written in full', async t => {
+  const f = await fixture(t), source = await setup(f, twoQuestions);
+  const research = await take(f), data = { questions: [{ id: 'writers', ...finding(source) }, { id: 'readers', coverage: 'answered', facts: [readerFact(source)], gaps: [] }] };
+  await submit(f, research, data);
+  const check = await take(f, 'checker'); await submit(f, check, checked(check));
+  await runCli(['reassess', '--project', f.project, '--run', f.run, '--again', 'writers']);
+  const again = await take(f, 'researcher-again'); assert.equal(again.kind, 'research');
+  const cross = await take(f, 'crosser'); assert.equal(cross.kind, 'cross');
+  await submit(f, again, { coverage: 'answered', facts: [], gaps: [] });
+  const recheck = await take(f, 'checker-2'); await submit(f, recheck, checked(recheck));
+  const write = await take(f, 'writer'); assert.deepEqual(write.questions.map(q => q.id), ['writers']); await submit(f, write, writing(write));
+  await submit(f, cross, { merges: [], conflicts: [], superseded: [], missing: [] });
+  const done = await finish(f);
+  assert.equal(done.status, 'complete');
+  assert.ok((await factsOf(done)).questions.every(question => question.headline), 'every question is written');
+});
+
+test('refresh follows a page through several revisions, including back to earlier text', async t => {
+  const f = await webRun(t), refresh = () => runCli(['refresh', '--project', f.project, '--run', f.run]);
+  for (const text of [reference + ' A first added paragraph about release notes leaves the writer rule alone.\n', reference + ' A second added paragraph about packaging leaves the writer rule alone.\n', reference + '\n']) { await refresh(); await finish(f, { refresh: reread(f, text) }); }
+  await refresh();
+  let task;
+  await finish(f, {
+    refresh: async item => { task = item; return reread(f, reference.replace(quote, 'OrionDB now permits two writers for each database, one per region.') + '\n')(item); },
+    research: item => ({ coverage: 'answered', facts: [{ statement: 'OrionDB now permits two writers for each database.', as_of: null, quotes: [{ source: item.sources.find(s => s.origin === 'https://fixture.invalid/orion').id, quote: 'OrionDB now permits two writers for each database, one per region.' }] }], gaps: [] }),
+  });
+  assert.equal(task.sources.length, 1); assert.deepEqual(task.sources[0].quotes, [quote]);
+  assert.equal((await verifyKeys({ project: f.project, keys: [f.key] })).keys[0].result, 'stale');
+  const web = JSON.parse(await readFile(join(f.project, '.harness-research/research-run.json'), 'utf8')).sources.filter(s => s.origin === 'https://fixture.invalid/orion');
+  assert.equal(new Set(web.map(s => s.id)).size, 5); assert.equal(web.filter(s => !s.stale_since).length, 1);
+});
+
+test('import does not carry a confirmed fact whose saved text is gone, even from an older revision, and refuses an altered pin', async t => {
+  const { rm, chmod } = await import('node:fs/promises');
+  const f = await webRun(t);
+  await runCli(['refresh', '--project', f.project, '--run', f.run]);
+  await finish(f, { refresh: reread(f, reference + ' An added paragraph about packaging leaves the writer rule alone.\n') });
+  const record = JSON.parse(await readFile(join(f.project, '.harness-research/research-run.json'), 'utf8'));
+  const old = record.sources.find(s => s.origin === 'https://fixture.invalid/orion' && s.stale_since);
+  await rm(join(f.project, old.pinned)); await rm(join(f.project, old.file));
+  const started = await startRun({ project: await newProject(t), from: [f.project], allowWeb: true });
+  assert.equal(started.status, 'in-progress'); assert.deepEqual(started.reassess.questions, ['writers']);
+  const imported = (await verifyKeys({ project: started.file.replace('/.harness-research/research-run.json', ''), keys: [f.key] })).keys[0];
+  assert.equal(imported.result, 'stale');
+
+  const g = await completed(t), pinned = (await factsOf(g.done)).sources[0].pinned;
+  await chmod(join(g.project, pinned), 0o644); await writeFile(join(g.project, pinned), reference.replace('single', 'sole') + '\n');
+  await assert.rejects(startRun({ project: await newProject(t), from: [g.project] }), /saved text .* altered/);
+});
+
+test('import rewrites and reviews answers that were never reviewed at standard depth', async t => {
+  const f = await fixture(t, { depth: 'standard' }), source = await setup(f);
+  await submit(f, await take(f), finding(source));
+  const check = await take(f, 'checker'); await submit(f, check, checked(check));
+  await submit(f, await take(f, 'checker'), { merges: [], conflicts: [], superseded: [], missing: [] });
+  const write = await take(f, 'writer'); await submit(f, write, writing(write));
+  assert.equal((await runStatus(f)).status, 'in-progress');
+  const target = await newProject(t), started = await startRun({ project: target, from: [f.project] });
+  assert.equal(started.status, 'in-progress'); assert.deepEqual(started.reassess.rewrite, ['writers']);
+  const done = await finish({ project: target, run: started.run });
+  const exported = await factsOf(done);
+  assert.equal(exported.prose_review, 'independently reviewed'); assert.ok(exported.questions[0].writingReview.by);
+});
+
+test('a question two origins answer differently is assessed again, and a stale or edited selected original is read again', async t => {
+  const rejected = await fixture(t), rSource = await setup(rejected);
+  await submit(rejected, await take(rejected), finding(rSource));
+  await finish(rejected, { check: task => checked(task, { rejected: true }) });
+  const answered = await completed(t), target = await newProject(t);
+  const started = await startRun({ project: target, from: [rejected.project, answered.project] });
+  const done = await finish({ project: target, run: started.run }, { plan: () => ({ questions: [] }), research: () => ({ coverage: 'answered', facts: [], gaps: [] }) });
+  const question = (await factsOf(done)).questions[0];
+  assert.equal(question.coverage, 'answered'); assert.notEqual(question.headline.kind, 'gap');
+  assert.deepEqual((await factsOf(done)).reassessments.map(item => item.questions), [['writers']]);
+
+  const local = await completed(t), key = (await factsOf(local.done)).facts[0].key;
+  await writeFile(join(local.project, 'sources/reference.txt'), reference.replace('single writer', 'single primary writer') + '\n');
+  const again = await startRun({ project: local.project, from: ['.'] });
+  assert.equal(again.status, 'in-progress');
+  assert.equal((await verifyKeys({ project: local.project, keys: [key] })).keys[0].result, 'stale');
+  const reread = await take({ project: local.project, run: again.run }, 'reader');
+  assert.equal(reread.kind, 'source'); assert.equal(reread.selected.file, 'sources/reference.txt');
+});
+
+test('a research folder copied under another name keeps its saved text', async t => {
+  const { cp, mkdir } = await import('node:fs/promises');
+  const origin = await completed(t), target = await newProject(t);
+  await mkdir(join(target, 'archive')); await cp(join(origin.project, 'research'), join(target, 'archive/orion-research'), { recursive: true });
+  const started = await startRun({ project: target, from: ['archive/orion-research'] });
+  assert.equal(started.status, 'complete'); assert.deepEqual(started.warnings, []);
+});
+
+test('reuse with a new selected source reads it before the planner extends the plan', async t => {
+  const origin = await completed(t), target = await newProject(t);
+  await writeFile(join(target, 'sources/backups.txt'), 'OrionDB backups are taken from a consistent snapshot every night.' + surroundings + '\n');
+  const started = await startRun({ project: target, from: [origin.project], sources: ['sources/backups.txt'] });
+  const f = { project: target, run: started.run }, kinds = [];
+  const first = await take(f, 'reader'); kinds.push(first.kind);
+  await submit(f, first, { register: [{ file: 'sources/backups.txt', title: 'Backups', publisher: 'Fixture' }] });
+  const done = await finish(f, { plan: task => { kinds.push(task.kind); assert.ok(task.sources.some(source => source.given)); return { questions: [] }; } });
+  assert.deepEqual(kinds, ['source', 'plan']); assert.equal(done.status, 'complete');
+});
+
+test('claim questions come across only when their exact target is in the new project', async t => {
+  const origin = await project(t), draft = 'OrionDB permits a single writer for each database, says our draft.\n';
+  await writeFile(join(origin, 'draft.md'), draft);
+  const claim = { file: 'draft.md', quote: 'OrionDB permits a single writer', start: 0 };
+  const f = await fixture(t, { project: origin, claims: [claim] });
+  await setup(f, { scope: 'Check the draft.', sections: [{ id: 'claims', name: 'Claims' }], subjects: [], questions: [{ id: 'claim-1', section: 'claims', kind: 'claim', question: 'Is the draft right about writers?', claim }] });
+  await submit(f, await take(f), finding((await factsOf(await runStatus(f))).sources[0]));
+  assert.equal((await finish(f)).status, 'complete');
+  const without = await startRun({ project: await newProject(t), from: [origin] });
+  assert.match(without.warnings.join(' '), /Claim question claim-1 was left out/); assert.equal(without.counts.questions, 0);
+  const withDraft = await newProject(t); await writeFile(join(withDraft, 'draft.md'), draft);
+  const carried = await startRun({ project: withDraft, from: [origin] });
+  assert.equal(carried.status, 'complete'); assert.equal((await factsOf(carried)).questions[0].verdict, 'supported');
 });

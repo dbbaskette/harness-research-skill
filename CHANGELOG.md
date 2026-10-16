@@ -17,7 +17,9 @@ pass (or the owner approves a narrower scope). The guidance still accepts runtim
 - `research start --from PATH` (repeatable) begins a run from earlier research,
   reading only its `research/` folder. Checked work keeps its keys; missing saved
   text, unchecked candidates and public sources in a supplied-only run are
-  researched again; edited research is refused. A new topic, context, sources or
+  researched again. Saved text or quotes that no longer match, or a confirmed fact
+  without a separate checker, refuse the import; this catches edits, not a
+  consistent forgery of the whole record. A new topic, context, sources or
   several origins ask the planner to extend the plan, and new questions are
   cross-checked. Colliding IDs are renamed. Origin approvals are history.
 - `research find --in DIR [--query TEXT]` lists research folders with status,
