@@ -27,7 +27,7 @@ requested chat-only answer omits saved artifacts.
 
 | Task | Read |
 | --- | --- |
-| Research a topic, comparison or claims; continue a queued run | [Skill research workflow](references/research-run.md) |
+| Research a topic, comparison or claims; continue or reassess a queued run | [Skill research workflow](references/research-run.md) |
 | Continue a manual plan, use legacy commands, or research with a 0.8.x runtime | [Workflow](references/workflow.md), [evidence](references/evidence.md) and [resume](references/resume.md) as needed |
 | Extend a retained item/field outline | [Comparative research](references/comparative.md) |
 | Search a specialized source domain | One strategy from [source routing](references/strategies.md) |
@@ -36,10 +36,11 @@ requested chat-only answer omits saved artifacts.
 The queued workflow needs runtime 0.9.0; with an older one, work manually and say so.
 References resolve within this guidance snapshot; commands use its returned
 installed runtime. Keep outputs in the user's project and the installation
-unchanged. Use the current harness and authorized capabilities. Independent
-checker invocations can run sequentially; using the researcher's context under
-another name is not independent checking. When unavailable, save a partial report
-and report the block. Delegate only with host/user authorization.
+unchanged. Use the current harness and authorized capabilities. Coordinate:
+run independent tasks in parallel subagents when allowed, or one after another.
+The researcher's context under another name is not an independent checker. When
+none is available, save a partial report and report the block. Delegate only
+with host/user authorization.
 
 Read original supporting passages, seek contradictions, and retain dates,
 versions and limits. A search snippet or model memory is not inspected proof.

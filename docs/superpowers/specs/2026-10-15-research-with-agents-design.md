@@ -1,6 +1,7 @@
 # Research a topic with Claude Code or Codex: a thoroughly researched, cited report
 
-Date: 2026-10-15. Status: draft 8, revised after the implementation review. Issue:
+Date: 2026-10-15. Status: draft 9, revised after the 0.9.0 review for speed, selective staleness and
+release-tag guidance (2026-10-16). Issue:
 [harness-research-skill#9](https://github.com/dbbaskette/harness-research-skill/issues/9).
 
 ## What it is for
@@ -140,7 +141,21 @@ node scripts/harness-research.mjs research source --project DIR --file research/
 
 # Where the run stands: stages, tasks, coverage, what is missing.
 node scripts/harness-research.mjs research status --project DIR
+
+# Release a --plan-only hold (optionally with an edited plan); record an execution block.
+node scripts/harness-research.mjs research continue --project DIR --run RUN [--file PLAN]
+node scripts/harness-research.mjs research block --project DIR --run RUN --reason TEXT
+
+# After a registered source changed: redo only the work that rests on it.
+node scripts/harness-research.mjs research reassess --project DIR --run RUN
 ```
+
+Commands answer compactly: `next` writes the full task to a file under
+`.harness-research/tasks/` and returns its path, and status replies summarise tasks
+by state. `--verbose` prints everything. A result may register its sources in a
+`register` array and cite them by file, instead of one `research source` command per
+source. The helper waits up to 30 seconds for a busy store, so parallel workers do
+not fail on each other's saves, and recovers a lock left by an exited process.
 
 `plan`, `record`, `status` and `migrate` stay as they are, for callers that research by hand.
 For a fact-check, `--claims FILE` supplies exact claim objects (`file`, `quote`, Unicode
@@ -158,16 +173,28 @@ assertion. A requested internal-consistency check must be labelled as such.
 | --- | --- | --- |
 | 0. Sources | one per source the person gave | the saved text of each, registered |
 | 1. Plan | one | the scope, an outline of sections, and their questions |
-| 2. Research | one per question | facts with quotes |
+| 2. Research | one per section at `light`, otherwise one per question | facts with quotes |
 | 3. Check | one per section at `light`, otherwise per question; a separate invocation eligible for every question it receives | each fact checked, plus the final coverage and claim verdict |
 | 4. Cross-check | one | duplicates, conflicts, superseded facts, missing angles |
-| 5. Fill gaps | the missing angles as new questions, researched, checked and cross-checked once | more facts: up to 3 questions at `light`, all missing angles at `standard` and `deep` |
+| 5. Fill gaps | the missing angles as new questions, researched and checked once, and cross-checked at `standard` and `deep` | more facts: up to 3 questions at `light`, all missing angles at `standard` and `deep` |
 | 6. Write | one per section | cited factual headlines/prose or structured gap answers |
 | 7. Review the writing | at `standard` and `deep`, one per section, never the writer | sentences that say more than their facts, cut back or removed |
 | 8. Finalize | none: the helper | one consistent output revision and a terminal status; partial outputs exist throughout |
 
 `research next` hands out tasks in that order, several at once where they are independent.
-Stage barriers use accepted results, not merely whether the queue currently has work ready.
+Stages are pipelined on accepted results rather than run as whole-stage waves: a unit is
+checked as soon as everything it covers has been researched; plan waits for the selected
+sources, the cross-check for all checks, and writing for the cross-check. At `light` a section
+is written as soon as its own gap-round questions are checked, and the gap round is not
+cross-checked again, so writing overlaps the gap round. At `standard` and `deep`, a section's
+review starts when its writing is accepted.
+
+**Speed.** A run should take a small multiple of one agent researching alone, not an order
+of magnitude more. That holds when the coordinator dispatches every ready task to parallel
+subagents, does the small tasks (selected sources, plan, cross-check) itself, and workers
+register sources inside their results. A `light` run is then about six waves: plan,
+section research with checks following each section, cross-check, the gap round alongside
+writing. Sequential execution remains valid but is several times slower.
 
 ### Worker identity and independent checking
 
@@ -225,7 +252,7 @@ proceed.
 | `complete` | All required stages succeeded, all scoped questions are answered, and no coverage/source gaps remain |
 | `complete-with-gaps` | All required stages succeeded; assessed questions or unreadable sources leave explicit evidence gaps |
 | `blocked` | A required task exhausted retries, independent checking is unavailable, or another prerequisite prevents progress |
-| `stale` | A pinned input/source or a checked fact revision changed and dependent work needs reassessment |
+| `stale` | A selected original, a pinned source revision or a claim target changed; only the facts, questions and answers resting on it need reassessment |
 
 An honest `not answered` assessment with a concrete gap is successful research work. An
 agent crash, invalid submission or missing checker is an execution problem, not evidence of
@@ -277,6 +304,15 @@ Files supplied as claim targets are pinned separately and are not evidence-sourc
 - A source that cannot be read is registered with its reason, so the report shows it as a gap
   rather than dropping it.
 - New sources found during research are saved and registered the same way.
+- **The helper pins what it registers.** Each registered text is copied to
+  `research/sources/revisions/<sha256>.txt` and quotes are checked against that copy, so a
+  later overwrite of the harness's working file (two workers fetching one page, say) changes
+  no evidence and does not make the run stale.
+- **A changed original affects only what rests on it.** `status` names the stale facts,
+  questions and answers; other facts stay current. `research reassess` keeps the stale facts
+  as history, reads the changed selected sources again, re-researches and re-checks only the
+  affected questions, and rewrites answers that cited stale facts. A changed claim target
+  cannot be reassessed, because its exact claim no longer matches; it needs a new run.
 - Registration preserves the original document identity/hash and the extraction hash,
   version/date when available, publisher and page/section locators. A checker records which
   original revision it inspected. Changing either an original file or its saved extraction
@@ -733,7 +769,9 @@ These exercise the completion and trust contracts independently of the live qual
 ## Appendix: `facts.json`, by example
 
 This is a complete, small synthetic contract fixture, not live research or quoted product
-proof. Counts and references are closed. Both original fixture files and their saved
+proof. Its two one-sentence sources are registered as partial captures with a reason,
+because the runtime refuses saved text under 280 characters, or a quote that is most of
+its source, unless the capture is labelled partial. Counts and references are closed. Both original fixture files and their saved
 extractions contain the exact text shown below, with one trailing newline. The example
 illustrates a narrowed assertion, a merge alias and a zero-fact gap; other audit lists are
 empty. Runtime/guidance identities below are synthetic too.
@@ -880,7 +918,12 @@ empty. Runtime/guidance identities below are synthetic too.
       "original_file": "fixtures/valkey-license.txt",
       "original_sha256": "e23f8af34cf93c760ca684f84280ff4471fdedfaa181473c7f971b045b60c03d",
       "file": "research/sources/valkey-license.md",
+      "pinned": "research/sources/revisions/e23f8af34cf93c760ca684f84280ff4471fdedfaa181473c7f971b045b60c03d.txt",
       "sha256": "e23f8af34cf93c760ca684f84280ff4471fdedfaa181473c7f971b045b60c03d",
+      "capture": {
+        "kind": "partial",
+        "reason": "A one-sentence synthetic fixture; the whole source is this short."
+      },
       "limits": "none"
     },
     {
@@ -895,7 +938,12 @@ empty. Runtime/guidance identities below are synthetic too.
       "original_file": "fixtures/fork-origin.txt",
       "original_sha256": "8e21024acf4c842093e3b71c0b358ba68e5a37856a1ed1367e0bed17ff260220",
       "file": "research/sources/fork-origin.md",
+      "pinned": "research/sources/revisions/8e21024acf4c842093e3b71c0b358ba68e5a37856a1ed1367e0bed17ff260220.txt",
       "sha256": "8e21024acf4c842093e3b71c0b358ba68e5a37856a1ed1367e0bed17ff260220",
+      "capture": {
+        "kind": "partial",
+        "reason": "A one-sentence synthetic fixture; the whole source is this short."
+      },
       "limits": "none"
     }
   ],
@@ -1095,6 +1143,8 @@ Valkey was forked from Redis.
   headline, an empty answer and recorded gap IDs. The renderer writes its gap message.
 - **A narrowed replacement is confirmed on its own terms.** `original_statement` and
   `revisions` retain the earlier, broader assertion for auditing and citation verification.
+- **Partial captures are labelled.** Both fixture sources carry `capture`, and the report
+  marks their quotes "(partial capture)".
 - **`sources_count` counts distinct publishers**, not quotations or mirrored copies.
   Unknown publisher identity is reported as unknown rather than inferred as independence.
 - **Question/fact links are reciprocal** for the current canonical facts; aliases remain

@@ -136,3 +136,15 @@ test('installed discovery entry is the small bootstrap while executable helpers 
  assert.notEqual(await readFile(join(result.runtime,'SKILL.md'),'utf8'),await readFile(new URL('../SKILL.md',import.meta.url),'utf8'));
  assert.match(await readFile(join(result.runtime,'scripts/sync-guidance.mjs'),'utf8'),/Refresh instructions only/);
 });
+test('new work takes the newest release its runtime supports, so unreleased guidance on main is not served', async t => {
+  const f = await fixture(t);
+  await exec('git', ['-C', f.source, 'tag', 'v0.3.0', f.first]);
+  await writeFile(join(f.source, 'SKILL.md'), `---\nname: ${skill}\n---\nUnreleased guidance\n`); await f.commit();
+  await writeFile(join(f.source, 'guidance/manifest.json'), JSON.stringify({ schema: 1, skill, version: '9.0.0', entry: 'SKILL.md', minimumRuntime: '9.0.0' }));
+  await exec('git', ['-C', f.source, 'tag', 'v9.0.0', await f.commit()]);
+  const started = await start(f);
+  assert.equal(started.revision, f.first); assert.equal(started.channel, 'release'); assert.equal(started.ref, 'refs/tags/v0.3.0');
+  assert.match(await readFile(started.guidance, 'utf8'), /First guidance/);
+  await exec('git', ['-C', f.source, 'tag', '-d', 'v0.3.0']);
+  await assert.rejects(start(f), /newer installed runtime/);
+});

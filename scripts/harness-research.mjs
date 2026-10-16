@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { planResearch, recordResearch, researchStatus, migrateResearch } from './lib/research.mjs';
 import { runCli } from './lib/run-cli.mjs';
 if (process.argv[2] === 'research') {
-  try { const result = await runCli(process.argv.slice(3)); console.log(JSON.stringify(result, null, 2)); if (result.accepted === false) process.exitCode = 1; }
+  try { const result = await runCli(process.argv.slice(3)); console.log(JSON.stringify(result, null, process.argv.includes('--verbose') ? 2 : 0)); if (result.accepted === false) process.exitCode = 1; }
   catch (error) { console.error(error.message); process.exitCode = 1; }
 } else {
 const { values, positionals } = parseArgs({ options: { project: { type: 'string' }, file: { type: 'string' }, run: { type: 'string' }, item: { type: 'string' }, 'allow-web': { type: 'boolean' }, version: { type: 'boolean' }, help: { type: 'boolean', short: 'h' } }, allowPositionals: true });

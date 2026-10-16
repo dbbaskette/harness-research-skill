@@ -1,24 +1,42 @@
 import { parseArgs } from 'node:util';
 import { readFile, realpath } from 'node:fs/promises';
-import { resolve, relative, isAbsolute } from 'node:path';
-import { parseJson } from './run-storage.mjs';
-import { startRun, nextTask, peekTask, releaseTask, submitTask, registerSource, heartbeat, runStatus, retryTask, continueRun, blockRun } from './research-run.mjs';
+import { resolve, relative, isAbsolute, join } from 'node:path';
+import { parseJson, atomic, directory } from './run-storage.mjs';
+import { startRun, nextTask, peekTask, releaseTask, submitTask, registerSource, heartbeat, runStatus, retryTask, continueRun, blockRun, reassessRun } from './research-run.mjs';
+
+// Every command answers compactly by default: a coordinator calls these many times, and each reply
+// costs it time and context. The full task payload goes to a file its worker reads; --verbose shows all.
+function compact(result) {
+  if (!result || typeof result !== 'object' || !Array.isArray(result.tasks)) return result;
+  const { tasks, ...rest } = result, summary = {};
+  for (const task of tasks) summary[task.status] = (summary[task.status] ?? 0) + 1;
+  const active = tasks.filter(task => ['ready', 'leased'].includes(task.status)).map(({ id, kind, status, section, questions, worker }) => ({ id, kind, status, ...(section ? { section } : {}), ...(questions ? { questions } : {}), ...(worker ? { worker } : {}) }));
+  return { ...rest, task_summary: summary, active_tasks: active };
+}
+async function taskFile(root, task) {
+  const folder = join(root, '.harness-research', 'tasks'); await directory(folder);
+  const name = `.harness-research/tasks/${task.id}-attempt-${task.attempt}.json`;
+  await atomic(join(root, name), JSON.stringify(task, null, 2) + '\n');
+  const { id, kind, run, worker, lease, attempt, expires, section, questions } = task;
+  return { id, kind, run, worker, lease, attempt, expires, ...(section ? { section } : {}), questions: (questions ?? []).map(question => question.id), file: name, brief: task.brief };
+}
 
 export async function runCli(argv) {
   const { values, positionals } = parseArgs({ args: argv, allowPositionals: true, options: {
     project: { type: 'string' }, run: { type: 'string' }, topic: { type: 'string' }, source: { type: 'string', multiple: true }, sources: { type: 'string' }, claims: { type: 'string' }, about: { type: 'string' }, depth: { type: 'string' }, 'allow-web': { type: 'boolean' }, 'plan-only': { type: 'boolean' }, 'source-mode': { type: 'string' }, 'guidance-task': { type: 'string' },
-    worker: { type: 'string' }, harness: { type: 'string' }, task: { type: 'string' }, lease: { type: 'string' }, attempt: { type: 'string' }, file: { type: 'string' }, origin: { type: 'string' }, title: { type: 'string' }, publisher: { type: 'string' }, standing: { type: 'string' }, given: { type: 'string' }, id: { type: 'string' }, 'original-file': { type: 'string' }, partial: { type: 'string' }, 'source-date': { type: 'string' }, transcribed: { type: 'boolean' }, pages: { type: 'string' }, limits: { type: 'string' }, reason: { type: 'string' }, help: { type: 'boolean', short: 'h' },
+    worker: { type: 'string' }, harness: { type: 'string' }, task: { type: 'string' }, lease: { type: 'string' }, attempt: { type: 'string' }, file: { type: 'string' }, origin: { type: 'string' }, title: { type: 'string' }, publisher: { type: 'string' }, standing: { type: 'string' }, given: { type: 'string' }, id: { type: 'string' }, 'original-file': { type: 'string' }, partial: { type: 'string' }, 'source-date': { type: 'string' }, transcribed: { type: 'boolean' }, pages: { type: 'string' }, limits: { type: 'string' }, reason: { type: 'string' }, verbose: { type: 'boolean' }, help: { type: 'boolean', short: 'h' },
   } });
   const [action, ...extra] = positionals;
   const allowed = {
     start: ['topic', 'source', 'sources', 'claims', 'about', 'depth', 'allow-web', 'plan-only', 'source-mode', 'guidance-task'],
     next: ['worker', 'harness'], peek: ['worker'], release: ['task', 'worker', 'lease', 'attempt'], submit: ['task', 'worker', 'lease', 'attempt', 'file'],
     source: ['task', 'worker', 'lease', 'attempt', 'file', 'origin', 'title', 'publisher', 'standing', 'given', 'id', 'original-file', 'source-date', 'transcribed', 'pages', 'limits', 'partial'],
-    heartbeat: ['task', 'worker', 'lease', 'attempt'], status: [], retry: ['task'], continue: ['file'], block: ['reason'],
+    heartbeat: ['task', 'worker', 'lease', 'attempt'], status: [], retry: ['task'], continue: ['file'], block: ['reason'], reassess: [],
   };
-  if (values.help || !action || action === 'help') return { usage: 'node scripts/harness-research.mjs research start|next|peek|submit|source|heartbeat|release|status|retry|continue|block --project DIR [options]', note: 'The harness does the research; this helper manages durable tasks and evidence. Start requires --topic; all writes after start bind the current --run. Task writes require --task --worker --lease --attempt.' };
+  if (values.help || !action || action === 'help') return { usage: 'node scripts/harness-research.mjs research start|next|peek|submit|source|heartbeat|release|status|retry|continue|block|reassess --project DIR [options] [--verbose]', note: 'The harness does the research; this helper manages durable tasks and evidence. Start requires --topic; all writes after start bind the current --run. Task writes require --task --worker --lease --attempt. next writes the full task to the file it names; --verbose prints full JSON.' };
   if (extra.length || !Object.hasOwn(allowed, action) || !values.project) throw new Error('Choose a research action and --project DIR.');
-  for (const name of Object.keys(values)) if (!['project', 'run', ...allowed[action]].includes(name)) throw new Error(`--${name} is not valid for research ${action}.`);
+  for (const name of Object.keys(values)) if (!['project', 'run', 'verbose', ...allowed[action]].includes(name)) throw new Error(`--${name} is not valid for research ${action}.`);
+  const verbose = Boolean(values.verbose), output = result => verbose ? result : compact(result);
   if (action === 'start' && values.run) throw new Error('research start creates a new run; omit --run.');
   if (!['start', 'status'].includes(action) && !values.run) throw new Error('Supply the current --run ID.');
   if (['submit', 'source', 'heartbeat', 'release'].includes(action)) for (const name of ['task', 'worker', 'lease', 'attempt']) if (!values[name]) throw new Error(`Task writes require --${name}.`);
@@ -47,17 +65,18 @@ export async function runCli(argv) {
       const selected = [...(values.source ?? []), ...sourceList];
       const claims = values.claims ? await json(values.claims) : [];
       if (!Array.isArray(claims)) throw new Error('--claims requires a JSON array.');
-      return startRun({ project: values.project, topic: values.topic, sources: await Promise.all(selected.map(sourceInput)), claims: await Promise.all(claims.map(async claim => ({ ...claim, file: await projectFile(claim.file) }))), aboutFile: values.about ? await projectFile(values.about) : undefined, depth: values.depth, allowWeb: values['allow-web'], sourceMode: values['source-mode'], planOnly: values['plan-only'], guidanceTask: values['guidance-task'] });
+      return output(await startRun({ project: values.project, topic: values.topic, sources: await Promise.all(selected.map(sourceInput)), claims: await Promise.all(claims.map(async claim => ({ ...claim, file: await projectFile(claim.file) }))), aboutFile: values.about ? await projectFile(values.about) : undefined, depth: values.depth, allowWeb: values['allow-web'], sourceMode: values['source-mode'], planOnly: values['plan-only'], guidanceTask: values['guidance-task'] }));
     }
-    case 'next': return nextTask(args);
-    case 'peek': return peekTask(args);
-    case 'release': return releaseTask(args);
-    case 'submit': if (!values.file) throw new Error('Submission requires --file result.json.'); return submitTask({ ...args, data: await json(values.file) });
-    case 'source': return registerSource({ ...args, data: { file: values.file ? await projectFile(values.file) : null, origin: values.origin, title: values.title, publisher: values.publisher, standing: values.standing, given: values.given, id: values.id, original_file: values['original-file'] ? await projectFile(values['original-file']) : undefined, source_date: values['source-date'], transcribed: values.transcribed, pages: values.pages, limits: values.limits, partial: values.partial } });
-    case 'heartbeat': return heartbeat(args);
-    case 'status': return runStatus(args);
-    case 'retry': return retryTask(args);
-    case 'continue': return continueRun({ ...args, ...(values.file ? { plan: await json(values.file) } : {}) });
-    case 'block': return blockRun(args);
+    case 'next': { const result = await nextTask(args); return output(verbose || !result.task ? result : { ...result, task: await taskFile(root, result.task) }); }
+    case 'peek': return output(await peekTask(args));
+    case 'release': return output(await releaseTask(args));
+    case 'submit': if (!values.file) throw new Error('Submission requires --file result.json.'); return output(await submitTask({ ...args, data: await json(values.file) }));
+    case 'source': return output(await registerSource({ ...args, data: { file: values.file ? await projectFile(values.file) : null, origin: values.origin, title: values.title, publisher: values.publisher, standing: values.standing, given: values.given, id: values.id, original_file: values['original-file'] ? await projectFile(values['original-file']) : undefined, source_date: values['source-date'], transcribed: values.transcribed, pages: values.pages, limits: values.limits, partial: values.partial } }));
+    case 'heartbeat': return output(await heartbeat(args));
+    case 'status': return output(await runStatus(args));
+    case 'retry': return output(await retryTask(args));
+    case 'continue': return output(await continueRun({ ...args, ...(values.file ? { plan: await json(values.file) } : {}) }));
+    case 'block': return output(await blockRun(args));
+    case 'reassess': return output(await reassessRun(args));
   }
 }

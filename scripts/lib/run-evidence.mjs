@@ -1,4 +1,6 @@
-import { hash, stable, key, text, identifier, readText, snapshot, unchanged } from './run-storage.mjs';
+import { writeFile, readFile } from 'node:fs/promises';
+import { join } from 'node:path';
+import { hash, stable, key, text, identifier, readText, snapshot, unchanged, exists, directory, localFile } from './run-storage.mjs';
 
 export const DEPTHS = { light: { facts: 12, gaps: 3 }, standard: { facts: 20, gaps: 80 }, deep: { facts: 30, gaps: 80 } };
 export const coverageValues = ['answered', 'partly answered', 'not answered'];
@@ -7,16 +9,47 @@ export const coverageValues = ['answered', 'partly answered', 'not answered'];
 export const SOURCE_MIN_CHARACTERS = 280;
 export const QUOTE_SHARE_LIMIT = 0.5;
 const characters = value => Array.from(String(value).trim()).length;
+// Spelled-out counts are numbers too: "five replicas" must not pass against a quote saying 3.
+// "one" is left out because it is far more often a pronoun ("one of the forks") than a count.
+const UNITS = { two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12, thirteen: 13, fourteen: 14, fifteen: 15, sixteen: 16, seventeen: 17, eighteen: 18, nineteen: 19, twice: 2, thrice: 3 };
+const TENS = { twenty: 20, thirty: 30, forty: 40, fifty: 50, sixty: 60, seventy: 70, eighty: 80, ninety: 90 };
+const SCALES = { hundred: 2, thousand: 3, million: 6, billion: 9, trillion: 12 };
+const ONES = { one: 1, ...UNITS };
+// Multiply a decimal string by 10^places without floating-point error: "1.5" × 10^6 → "1500000".
+function shift(value, places) {
+  const [whole, fraction = ''] = value.split('.'), digits = whole + fraction, point = whole.length + places;
+  const result = point >= digits.length ? digits + '0'.repeat(point - digits.length) : digits.slice(0, point) + '.' + digits.slice(point);
+  return result.replace(/^0+(?=\d)/, '');
+}
+function spelled(text) {
+  const tens = Object.keys(TENS).join('|'), ones = Object.keys(ONES).join('|'), units = Object.keys(UNITS).join('|'), scales = Object.keys(SCALES).join('|');
+  // "twenty-five", "twenty", "five"; a scale word after a number scales it: "1.5 million", "two hundred".
+  return text
+    .replace(new RegExp(`\\b(${tens})[-\\s](${Object.keys(ONES).filter(word => !['twice', 'thrice'].includes(word) && ONES[word] < 10).join('|')})\\b`, 'gi'), (_, ten, one) => String(TENS[ten.toLowerCase()] + ONES[one.toLowerCase()]))
+    .replace(new RegExp(`\\b(${tens})\\b`, 'gi'), word => String(TENS[word.toLowerCase()]))
+    .replace(new RegExp(`\\b(${ones})(?=\\s+(?:${scales})\\b)`, 'gi'), word => String(ONES[word.toLowerCase()]))
+    .replace(new RegExp(`\\b(${units})\\b`, 'gi'), word => String(UNITS[word.toLowerCase()]))
+    .replace(new RegExp(`(\\d+(?:[.,]\\d+)*)\\s+(${scales})\\b(?!s)`, 'gi'), (_, number, scale) => /^\d{1,3}(?:,\d{3})+$/.test(number) ? number : shift(number.replace(/,/g, ''), SCALES[scale.toLowerCase()]));
+}
 export function numbers(value) {
-  return [...new Set((String(value).normalize('NFKC').match(/\d+(?:[.,]\d+)*/g) ?? []).map(n => /^\d{1,3}(?:,\d{3})+$/.test(n) ? n.replaceAll(',', '') : n))];
+  return [...new Set((spelled(String(value).normalize('NFKC')).match(/\d+(?:[.,]\d+)*/g) ?? []).map(n => /^\d{1,3}(?:,\d{3})+$/.test(n) ? n.replaceAll(',', '') : n))];
 }
 export function numericSupport(statement, quotes) {
   const available = new Set(quotes.flatMap(numbers)), missing = numbers(statement).filter(number => !available.has(number));
   if (missing.length) throw new Error(`Numbers not present in the cited evidence: ${missing.join(', ')}`);
 }
+// Sentence segmentation breaks after "vs." or "U.S." followed by a capital, so the full stops in
+// common abbreviations and initials are masked before counting sentences.
+const ABBREVIATIONS = /\b(?:vs|etc|e\.g|i\.e|cf|approx|incl|est|Inc|Ltd|Corp|Co|LLC|Nos?|Dr|Mr|Mrs|Ms|Prof|Jr|Sr|St|Fig|Figs|Vol|Ver|Rev|Sec|Ch|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\.(?=\s)/g;
+function masked(value) {
+  return value
+    .replace(/\b(?:[A-Za-z]\.){2,}/g, match => match.replaceAll('.', '\uE000'))
+    .replace(ABBREVIATIONS, match => match.replaceAll('.', '\uE000'))
+    .replace(/(^|\s)([A-Z])\.(?=\s+[A-Z])/g, '$1$2\uE000');
+}
 export function statement(value, label = 'Fact') {
   const result = text(value, label, 1000);
-  if (result.split(/\s+/u).length > 40 || [...new Intl.Segmenter('en', { granularity: 'sentence' }).segment(result)].filter(x => x.segment.trim()).length > 1) throw new Error(`${label} must be one sentence of at most 40 words.`);
+  if (result.split(/\s+/u).length > 40 || [...new Intl.Segmenter('en', { granularity: 'sentence' }).segment(masked(result))].filter(x => x.segment.trim()).length > 1) throw new Error(`${label} must be one sentence of at most 40 words.`);
   return result;
 }
 const normalizedChar = c => c.normalize('NFKC').replace(/[“”]/g, '"').replace(/[‘’]/g, "'").replace(/[‐‑‒–—−]/g, '-');
@@ -61,10 +94,36 @@ export function factFor(state, supplied) {
   if (!fact) throw new Error(`Unknown fact key: ${supplied}`);
   return fact;
 }
+// The helper keeps its own copy of every registered text, named by its hash, and checks quotes
+// against that copy. The harness's working file can then change without silently changing evidence.
+export const PINNED_DIRECTORY = 'research/sources/revisions';
+async function pin(root, sha256, content) {
+  for (const part of ['research', 'research/sources', PINNED_DIRECTORY]) await directory(join(root, part));
+  const name = `${PINNED_DIRECTORY}/${sha256}.txt`, path = join(root, name);
+  if (!await exists(path)) await writeFile(path, content, { flag: 'wx', mode: 0o444 }).catch(error => { if (error.code !== 'EEXIST') throw error; });
+  if (!await unchanged(root, { file: name, sha256 })) throw new Error(`Pinned source revision ${name} does not match its hash; restore or remove it.`);
+  return name;
+}
+async function readPinnable(root, file, sha256) {
+  const bytes = await readFile(await localFile(root, file));
+  if (hash(bytes) !== sha256) throw new Error('Source text changed while it was being registered; register it again.');
+  return bytes;
+}
+// The text a citation is checked against: the pinned copy, or the working file for runs saved before pinning.
+export const evidenceFile = source => source.pinned ?? source.file;
 export async function sourceRecord(root, state, supplied, task) {
   const givenId = supplied.given ?? task?.given;
   const given = state.givenSources.find(item => item.id === givenId);
   if (givenId && !given) throw new Error('Unknown selected reference.');
+  // A selected original edited before anything was registered from it is simply read as it is now.
+  if (given?.sha256) {
+    const current = await snapshot(root, given.original_file ?? given.file).catch(() => null);
+    if (current && current.sha256 !== (given.original_sha256 ?? given.sha256)) {
+      if (state.sources.some(source => source.given === given.id)) throw new Error('Selected original changed after registration; run research reassess.');
+      if (given.original_file) given.original_sha256 = current.sha256; else given.sha256 = current.sha256;
+      state.inputs = state.inputs.map(input => input.file === current.file ? current : input);
+    }
+  }
   if (!given && state.sourceMode !== 'public-web') throw new Error('Found sources require explicit public-web permission.');
   const origin = given?.origin ?? text(supplied.origin, 'Source origin');
   if (given && supplied.origin && supplied.origin !== given.origin) throw new Error('Source origin does not match the selected reference.');
@@ -86,19 +145,21 @@ export async function sourceRecord(root, state, supplied, task) {
   if (!['primary', 'secondary', 'community'].includes(standing)) throw new Error('Invalid source standing.');
   // Capturing only part of a source changes its provenance, not its saved bytes.
   // Issue a new revision for that metadata while preserving existing full-source IDs.
-  const identity = capture ? [origin, sha256, capture] : [origin, sha256];
+  // A changed original with unchanged extracted text is still a new revision.
+  const identity = [origin, sha256, ...(original && original.sha256 !== sha256 ? [original.sha256] : []), ...(capture ? [capture] : [])];
   const id = identifier(supplied.id ?? 'source-' + hash(stable(identity)).slice(0, 20));
   const previous = state.sources.find(source => source.id === id);
   if (previous && (previous.sha256 !== sha256 || previous.origin !== origin)) throw new Error('Source IDs identify immutable revisions; register a new ID.');
-  return { id, given: given?.id ?? null, title, origin, publisher: supplied.publisher ? text(supplied.publisher, 'Publisher') : null, standing, provenance: supplied.transcribed ? 'transcribed' : given ? 'given' : 'found', capture, pages: supplied.pages ?? null, file: supplied.file, sha256, original_file: originalFile, original_sha256: original?.sha256 ?? null, limits, source_date: supplied.source_date ?? null, saved_at: previous?.saved_at ?? new Date().toISOString() };
+  const pinned = await pin(root, sha256, await readPinnable(root, supplied.file, sha256));
+  return { id, given: given?.id ?? null, title, origin, publisher: supplied.publisher ? text(supplied.publisher, 'Publisher') : null, standing, provenance: supplied.transcribed ? 'transcribed' : given ? 'given' : 'found', capture, pages: supplied.pages ?? null, file: supplied.file, pinned, sha256, original_file: originalFile, original_sha256: original?.sha256 ?? null, limits, source_date: supplied.source_date ?? null, saved_at: previous?.saved_at ?? new Date().toISOString() };
 }
 export async function citations(root, state, supplied, question) {
   if (!Array.isArray(supplied) || supplied.length < 1 || supplied.length > 5) throw new Error('A fact needs 1 to 5 registered-source quotes.');
   const result = [];
   for (const item of supplied) {
     const source = sourceFor(state, item.source);
-    if (!source.file || !await unchanged(root, { file: source.file, sha256: source.sha256 }) || source.original_file && !await unchanged(root, { file: source.original_file, sha256: source.original_sha256 })) throw new Error('Source revision is unreadable or stale.');
-    const extracted = await readText(root, source.file, { withHash: true });
+    if (!source.file || !await unchanged(root, { file: evidenceFile(source), sha256: source.sha256 }) || source.original_file && !await unchanged(root, { file: source.original_file, sha256: source.original_sha256 })) throw new Error(`Source ${source.id} is unreadable or its original changed; register the current text as a new source (or run research reassess).`);
+    const extracted = await readText(root, evidenceFile(source), { withHash: true });
     if (extracted.sha256 !== source.sha256) throw new Error('Source revision changed while reading its quote.');
     const placed = placeQuote(extracted.content, item.quote);
     if (!source.capture && characters(placed.quote) > QUOTE_SHARE_LIMIT * characters(extracted.content)) throw new Error(`The quote is most of its saved source ${source.id}. Save the surrounding page or section so the quote can be checked in context, or register the source with --partial and the reason.`);
@@ -126,11 +187,13 @@ export function gaps(state, question, supplied, worker) {
     return { id: key('gap-'), question: question.id, kind: item.kind, reason, sources, attempts: item.attempts ?? null, assessed_by: worker, check: null };
   });
 }
+const COVERAGE_ALIASES = { partial: 'partly answered', partly: 'partly answered', 'partially answered': 'partly answered', unanswered: 'not answered' };
 export function coverage(value) {
+  value = COVERAGE_ALIASES[value] ?? value;
   if (!coverageValues.includes(value)) throw new Error('Coverage must be answered, partly answered or not answered.');
   return value;
 }
-export function validateAssessment(state, question, supplied, worker) {
+export function validateAssessment(state, question, supplied, worker, now = Date.now()) {
   const finalCoverage = coverage(supplied.coverage);
   const checked = state.facts.filter(fact => fact.questions.includes(question.id) && fact.status === 'confirmed' && !fact.superseded_by);
   if (finalCoverage !== 'not answered' && !checked.length) throw new Error('Answered coverage requires current confirmed facts.');
@@ -141,8 +204,9 @@ export function validateAssessment(state, question, supplied, worker) {
   if (['supported', 'contradicted'].includes(verdict) && !checked.length) throw new Error('Claim verdict requires current confirmed evidence.');
   if (finalCoverage === 'not answered' && verdict && verdict !== 'insufficient') throw new Error('An unanswered claim must be insufficient.');
   question.coverage = finalCoverage; question.verdict = verdict;
-  question.assessment = { by: worker, at: new Date().toISOString() };
-  for (const id of ids) state.gaps.find(gap => gap.id === id).check = { by: worker, result: 'confirmed' };
+  question.assessment = { by: worker, at: new Date(now).toISOString() };
+  // A gap the checker wrote itself is its own assessment, not an independently confirmed one.
+  for (const id of ids) { const gap = state.gaps.find(item => item.id === id); gap.check = { by: worker, result: gap.assessed_by === worker ? 'checker assessment' : 'confirmed', at: new Date(now).toISOString() }; }
 }
 export function validateSentence(state, supplied, { allowed } = {}) {
   const value = statement(supplied.sentence, 'Answer sentence');
@@ -153,7 +217,8 @@ export function validateSentence(state, supplied, { allowed } = {}) {
     if (allowed && !allowed.has(fact.key)) throw new Error('Writing review cannot add a new factual reference.');
     return fact;
   });
-  numericSupport(value, facts.map(fact => fact.statement));
+  // A sentence may state a cited fact's own date, which is part of what was checked.
+  numericSupport(value, facts.flatMap(fact => [fact.statement, ...(fact.as_of ? [fact.as_of, String(fact.as_of).replace(/-/g, ' ')] : [])]));
   return { sentence: value, facts: [...new Set(facts.map(fact => fact.key))], ...(supplied.historical ? { historical: true } : {}), ...(supplied.paragraph ? { paragraph: supplied.paragraph } : {}) };
 }
 export function validateAnswer(state, question, supplied, options = {}) {
@@ -171,12 +236,36 @@ export function validateAnswer(state, question, supplied, options = {}) {
   for (const sentence of answer) if (sentence.paragraph !== undefined && (!Number.isInteger(sentence.paragraph) || sentence.paragraph < 1 || sentence.paragraph > 4)) throw new Error('Answers use at most four paragraphs.');
   return { id: question.id, headline, answer, gaps: gapIds };
 }
-export async function changedInputs(root, state) {
-  const changed = [];
-  for (const input of state.inputs) if (!await unchanged(root, input)) changed.push(input.file);
+// What changed since it was pinned, and what that makes out of date. Only work resting on a changed
+// source is affected: facts citing it, the questions they or their gaps belong to, and answers citing
+// those facts. A changed claim target invalidates its claim questions. Other inputs are reported only.
+export async function changedState(root, state) {
+  const sources = new Set(), files = new Set();
   for (const source of state.sources) {
-    if (source.file && !await unchanged(root, { file: source.file, sha256: source.sha256 })) changed.push(source.file);
-    if (source.original_file && !await unchanged(root, { file: source.original_file, sha256: source.original_sha256 })) changed.push(source.original_file);
+    if (source.stale_since) continue;
+    let changed = false;
+    if (source.original_file && !await unchanged(root, { file: source.original_file, sha256: source.original_sha256 })) { changed = true; files.add(source.original_file); }
+    if (source.file && !await unchanged(root, { file: evidenceFile(source), sha256: source.sha256 })) { changed = true; files.add(evidenceFile(source)); }
+    if (changed) sources.add(source.id);
   }
-  return [...new Set(changed)];
+  const claimFiles = new Set(state.claims.map(claim => claim.file)), claims = new Set();
+  const informational = [];
+  for (const input of state.inputs) {
+    if (await unchanged(root, input)) continue;
+    files.add(input.file);
+    if (claimFiles.has(input.file)) for (const question of state.questions) { if (question.claim?.file === input.file) claims.add(question.id); }
+    else if (!state.sources.some(source => source.original_file === input.file || source.file === input.file)) informational.push(input.file);
+  }
+  const facts = new Set(state.facts.filter(fact => ['candidate', 'confirmed'].includes(fact.status) && fact.citations.some(citation => sources.has(citation.source))).map(fact => fact.key));
+  const research = new Set([...claims]);
+  for (const fact of state.facts) if (facts.has(fact.key)) fact.questions.forEach(id => research.add(id));
+  for (const gap of state.gaps) if (gap.sources.some(id => sources.has(id))) research.add(gap.question);
+  const rewrite = new Set(research);
+  for (const question of state.questions) {
+    const cited = [...(question.headline?.facts ?? []), ...(question.answer ?? []).flatMap(sentence => sentence.facts)];
+    if (cited.some(id => facts.has(resolveKey(state, id)))) rewrite.add(question.id);
+  }
+  return { files: [...files], sources: [...sources], facts: [...facts], research: [...research], rewrite: [...rewrite], claims: [...claims], informational };
 }
+function resolveKey(state, id) { try { return factFor(state, id).key; } catch { return id; } }
+export async function changedInputs(root, state) { return (await changedState(root, state)).files; }
