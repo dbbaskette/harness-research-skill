@@ -201,4 +201,4 @@ its research, and whoever can see the repository can use it.
   approval first when the topic is broad or the person asks.
 - **Uncited slides:** Slides' `outline check` warns, and does not refuse, when a content slide
   in a researched deck cites no fact.
-- **Order:** standalone first (0.9.0), then the library and Brand, then the studios.
+- **Order:** standalone first (0.9.0), then reuse and Brand, then the studios.
