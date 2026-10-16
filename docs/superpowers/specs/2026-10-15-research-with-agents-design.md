@@ -531,7 +531,7 @@ comparison, `subjects` is empty and every `subject` is null. The values are illu
      "headline": "Valkey is licensed under the BSD 3-Clause licence and has kept that licence since the fork.",
      "answer": [
        {"sentence": "Valkey is licensed under the BSD 3-Clause licence.", "facts": ["valkey.licensing.3fa9c2"]},
-       {"sentence": "It kept the licence Redis used before Redis changed its own in 2024.", "facts": ["fork-history.77d1e0", "redis.licensing.aa11bb"]}
+       {"sentence": "Valkey kept the licence Redis used before Redis changed its own.", "facts": ["fork-history.77d1e0", "redis.licensing.aa11bb"]}
      ],
      "facts": ["valkey.licensing.3fa9c2"]},
     {"id": "fork-history", "section": "origin", "subject": null, "kind": "open", "round": 1,
