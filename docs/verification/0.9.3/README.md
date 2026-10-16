@@ -1,6 +1,6 @@
 # Harness Research 0.9.3 development checks
 
-**Status (2026-10-16): in development, not released.** 0.9.3 addresses the three
+**Status (2026-10-16): released after the owner confirmed it.** 0.9.3 addresses the three
 minor findings left from the [0.9.1 live trials](../0.9.1/live-acceptance/README.md#findings).
 
 | Finding | Change | Check |

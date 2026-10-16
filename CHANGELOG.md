@@ -1,10 +1,10 @@
 # Changelog
 
-## 0.9.3 — unreleased
+## 0.9.3 — 2026-10-16
 
 The remaining minor findings from the 0.9.1 live trials
 ([findings](docs/verification/0.9.1/live-acceptance/README.md#findings)).
-Not released until it is verified and tagged.
+[Checks](docs/verification/0.9.3/README.md).
 
 - Each answer's "Facts behind this answer" list is folded into a collapsed
   `<details>` block after the cited prose. The evidence lists were 49–69% of
