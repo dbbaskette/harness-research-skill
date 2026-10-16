@@ -35,4 +35,11 @@ Before release, the spec's broader Claude/Codex topics, supplied PDF/link trials
 matched 0.8.1 comparisons remain required. These narrow live examples and deterministic
 tests establish implementation evidence, not the entire release acceptance matrix.
 
-Full local CI evidence will be recorded here after the native gate completes.
+Full native CI passed on commit `d0a865b1fbe15922b42aa87ea0bc4070b76ee023` (clean tree), using the existing
+Tart wrapper: macOS 27.0, Node 22.23.2, Python 3.9.6; **67 tests passed, zero failed or
+skipped**. Dependency audit reported zero vulnerabilities, context measurements matched,
+and installation plus installed CLI checks passed at version 0.9.0. The disposable clone
+was deleted and its VM directory is absent. [Machine-readable evidence](ci/verification.json)
+and [test log](ci/tests.log) are retained. No GitHub CI workflow is present in this source
+checkout; no remote CI result is claimed. Later documentation-only evidence updates do not
+change the tested implementation or example artifacts.
