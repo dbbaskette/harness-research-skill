@@ -83,7 +83,7 @@ node scripts/harness-research.mjs research submit --project DIR --task ID --file
 
 # Register the text of a source the harness has saved.
 node scripts/harness-research.mjs research source --project DIR --file research/sources/NAME.md \
-  --origin URL_OR_PATH --title TEXT --standing primary|secondary|community \
+  --origin URL_OR_PATH --title TEXT [--standing primary|secondary|community] \
   [--transcribed --pages 4-6]
 
 # Where the run stands: stages, tasks, coverage, what is missing.
@@ -126,6 +126,10 @@ Each source the person gave becomes a task: read it, save its text, register it.
 - **Links:** the harness fetches them with its own tools. A page that needs signing in can be
   read if the person's session can reach it, for example through its browser; otherwise it is
   a gap, and the person can save it as a PDF and give that instead.
+- **Sources the person gives are always `primary`.** The helper sets that when they are
+  registered. Sources found during research are labelled by the harness: `primary` (the
+  subject's own documentation, specifications, announcements, standards or filings),
+  `secondary` (press, analysts) or `community` (forums, personal blogs).
 - A source that cannot be read is registered with its reason, so the report shows it as a gap
   rather than dropping it.
 - New sources found during research are saved and registered the same way.
@@ -459,7 +463,7 @@ Shortened, with one entry of each kind. The values are illustrative.
 - **`statement` is what a consumer uses;** `original_statement` shows what a narrowed fact said
   before the checker cut it back.
 - **`sources_count` and `best_standing`** let a consumer prefer facts backed by more than one
-  publisher, or by primary sources.
+  publisher, or by primary sources. A source the person gave is always `primary`.
 - **Questions list their facts and facts list their questions,** because a merged duplicate can
   answer more than one question.
 - **`rejected` and `failed`** are kept for auditing. Consumers should not cite them.
