@@ -165,7 +165,8 @@ of evidence.
 ## Independent checking
 
 The checker receives the candidate facts, their pinned sources and the questions,
-not the researcher's reasoning. It opens the originals, reads context, and returns:
+not the researcher's reasoning. It opens the originals, verifies page/line locators
+against them, reads context, and returns:
 
 ```json
 {"facts":[{"key":"assigned-fact-key","result":"confirmed"}],"inspected_sources":[{"source":"source-id","sha256":"extraction-hash-from-task","original_sha256":"original-hash-from-task-or-null","read_original":true}],"assessments":[{"id":"question-id","coverage":"answered","gaps":[]}]}
@@ -196,7 +197,8 @@ Writing results contain each assigned question exactly once:
 
 The writing task carries the section's current facts; other sections' facts are in
 `research/brief.md` and may be cited by key. Every factual headline and sentence
-needs current keys and supported numbers. Use up to four paragraphs; explain
+needs current keys and supported numbers. An answered question needs 1–40 cited body sentences in addition to its headline,
+in up to four paragraphs; explain
 conflicts, dates and limitations without recommendations beyond the facts.
 Preserve gap IDs. A question assessed `not answered` instead has
 `headline:{kind:"gap",gaps:[IDs]}`, `answer:[]` and those gap IDs; the helper

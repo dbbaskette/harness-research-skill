@@ -2,6 +2,12 @@
 
 ## 0.9.0 (unreleased)
 
+Live acceptance follow-up (2026-10-16):
+
+- Clarify reuse of selected evidence by registered source ID, identify missing
+  quote source IDs with an actionable error, require cited answer-body sentences
+  explicitly, and ask checkers to verify page/line locators against originals.
+
 Review follow-up (2026-10-16):
 
 - Speed: stages are pipelined per section instead of whole-stage waves; light research takes
