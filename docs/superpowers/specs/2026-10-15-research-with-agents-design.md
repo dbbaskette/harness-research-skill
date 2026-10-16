@@ -67,6 +67,33 @@ computer (Valkey vs Redis, 8 October) had nine broad questions, each marked "sup
 single quote. The first summary claims caches, sessions, counters and rankings; its only
 quote is "Valkey is a data structure server." The checks passed.
 
+## Compared with how the skill works today (0.8.1)
+
+| | Today | This design |
+| --- | --- | --- |
+| **What goes in** | A plan the calling agent writes: topic, purpose, scope, any supplied documents it has already turned into text, and 1 to 30 questions | A topic, the person's links and documents, a depth and a note on who it is for. The harness writes the plan |
+| **Who researches** | The calling agent, however it likes, in turn or with helpers it starts itself | The same harness, task by task from a queue, with several subagents at once |
+| **The plan** | Any 1 to 30 questions, unstructured | A grid of subjects by dimensions, sized by depth, up to 80 questions, plus one round for missing angles |
+| **What a question produces** | One finding: a verdict (supported, contradicted, insufficient, unavailable), an optional headline, a summary of up to 12,000 characters, limits and up to 20 quotes | Many one-sentence facts, each with its own quotes; "answered / partly / not" for open questions and a verdict only for claims; no summary |
+| **Evidence check** | The quote must appear, exactly, at the offset the agent gives, in any file in the project, including one the agent wrote itself | The quote must be in a registered source's saved text; the helper finds it, allowing for spacing, quote-mark and dash differences; every number in the fact must be in its quotes |
+| **Support** | Not checked: "semantic support is the researcher's assessment" | Every fact checked by a worker that did not write it, ideally the other harness, against the original source: confirmed, narrowed or rejected |
+| **Across questions** | Nothing | Duplicates merged, conflicts and superseded facts shown, missing angles researched |
+| **Sources** | Supplied documents are registered with a hash; web pages are files the agent saves, with no register or label | Every source registered with a hash, a title, a publisher and a standing; the person's own sources are always primary; text read from charts or scans is marked transcribed |
+| **When it is done** | When no question is pending; the guidance asks the agent to open the report and check it | When every stage is done; the helper will not say complete before then |
+| **Working in parallel** | Allowed when the host permits; saves are one at a time, with "busy, retry" errors | Tasks are leased to workers, so subagents and sessions do not collide |
+| **Output** | `.harness-research/research-report.md`, a per-question list in a hidden folder, and the record | `research/report.md` with a coverage grid, facts side by side by dimension, conflicts, gaps, numbered sources and rejected facts; `research/facts.json`; `research/brief.md`. The record stays |
+| **Citations** | By question; no stable IDs | Stable fact keys, with a hash of each quote, that a deck, training or blog can cite and check later |
+| **Studios** | Each builds its own research loop and confined worker tools (three copies) | One instruction to the harness; they read `facts.json` |
+
+**What stays the same:** the Node-only helper; the record, its history, locking and
+migration; staleness from changed inputs and sources; supplied-only versus public-web and the
+`--allow-web` rule; the rule that only exact quotes count; and the `plan`, `record`, `status`
+and `migrate` commands for anyone researching by hand.
+
+**What becomes redundant:** the comparative path (`outline.yaml` and `fields.yaml` from the
+retained upstream skills) does what the subject and dimension grid now does, and could be
+retired once the grid has been tried.
+
 ## Commands
 
 The harness runs these; people do not.
