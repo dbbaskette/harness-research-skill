@@ -1,4 +1,4 @@
-import { readFile, writeFile, readdir } from 'node:fs/promises';
+import { readFile, writeFile, readdir, mkdir } from 'node:fs/promises';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { resolve } from 'node:path';
 import { createHash } from 'node:crypto';
@@ -67,6 +67,71 @@ export async function measureContext() {
 export function renderReport(data) {
   return 'Measured with `cl100k_base`; cumulative instruction counts, including a normalized\nrepresentative guidance-start response. Bootstrap activation is shown separately.\n\n| Reading path | Tokens |\n| --- | ---: |\n' + Object.entries(data.routes).map(([label, value]) => `| ${label} | ${value.toLocaleString('en-US')} |`).join('\n') + '\n\nComparative rows include the selected platform resource, not the complete bundle.\nWorker rows count only the file a task\'s `guide` names, without the\nbootstrap or entry. Each strategy row includes one router and one strategy. Status/resume skips plan\nand finding schemas until a new save is needed. Only explicitly requested chat-only\nanswers omit saved artifacts; default research uses the skill task/evidence workflow. Source\ncontent, images, research task responses and conversation add separately. The JSON\nreport also exposes direct-handoff paths without the bootstrap/start response.\n';
 }
+// The progressive disclosure map: what loads at each step, from the same measurements as the table.
+const tokens = n => n < 1000 ? `${n} tokens` : `~${(n / 1000).toFixed(1)}k`;
+const range = values => values.length ? `${tokens(Math.min(...values))}–${tokens(Math.max(...values)).replace('~', '')}` : '';
+const escape = value => String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+function box(x, y, w, color, title, value, note, dashed = false) {
+  return `  <g transform="translate(${x} ${y})">
+    <rect width="${w}" height="96" rx="12" fill="white" stroke="${color}" stroke-width="2"${dashed ? ' stroke-dasharray="6 4"' : ''}/>
+    <text x="16" y="26" font-size="17" font-weight="700" fill="${color}">${escape(title)}</text>
+    <text x="16" y="56" font-size="26" font-weight="700">${escape(value)}</text>
+    <text x="16" y="80" font-size="13">${escape(note)}</text>
+  </g>`;
+}
+export function renderMap(data) {
+  const r = data.routes, pick = prefix => Object.entries(r).filter(([label]) => prefix(label)).map(([, value]) => value);
+  const comparative = pick(label => label === 'Comparative routing only' || /^(Codex|Claude) /.test(label)), strategies = pick(label => label.startsWith('Saved research + '));
+  const main = '#005C8A', worker = '#6C4B94', legacy = '#6B7280', W = 240, xs = [24, 288, 552, 816];
+  const rows = [
+    box(24, 80, 300, main, 'Skill discovery', tokens(r['Discovery metadata']), 'Name and description, always visible'),
+    box(390, 80, 300, main, 'Installed bootstrap', tokens(r['Installed bootstrap']), 'Picks and pins the guidance release'),
+    box(756, 80, 300, main, 'Guidance entry', tokens(r['Bootstrap + current guidance entry']), 'SKILL.md routes to one path'),
+    box(xs[0], 230, W, main, 'Checked research run', tokens(r['Coordinator: skill research with independent checks and saved report']), 'Coordinator: run guide + 2 contracts'),
+    box(xs[1], 230, W, main, 'Verify, again, reuse', tokens(r['Verify, research again, reuse or refresh']), 'Follow-ups on saved research'),
+    box(xs[2], 230, W, main, 'Status or resume', tokens(r['Status / resume without new findings']), 'No new findings'),
+    box(xs[3], 230, W, main, 'Chat-only answer', tokens(r['Explicit chat-only cited answer']), 'Only when asked for no saved report'),
+    box(xs[0], 400, W, worker, 'Researcher', tokens(r['Research worker subagent']), 'task-research.md'),
+    box(xs[1], 400, W, worker, 'Checker', tokens(r['Checker subagent']), 'task-check.md'),
+    box(xs[2], 400, W, worker, 'Writer or reviewer', tokens(r['Writer or reviewer subagent']), 'task-write.md'),
+    box(xs[3], 400, W, worker, 'Refresh reader', tokens(r['Refresh worker']), 'reuse.md'),
+    box(xs[0], 570, W, legacy, 'Manual 0.8 workflow', tokens(r['Legacy manual research with saved report']), 'plan and record commands', true),
+    box(xs[1], 570, W, legacy, 'Comparative outlines', range(comparative), 'One preserved upstream resource', true),
+    box(xs[2], 570, W, legacy, 'Source strategies', range(strategies), 'Run guidance + one strategy', true),
+    box(xs[3], 570, W, legacy, 'Older Brand records', tokens(r['Legacy migration']), 'Migration', true),
+  ];
+  const centre = x => x + W / 2;
+  const arrows = [
+    'M324 128 H390', 'M690 128 H756',
+    `M906 176 V202 H${centre(xs[0])} V230`, `M${centre(xs[1])} 202 V230`, `M${centre(xs[2])} 202 V230`, `M${centre(xs[3])} 202 V230`,
+  ].map(d => `      <path d="${d}"/>`);
+  // One dashed trunk from the coordinator, then a drop to each worker; only the drops carry arrowheads.
+  const trunk = `      <path d="M${centre(xs[0])} 326 V378 H${centre(xs[3])}"/>`;
+  const workers = xs.map(x => `      <path d="M${centre(x)} 378 V400" marker-end="url(#arrow-worker)"/>`);
+  const description = `Progressive disclosure, cumulative instruction tokens measured with cl100k_base. Discovery ${tokens(r['Discovery metadata'])}, installed bootstrap ${tokens(r['Installed bootstrap'])}, guidance entry ${tokens(r['Bootstrap + current guidance entry'])}. Paths: checked research run ${tokens(r['Coordinator: skill research with independent checks and saved report'])}, verify/again/reuse/refresh ${tokens(r['Verify, research again, reuse or refresh'])}, status or resume ${tokens(r['Status / resume without new findings'])}, chat-only answer ${tokens(r['Explicit chat-only cited answer'])}. Worker subagents read only their own contract: researcher ${tokens(r['Research worker subagent'])}, checker ${tokens(r['Checker subagent'])}, writer or reviewer ${tokens(r['Writer or reviewer subagent'])}, refresh reader ${tokens(r['Refresh worker'])}. Legacy paths: manual workflow ${tokens(r['Legacy manual research with saved report'])}, comparative outlines ${range(comparative)}, source strategies ${range(strategies)}, older Brand records ${tokens(r['Legacy migration'])}. One path is loaded, not the sum.`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="700" viewBox="0 0 1080 700" role="img" aria-labelledby="title description">
+  <title id="title">Harness Research: progressive context loading</title>
+  <desc id="description">${escape(description)}</desc>
+  <!-- Input digest: ${data.inputDigest} -->
+  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="${main}"/></marker><marker id="arrow-worker" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="${worker}"/></marker></defs>
+  <rect width="1080" height="700" rx="16" fill="#F5F7F9"/>
+  <g font-family="Arial, Helvetica, sans-serif" fill="#1B1D36">
+    <text x="24" y="36" font-size="24" font-weight="700">Load what the task needs</text>
+    <text x="24" y="59" font-size="15">Cumulative instruction tokens. Each request takes one path; branches are not added together.</text>
+    <g fill="none" stroke="${main}" stroke-width="2" marker-end="url(#arrow)">
+${arrows.join('\n')}
+    </g>
+    <text x="164" y="356" font-size="14" fill="${worker}" font-weight="700">The coordinator hands each task a guide; a worker subagent reads only that file.</text>
+    <g fill="none" stroke="${worker}" stroke-width="2" stroke-dasharray="6 4">
+${trunk}
+${workers.join('\n')}
+    </g>
+    <text x="24" y="556" font-size="14" fill="${legacy}" font-weight="700">Kept for older callers: routed from the entry only when that work is asked for.</text>
+${rows.join('\n')}
+  </g>
+</svg>
+`;
+}
 export async function main() {
   const args = process.argv.slice(2);
   if (args.some(x => !['--write', '--check', '--json'].includes(x)) || args.length > 1) throw new Error('Choose --write, --check or --json');
@@ -76,8 +141,10 @@ export async function main() {
   const pattern = /<!-- CONTEXT-USAGE:START -->[\s\S]*?<!-- CONTEXT-USAGE:END -->/;
   if (!pattern.test(readme) || (readme.match(/<!-- CONTEXT-USAGE:START -->/g) ?? []).length !== 1) throw new Error('Expected one context report marker pair');
   const next = readme.replace(pattern, `<!-- CONTEXT-USAGE:START -->\n${renderReport(data)}<!-- CONTEXT-USAGE:END -->`);
-  if (args.includes('--write')) await writeFile(url, next);
-  else if (readme !== next) throw new Error('Context counts changed; run npm run context:update');
+  const mapUrl = new URL('docs/images/context-loading.svg', root), map = renderMap(data);
+  const savedMap = await readFile(mapUrl, 'utf8').catch(() => null);
+  if (args.includes('--write')) { await mkdir(new URL('docs/images/', root), { recursive: true }); await writeFile(url, next); await writeFile(mapUrl, map); }
+  else if (readme !== next || savedMap !== map) throw new Error('Context counts changed; run npm run context:update');
   console.log(JSON.stringify({ routes: data.routes, inputDigest: data.inputDigest }, null, 2));
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) main().catch(error => { console.error(error.message); process.exitCode = 1; });

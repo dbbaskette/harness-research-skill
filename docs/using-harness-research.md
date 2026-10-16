@@ -2,7 +2,7 @@
 
 [← README](../README.md) · [Setup & updates](setup.md) · [Developer guide](development.md)
 
-This guide describes **0.9.4**, including [using research again](#use-research-again),
+This guide describes **0.9.5**, including [using research again](#use-research-again),
 which needs runtime 0.9.1. Version 0.8.1 retains the earlier manual workflow; see
 [version choices](setup.md#choose-your-version).
 
