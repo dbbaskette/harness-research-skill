@@ -330,7 +330,8 @@ All in `research/`, where a person will look:
   subjects when comparing, questions with their answers (each sentence with its fact keys), sources with their provenance (`given`, `found` or `transcribed`, or `caller`
   for a file quoted through `record`), facts with their checks and citations, conflicts,
   superseded, missing, rejected and counts. A fact's `key` is its question ID and a short hash
-  of its statement, such as `valkey.licensing.3fa9c2`. It stays the same when the run is
+  of its statement, such as `valkey-licensing-3fa9c2`: lowercase letters, digits and hyphens
+  only, so it fits in citation markers, links and file names. It stays the same when the run is
   repeated and the fact is found again, so a deck, a training or a blog can cite it and later
   check it; each citation also carries the hash of its quote.
 - **`research/brief.md`**: every fact with its key, one per line, no quotes. The shortest
@@ -524,21 +525,21 @@ comparison, `subjects` is empty and every `subject` is null. The values are illu
   "subjects": [{"id": "redis", "name": "Redis"}, {"id": "valkey", "name": "Valkey"}],
 
   "questions": [
-    {"id": "valkey.licensing", "section": "licensing", "subject": "valkey",
+    {"id": "valkey-licensing", "section": "licensing", "subject": "valkey",
      "kind": "open", "round": 1,
      "question": "Under what licence is Valkey released, and has that changed?",
      "coverage": "answered", "gaps": "",
      "headline": "Valkey is licensed under the BSD 3-Clause licence and has kept that licence since the fork.",
      "answer": [
-       {"sentence": "Valkey is licensed under the BSD 3-Clause licence.", "facts": ["valkey.licensing.3fa9c2"]},
-       {"sentence": "Valkey kept the licence Redis used before Redis changed its own.", "facts": ["fork-history.77d1e0", "redis.licensing.aa11bb"]}
+       {"sentence": "Valkey is licensed under the BSD 3-Clause licence.", "facts": ["valkey-licensing-3fa9c2"]},
+       {"sentence": "Valkey kept the licence Redis used before Redis changed its own.", "facts": ["fork-history-77d1e0", "redis-licensing-aa11bb"]}
      ],
-     "facts": ["valkey.licensing.3fa9c2"]},
+     "facts": ["valkey-licensing-3fa9c2"]},
     {"id": "fork-history", "section": "origin", "subject": null, "kind": "open", "round": 1,
      "question": "How and when was Valkey forked from Redis?",
      "coverage": "partly answered",
      "gaps": "No primary source gives the date the first Valkey release was tagged.",
-     "facts": ["fork-history.77d1e0"]}
+     "facts": ["fork-history-77d1e0"]}
   ],
 
   "sources": [
@@ -554,9 +555,9 @@ comparison, `subjects` is empty and every `subject` is null. The values are illu
   ],
 
   "facts": [
-    {"key": "valkey.licensing.3fa9c2",
+    {"key": "valkey-licensing-3fa9c2",
      "statement": "Valkey is licensed under the BSD 3-Clause licence.",
-     "section": "licensing", "subject": "valkey", "questions": ["valkey.licensing"],
+     "section": "licensing", "subject": "valkey", "questions": ["valkey-licensing"],
      "as_of": null,
      "check": {"result": "confirmed", "by": "codex", "at": "2026-10-16T14:31:05Z"},
      "original_statement": null,
@@ -569,19 +570,19 @@ comparison, `subjects` is empty and every `subject` is null. The values are illu
   ],
 
   "conflicts": [
-    {"facts": ["redis.performance.1b2c3d", "valkey.performance.9e8f7a"],
+    {"facts": ["redis-performance-1b2c3d", "valkey-performance-9e8f7a"],
      "note": "Each vendor's benchmark uses a different instance size and client count."}
   ],
   "superseded": [
-    {"fact": "redis.licensing.aa11bb", "by": "redis.licensing.cc22dd",
+    {"fact": "redis-licensing-aa11bb", "by": "redis-licensing-cc22dd",
      "note": "A later release added another licence option."}
   ],
   "missing": [
-    {"angle": "Support lifecycle and end-of-life policy", "became": ["redis.support", "valkey.support"]}
+    {"angle": "Support lifecycle and end-of-life policy", "became": ["redis-support", "valkey-support"]}
   ],
   "rejected": [
     {"statement": "Redis Cluster supports active-active writes across regions.",
-     "question": "redis.clustering",
+     "question": "redis-clustering",
      "reason": "The quote describes Redis Enterprise's Active-Active feature, not open-source Redis Cluster.",
      "by": "codex", "citations": [{"source": "s31", "quote": "…"}]}
   ],
@@ -590,7 +591,7 @@ comparison, `subjects` is empty and every `subject` is null. The values are illu
 ```
 
 - **Keys** are stable: the question ID and a short hash of the statement. A deck, training or
-  blog cites `valkey.licensing.3fa9c2`, and can later look the key up to check the fact still
+  blog cites `valkey-licensing-3fa9c2`, and can later look the key up to check the fact still
   stands, unchanged (`quote_sha256`), not narrowed, rejected or superseded.
 - **`statement` is what a consumer uses;** `original_statement` shows what a narrowed fact said
   before the checker cut it back.
