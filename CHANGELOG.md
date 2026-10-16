@@ -6,7 +6,7 @@ Recommendations 1 and 2 of the [0.9.3 skill review](https://github.com/dbbaskett
 a lighter light depth and per-role guidance. Not released until it is verified
 and tagged.
 
-- **Light depth is lighter.** A research submission records at most 6 facts per
+- **Light depth is lighter.** A research submission records at most 8 facts per
   question at light (was 12), and an answer has at most 10 cited body sentences
   (was 40). Standard keeps 20 facts and deep 30, both with 40 sentences. Tasks
   carry `facts_per_question` and `sentences_per_answer`, and the briefs say these
@@ -23,7 +23,8 @@ and tagged.
 - [Live trials](docs/verification/0.9.4/live/README.md): in Claude Code, subagent
   tokens fell 28% (checkers 34%), wall time 61% and report length 50% against the
   0.9.1 run of the same plan, with similar narrowing and one question only partly
-  answered.
+  answered. Those trials ran with a light limit of 6; it was then raised to 8 to
+  recover coverage, which has not been measured live.
 
 ## 0.9.3 — 2026-10-16
 

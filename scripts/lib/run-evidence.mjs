@@ -4,7 +4,7 @@ import { hash, stable, key, text, identifier, readText, snapshot, unchanged, exi
 
 // Per question: candidate facts per research submission and cited body sentences per answer. Light keeps
 // both small so checkers and writers read less; standard and deep go further on request.
-export const DEPTHS = { light: { facts: 6, gaps: 3, sentences: 10 }, standard: { facts: 20, gaps: 80, sentences: 40 }, deep: { facts: 30, gaps: 80, sentences: 40 } };
+export const DEPTHS = { light: { facts: 8, gaps: 3, sentences: 10 }, standard: { facts: 20, gaps: 80, sentences: 40 }, deep: { facts: 30, gaps: 80, sentences: 40 } };
 export const coverageValues = ['answered', 'partly answered', 'not answered'];
 // A quote is only checkable against the text around it. Saved text shorter than this, or a quote
 // that is most of its saved text, is refused unless the source is registered as a partial capture.

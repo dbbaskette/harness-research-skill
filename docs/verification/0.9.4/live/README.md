@@ -1,5 +1,10 @@
 # 0.9.4 live trials: lighter light depth and per-role guidance
 
+> **These trials ran with a light limit of 6 facts per question.** After one
+> question came back only partly answered, the owner had the limit raised to 8
+> before release. The figures below describe the limit of 6. A limit of 8 should
+> fall between these results and 0.9.1's, but that has not been measured.
+
 Date: 2026-10-16. One fresh run of the 0.9.1 SQLite WAL request in each harness,
 on the 0.9.4 candidate (`0b6377a`, installed into disposable `--home`/`--shared`,
 guidance supplied explicitly from the checkout). Initial runs only; no follow-ups.
@@ -70,7 +75,7 @@ tokens are not compared.
   and none were rejected in either run.
 - **Coverage gave a little.** One question, crash recovery, came back partly
   answered: with 6 facts the researcher left out the recovery procedure. 0.9.1
-  answered every question.
+  answered every question. The limit is now 8 for this reason.
 - **Per-role guidance had one regression.** The rule against citing struck-through
   text lived only in the Sources section, which checkers no longer read. A checker
   recorded a gap from struck 1 GB guidance in the saved copy. 0.9.1's checker made

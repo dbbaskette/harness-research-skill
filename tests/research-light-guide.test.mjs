@@ -14,13 +14,13 @@ const names = ['alpha', 'beta', 'gamma', 'delta', 'epsilon', 'zeta', 'eta', 'the
 const facts = (source, n) => ({ coverage: 'answered', gaps: [], facts: names.slice(0, n).map(name => ({ statement: `OrionDB permits a single writer for each database (${name}).`, as_of: null, quotes: [{ source: source.id, quote, locator: 'Line 1' }] })) });
 const refused = async (f, task, data) => { const result = await submitTask(argsFor(f, task, { data })); assert.equal(result.accepted, false); return JSON.stringify(result.errors); };
 
-test('light depth keeps facts and answers short: at most 6 facts per question and 10 answer sentences', async t => {
-  assert.deepEqual([DEPTHS.light.facts, DEPTHS.standard.facts, DEPTHS.deep.facts], [6, 20, 30]);
+test('light depth keeps facts and answers short: at most 8 facts per question and 10 answer sentences', async t => {
+  assert.deepEqual([DEPTHS.light.facts, DEPTHS.standard.facts, DEPTHS.deep.facts], [8, 20, 30]);
   assert.deepEqual([DEPTHS.light.sentences, DEPTHS.standard.sentences, DEPTHS.deep.sentences], [10, 40, 40]);
   const f = await fixture(t), source = await setup(f), research = await take(f);
-  assert.equal(research.facts_per_question, 6); assert.match(research.brief, /at most facts_per_question/);
-  assert.match(await refused(f, research, facts(source, 7)), /exceeds the 6 allowed at light depth/);
-  await submit(f, research, facts(source, 6));
+  assert.equal(research.facts_per_question, 8); assert.match(research.brief, /at most facts_per_question/);
+  assert.match(await refused(f, research, facts(source, 9)), /exceeds the 8 allowed at light depth/);
+  await submit(f, research, facts(source, 8));
 });
 
 test('a light writer gets its sentence limit in the task and more is refused', async t => {

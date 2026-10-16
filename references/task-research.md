@@ -63,7 +63,7 @@ subjects, is accepted with `warnings`; fix it or say why it is right.
 
 At light depth a research task covers a whole section; at standard and deep, one
 question. Return every assigned question in `questions` as above. Record at most
-the task's `facts_per_question` facts per question (6 at light, 20 at standard, 30
+the task's `facts_per_question` facts per question (8 at light, 20 at standard, 30
 at deep): the strongest, not a quota. Facts are single sentences of at most 40
 words, with 1–5 exact source quotes of 20–900 characters.
 Every number must occur in its quotes, including spelled-out numbers ("five"),

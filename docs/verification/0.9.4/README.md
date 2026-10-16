@@ -5,7 +5,7 @@ recommendations 1 and 2 of the 0.9.3 skill review.
 
 | Change | Before (0.9.3) | Now |
 | --- | --- | --- |
-| Facts per question at light | up to 12; researchers hit it on 8 of 10 trial questions | up to 6; standard 20, deep 30 unchanged |
+| Facts per question at light | up to 12; researchers hit it on 8 of 10 trial questions | up to 8 (the live trials ran at 6); standard 20, deep 30 unchanged |
 | Answer body sentences at light | 1–40 | 1–10; standard and deep keep 40 |
 | Guidance a researcher subagent reads | `research-run.md`, 3,395 tokens | `task-research.md`, 1,133 tokens |
 | Guidance a checker subagent reads | 3,395 tokens | `task-check.md`, 542 tokens |
