@@ -153,7 +153,7 @@ your agent will explain what needs reassessment.
 | Understand helpers, schemas, or run tests | [Developer guide](docs/development.md) |
 | Continue older Tanzu Brand research | [Migration guide](references/migration.md) |
 | Inspect the agent's workflow | [Skill instructions](SKILL.md) and [research contract](references/research-run.md) |
-| See what has been verified | [Development evidence and remaining release gates](docs/verification/0.9.0/README.md) |
+| See what has been verified | [Development evidence and release decision](docs/verification/0.9.0/README.md) |
 
 ## Built for your agent, with the work kept in your project
 
