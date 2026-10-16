@@ -1,6 +1,6 @@
 {
   "schema": "harness-research-release-acceptance/1",
-  "candidate": "0.9.0 unreleased",
+  "candidate": "0.9.0",
   "code_tested": "f6c15c9ef3e7ce6498d004188e23f7219826a30c",
   "merged_equivalent": "39b6f243c5b24fa787aa074005ee5a359878ce08",
   "initial_live_runtime": "db98116c3bc6d356ed8cd6c4de28c3d42e56fc10",
@@ -12,7 +12,7 @@
     "audit_vulnerabilities": 0,
     "installer": "passed"
   },
-  "human_acceptance": "pending",
+  "human_acceptance": "formal sampling incomplete; owner accepted release for ongoing-use refinement",
   "measurements_note": "Single observed trials on existing subscription access; USD is CLI API-equivalent/list estimate, not invoice. Missing telemetry is null. Baseline findings and new facts are different units; atomic assertions are used for sampling. Corrective LLM trials reused disclosed authored candidate material; they are not cold-start timing comparisons.",
   "excluded_trials": [
     {
@@ -33,7 +33,7 @@
       "wall_seconds": 292.09,
       "claude_list_estimate_usd": 1.0742263,
       "measurement_scope": "whole invocation",
-      "human_acceptance": "pending",
+      "human_acceptance": "not formally scored",
       "sample": {
         "assertions": 19,
         "sentences": 22,
@@ -57,7 +57,7 @@
       "wall_seconds": 237.18,
       "claude_list_estimate_usd": 1.9600192,
       "measurement_scope": "whole invocation",
-      "human_acceptance": "pending",
+      "human_acceptance": "not formally scored",
       "sample": {
         "assertions": 13,
         "sentences": 20,
@@ -95,7 +95,7 @@
       "wall_seconds": null,
       "claude_list_estimate_usd": 0.6772403,
       "measurement_scope": "Claude checker only; 208.09 seconds; Codex researcher wall/usage unavailable",
-      "human_acceptance": "pending",
+      "human_acceptance": "not formally scored",
       "sample": {
         "assertions": 7,
         "sentences": 14,
@@ -133,7 +133,7 @@
       "wall_seconds": 911.22,
       "claude_list_estimate_usd": 7.8074166,
       "measurement_scope": "whole invocation; atomic mapping excluded",
-      "human_acceptance": "pending",
+      "human_acceptance": "not formally scored",
       "sample": {
         "assertions": 30,
         "sentences": 30,
@@ -158,7 +158,7 @@
       "wall_seconds": 875.14,
       "claude_list_estimate_usd": 19.0499998,
       "measurement_scope": "whole invocation",
-      "human_acceptance": "pending",
+      "human_acceptance": "not formally scored",
       "sample": {
         "assertions": 30,
         "sentences": 30,
@@ -197,7 +197,7 @@
       "wall_seconds": 2074.31,
       "claude_list_estimate_usd": 85.2364616,
       "measurement_scope": "whole invocation",
-      "human_acceptance": "pending",
+      "human_acceptance": "not formally scored",
       "sample": {
         "assertions": 30,
         "sentences": 30,
@@ -236,7 +236,7 @@
       "wall_seconds": 927.99,
       "claude_list_estimate_usd": null,
       "measurement_scope": "native Codex; cost unavailable",
-      "human_acceptance": "pending",
+      "human_acceptance": "not formally scored",
       "sample": {
         "assertions": 30,
         "sentences": 30,
@@ -272,7 +272,7 @@
       "wall_seconds": 929.12,
       "claude_list_estimate_usd": null,
       "measurement_scope": "native Codex; cost unavailable",
-      "human_acceptance": "pending",
+      "human_acceptance": "not formally scored",
       "sample": {
         "assertions": 30,
         "sentences": 30,
@@ -307,7 +307,7 @@
       "wall_seconds": 1070.5761170387268,
       "claude_list_estimate_usd": 12.9841099,
       "measurement_scope": "whole replacement invocation; reused primary candidate notes and captures, all research reassessed and all independent checks/writing fresh",
-      "human_acceptance": "pending",
+      "human_acceptance": "not formally scored",
       "sample": {
         "assertions": 30,
         "sentences": 30,
@@ -357,7 +357,7 @@
       "wall_seconds": 629.07,
       "claude_list_estimate_usd": 8.2035907,
       "measurement_scope": "planning and research; atomic mapping 276.6 seconds / $0.8511004 separately",
-      "human_acceptance": "pending",
+      "human_acceptance": "not formally scored",
       "sample": {
         "assertions": 30,
         "sentences": 30,
@@ -382,7 +382,7 @@
       "wall_seconds": null,
       "claude_list_estimate_usd": 3.5208906,
       "measurement_scope": "three fresh Claude checker phases only, 563.43 seconds; Codex/browser checker time/usage unavailable; reused actual authored candidates, all checks/writing fresh",
-      "human_acceptance": "pending",
+      "human_acceptance": "not formally scored",
       "sample": {
         "assertions": 30,
         "sentences": 30,
@@ -420,7 +420,7 @@
       "wall_seconds": 321.39,
       "claude_list_estimate_usd": 1.3588741,
       "measurement_scope": "whole invocation",
-      "human_acceptance": "pending",
+      "human_acceptance": "not formally scored",
       "sample": {
         "assertions": 6,
         "sentences": 12,
@@ -458,7 +458,7 @@
       "wall_seconds": 341.15,
       "claude_list_estimate_usd": 0.2630604,
       "measurement_scope": "wall whole run; cost Claude checker only, Codex researcher unavailable",
-      "human_acceptance": "pending",
+      "human_acceptance": "not formally scored",
       "sample": {
         "assertions": 7,
         "sentences": 8,
@@ -492,5 +492,12 @@
     }
   ],
   "completed_eligible_report_cases": 13,
-  "human_feedback": "Positive aggregate feedback received before the final corrected Claude report completed; no per-item scores or threshold attestation inferred. Final case sampling remains pending."
+  "human_feedback": "looks good for now... ongoing use will let me tweak more than a specific test",
+  "release_decision": {
+    "source": "direct owner response after final case was made available",
+    "accepted_for_release": true,
+    "formal_human_sampling_completed": false,
+    "measured_90_percent_support_claimed": false,
+    "scope": "0.9.0 release exception; retain evidence and refine through ongoing use"
+  }
 }

@@ -1,10 +1,11 @@
 # Harness Research 0.9.0 development verification
 
-**Current status (2026-10-16):** stable 0.9.0 is not published. The current
+**Current status (2026-10-16):** the owner accepted 0.9.0 for release. The current
 implementation passed [88 native tests](ci-acceptance-fixes/verification.json),
 zero failures or skips, plus audit, context, installer and installed-version checks.
 The [live acceptance record](live-acceptance/README.md) tracks the broader harness
-trials, corrected failures, measured limitations and outstanding human review.
+trials, corrected failures, measured limitations and the scoped decision to use
+ongoing feedback instead of completing formal human sample scoring.
 
 Earlier checkpoints below are historical evidence; their narrower test counts
 and then-outstanding trials do not supersede the current record.

@@ -9,15 +9,17 @@ belong in your content project; the skill installation is shared across projects
 
 | Version | What you get | Install from |
 | --- | --- | --- |
-| **0.9.0 preview** | The current task workflow, independent evidence checks, and visible `research/` outputs. Broader live release acceptance is still pending. | This repository's `main` branch. |
-| **0.8.1 release** | The earlier manual plan/finding workflow and a saved report in `.harness-research/`. | The immutable `v0.8.1` tag. |
+| **0.9.0 release** | The task workflow, independent evidence checks, and visible `research/` outputs. | The immutable `v0.9.0` tag. |
+| **0.8.1 previous release** | The earlier manual plan/finding workflow and a saved report in `.harness-research/`. | The immutable `v0.8.1` tag. |
+| **Development** | Unreleased work; guidance must be selected explicitly for testing. | `main` or a development branch; see the [developer guide](development.md). |
 
-This repository's README and user guide describe the 0.9.0 preview. The
-[release page](https://github.com/dbbaskette/harness-research-skill/releases/tag/v0.8.1)
-has the published 0.8.1 ZIP and checksum. Preview verification and outstanding
-acceptance work are recorded in [development evidence](verification/0.9.0/README.md).
+The README and user guide describe 0.9.0. The
+[release page](https://github.com/dbbaskette/harness-research-skill/releases/tag/v0.9.0)
+has its ZIP and checksum. The [verification record](verification/0.9.0/README.md)
+separates native results, live trials and the owner's decision to refine quality
+through ongoing use rather than complete formal human sampling.
 
-### Install the current preview
+### Install the release
 
 Requirements: Node.js 20 or newer, Git, Bash, and a configured Codex, Claude Code,
 or Cursor environment. Your harness supplies document-reading and research tools,
@@ -25,7 +27,7 @@ model access, and permission to create a separate checker invocation. The helper
 does not supply those capabilities or require another research account.
 
 ```sh
-git clone --branch main https://github.com/dbbaskette/harness-research-skill.git
+git clone --branch v0.9.0 https://github.com/dbbaskette/harness-research-skill.git
 cd harness-research-skill
 bash scripts/Install-Harness-Research.sh
 ```
@@ -37,31 +39,21 @@ before installation, run this from the checkout first:
 bash scripts/Install-Harness-Research.sh --dry-run
 ```
 
-Until 0.9.0 is tagged, ordinary installed use still loads released 0.8.1
-guidance. To exercise the preview workflow, use the explicit development
-prompt in [Get started](../README.md#get-started), pointing at this checkout
-and its local runtime. Installing preview helpers alone does not select preview
-instructions.
-
 An actual installation returns JSON with `"status": "installed"`,
 `runtimeVersion`, installation locations, and the content digest. Start a new
 agent session, open the project where you want research saved, and invoke the
 skill using the [first-session prompts](../README.md#get-started).
 
-### Install the tagged release instead
+**Preview users:** reinstall from `v0.9.0` even if `--version` already reports
+0.9.0. Preview and final helpers can have the same version label with different
+contents; a guidance refresh does not replace executable helpers.
 
-Use this in place of the preview installation:
+### Use the previous release
 
-```sh
-git clone --branch v0.8.1 https://github.com/dbbaskette/harness-research-skill.git
-cd harness-research-skill
-bash scripts/Install-Harness-Research.sh
-```
-
-The checkout is detached at the tag. Its manual workflow is documented in the
-[legacy evidence contract](../references/evidence.md) and
-[workflow reference](../references/workflow.md). It does not gain the 0.9.0
-task commands or independent-checking stages merely by loading newer guidance.
+Replace `v0.9.0` with `v0.8.1` in the clone command to install the older release.
+Its manual workflow is documented in the [legacy evidence contract](../references/evidence.md)
+and [workflow reference](../references/workflow.md). It does not gain task commands
+or independent-checking stages merely by loading newer guidance.
 
 ## Where installation puts things
 
@@ -110,8 +102,8 @@ With the default discovery link, this works offline and needs no content project
 node "$HOME/.agents/skills/harness-research/scripts/harness-research.mjs" --version
 ```
 
-The current preview reports `harness-research 0.9.0`; the tagged release reports
-`harness-research 0.8.1`.
+The current release reports `harness-research 0.9.0`. The previous release reports
+`harness-research 0.8.1`; a preview can also report 0.9.0, so reinstall it from the tag.
 
 When work starts or resumes, the agent should also report the installed runtime,
 guidance release, exact guidance revision, and freshness. These identities can
@@ -119,23 +111,23 @@ differ. A newly loaded instruction set is not proof of a newer executable.
 
 ## Update an existing installation
 
-### Adopt the preview for new work
+### Update to 0.9.0 for new work
 
 From your skill repository checkout, with your own changes committed or otherwise
 preserved:
 
 ```sh
-git fetch origin
-git switch main
-git pull --ff-only origin main
+git fetch origin tag v0.9.0
+git switch --detach v0.9.0
 bash scripts/Install-Harness-Research.sh
 ```
 
-Open a new agent session and check the installed version. Existing content runs
-keep their saved runtime and guidance; an installation update does not silently
-move them to a different workflow.
+Open a new agent session and check the installed version. Reinstall previews even
+if the version label already matches. Existing content runs keep their saved
+runtime and guidance; an installation update does not silently move them to a
+different workflow.
 
-### Return to the tagged release for new work
+### Roll back new work to 0.8.1
 
 ```sh
 git fetch origin tag v0.8.1

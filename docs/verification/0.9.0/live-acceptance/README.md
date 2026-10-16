@@ -1,6 +1,7 @@
 # 0.9.0 live acceptance
 
-**Stable 0.9.0 remains unpublished. Human acceptance is pending.** The native
+**The owner accepted 0.9.0 for release and ongoing-use refinement. Formal human
+sampling is incomplete; no measured semantic acceptance pass is claimed.** The native
 implementation gate passed: [88 tests, zero failures or skips](../ci-acceptance-fixes/verification.json),
 plus dependency audit, context, installer and installed-version checks.
 
@@ -99,10 +100,18 @@ The local review bundle is ignored by Git at
 `.codex-build/release-0.9.0/human-review/README.md`. It contains the matched reports,
 original captures, deterministic fixed samples and blank decisions. Raw transcripts,
 source documents and disposable expired task leases stay local; they are excluded
-from the release archive. The public matrix preserves identities and denominators. There are 292 sampled
-assertions and 316 factual prose sentences across the 13 cases. Positive aggregate
-feedback arrived before the final Claude replacement completed; it is retained
-verbatim locally without inferring item-level grades or threshold attainment.
+from the release archive. The public matrix preserves identities and denominators:
+292 sampled assertions and 316 factual prose sentences across the 13 cases. The
+forms remain unscored.
+
+The owner was asked explicitly whether the evidence/support/coverage/usefulness
+checks were complete, including the last corrected Claude report, and replied:
+“looks good for now... ongoing use will let me tweak more than a specific test”.
+This is retained as the release decision to accept ongoing-use refinement rather
+than a claim that all quotes were manually found or a 90% threshold was measured.
+Native tests and model/mechanical evidence remain valid within their stated scope.
+
+The original human acceptance target remains available for later evaluation:
 
 A person must find every sampled quote in its original, assess 30 assertions per
 run or all if fewer, and assess 30 factual headlines/body sentences or all if fewer.

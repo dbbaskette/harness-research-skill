@@ -646,6 +646,13 @@ its gates (with `--plan-only`), and what the facts feed.
 
 ## Acceptance: better than today, measured
 
+> **0.9.0 release decision, 2026-10-16:** after native verification and 13 eligible
+> live report cases, the owner accepted release for ongoing-use refinement:
+> “looks good for now... ongoing use will let me tweak more than a specific test”.
+> Formal human sampling and comparative scoring below were not completed and are
+> not claimed as passed. This scoped exception preserves the target criteria for
+> later evaluation; see the [release record](../../verification/0.9.0/live-acceptance/README.md).
+
 Before release, the same three requests are run with today's skill (0.8.1) and with this
 design, in Claude Code, and the results compared:
 

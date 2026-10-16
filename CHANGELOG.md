@@ -1,6 +1,10 @@
 # Changelog
 
-## 0.9.0 (unreleased)
+## 0.9.0 — 2026-10-16
+
+Release validation: 88 native tests passed; 13 eligible live report cases completed.
+The owner accepted ongoing-use refinement instead of formal human sample scoring;
+no 90% support result is claimed. [Evidence and release decision](docs/verification/0.9.0/live-acceptance/README.md).
 
 Live acceptance follow-up (2026-10-16):
 
