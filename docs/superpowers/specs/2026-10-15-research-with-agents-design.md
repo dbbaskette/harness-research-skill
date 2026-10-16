@@ -129,7 +129,7 @@ node scripts/harness-research.mjs research status --project DIR
 | 2. Research | one per question | facts with quotes |
 | 3. Check | one per question, never to the worker that researched it | each fact confirmed, narrowed or rejected |
 | 4. Cross-check | one | duplicates, conflicts, superseded facts, missing angles |
-| 5. Fill gaps | the missing angles as new questions, researched, checked and cross-checked once | more facts, at `standard` and `deep` only |
+| 5. Fill gaps | the missing angles as new questions, researched, checked and cross-checked once | more facts: up to 3 questions at `light`, all missing angles at `standard` and `deep` |
 | 6. Write | none: the helper | `research/report.md`, `facts.json`, `brief.md` |
 
 `research next` hands out tasks in that order, several at once where they are independent, so
@@ -191,15 +191,15 @@ Two examples, at the default `light` depth:
 | Scope | Large language models as of late 2026: what they are, how they are built and run, the main models and vendors, what they can and cannot do, cost, risks and regulation, and how organisations use them. Not the mathematics in depth. | The two engines as products: technology, licensing, ecosystem and migration, as of late 2026. Not every managed service's pricing. |
 | Subjects | none | Redis, Valkey |
 | Sections | What an LLM is; how they work; history and milestones; main model families and vendors; capabilities and benchmarks; tools, context and agents; cost and pricing; running them; limitations; risks and security; regulation; how organisations use them; trends | Origin and governance; licensing; releases and versions; architecture; data types and commands; persistence and replication; clustering; performance; modules and vectors; security; clients and tooling; cloud offerings; enterprise support; compatibility and migration; community; known problems |
-| Sections at `light` | the 6 or 7 that matter most for the scope | the 6 or 7 that matter most, such as licensing, architecture, persistence, performance, compatibility and migration |
-| Questions at `light` | about 12 | about 14: one per section per subject, plus 2 cross-cutting |
+| Sections at `light` | the 8 or 9 that matter most for the scope | the 8 or 9 that matter most, such as licensing, architecture, persistence, clustering, performance, security, compatibility and migration |
+| Questions at `light` | about 20 | about 20: one per section per subject, plus 2 cross-cutting |
 | Questions at `deep` | about 45 | about 45 |
 
 | `--depth` | Sections | Questions | Facts per question | Checking | Gap round |
 | --- | --- | --- | --- | --- | --- |
-| `light` (default) | the 5 to 8 that matter most | 8 to 15 | up to 8 | one checker per section | no |
-| `standard` | most that apply | 20 to 40 | up to 15 | one checker per question | yes |
-| `deep` | all that apply | 40 to 80 | up to 30 | one checker per question | yes |
+| `light` (default) | the 6 to 10 that matter most | 15 to 25 | up to 12 | one checker per section | up to 3 questions |
+| `standard` | most that apply | 25 to 45 | up to 20 | one checker per question | yes |
+| `deep` | all that apply | 45 to 80 | up to 30 | one checker per question | yes |
 
 The default is deliberately light. Even at `light`, a run gives more than today's skill:
 more questions, several quoted facts per question instead of one paragraph, every fact
@@ -267,7 +267,8 @@ standing. It hands back references to existing facts only:
 
 ### 5. Fill the gaps
 
-At `standard` and `deep`, the missing angles become new questions, which are researched,
+The missing angles become new questions: the 3 that matter most at `light`, all of them at
+`standard` and `deep`. They are which are researched,
 checked and cross-checked once. Only one round, so a run always ends.
 
 ### 6. Output
@@ -425,11 +426,11 @@ cost are recorded, not limited.
    harness cannot, the run is sequential unless more sessions are started on the queue.
 5. **A harness reading the web can be misled by a page.** In a person's session it has
    whatever the person allowed it; a studio decides what its headless sessions may do.
-6. **Depth costs.** The default `light` run is about 12 questions with a checker per section:
-   very roughly $3 to $6 and 10 to 15 minutes, a little more than Training's measured $2.31 for
-   eight questions without checking. `deep` is about 45 questions, each checked, plus a gap
+6. **Depth costs.** The default `light` run is about 20 questions with a checker per section
+   and up to 3 gap questions: very roughly $6 to $10 and 15 to 25 minutes, judged from
+   Training's measured $2.31 for eight questions without checking. `deep` is about 45 questions, each checked, plus a gap
    round: very roughly $20 to $40 and 30 to 60 minutes. All to be measured in the trials.
-7. **A deep report is long.** A `light` run gives roughly 50 to 100 facts; a deep comparison
+7. **A deep report is long.** A `light` run gives roughly 100 to 200 facts; a deep comparison
    can hold several hundred. Coverage by section and `brief.md` are the way in.
 
 ## Settled in review
@@ -441,8 +442,9 @@ cost are recorded, not limited.
 - **Coverage scales with the topic:** a scope, an outline of sections with several questions
   each, subjects only for comparisons, and `--depth`, instead of a fixed 8 to 20 questions. Any
   topic works, not only comparisons.
-- **A light default:** about 12 questions, a checker per section and no gap round. Anything
-  more than today's skill is an improvement; `standard` and `deep` are there when asked for.
+- **A light default:** about 20 questions, a checker per section and up to 3 gap questions.
+  Anything more than today's skill is an improvement; `standard` and `deep` are there when
+  asked for.
 - **The harness does all the work.** The helper does no fetching, extraction or agent starting;
   it is a queue, a set of checks and the record. No `pdftotext` dependency.
 - **Private words in searches:** not a concern.
@@ -462,9 +464,9 @@ comparison, `subjects` is empty and every `subject` is null. The values are illu
   "scope": "public-web",
   "status": "complete",
   "created_at": "2026-10-16T14:00:03Z",
-  "completed_at": "2026-10-16T14:13:40Z",
-  "counts": {"questions": 14, "facts": 86, "narrowed": 9, "rejected": 6,
-             "sources": 31, "conflicts": 2, "superseded": 1, "failed": 0},
+  "completed_at": "2026-10-16T14:21:15Z",
+  "counts": {"questions": 21, "facts": 152, "narrowed": 14, "rejected": 9,
+             "sources": 44, "conflicts": 3, "superseded": 1, "failed": 0},
 
   "scope": "The two engines as products: technology, licensing, ecosystem and migration, as of late 2026. Not every managed service's pricing.",
   "sections": [{"id": "licensing", "name": "Licensing"}, {"id": "origin", "name": "Origin and governance"}],
