@@ -1,6 +1,6 @@
 # Versioned releases
 
-The current release is **0.9.2**. Package/lockfile versions,
+The current release is **0.9.3**. Package/lockfile versions,
 `guidance/manifest.json`, the guidance release label in `SKILL.md`, and current
 install examples identify this software release. Earlier changelog entries and
 saved tasks retain their recorded versions.
@@ -10,8 +10,14 @@ commands (`verify`, `reassess --again`, `start --from`, `find`, `approve`,
 `refresh`) need runtime 0.9.1. Guidance refresh cannot upgrade executable
 helpers, so the guidance keeps a minimum runtime of 0.8.1 and routes older
 runtimes to the manual workflow. Raise the minimum only when that manual path is
-retired. Preview users must reinstall from `v0.9.2` even if their helper already
-reports 0.9.2: the immutable content digest distinguishes the bits.
+retired. Preview users must reinstall from `v0.9.3` even if their helper already
+reports 0.9.3: the immutable content digest distinguishes the bits.
+
+**0.9.3 acceptance scope (2026-10-16).** 0.9.3 addresses the three minor 0.9.1
+findings: folded report evidence, restated scope for reused runs, and marked
+struck-through text. The owner confirmed its release after reviewing the PR. Its
+checks are the native gate and the installed command and fix checks; no live
+trial was run for it. The [0.9.3 record](verification/0.9.3/README.md) keeps them.
 
 **0.9.2 acceptance scope (2026-10-16).** 0.9.2 fixes five findings from the
 0.9.1 trials. The owner asked for it to be implemented, merged and released
@@ -53,7 +59,7 @@ a task that skips a newer release because it needs a newer runtime reports
 to 0.8.1 still read `main` directly: until they are updated, keep `main` at
 released guidance and develop on branches, merging to `main` when the release is
 tagged.
-[Release verification](verification/0.9.2/README.md) records completed checks
+[Release verification](verification/0.9.3/README.md) records completed checks
 and the scope of the recorded acceptance evidence. Do not cut the release from
 narrow examples alone.
 
@@ -66,14 +72,14 @@ repeat an unchanged suite merely because the merge SHA differs.
 Archive the exact verified merge commit, never a mutable working directory:
 
 ```sh
-git archive --format=zip --prefix=harness-research-v0.9.2/ --output /private/tmp/harness-research-v0.9.2.zip COMMIT
-shasum -a 256 /private/tmp/harness-research-v0.9.2.zip
+git archive --format=zip --prefix=harness-research-v0.9.3/ --output /private/tmp/harness-research-v0.9.3.zip COMMIT
+shasum -a 256 /private/tmp/harness-research-v0.9.3.zip
 ```
 
 Extract into disposable state, compare every file with the tagged tree, run its
 installer with disposable `--home`/`--shared` paths, and verify the installed
-`--version` reports 0.9.2. Publish the ZIP and checksum at an unused immutable
-`v0.9.2` tag, then download and verify both assets. Keep logs, exact commits,
+`--version` reports 0.9.3. Publish the ZIP and checksum at an unused immutable
+`v0.9.3` tag, then download and verify both assets. Keep logs, exact commits,
 artifact hashes and cleanup results. No model or real-account access is needed.
 
 Installing updates the entrypoint for new tasks. Existing tasks keep their saved

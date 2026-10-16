@@ -110,8 +110,10 @@ sentence you will quote. A quote is checked against its surrounding text, so tex
 shorter than 280 characters, or a quote that is most of its saved source, is
 refused. When a tool returns only part of a page, or the source really is that
 short, register it with `"partial":"reason"`; its facts are labelled. Mark chart or
-scan transcriptions with `"transcribed":true,"pages":"4-6"`. A summary or
-translation is not the original quoted text.
+scan transcriptions with `"transcribed":true,"pages":"4-6"`. Keep markup that
+changes meaning: write struck-through or deleted text as `~~text~~`, never as
+plain current wording, and do not cite it as current. A summary or translation
+is not the original quoted text.
 
 Reuse sources already listed in the task by their registered IDs:
 `{"source":"source-id","quote":"Exact original wording.","locator":"Section"}`.

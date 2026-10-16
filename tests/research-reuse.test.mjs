@@ -519,3 +519,29 @@ test('a relative --from that finds nothing says it was read against --project', 
   const relative = (await import('node:path')).relative(target, origin.project);
   assert.equal((await runCli(['start', '--project', target, '--from', relative])).status, 'complete');
 });
+
+test('each answer keeps its evidence in a collapsed block after the cited prose', async t => {
+  const f = await completed(t), report = await readFile(f.done.report, 'utf8');
+  const answer = report.indexOf('### How many writers does OrionDB permit?'), opened = report.indexOf('<details>\n<summary>Facts behind this answer (1)</summary>\n\n', answer);
+  assert.ok(answer >= 0 && opened > answer, 'the evidence block follows the question');
+  assert.ok(report.indexOf(quote + ' [1]', answer) < opened, 'the cited answer comes before the folded evidence');
+  const closed = report.indexOf('\n</details>\n', opened);
+  assert.ok(closed > opened && report.slice(opened, closed).includes('> ' + quote), 'the quotes stay in the report, inside the block');
+});
+
+test('an extension for a new topic can restate the scope and title, and otherwise keeps the origin scope', async t => {
+  const origin = await completed(t), target = await newProject(t);
+  const started = await startRun({ project: target, from: [origin.project], topic: 'OrionDB writers and crash safety for an operations runbook' });
+  let brief;
+  const done = await finish({ project: target, run: started.run }, {
+    plan: task => { brief = task.brief; return { title: 'OrionDB operations runbook', scope: 'OrionDB writer limits and crash safety for operators.', sections: [{ id: 'safety', name: 'Crash safety' }], questions: [{ id: 'crash', section: 'safety', question: 'Does OrionDB lose committed transactions in a crash?' }] }; },
+    research: task => ({ coverage: 'answered', facts: [{ statement: 'OrionDB loses no committed transaction in a crash.', as_of: null, quotes: [{ source: task.sources[0].id, quote: 'The engine keeps a write-ahead log, so a crash loses no committed transaction.', locator: 'Line 1' }] }], gaps: [] }),
+  });
+  assert.match(brief, /"scope"/);
+  const exported = await factsOf(done), report = await readFile(done.report, 'utf8');
+  assert.equal(exported.scope, 'OrionDB writer limits and crash safety for operators.'); assert.equal(exported.title, 'OrionDB operations runbook');
+  assert.match(report, /^# OrionDB operations runbook/); assert.match(report, /OrionDB writer limits and crash safety for operators\./);
+  const keptProject = await newProject(t), kept = await startRun({ project: keptProject, from: [origin.project], topic: 'A different topic' });
+  const keptDone = await finish({ project: keptProject, run: kept.run }, { plan: () => ({ questions: [] }) });
+  assert.equal((await factsOf(keptDone)).scope, (await factsOf(origin.done)).scope);
+});
