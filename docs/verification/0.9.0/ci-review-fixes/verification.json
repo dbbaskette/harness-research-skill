@@ -1,0 +1,35 @@
+{
+  "source_commit": "65071d3094e12a7250bbd5dd18f9b210f4b3d7e6",
+  "source_tree": "0165f4a1a8eb773cb59076d1157225eb29932b1f",
+  "source_was_clean": true,
+  "environment": {
+    "os": "macOS 27.0",
+    "node": "v22.23.2",
+    "python": "3.9.6"
+  },
+  "tests": {
+    "passed": 77,
+    "failed": 0,
+    "skipped": 0
+  },
+  "targeted_research_run_tests": 35,
+  "audit": "0 vulnerabilities",
+  "context": "passed",
+  "installer": "passed",
+  "installed_version": "harness-research 0.9.0",
+  "owned_vm": "harness-research-test-20261016123015-56235-892b3e96",
+  "owned_vm_deleted": true,
+  "owned_vm_files_absent": true,
+  "host_logs": "/Users/dbbaskette/Library/Logs/MacOS Test Suite/harness-research/harness-research-test-20261016123015-56235-892b3e96",
+  "log_sha256": {
+    "environment.txt": "336ae1ee7d3f8391c95ed9ac68b165eff7ad0c1ba29ff5044bbe0ad7d973fd27",
+    "tests.log": "13496f517a1a89cd088ff8bb3f44030e8138cf3b66be51fc7f6540345a24a3f6",
+    "audit.log": "6d8c5c8f3d7684adb070417bd608d01ae90aa3dc26a65af03ffda4955f38d9a3",
+    "context.log": "cc276eeb892f0ac4c443998bb83a91b91425f2d6298092d82a66b033d719ad40",
+    "installer.log": "f5402c0969cdb93e7536b86523f60f91b2fbc8da9efb6d9438d8735b336ddcfb",
+    "installed-version.log": "38be90bc72a08dc548dc1054adce9b1cfe5c8f1f7baea1c173c1a9363820aea2",
+    "result.txt": "c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431",
+    "run.txt": "60c5a8e356ab881c617fbb0585c03996ef6ede1e83faa6cc1975e3d8fcb550cd"
+  },
+  "release_acceptance": "Still pending the broader live matrix; this is verification for merging the unreleased candidate."
+}

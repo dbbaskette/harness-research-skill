@@ -1,6 +1,7 @@
 import { readFile, writeFile, mkdir, rename, realpath, lstat, unlink, readdir, cp, rm } from 'node:fs/promises';
 import { createHash, randomUUID } from 'node:crypto';
 import { join, resolve, sep, isAbsolute } from 'node:path';
+import { managedLegacyStatus } from './research-run.mjs';
 
 const scopeLabels = { 'supplied-only': 'Uploaded sources only', 'public-web': 'Uploaded sources plus external research' };
 const verdicts = ['supported', 'contradicted', 'insufficient', 'unavailable'];
@@ -158,6 +159,7 @@ function keptResults(old, plan, pin) {
 
 async function planUnlocked(project, supplied, { allowWeb = false } = {}) {
   const locations = await paths(project);
+  if (await exists(join(locations.derived, 'research-run.json'))) throw new Error('This run uses leased research tasks; use research continue/start rather than replacing its plan through a manual command.');
   if (!await exists(locations.file) && await exists(join(locations.root, '.tanzu-research'))) throw new Error('Older Brand research exists; run migrate before starting a new plan.');
   text(supplied.topic, 'Topic');
   if (!['planning', 'fact-check'].includes(supplied.purpose) || !['supplied-only', 'public-web'].includes(supplied.scope)) throw new Error('Choose planning/fact-check and supplied-only/public-web.');
@@ -187,6 +189,7 @@ async function planUnlocked(project, supplied, { allowWeb = false } = {}) {
   let kept = {};
   if (await exists(locations.file)) {
     const old = await readState(locations.file);
+    if (old.workflow_run) throw new Error('This run uses leased research tasks; use research continue/start rather than replacing its plan through a manual command.');
     if (old.scope === 'supplied-only' && plan.scope === 'public-web' && !allowWeb) throw new Error('Supplied-only research requires explicit permission before changing to public-web scope.');
     if (old.run === run) return { ...(await statusUnlocked(project)), carried: [] };
     kept = keptResults(old, plan, pin);
@@ -197,7 +200,9 @@ async function planUnlocked(project, supplied, { allowWeb = false } = {}) {
 }
 async function recordUnlocked(project, run, id, supplied) {
   const locations = await paths(project);
+  if (await exists(join(locations.derived, 'research-run.json'))) throw new Error('This run requires leased research submit; manual record cannot bypass its checks.');
   const value = await readState(locations.file);
+  if (value.workflow_run) throw new Error('This run requires leased research submit; manual record cannot bypass its checks.');
   if (value.run !== run || stable(await inputs(locations.root, Object.keys(value.inputs))) !== stable(value.inputs)) throw new Error('Research run or content changed; refresh the plan before recording results.');
   if (!value.items.some(item => item.id === id)) throw new Error('Unknown research question.');
   if (!verdicts.includes(supplied.status) || !Array.isArray(supplied.evidence) || supplied.evidence.length > 20) throw new Error('Result requires a supported/contradicted/insufficient/unavailable status and up to 20 evidence passages.');
@@ -243,7 +248,12 @@ async function withLock(project, create, action) {
 }
 export const planResearch = (project, plan, options) => withLock(project, true, () => planUnlocked(project, plan, options));
 export const recordResearch = (project, run, id, finding) => withLock(project, false, () => recordUnlocked(project, run, id, finding));
-export const researchStatus = project => withLock(project, false, () => statusUnlocked(project));
+export async function researchStatus(project) {
+  const locations = await paths(project);
+  if (await exists(join(locations.derived, 'research-run.json'))) return managedLegacyStatus(project);
+  if (await exists(locations.file) && (await readState(locations.file)).workflow_run) return managedLegacyStatus(project);
+  return withLock(project, false, () => statusUnlocked(project));
+}
 
 // Copy legacy state without altering its files, scope or evidence currency.
 export async function migrateResearch(project) {

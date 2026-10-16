@@ -1,0 +1,56 @@
+{
+  "run": "4da5c841fb274fbcb5781e2c",
+  "output_revision": 28,
+  "scope": "Compare PostgreSQL and SQLite for a small internal application using public primary documentation; deployment architecture and write concurrency only; four questions; light depth. No performance benchmark, cost comparison, or specific workload sizing.",
+  "source_mode": "public-web",
+  "sections": [
+    {
+      "id": "postgresql",
+      "name": "PostgreSQL"
+    },
+    {
+      "id": "sqlite",
+      "name": "SQLite"
+    }
+  ],
+  "subjects": [
+    {
+      "id": "postgresql",
+      "name": "PostgreSQL"
+    },
+    {
+      "id": "sqlite",
+      "name": "SQLite"
+    }
+  ],
+  "questions": [
+    {
+      "id": "pg-deployment",
+      "question": "What deployment architecture does PostgreSQL require?",
+      "section": "postgresql",
+      "subject": "postgresql",
+      "kind": "open"
+    },
+    {
+      "id": "pg-writes",
+      "question": "How does PostgreSQL coordinate concurrent reads and writes, including writes to the same row?",
+      "section": "postgresql",
+      "subject": "postgresql",
+      "kind": "open"
+    },
+    {
+      "id": "sqlite-deployment",
+      "question": "What deployment architecture does SQLite use?",
+      "section": "sqlite",
+      "subject": "sqlite",
+      "kind": "open"
+    },
+    {
+      "id": "sqlite-writes",
+      "question": "What write concurrency does SQLite permit, and how does WAL affect readers?",
+      "section": "sqlite",
+      "subject": "sqlite",
+      "kind": "open"
+    }
+  ]
+}

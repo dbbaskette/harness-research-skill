@@ -1,0 +1,3 @@
+In database jargon, PostgreSQL uses a client/server model.
+
+the client and the server can be on different hosts.

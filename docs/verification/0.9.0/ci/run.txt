@@ -1,0 +1,5 @@
+Project: /private/tmp/harness-research-pr10-f9720cb8
+Test suite: harness-research
+Base VM: tanzu-brand-golden-gate-base
+Test VM: harness-research-test-20261016042348-60411-18093eec
+Source commit: d0a865b1fbe15922b42aa87ea0bc4070b76ee023

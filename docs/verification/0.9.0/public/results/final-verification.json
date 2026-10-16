@@ -1,0 +1,13 @@
+{
+  "run": "4da5c841fb274fbcb5781e2c",
+  "revision": 27,
+  "status": "complete-with-gaps",
+  "facts": 8,
+  "sources": 6,
+  "questions": 4,
+  "source_and_quote_hashes": "passed",
+  "run_revision_consistency": "passed",
+  "independent_checker": "/root/skill_example_public/checker",
+  "question_gaps": 0,
+  "source_limits": 6
+}

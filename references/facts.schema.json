@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Harness Research facts export, schema 1",
+  "type": "object",
+  "required": ["schema", "run", "output_revision", "runtime_version", "guidance_version", "guidance_revision", "topic", "depth", "source_mode", "scope", "status", "questions", "sources", "facts", "aliases", "revisions", "gaps", "rejected", "failed", "counts"],
+  "properties": {
+    "schema": {"enum": [1]},
+    "run": {"type": "string", "pattern": "^[a-f0-9]{24}$"},
+    "output_revision": {"type": "integer", "minimum": 1},
+    "runtime_version": {"type": "string"},
+    "guidance_version": {"type": ["string", "null"]},
+    "guidance_revision": {"type": ["string", "null"]},
+    "topic": {"type": "string"},
+    "scope": {"type": "string"},
+    "depth": {"enum": ["light", "standard", "deep"]},
+    "source_mode": {"enum": ["supplied-only", "public-web"]},
+    "status": {"enum": ["in-progress", "complete", "complete-with-gaps", "blocked", "stale"]},
+    "questions": {"type": "array", "items": {"$ref": "#/$defs/question"}},
+    "sources": {"type": "array", "items": {"$ref": "#/$defs/source"}},
+    "facts": {"type": "array", "items": {"$ref": "#/$defs/fact"}},
+    "aliases": {"type": "array", "items": {"type": "object", "required": ["key", "canonical", "original"]}},
+    "revisions": {"type": "array", "items": {"type": "object", "required": ["previous", "current", "kind", "reason"], "properties": {"kind": {"enum": ["narrowed", "superseded"]}}}},
+    "gaps": {"type": "array", "items": {"type": "object", "required": ["id", "question", "kind", "reason", "sources", "check"], "properties": {"kind": {"enum": ["insufficient", "unreadable", "unavailable"]}, "sources": {"type": "array", "items": {"type": "string"}}, "reason": {"type": "string"}}}},
+    "rejected": {"type": "array", "items": {"$ref": "#/$defs/fact"}},
+    "failed": {"type": "array", "items": {"type": "object", "required": ["id", "kind", "reason", "attempts"]}},
+    "counts": {"type": "object", "required": ["questions", "facts", "checked", "sources", "narrowed", "rejected", "gaps", "conflicts", "superseded", "failed"]}
+  },
+  "$defs": {
+    "question": {
+      "type": "object", "required": ["id", "question", "section", "kind", "coverage", "gaps", "facts", "assessment"],
+      "properties": {"id": {"type": "string"}, "question": {"type": "string"}, "kind": {"enum": ["open", "claim"]}, "coverage": {"enum": ["answered", "partly answered", "not answered"]}, "gaps": {"type": "array", "items": {"type": "string"}}, "facts": {"type": "array", "items": {"type": "string", "pattern": "^fact-[a-f0-9]{32}$"}}}
+    },
+    "source": {
+      "type": "object", "required": ["id", "title", "origin", "file", "sha256", "original_file", "original_sha256", "standing", "provenance", "limits"],
+      "properties": {"id": {"type": "string"}, "title": {"type": "string"}, "origin": {"type": "string"}, "file": {"type": ["string", "null"]}, "sha256": {"type": ["string", "null"]}, "original_file": {"type": ["string", "null"]}, "original_sha256": {"type": ["string", "null"]}, "standing": {"enum": ["primary", "secondary", "community"]}, "provenance": {"enum": ["given", "found", "transcribed"]}, "limits": {"type": "string"}}
+    },
+    "fact": {
+      "type": "object", "required": ["key", "statement", "questions", "section", "subject", "as_of", "authored_by", "status", "check", "citations", "original_statement", "conflicts_with", "superseded_by"],
+      "properties": {"key": {"type": "string", "pattern": "^fact-[a-f0-9]{32}$"}, "statement": {"type": "string"}, "questions": {"type": "array", "minItems": 1, "items": {"type": "string"}}, "status": {"enum": ["candidate", "confirmed", "rejected", "stale"]}, "check": {"type": ["object", "null"]}, "citations": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/citation"}}}
+    },
+    "citation": {
+      "type": "object", "required": ["source", "quote", "start", "quote_sha256", "source_sha256", "locator"],
+      "properties": {"source": {"type": "string"}, "quote": {"type": "string"}, "start": {"type": "integer", "minimum": 0}, "quote_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}, "source_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}, "locator": {"type": "string"}}
+    }
+  }
+}
