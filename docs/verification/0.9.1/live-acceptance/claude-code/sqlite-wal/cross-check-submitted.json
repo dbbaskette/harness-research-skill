@@ -1,0 +1,36 @@
+{
+ "merges": [
+  {
+   "canonical": "fact-53041ebbc678401f965aab7fe4671265",
+   "duplicates": [
+    "fact-ea465c9a315a49e2bb6d97e0a8ad274d"
+   ],
+   "same_assertion": true,
+   "reason": "Both say, from the same wal.html passage, that the only safe way to remove a WAL file is to open the database with sqlite3_open() and immediately close it."
+  },
+  {
+   "canonical": "fact-22bb8287076b4eef8f08c84b1776a645",
+   "duplicates": [
+    "fact-2ed9afff68d94309aae73df482389196"
+   ],
+   "same_assertion": true,
+   "reason": "Both say, from the same wal.html passage, that the WAL cannot be reset during a write transaction, so a very large write transaction can make it grow very large."
+  }
+ ],
+ "conflicts": [
+  {
+   "facts": [
+    "fact-c2ba83a076a84227b8e08fa3577bbe99",
+    "fact-16168e517ec04b0194d831e0949ff592"
+   ],
+   "note": "wal.html presents RESTART and TRUNCATE checkpoints as running to completion, while the sqlite3_wal_checkpoint_v2() page says FULL, RESTART and TRUNCATE continue like PASSIVE and return SQLITE_BUSY if the busy handler gives up, so completion is not guaranteed."
+  }
+ ],
+ "superseded": [],
+ "missing": [
+  {
+   "section": "limits",
+   "question": "What performance advantages and disadvantages does SQLite's documentation give for WAL compared with rollback-journal mode, and for which workloads?"
+  }
+ ]
+}

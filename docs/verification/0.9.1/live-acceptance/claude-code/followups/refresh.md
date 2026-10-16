@@ -1,0 +1,2 @@
+Fresh coordinator subagent: `--version`; `research status`; `research refresh --run`; `research next` ×2 and `research submit` ×2 (it read the refresh tasks itself, saving new *-current.md files); `research status`.
+Result: "Sources re-read: round 2 on 2026-10-16 (16 unchanged, 1 changed, 0 could not be opened; 0 questions researched again)". The one changed source was an earlier partial excerpt of pragma.html now saved in full; all six quoted passages remained. Revision 51; the reply said revision 51 is unapproved and that refresh checks quoted passages only.

@@ -1,0 +1,147 @@
+{
+  "status": "installed",
+  "runtimeVersion": "0.9.1",
+  "shared": "<disposable>/shared",
+  "runtime": "<disposable>/shared/versions/0.9.1-282e147e9e753a145fe2",
+  "targets": [
+    "<disposable>/home/.agents/skills/harness-research",
+    "<disposable>/home/.claude/skills/harness-research",
+    "<disposable>/home/.cursor/skills/harness-research"
+  ],
+  "legacy": [
+    {
+      "path": "<disposable>/home/.agents/skills/research",
+      "old": "<disposable>/home/.agents/skills/tanzu-brand/scripts/research/codex/skills/research",
+      "source": "<disposable>/shared/current/upstream/codex/skills/research",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "<disposable>/home/.agents/skills/research-add-items",
+      "old": "<disposable>/home/.agents/skills/tanzu-brand/scripts/research/codex/skills/research-add-items",
+      "source": "<disposable>/shared/current/upstream/codex/skills/research-add-items",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "<disposable>/home/.agents/skills/research-add-fields",
+      "old": "<disposable>/home/.agents/skills/tanzu-brand/scripts/research/codex/skills/research-add-fields",
+      "source": "<disposable>/shared/current/upstream/codex/skills/research-add-fields",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "<disposable>/home/.agents/skills/research-deep",
+      "old": "<disposable>/home/.agents/skills/tanzu-brand/scripts/research/codex/skills/research-deep",
+      "source": "<disposable>/shared/current/upstream/codex/skills/research-deep",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "<disposable>/home/.agents/skills/research-report",
+      "old": "<disposable>/home/.agents/skills/tanzu-brand/scripts/research/codex/skills/research-report",
+      "source": "<disposable>/shared/current/upstream/codex/skills/research-report",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "<disposable>/home/.codex/agents/web-researcher.toml",
+      "old": "<disposable>/home/.agents/skills/tanzu-brand/scripts/research/codex/agents/web-researcher.toml",
+      "source": "<disposable>/shared/current/upstream/codex/agents/web-researcher.toml",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "<disposable>/home/.codex/agents/web-search-modules",
+      "old": "<disposable>/home/.agents/skills/tanzu-brand/scripts/research/codex/agents/web-search-modules",
+      "source": "<disposable>/shared/current/upstream/codex/agents/web-search-modules",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "<disposable>/home/.codex/skills/research",
+      "old": "<disposable>/home/.codex/skills/tanzu-brand/scripts/research/codex/skills/research",
+      "source": "<disposable>/shared/current/upstream/codex/skills/research",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "<disposable>/home/.codex/skills/research-add-items",
+      "old": "<disposable>/home/.codex/skills/tanzu-brand/scripts/research/codex/skills/research-add-items",
+      "source": "<disposable>/shared/current/upstream/codex/skills/research-add-items",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "<disposable>/home/.codex/skills/research-add-fields",
+      "old": "<disposable>/home/.codex/skills/tanzu-brand/scripts/research/codex/skills/research-add-fields",
+      "source": "<disposable>/shared/current/upstream/codex/skills/research-add-fields",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "<disposable>/home/.codex/skills/research-deep",
+      "old": "<disposable>/home/.codex/skills/tanzu-brand/scripts/research/codex/skills/research-deep",
+      "source": "<disposable>/shared/current/upstream/codex/skills/research-deep",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "<disposable>/home/.codex/skills/research-report",
+      "old": "<disposable>/home/.codex/skills/tanzu-brand/scripts/research/codex/skills/research-report",
+      "source": "<disposable>/shared/current/upstream/codex/skills/research-report",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "<disposable>/home/.claude/skills/research",
+      "old": "<disposable>/home/.claude/skills/tanzu-brand/scripts/research/claude/skills/research",
+      "source": "<disposable>/shared/current/upstream/claude/skills/research",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "<disposable>/home/.claude/skills/research-add-items",
+      "old": "<disposable>/home/.claude/skills/tanzu-brand/scripts/research/claude/skills/research-add-items",
+      "source": "<disposable>/shared/current/upstream/claude/skills/research-add-items",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "<disposable>/home/.claude/skills/research-add-fields",
+      "old": "<disposable>/home/.claude/skills/tanzu-brand/scripts/research/claude/skills/research-add-fields",
+      "source": "<disposable>/shared/current/upstream/claude/skills/research-add-fields",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "<disposable>/home/.claude/skills/research-deep",
+      "old": "<disposable>/home/.claude/skills/tanzu-brand/scripts/research/claude/skills/research-deep",
+      "source": "<disposable>/shared/current/upstream/claude/skills/research-deep",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "<disposable>/home/.claude/skills/research-report",
+      "old": "<disposable>/home/.claude/skills/tanzu-brand/scripts/research/claude/skills/research-report",
+      "source": "<disposable>/shared/current/upstream/claude/skills/research-report",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "<disposable>/home/.claude/agents/web-search-agent.md",
+      "old": "<disposable>/home/.claude/skills/tanzu-brand/scripts/research/claude/agents/web-search-agent.md",
+      "source": "<disposable>/shared/current/upstream/claude/agents/web-search-agent.md",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "<disposable>/home/.claude/agents/web-search-modules",
+      "old": "<disposable>/home/.claude/skills/tanzu-brand/scripts/research/claude/agents/web-search-modules",
+      "source": "<disposable>/shared/current/upstream/claude/agents/web-search-modules",
+      "status": "preserved",
+      "previous": null
+    }
+  ],
+  "contentDigest": "282e147e9e753a145fe2df76d46a7e6b5622d973f23d18e0dd460e2de5116ebe"
+}

@@ -1,0 +1,405 @@
+{
+  "schema": "harness-research-release-acceptance/1",
+  "candidate": "0.9.1",
+  "code_tested": "55d1695147f5d18dabc7ba0318073e0e92d138b3",
+  "runtime": "harness-research 0.9.1, installed from the candidate into disposable --home/--shared (content digest 282e147e9e753a145fe2\u2026); guidance from the candidate checkout, explicitly supplied (no bootstrap or public refresh)",
+  "scope_decision": {
+    "source": "owner's answer in the release-verification session, 2026-10-16, before any live trial",
+    "chosen": "Claude + Codex sequence: one fresh narrow light public-web run per harness, then plain-language follow-ups that verify, research again, approve, refresh, find and reuse it",
+    "not_rerun": "the design's broad, deep, fact-check and supplied-only report cases and its human sample scoring (0.9.0 record retains them)"
+  },
+  "request": "Research how SQLite's write-ahead logging (WAL) mode works for an application team deciding whether to enable it: how readers and writers interact, checkpoints, durability, and limitations. Use public sources, sqlite.org documentation first. Keep it focused. Save a cited report.",
+  "harnesses": {
+    "claude-code": {
+      "coordinator": "Claude Code desktop session (Claude Opus 5.5) for the initial run, task dispatch and cross-checks; each follow-up request was given to a fresh general-purpose subagent with only the request, the skill paths and the runtime",
+      "workers": "fresh Claude Code subagents with minted cc- identities; model per subagent not recorded",
+      "cost": "not measured (in-session subagents)",
+      "steps": [
+        {
+          "request": "initial research",
+          "wall_seconds": 1517,
+          "commands": [
+            "start",
+            "next",
+            "submit",
+            "peek",
+            "status"
+          ],
+          "result": {
+            "run": "430fd4b5583c409fb2dab837",
+            "output_revision": 35,
+            "status": "complete-with-gaps",
+            "questions": 10,
+            "checked_facts": 111,
+            "narrowed": 14,
+            "rejected": 0,
+            "gaps": 3,
+            "conflicts": 1,
+            "sources": 16,
+            "checker_invocations": 5
+          }
+        },
+        {
+          "request": "verify a slide draft",
+          "agent_seconds": 87,
+          "commands": [
+            "status",
+            "verify --keys deck/draft.md"
+          ],
+          "outcome": "4 confirmed; 1 narrowed key reported with its checked replacement, not as confirmed"
+        },
+        {
+          "request": "approve",
+          "agent_seconds": 80,
+          "commands": [
+            "status",
+            "approve --by \"Trial Reviewer\" --revision 35"
+          ],
+          "outcome": "approval current for revision 35"
+        },
+        {
+          "request": "research the checkpoint question again",
+          "wall_seconds": 697,
+          "commands": [
+            "reassess --again checkpoint-starvation --reason \u2026",
+            "peek",
+            "next",
+            "submit"
+          ],
+          "outcome": "12 new facts (11 confirmed, 1 narrowed); approval reported as no longer current"
+        },
+        {
+          "request": "refresh against current web sources",
+          "wall_seconds": 194,
+          "commands": [
+            "refresh",
+            "next",
+            "submit",
+            "status"
+          ],
+          "outcome": "16 unchanged, 1 changed (earlier partial excerpt now saved whole; quoted passages present), 0 questions researched again"
+        },
+        {
+          "request": "find earlier research and start a runbook from it",
+          "wall_seconds": 711,
+          "commands": [
+            "find --in \u2026 --query sqlite",
+            "start --from ../sqlite-wal --topic \u2026 --about \u2026",
+            "next",
+            "submit",
+            "peek"
+          ],
+          "result": {
+            "run": "39994b37a5054110959c469f",
+            "output_revision": 27,
+            "status": "complete-with-gaps",
+            "questions": 16,
+            "checked_facts": 192,
+            "narrowed": 23,
+            "rejected": 1,
+            "gaps": 7,
+            "conflicts": 2,
+            "sources": 19,
+            "checker_invocations": 9,
+            "rounds": [
+              {
+                "kind": "import",
+                "questions": 6
+              }
+            ],
+            "approval": null,
+            "origins": [
+              "430fd4b5583c409fb2dab837"
+            ],
+            "facts_sha256": "374ee4714ca399466f04ab68f719fdadaf070014a15b80dee27ff2b7758e5019",
+            "report_sha256": "4066e3f64c7b819d5acfefd0a8606a3dd75d18eefae917b71a9e043f67fc3448",
+            "report_words": 28776
+          }
+        }
+      ],
+      "final_origin_run": {
+        "run": "430fd4b5583c409fb2dab837",
+        "output_revision": 51,
+        "status": "complete-with-gaps",
+        "questions": 10,
+        "checked_facts": 123,
+        "narrowed": 15,
+        "rejected": 0,
+        "gaps": 4,
+        "conflicts": 1,
+        "sources": 18,
+        "checker_invocations": 6,
+        "rounds": [
+          {
+            "kind": "again",
+            "questions": 1
+          },
+          {
+            "kind": "refresh",
+            "questions": 0
+          }
+        ],
+        "approval": {
+          "by": "Trial Reviewer",
+          "at": "2026-10-16T17:11:12.502Z",
+          "output_revision": 35,
+          "current": false,
+          "reason": "The research changed since it was approved."
+        },
+        "origins": [],
+        "facts_sha256": "bd788433fb819c97de9723d62b25e2bf8962e24da40e029a98098b6b732adfd7",
+        "report_sha256": "b499e67aaba4e7b1748edfe1b83545b394ad472fea238019e2839e0be41b5808",
+        "report_words": 19577
+      }
+    },
+    "codex": {
+      "coordinator": "codex exec 0.162.1 (model gpt-6.1-sol, reasoning high; workspace-write sandbox with network) resumed for each follow-up in one thread",
+      "workers": "Codex multi_agent children (/root/\u2026)",
+      "telemetry": "token usage from turn.completed, cumulative across the resumed thread; whether child agents are included is not established",
+      "turns": [
+        {
+          "turn": 1,
+          "wall_seconds": 397,
+          "exit": 0,
+          "usage": {
+            "input_tokens": 2878734,
+            "cached_input_tokens": 2760320,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 14376,
+            "reasoning_output_tokens": 3042
+          },
+          "helper_commands": {
+            "research start (exit 1)": 1,
+            "research start (exit 0)": 1,
+            "research next (exit 1)": 1,
+            "research next (exit 0)": 11,
+            "research submit (exit 0)": 5,
+            "research status (exit 0)": 4,
+            "research verify (exit 0)": 2
+          },
+          "curl_calls": 0,
+          "web_searches": 1
+        },
+        {
+          "turn": 2,
+          "wall_seconds": 71,
+          "exit": 0,
+          "usage": {
+            "input_tokens": 3520943,
+            "cached_input_tokens": 3376640,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 17125,
+            "reasoning_output_tokens": 4052
+          },
+          "helper_commands": {
+            "research status (exit 0)": 1,
+            "research verify (exit 0)": 2
+          },
+          "curl_calls": 2,
+          "web_searches": 2
+        },
+        {
+          "turn": 3,
+          "wall_seconds": 19,
+          "exit": 0,
+          "usage": {
+            "input_tokens": 3977841,
+            "cached_input_tokens": 3819648,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 17639,
+            "reasoning_output_tokens": 4067
+          },
+          "helper_commands": {
+            "research status (exit 0)": 2,
+            "research approve (exit 0)": 1
+          },
+          "curl_calls": 0,
+          "web_searches": 0
+        },
+        {
+          "turn": 4,
+          "wall_seconds": 315,
+          "exit": 0,
+          "usage": {
+            "input_tokens": 7212664,
+            "cached_input_tokens": 6996736,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 28772,
+            "reasoning_output_tokens": 7515
+          },
+          "helper_commands": {
+            "research status (exit 0)": 3,
+            "research reassess (exit 0)": 1,
+            "research next (exit 0)": 3,
+            "research submit (exit 0)": 1,
+            "research verify (exit 0)": 1
+          },
+          "curl_calls": 0,
+          "web_searches": 2
+        },
+        {
+          "turn": 5,
+          "wall_seconds": 166,
+          "exit": 0,
+          "usage": {
+            "input_tokens": 9861822,
+            "cached_input_tokens": 9595392,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 36240,
+            "reasoning_output_tokens": 10268
+          },
+          "helper_commands": {
+            "research refresh (exit 0)": 1,
+            "research next (exit 0)": 2,
+            "research submit (exit 0)": 2,
+            "research status (exit 0)": 1,
+            "research verify (exit 0)": 1
+          },
+          "curl_calls": 0,
+          "web_searches": 0
+        },
+        {
+          "turn": 6,
+          "wall_seconds": 407,
+          "exit": 0,
+          "usage": {
+            "input_tokens": 17625033,
+            "cached_input_tokens": 17289600,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 51738,
+            "reasoning_output_tokens": 15273
+          },
+          "helper_commands": {
+            "research find (exit 0)": 1,
+            "research start (exit 1)": 1,
+            "research start (exit 0)": 1,
+            "research next (exit 0)": 9,
+            "research submit (exit 0)": 4,
+            "research submit (exit 1)": 1,
+            "research status (exit 0)": 2,
+            "research verify (exit 0)": 1
+          },
+          "curl_calls": 0,
+          "web_searches": 1
+        }
+      ],
+      "outcomes": [
+        "initial: complete, 6 questions, 32 checked facts",
+        "verify --keys deck/draft.md: 5 confirmed; it also re-fetched wal.html and pragma.html before saying current docs still support them",
+        "approve --by \"Trial Reviewer\" --revision 23",
+        "reassess --again checkpoint --reason \u2026: 12 new checked facts; reported that the approval does not cover the new revision",
+        "refresh: 14 sources re-read, all passages present, 0 questions researched again",
+        "find, then start --from (absolute path after a relative one failed) with a new topic: 44 facts reused, 16 new checked facts, complete-with-gaps"
+      ],
+      "final_origin_run": {
+        "run": "4448974aa66e4d969fb9d588",
+        "output_revision": 36,
+        "status": "complete",
+        "questions": 6,
+        "checked_facts": 44,
+        "narrowed": 3,
+        "rejected": 0,
+        "gaps": 0,
+        "conflicts": 0,
+        "sources": 27,
+        "checker_invocations": 4,
+        "rounds": [
+          {
+            "kind": "again",
+            "questions": 1
+          },
+          {
+            "kind": "refresh",
+            "questions": 0
+          }
+        ],
+        "approval": {
+          "by": "Trial Reviewer",
+          "at": "2026-10-16T16:51:29.714Z",
+          "output_revision": 23,
+          "current": false,
+          "reason": "The research changed since it was approved."
+        },
+        "origins": [],
+        "facts_sha256": "4dda5ab76cc2b2460f153bd0b7a7841b6bae3add8162fc51bc2e08bcb724b918",
+        "report_sha256": "7c627c7a7df3de91908700f0a8227b250b5a1891c8a65c022f02613275fe15fd",
+        "report_words": 6799
+      },
+      "runbook_run": {
+        "run": "2ea1e34bcee34121a1ea2042",
+        "output_revision": 18,
+        "status": "complete-with-gaps",
+        "questions": 8,
+        "checked_facts": 60,
+        "narrowed": 3,
+        "rejected": 0,
+        "gaps": 1,
+        "conflicts": 0,
+        "sources": 28,
+        "checker_invocations": 6,
+        "rounds": [
+          {
+            "kind": "import",
+            "questions": 2
+          }
+        ],
+        "approval": null,
+        "origins": [
+          "4448974aa66e4d969fb9d588"
+        ],
+        "facts_sha256": "8ef2b77237d76001faaed9cc7dac01d55850665b354bac90e9de0fd30a4ac4fb",
+        "report_sha256": "ab59223960932ed49f4b7ce9ea8cf0fb29f201bdcd60858aea12a8129418cf21",
+        "report_words": 8762
+      }
+    }
+  },
+  "findings": [
+    {
+      "id": "codex-unvalidated-side-reports",
+      "severity": "guidance",
+      "detail": "Codex wrote its own summaries outside research/ (a project-root report.md, citation-check.md, checkpoint-starvation.md, source-refresh.md) and linked those as the deliverable instead of research/report.md. Their prose is not helper-validated; the guidance says to return research/report.md."
+    },
+    {
+      "id": "number-rule-identifier-digits",
+      "severity": "helper usability",
+      "detail": "The number rule refused statements naming sqlite3_* or *_v2 identifiers because those digits were not in the quotes (three refusals across Claude Code workers). Workers reworded or added quotes; no unsupported number was accepted."
+    },
+    {
+      "id": "from-relative-path-message",
+      "severity": "helper usability",
+      "detail": "A relative --from resolves against --project; the refusal 'No saved research at sqlite-wal/research.' does not say so. Codex recovered with an absolute path."
+    },
+    {
+      "id": "start-missing-project-dir",
+      "severity": "helper usability",
+      "detail": "research start on a project folder that does not exist yet fails with a raw ENOENT realpath error."
+    },
+    {
+      "id": "peek-harness-flag",
+      "severity": "helper usability",
+      "detail": "peek requires --worker but rejects --harness, which next accepts; two Claude Code coordinators hit it."
+    },
+    {
+      "id": "trial-extractor-strikethrough",
+      "severity": "trial tooling",
+      "detail": "The trial's HTML-to-text extractor drops strikethrough, so one outdated wal.html warning read as current; the independent checker caught it on the live page and narrowed the fact."
+    },
+    {
+      "id": "extension-scope-text",
+      "severity": "report",
+      "detail": "A reused run extended with a new topic keeps the origin's scope paragraph; the topic line is updated."
+    },
+    {
+      "id": "report-length",
+      "severity": "report",
+      "detail": "The narrow Claude Code report is about 19.6k words for 10 questions (Codex about 6.8k for 6), echoing 0.9.0's size concern."
+    }
+  ],
+  "limitations": [
+    "The Claude Code coordinator for the initial run and task dispatch was the release-verification session, which had read the implementation; follow-up routing was by fresh subagents given only the request and skill paths.",
+    "Approvals were recorded under the synthetic name 'Trial Reviewer'; they are not the owner's approval of the reports.",
+    "Refresh ran the same day, so no quoted passage had changed; the changed-passage path is covered by native and installed checks, not live.",
+    "Runtime and guidance were explicitly supplied from the candidate; a public tag refresh was exercised only against a disposable repository.",
+    "No human sample scoring; model and mechanical checks only."
+  ]
+}

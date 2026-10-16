@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "owner": "harness-research-output",
+  "run": "39994b37a5054110959c469f",
+  "output_revision": 27,
+  "files": {
+    "report.md": "4066e3f64c7b819d5acfefd0a8606a3dd75d18eefae917b71a9e043f67fc3448",
+    "facts.json": "374ee4714ca399466f04ab68f719fdadaf070014a15b80dee27ff2b7758e5019",
+    "brief.md": "d651a562cfe4040162043c850004247af49725a33acb749244f58be4ceaa8439",
+    "plan.json": "cba2bea791841f0bdd62802fee9e98e69191170c1198dc219878e5cc1ebcf870",
+    "plan.md": "160d347afaa7734680a3af60b7567b2f993fad9573cd5058c3da283b97347c3e"
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "run": "2ea1e34bcee34121a1ea2042",
+  "output_revision": 18,
+  "scope": "Focused, public-source research with sqlite.org documentation first. Explain WAL mechanics and reader/writer interaction, checkpoint behavior, durability choices, and deployment/operational limits. Assume ordinary SQLite connections on one host; distinguish documented behavior from workload-dependent performance. No application-specific benchmarks or deployment changes.",
+  "source_mode": "public-web",
+  "sections": [
+    {
+      "id": "concurrency",
+      "name": "WAL mechanics and concurrency"
+    },
+    {
+      "id": "checkpoint-durability",
+      "name": "Checkpoints and durability"
+    },
+    {
+      "id": "limits",
+      "name": "Deployment limits and enablement decision"
+    },
+    {
+      "id": "autocheckpoint-policy",
+      "name": "Production automatic-checkpoint policy"
+    },
+    {
+      "id": "wal-retention",
+      "name": "WAL allocation and journal_size_limit"
+    }
+  ],
+  "subjects": [],
+  "questions": [
+    {
+      "id": "mechanism",
+      "question": "How do WAL commits and reader snapshots work, and what concurrency does WAL permit?",
+      "section": "concurrency",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "contention",
+      "question": "What contention and stale-snapshot failures remain, and how should transaction design account for them?",
+      "section": "concurrency",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "checkpoint",
+      "question": "How do automatic and manual checkpoints work, and how do long-lived readers affect WAL growth and latency?",
+      "section": "checkpoint-durability",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "durability",
+      "question": "What crash and power-loss durability do synchronous FULL and NORMAL provide in WAL mode?",
+      "section": "checkpoint-durability",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "deployment",
+      "question": "Which deployment, file-handling, read-only, attached-database and compatibility limits matter before enabling WAL, including current relevant version caveats?",
+      "section": "limits",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "enablement",
+      "question": "How is WAL enabled and verified, which settings persist or are per connection, and what documented tradeoffs inform the decision?",
+      "section": "limits",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "autocheckpoint-tuning",
+      "question": "Beyond the inherited defaults and mode descriptions, how does wal_autocheckpoint interact with commit-time thresholds, wal hooks, large transactions, and the read/write performance tradeoff when choosing a production checkpoint policy?",
+      "section": "autocheckpoint-policy",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "journal-size-tuning",
+      "question": "What exactly does journal_size_limit control in WAL mode: units, default and special values, connection/database scope, readback, when shrinking happens, and why it cannot cap an active WAL or resolve starvation?",
+      "section": "wal-retention",
+      "subject": null,
+      "kind": "open"
+    }
+  ]
+}

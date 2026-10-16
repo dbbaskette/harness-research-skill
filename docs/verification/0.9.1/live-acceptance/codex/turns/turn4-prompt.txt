@@ -1,0 +1,1 @@
+Please research the checkpoint question again. I specifically want to know what happens when a read transaction stays open for a long time, and how an application can detect or avoid checkpoint starvation.
