@@ -1,6 +1,6 @@
 # Harness Research 0.9.4 development checks
 
-**Status (2026-10-16): in development, not released.** 0.9.4 implements
+**Status (2026-10-16): released after the owner confirmed it.** 0.9.4 implements
 recommendations 1 and 2 of the 0.9.3 skill review.
 
 | Change | Before (0.9.3) | Now |

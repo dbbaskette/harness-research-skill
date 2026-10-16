@@ -1,10 +1,10 @@
 # Changelog
 
-## 0.9.4 — unreleased
+## 0.9.4 — 2026-10-16
 
 Recommendations 1 and 2 of the [0.9.3 skill review](https://github.com/dbbaskette/harness-research-skill/pull/20):
-a lighter light depth and per-role guidance. Not released until it is verified
-and tagged.
+a lighter light depth and per-role guidance.
+[Checks](docs/verification/0.9.4/README.md).
 
 - **Light depth is lighter.** A research submission records at most 8 facts per
   question at light (was 12), and an answer has at most 10 cited body sentences
