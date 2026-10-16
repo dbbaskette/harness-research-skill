@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtemp, mkdir, writeFile, readFile, rm, realpath, symlink, chmod } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { startRun, nextTask, submitTask, registerSource, heartbeat, runStatus, retryTask, continueRun, blockRun } from '../scripts/lib/research-run.mjs';
+import { startRun, nextTask, peekTask, releaseTask, submitTask, registerSource, heartbeat, runStatus, retryTask, continueRun, blockRun } from '../scripts/lib/research-run.mjs';
 import { researchStatus, recordResearch, planResearch } from '../scripts/lib/research.mjs';
 import { hash, parseJson } from '../scripts/lib/run-storage.mjs';
 import { placeQuote, numbers } from '../scripts/lib/run-evidence.mjs';
@@ -16,11 +16,14 @@ import { promisify } from 'node:util';
 import { start as startGuidance } from '../scripts/sync-guidance.mjs';
 
 const quote = 'OrionDB permits a single writer for each database.';
+// Saved sources carry their surrounding text; a source no longer than its quote is refused.
+const surroundings = ' Readers never wait for that writer, because each query sees a consistent snapshot taken when it starts. The engine keeps a write-ahead log, so a crash loses no committed transaction. Replication, backups and retention are described in other references and are not covered here.';
+const reference = quote + surroundings;
 const plan = { scope: 'Synthetic OrionDB deployment facts from the selected reference.', sections: [{ id: 'deployment', name: 'Deployment' }], subjects: [], questions: [{ id: 'writers', section: 'deployment', kind: 'open', question: 'How many writers does OrionDB permit?' }] };
 async function fixture(t, options = {}) {
   const project = await realpath(await mkdtemp(join(tmpdir(), 'research-run-test-')));
   t.after(() => rm(project, { recursive: true, force: true }));
-  await mkdir(join(project, 'sources')); await writeFile(join(project, 'sources/reference.txt'), quote + '\n');
+  await mkdir(join(project, 'sources')); await writeFile(join(project, 'sources/reference.txt'), reference + '\n');
   const started = await startRun({ project, topic: 'OrionDB deployment', sources: ['sources/reference.txt'], ...options });
   return { project, run: started.run };
 }
@@ -95,21 +98,43 @@ test('honest zero-fact and all-rejected questions complete with gaps and no inve
     assert.equal(output.rejected.length, rejected ? 1 : 0);
   }
 });
+const LEASE = 30 * 60 * 1000;
 test('lease expiry fences old workers, renews live work and accepted replay cannot rewrite results', async t => {
   const f = await fixture(t), now = Date.now(), first = (await nextTask({...f,worker:'a',now})).task;
+  assert.equal(first.expires, now + LEASE);
   const renewed = await heartbeat(argsFor(f, first, { now: now + 1000 })); assert.ok(renewed.lease.expires > first.expires);
-  const second = (await nextTask({...f,worker:'b',now:now+400000})).task;
+  const later = now + 1000 + LEASE + 1000, second = (await nextTask({...f,worker:'b',now:later})).task;
   assert.equal(second.id, first.id); assert.notEqual(second.lease, first.lease);
-  await assert.rejects(submitTask(argsFor(f, first, { data: {sources:[]}, now:now+400001 })), /lease/);
-  const registered = await registerSource(argsFor(f, second, { now:now+400001, data:{file:'sources/reference.txt',title:'Reference',publisher:'Publisher'} }));
+  await assert.rejects(submitTask(argsFor(f, first, { data: {sources:[]}, now:later+1 })), /another worker holds this task/);
+  const registered = await registerSource(argsFor(f, second, { now:later+1, data:{file:'sources/reference.txt',title:'Reference',publisher:'Publisher'} }));
   const result = {sources:[registered.source.id]};
-  await submit(f, second, result, {now:now+400002});
-  const replay = await submitTask(argsFor(f, second, {data:result,now:now+900000})); assert.equal(replay.replay,true);
-  await assert.rejects(submitTask(argsFor(f,second,{data:{sources:[]},now:now+900000})),/different payload/);
+  await submit(f, second, result, {now:later+2});
+  const replay = await submitTask(argsFor(f, second, {data:result,now:later+3*LEASE})); assert.equal(replay.replay,true);
+  await assert.rejects(submitTask(argsFor(f,second,{data:{sources:[]},now:later+3*LEASE})),/different payload/);
 });
-test('three invalid attempts block instead of fabricating unavailable, explicit retry retains history', async t => {
+test('a lapsed lease still submits while nobody else has taken the task', async t => {
+  const f = await fixture(t), now = Date.now(), task = (await nextTask({...f,worker:'slow',now})).task;
+  const lapsed = await runStatus({...f, now: now + LEASE + 60000});
+  assert.equal(lapsed.tasks.find(item => item.id === task.id).status, 'ready');
+  const registered = await registerSource(argsFor(f, task, { now: now + LEASE + 61000, data: { file: 'sources/reference.txt', title: 'Reference', publisher: 'Publisher' } }));
+  await submit(f, task, { sources: [registered.source.id] }, { now: now + LEASE + 62000 });
+  const state = JSON.parse(await readFile(lapsed.file, 'utf8')), done = state.tasks.find(item => item.id === task.id);
+  assert.equal(done.status, 'done'); assert.equal(done.attempts.length, 1); assert.equal(done.attempts[0].error, undefined);
+});
+test('a refused submission keeps its lease for correction, and ten refusals end the attempt', async t => {
+  const f = await fixture(t), task = await take(f);
+  const refused = await submitTask(argsFor(f, task, { data: { sources: [] } }));
+  assert.equal(refused.accepted, false); assert.equal(refused.lease_kept, true); assert.equal(refused.refusals, 1);
+  const registered = await registerSource(argsFor(f, task, { data: { file: 'sources/reference.txt', title: 'Reference', publisher: 'Publisher' } }));
+  await submit(f, task, { sources: [registered.source.id] });
+  const g = await fixture(t), stubborn = await take(g);
+  for (let i = 1; i <= 10; i++) { const result = await submitTask(argsFor(g, stubborn, { data: { sources: [] } })); assert.equal(result.lease_kept, i < 10); }
+  const state = JSON.parse(await readFile((await runStatus(g)).file, 'utf8'));
+  assert.equal(state.tasks[0].status, 'ready'); assert.match(state.tasks[0].lastError, /Refused 10 times/);
+});
+test('three failed attempts block instead of fabricating unavailable, explicit retry retains history', async t => {
   const f = await fixture(t);
-  for(let i=0;i<3;i++) { const task=await take(f); const result=await submitTask(argsFor(f,task,{data:{sources:[]}})); assert.equal(result.accepted,false); }
+  for(let i=0;i<3;i++) { const task=await take(f); const result=await submitTask(argsFor(f,task,{data:{error:{message:'Synthetic crash.'}}})); assert.equal(result.accepted,false); assert.equal(result.lease_kept,false); }
   const blocked=await runStatus(f); assert.equal(blocked.status,'blocked'); assert.equal(blocked.counts.gaps,0);
   const failed=blocked.tasks.find(task=>task.status==='failed');
   await retryTask({...f,task:failed.id});
@@ -174,7 +199,7 @@ test('cross-check merges checked duplicates, preserves aliases, and rejects supe
   const cross=await take(f,'cross'),[a,b]=cross.facts;
   const invalid=await submitTask(argsFor(f,cross,{data:{merges:[],conflicts:[],missing:[],superseded:[{fact:a.key,by:b.key,note:'New context.'},{fact:b.key,by:a.key,note:'Invalid cycle.'}]}}));
   assert.equal(invalid.accepted,false);assert.match(invalid.errors[0],/cycle/);
-  const retried=await take(f,'cross');
+  const retried=cross; // a refusal keeps the lease, so the same task is corrected and resubmitted
   await submit(f,retried,{merges:[{canonical:a.key,duplicates:[b.key]}],conflicts:[],superseded:[],missing:[]});
   const complete=await finish(f),exported=JSON.parse(await readFile(complete.facts,'utf8'));
   assert.equal(exported.facts.length,1);assert.equal(exported.aliases[0].key,b.key);assert.equal(exported.aliases[0].canonical,a.key);
@@ -204,7 +229,7 @@ test('standard depth requires a different writing reviewer and rejects unsupport
   const cross=await take(f,'checker');await submit(f,cross,{});
   const writer=await take(f,'writer'),bad=writing(writer);bad.questions[0].headline.sentence='OrionDB permits 9000 writers.';
   assert.equal((await submitTask(argsFor(f,writer,{data:bad}))).accepted,false);
-  const retry=await take(f,'writer');await submit(f,retry,writing(retry));
+  const retry=writer;await submit(f,retry,writing(retry)); // same lease, corrected
   assert.equal((await nextTask({...f,worker:'writer'})).task,null);
   assert.equal((await runStatus(f)).status,'in-progress');
   const review=await take(f,'prose-reviewer');assert.equal(review.kind,'review');await submit(f,review,writing(review));
@@ -227,9 +252,9 @@ test('source original and extraction revisions are pinned separately; changed or
 });
 
 test('UTF-8 BOM hashes use original bytes, and unreadable selected originals become assessed gaps', async t => {
-  const f=await fixture(t);await writeFile(join(f.project,'sources/reference.txt'),'\uFEFF'+quote);
+  const f=await fixture(t);await writeFile(join(f.project,'sources/reference.txt'),'\uFEFF'+reference);
   const started=await startRun({project:f.project,topic:'BOM reference',sources:['sources/reference.txt']});f.run=started.run;
-  const source=await setup(f);assert.equal(source.sha256,hash('\uFEFF'+quote));
+  const source=await setup(f);assert.equal(source.sha256,hash('\uFEFF'+reference));
   const task=await take(f);await submit(f,task,finding(source));assert.equal((await finish(f)).status,'complete');
   const binary=await fixture(t,{sources:[]});await writeFile(join(binary.project,'sources/scan.pdf'),'%PDF-1.7 unreadable fixture');
   binary.run=(await startRun({project:binary.project,topic:'Scan',sources:['sources/scan.pdf']})).run;
@@ -244,7 +269,7 @@ test('UTF-8 BOM hashes use original bytes, and unreadable selected originals bec
 test('public-source permissions and exact Unicode claim targets cannot be bypassed by self-citation', async t => {
   const f=await fixture(t),source=await setup(f),task=await take(f);
   await assert.rejects(registerSource(argsFor(f,task,{data:{origin:'https://example.test/reference',file:'sources/reference.txt',title:'Found source'}})),/public-web/);
-  const claimFile='sources/claim.txt';await writeFile(join(f.project,claimFile),'😀 '+quote);
+  const claimFile='sources/claim.txt';await writeFile(join(f.project,claimFile),'😀 '+reference);
   const claim={file:claimFile,start:2,quote};
   await assert.rejects(startRun({project:f.project,topic:'Claim',claims:[{...claim,start:1}]}),/exact target/);
   f.run=(await startRun({project:f.project,topic:'Claim',sources:[claimFile],claims:[claim]})).run;
@@ -354,4 +379,86 @@ test('preserved live skill examples keep valid exports, exact evidence and indep
     if(name==='supplied'){assert.equal(facts.gaps.length,2);assert.equal(facts.facts.length,4);}
     else {assert.equal(facts.facts.length,8);assert.equal(facts.revisions.filter(r=>r.kind==='narrowed').length,1);}
   }
+});
+
+test('a failed question holds up only the stages after it; the other questions continue', async t => {
+  const twoQuestions = { ...plan, questions: [...plan.questions, { id: 'readers', section: 'deployment', kind: 'open', question: 'Do OrionDB readers wait for the writer?' }] };
+  const f = await fixture(t), source = await setup(f, twoQuestions);
+  let failedId;
+  for (let i = 0; i < 3; i++) { const task = await take(f, 'researcher'); failedId ??= task.id; assert.equal(task.id, failedId); await submitTask(argsFor(f, task, { data: { error: { message: 'Synthetic crash.' } } })); }
+  const meanwhile = await runStatus(f); assert.equal(meanwhile.status, 'in-progress'); assert.equal(meanwhile.failedTasks.length, 1);
+  const other = await take(f, 'researcher'); assert.notEqual(other.id, failedId);
+  await submit(f, other, { coverage: 'answered', facts: [{ statement: 'OrionDB readers never wait for the single writer.', as_of: null, quotes: [{ source: source.id, quote: 'Readers never wait for that writer, because each query sees a consistent snapshot taken when it starts.' }] }], gaps: [] });
+  const stuck = await runStatus(f); assert.equal(stuck.status, 'blocked'); assert.match(stuck.blockReasons[0], /Synthetic crash/);
+  assert.equal((await nextTask({ ...f, worker: 'checker-invocation' })).task, null);
+  await retryTask({ ...f, task: failedId });
+  const again = await take(f, 'researcher'); assert.equal(again.id, failedId); await submit(f, again, finding(source));
+  assert.equal((await finish(f)).status, 'complete');
+});
+test('peek shows the next task without taking it, and release gives it back without a failed attempt', async t => {
+  const f = await fixture(t);
+  const peeked = await peekTask({ ...f, worker: 'a' }); assert.equal(peeked.task.kind, 'source');
+  const task = await take(f, 'a'); assert.equal(task.id, peeked.task.id);
+  assert.equal((await releaseTask(argsFor(f, task))).released, task.id);
+  await assert.rejects(submitTask(argsFor(f, task, { data: { sources: [] } })), /lease/);
+  const again = await take(f, 'b'); assert.equal(again.id, task.id); assert.equal(again.attempt, 2);
+  const state = JSON.parse(await readFile((await runStatus(f)).file, 'utf8'));
+  assert.equal(state.tasks[0].attempts.length, 1); assert.ok(state.tasks[0].attemptHistory[0].released);
+});
+test('saved source text must carry its surroundings unless registered as a partial capture', async t => {
+  const f = await fixture(t, { sources: [] });
+  await writeFile(join(f.project, 'sources/excerpt.txt'), quote + '\n');
+  f.run = (await startRun({ project: f.project, topic: 'Excerpts', sources: ['sources/excerpt.txt'] })).run;
+  const task = await take(f);
+  await assert.rejects(registerSource(argsFor(f, task, { data: { file: 'sources/excerpt.txt', title: 'Excerpt' } })), /only \d+ characters/);
+  const partial = await registerSource(argsFor(f, task, { data: { file: 'sources/excerpt.txt', title: 'Excerpt', partial: 'The vendor page shows only this sentence to automated readers.' } }));
+  assert.equal(partial.source.capture.kind, 'partial');
+  await submit(f, task, { sources: [partial.source.id] }); const planner = await take(f); await submit(f, planner, plan);
+  const research = await take(f); await submit(f, research, finding(partial.source));
+  const done = await finish(f), report = await readFile(done.report, 'utf8');
+  assert.match(report, /\(partial capture\)/); assert.match(report, /Partial capture: The vendor page/);
+  assert.equal(JSON.parse(await readFile(done.facts, 'utf8')).sources[0].capture.kind, 'partial');
+  const g = await fixture(t, { sources: [] });
+  const longQuote = 'OrionDB keeps every committed transaction in a write-ahead log that is flushed before the commit returns, so a crash of the process or the host loses no acknowledged write and recovery replays the log from the last checkpoint.';
+  await writeFile(join(g.project, 'sources/log.txt'), longQuote + ' Backups, replication and retention are covered in other references and are not described here at all.\n');
+  g.run = (await startRun({ project: g.project, topic: 'Logs', sources: ['sources/log.txt'] })).run;
+  const s = await take(g), registered = await registerSource(argsFor(g, s, { data: { file: 'sources/log.txt', title: 'Log' } }));
+  await submit(g, s, { sources: [registered.source.id] }); await submit(g, await take(g), plan);
+  const r = await take(g), refused = await submitTask(argsFor(g, r, { data: { coverage: 'answered', facts: [{ statement: 'OrionDB keeps every committed transaction in a write-ahead log.', as_of: null, quotes: [{ source: registered.source.id, quote: longQuote }] }], gaps: [] } }));
+  assert.equal(refused.accepted, false); assert.match(refused.errors[0], /most of its saved source/);
+});
+test('reports take a short title, compare subjects side by side, and export no worker bookkeeping', async t => {
+  const topic = 'Compare OrionDB and NovaDB for a small internal app. Cover writers only, in two questions, using the selected reference.';
+  const comparison = { title: 'OrionDB and NovaDB writers', scope: 'Writers in OrionDB and NovaDB, from the selected reference.', sections: plan.sections,
+    subjects: [{ id: 'orion', name: 'OrionDB' }, { id: 'nova', name: 'NovaDB' }],
+    questions: [{ id: 'orion-writers', section: 'deployment', subject: 'orion', kind: 'open', question: 'How many writers does OrionDB permit?' },
+      { id: 'nova-writers', section: 'deployment', subject: 'nova', kind: 'open', question: 'How many writers does NovaDB permit?' }] };
+  const f = await fixture(t, { topic }), source = await setup(f, comparison);
+  const orion = await take(f); await submit(f, orion, finding(source));
+  const nova = await take(f); await submit(f, nova, { coverage: 'not answered', facts: [], gaps: [{ kind: 'insufficient', reason: 'The selected reference does not describe NovaDB.', sources: [source.id] }] });
+  const checker = await take(f, 'checker-invocation');
+  await submit(f, checker, { facts: checker.facts.map(fact => ({ key: fact.key, result: 'confirmed' })), inspected_sources: [{ source: source.id, sha256: source.sha256, original_sha256: source.original_sha256, read_original: true }],
+    assessments: [{ id: 'orion-writers', coverage: 'answered' }, { id: 'nova-writers', coverage: 'not answered' }] });
+  const done = await finish(f), report = await readFile(done.report, 'utf8'), exported = JSON.parse(await readFile(done.facts, 'utf8'));
+  assert.match(report, /^# OrionDB and NovaDB writers\n\nRequest: Compare OrionDB and NovaDB/);
+  assert.match(report, /\| OrionDB \| NovaDB \|\n\| --- \| --- \|\n\| OrionDB permits a single writer for each database\. \[1\] \|  \|/);
+  assert.equal(exported.title, 'OrionDB and NovaDB writers');
+  for (const question of exported.questions) for (const field of ['researchWorkers', 'provisionalCoverage', 'writtenBy']) assert.equal(Object.hasOwn(question, field), false, field);
+});
+test('the sources list reads one path or link per line, and peek and release work from the command line', async t => {
+  const f = await fixture(t, { sources: [] });
+  await writeFile(join(f.project, 'sources.txt'), '# selected references\nsources/reference.txt\tOrion reference\nhttps://example.test/orion\n');
+  const started = await runCli(['start', '--project', f.project, '--topic', 'Lines', '--sources', 'sources.txt']); f.run = started.run;
+  const state = JSON.parse(await readFile(started.file, 'utf8'));
+  assert.deepEqual(state.givenSources.map(s => [s.origin, s.title]), [['sources/reference.txt', 'Orion reference'], ['https://example.test/orion', 'https://example.test/orion']]);
+  assert.equal((await runCli(['peek', '--project', f.project, '--run', f.run, '--worker', 'a'])).task.kind, 'source');
+  const task = (await runCli(['next', '--project', f.project, '--run', f.run, '--worker', 'a'])).task;
+  const released = await runCli(['release', '--project', f.project, '--run', f.run, '--task', task.id, '--worker', 'a', '--lease', task.lease, '--attempt', String(task.attempt)]);
+  assert.equal(released.released, task.id);
+});
+test('published guidance still accepts runtime 0.8.1 and routes it to the manual workflow', async () => {
+  const manifest = JSON.parse(await readFile(new URL('../guidance/manifest.json', import.meta.url), 'utf8'));
+  assert.equal(manifest.minimumRuntime, '0.8.1');
+  const skill = await readFile(new URL('../SKILL.md', import.meta.url), 'utf8');
+  assert.match(skill, /queued workflow needs runtime 0\.9\.0/); assert.match(skill, /0\.8\.x runtime/);
 });

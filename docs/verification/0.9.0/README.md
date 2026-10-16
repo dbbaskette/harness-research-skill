@@ -31,6 +31,11 @@ restricted tools. It returned `Not logged in · Please run /login` before any mo
 work (zero API tokens/cost). It did not establish Claude acceptance. No account setup or
 configuration change was attempted.
 
+The public example's saved sources are 17 to 21-word excerpts of the pages it quotes. The
+runtime now refuses saved text that short, or a quote that is most of its source, unless the
+source is registered as a partial capture with its reason; the example predates that rule
+and is kept as it was recorded.
+
 Before release, the spec's broader Claude/Codex topics, supplied PDF/link trials and
 matched 0.8.1 comparisons remain required. These narrow live examples and deterministic
 tests establish implementation evidence, not the entire release acceptance matrix.

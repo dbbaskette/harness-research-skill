@@ -28,11 +28,12 @@ requested chat-only answer omits saved artifacts.
 | Task | Read |
 | --- | --- |
 | Research a topic, comparison or claims; continue a queued run | [Skill research workflow](references/research-run.md) |
-| Continue an existing manual plan or integrate the legacy commands | [Workflow](references/workflow.md), [evidence](references/evidence.md) and [resume](references/resume.md) as needed |
+| Continue a manual plan, use legacy commands, or research with a 0.8.x runtime | [Workflow](references/workflow.md), [evidence](references/evidence.md) and [resume](references/resume.md) as needed |
 | Extend a retained item/field outline | [Comparative research](references/comparative.md) |
 | Search a specialized source domain | One strategy from [source routing](references/strategies.md) |
 | Continue Brand's older saved records | [Migration](references/migration.md) |
 
+The queued workflow needs runtime 0.9.0; with an older one, work manually and say so.
 References resolve within this guidance snapshot; commands use its returned
 installed runtime. Keep outputs in the user's project and the installation
 unchanged. Use the current harness and authorized capabilities. Independent

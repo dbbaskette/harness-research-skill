@@ -5,6 +5,14 @@ import { factFor, sourceFor } from './run-evidence.mjs';
 import { validateFacts } from './run-schema.mjs';
 
 const literal = value => String(value ?? '').replace(/([\\`*_{}\[\]<>!#|])/g, '\\$1');
+// The plan may name a short title; otherwise the topic's first sentence, cut to a readable length.
+export function titleOf(state) {
+  if (state.title) return state.title;
+  const first = String(state.topic).split(/(?<=[.!?])\s/)[0].trim();
+  return Array.from(first).length > 90 ? Array.from(first).slice(0, 87).join('').trimEnd() + '...' : first;
+}
+// Worker bookkeeping stays in the run record; the export carries what a reader or caller needs.
+const exported = ({ researchWorkers, provisionalCoverage, writtenBy, ...question }) => question;
 const current = (fact, view) => fact.status === 'confirmed' && !fact.superseded_by && !view?.staleInputs?.length;
 export function sourceCount(state, fact) {
   const publishers = fact.citations.map(citation => sourceFor(state, citation.source).publisher);
@@ -14,11 +22,11 @@ export function exportFacts(state, view) {
   return {
     schema: 1, run: state.run, output_revision: state.revision, runtime_version: state.runtimeVersion,
     guidance_version: state.guidanceVersion, guidance_revision: state.guidanceRevision, guidance_task: state.guidanceTask ?? null,
-    topic: state.topic, about: state.about, depth: state.depth, source_mode: state.sourceMode,
+    title: titleOf(state), topic: state.topic, about: state.about, depth: state.depth, source_mode: state.sourceMode,
     scope: state.scope ?? 'Planning pending.', status: view.status, created_at: state.createdAt,
     updated_at: state.updatedAt, prose_review: state.depth === 'light' ? 'not independently reviewed at light depth' : view.status.startsWith('complete') ? 'independently reviewed' : 'pending independent review',
     sections: state.sections, subjects: state.subjects,
-    questions: state.questions.map(question => ({ ...question, facts: state.facts.filter(fact => fact.questions.includes(question.id) && current(fact, view)).map(fact => fact.key) })),
+    questions: state.questions.map(question => ({ ...exported(question), facts: state.facts.filter(fact => fact.questions.includes(question.id) && current(fact, view)).map(fact => fact.key) })),
     sources: state.sources,
     facts: state.facts.filter(fact => fact.status !== 'rejected').map(fact => ({ ...fact, ...(view.staleInputs.length && ['candidate', 'confirmed'].includes(fact.status) ? { status: 'stale' } : {}), sources_count: sourceCount(state, fact), best_standing: ['primary', 'secondary', 'community'].find(standing => fact.citations.some(citation => sourceFor(state, citation.source).standing === standing)) ?? null })),
     aliases: state.aliases, revisions: state.factRevisions, gaps: state.gaps,
@@ -53,7 +61,7 @@ export function legacyRecord(state, view) {
 }
 export function renderReport(state, view) {
   const number = new Map(state.sources.map((source, i) => [source.id, i + 1]));
-  const lines = ['# ' + literal(state.topic), '', `Run: ${state.run}; output revision: ${state.revision}.`, `Status: ${view.status}. Depth: ${state.depth}.`, `Runtime: ${state.runtimeVersion}; guidance: ${state.guidanceVersion ?? 'unknown'} (${state.guidanceRevision ?? 'local runtime guidance'}).`, '', literal(state.scope ?? 'Research plan pending.'), '', 'Facts are checked for source support, not certified as true or live-current. ' + (state.depth === 'light' ? 'Prose has citation/number validation but no independent semantic writing review at light depth.' : 'Writing review is required before completion.'), '', '## Coverage', ''];
+  const lines = ['# ' + literal(titleOf(state)), '', ...(titleOf(state) !== state.topic ? ['Request: ' + literal(state.topic), ''] : []), `Run: ${state.run}; output revision: ${state.revision}.`, `Status: ${view.status}. Depth: ${state.depth}.`, `Runtime: ${state.runtimeVersion}; guidance: ${state.guidanceVersion ?? 'unknown'} (${state.guidanceRevision ?? 'local runtime guidance'}).`, '', literal(state.scope ?? 'Research plan pending.'), '', 'Facts are checked for source support, not certified as true or live-current. ' + (state.depth === 'light' ? 'Prose has citation/number validation but no independent semantic writing review at light depth.' : 'Writing review is required before completion.'), '', '## Coverage', ''];
   for (const section of state.sections) {
     const questions = state.questions.filter(question => question.section === section.id);
     const facts = state.facts.filter(fact => current(fact, view) && fact.questions.some(id => questions.some(question => question.id === id)));
@@ -63,8 +71,18 @@ export function renderReport(state, view) {
   if (view.blockReasons.length) lines.push('', 'Execution blocked: ' + view.blockReasons.map(literal).join('; '));
   if (view.staleInputs.length) lines.push('', 'Changed inputs/sources: ' + view.staleInputs.map(literal).join(', '));
   const cite = ids => [...new Set(ids.flatMap(id => factFor(state, id).citations.map(citation => number.get(citation.source))))].sort((a, b) => a - b).map(n => `[${n}]`).join(' ');
+  const cell = value => literal(value).replace(/\n/g, ' ');
   for (const section of state.sections) {
     lines.push('', '## ' + literal(section.name), '');
+    // When comparing, each subject's current facts in this section side by side, before the questions.
+    if (state.subjects.length > 1) {
+      const columns = state.subjects.map(subject => state.facts.filter(fact => current(fact, view) && fact.section === section.id && fact.subject === subject.id));
+      if (columns.some(column => column.length)) {
+        lines.push('| ' + state.subjects.map(subject => cell(subject.name)).join(' | ') + ' |', '|' + state.subjects.map(() => ' --- |').join(''));
+        for (let row = 0; row < Math.max(...columns.map(column => column.length)); row++) lines.push('| ' + columns.map(column => column[row] ? `${cell(column[row].statement)} ${cite([column[row].key])}` : '').join(' | ') + ' |');
+        lines.push('');
+      }
+    }
     for (const question of state.questions.filter(item => item.section === section.id)) {
       lines.push('### ' + literal(question.question), '');
       if (question.headline) {
@@ -81,7 +99,7 @@ export function renderReport(state, view) {
       if (facts.length) lines.push('Facts behind this answer:', '');
       for (const fact of facts) {
         lines.push(`- ${fact.key} [${view.staleInputs.length ? 'stale' : fact.status}${fact.superseded_by ? ', superseded' : ''}]: ${literal(fact.statement)} ${cite([fact.key])}; as of ${literal(fact.as_of ?? 'unknown')}; ${sourceCount(state, fact) === null ? 'publisher independence unknown' : sourceCount(state, fact) === 1 ? 'one publisher' : sourceCount(state, fact) + ' publishers'}.`);
-        for (const citation of fact.citations) lines.push(`  > ${literal(citation.quote).replace(/\n/g, '\n  > ')} [${number.get(citation.source)}], ${literal(citation.locator)}${sourceFor(state, citation.source).provenance === 'transcribed' ? ' (transcribed)' : ''}`);
+        for (const citation of fact.citations) lines.push(`  > ${literal(citation.quote).replace(/\n/g, '\n  > ')} [${number.get(citation.source)}], ${literal(citation.locator)}${sourceFor(state, citation.source).provenance === 'transcribed' ? ' (transcribed)' : ''}${sourceFor(state, citation.source).capture ? ' (partial capture)' : ''}`);
         lines.push('');
       }
     }
@@ -97,6 +115,7 @@ export function renderReport(state, view) {
     const local = source.original_file ?? selected?.file ?? source.file;
     const origin = /^https?:\/\//.test(source.origin) ? `[${literal(source.title)}](${source.origin.replace(/[()\s]/g, c => encodeURIComponent(c))})` : local ? `[${literal(source.title)}](../${local.split('/').map(encodeURIComponent).join('/')})` : `${literal(source.title)} (${literal(source.origin)})`;
     lines.push(`${number.get(source.id)}. ${origin}; ${literal(source.publisher ?? 'publisher unknown')}; ${source.standing}; ${source.provenance}; saved ${source.saved_at}; source date ${literal(source.source_date ?? 'unknown')}.`);
+    if (source.capture) lines.push('   Partial capture: ' + literal(source.capture.reason));
     if (source.limits !== 'none') lines.push('   Coverage gap: ' + literal(source.limits));
   }
   lines.push('', '## Rejected facts and failed tasks', '');
@@ -133,7 +152,7 @@ export async function writeOutput(locations, state, view) {
   const files = { 'report.md': report, 'facts.json': JSON.stringify(facts, null, 2) + '\n', 'brief.md': brief.join('\n') + '\n' };
   const plan = { run: state.run, output_revision: state.revision, scope: state.scope ?? null, source_mode: state.sourceMode, sections: state.sections, subjects: state.subjects, questions: state.questions.map(({ id, question, section, subject, kind, claim }) => ({ id, question, section, subject, kind, ...(claim ? { claim } : {}) })) };
   files['plan.json'] = JSON.stringify(plan, null, 2) + '\n';
-  files['plan.md'] = ['# Research plan', '', state.scope ?? 'Planning pending.', '', ...state.sections.flatMap(section => ['## ' + section.name, ...state.questions.filter(q => q.section === section.id).map(q => '- ' + q.question), ''])].join('\n');
+  files['plan.md'] = ['# Research plan: ' + titleOf(state), '', state.scope ?? 'Planning pending.', '', ...state.sections.flatMap(section => ['## ' + section.name, ...state.questions.filter(q => q.section === section.id).map(q => '- ' + q.question), ''])].join('\n');
   for (const [name, content] of Object.entries(files)) await atomic(join(locations.output, name), content);
   await atomic(join(locations.derived, 'research-report.md'), report);
   await atomic(locations.legacy, JSON.stringify(legacyRecord(state, view), null, 2) + '\n');

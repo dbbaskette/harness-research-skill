@@ -2,6 +2,11 @@ import { hash, stable, key, text, identifier, readText, snapshot, unchanged } fr
 
 export const DEPTHS = { light: { facts: 12, gaps: 3 }, standard: { facts: 20, gaps: 80 }, deep: { facts: 30, gaps: 80 } };
 export const coverageValues = ['answered', 'partly answered', 'not answered'];
+// A quote is only checkable against the text around it. Saved text shorter than this, or a quote
+// that is most of its saved text, is refused unless the source is registered as a partial capture.
+export const SOURCE_MIN_CHARACTERS = 280;
+export const QUOTE_SHARE_LIMIT = 0.5;
+const characters = value => Array.from(String(value).trim()).length;
 export function numbers(value) {
   return [...new Set((String(value).normalize('NFKC').match(/\d+(?:[.,]\d+)*/g) ?? []).map(n => /^\d{1,3}(?:,\d{3})+$/.test(n) ? n.replaceAll(',', '') : n))];
 }
@@ -66,12 +71,14 @@ export async function sourceRecord(root, state, supplied, task) {
   if (!given && !/^https?:\/\//i.test(origin)) throw new Error('Found source origins must be public HTTP(S) URLs.');
   const title = text(supplied.title ?? given?.title, 'Source title');
   const limits = supplied.limits ?? 'none'; text(limits, 'Source limits');
+  const capture = supplied.partial ? { kind: 'partial', reason: text(supplied.partial, 'Partial capture reason', 1000) } : null;
   if (!supplied.file) {
     if (!given || limits === 'none') throw new Error('An unreadable selected source requires a concrete gap.');
-    return { id: identifier(supplied.id ?? given.id), given: given.id, title, origin, file: null, original_file: given.original_file ?? given.file ?? null, original_sha256: given.original_sha256 ?? given.sha256 ?? null, sha256: null, publisher: supplied.publisher ?? null, standing: 'primary', provenance: 'given', limits, saved_at: new Date().toISOString() };
+    return { id: identifier(supplied.id ?? given.id), given: given.id, title, origin, capture: null, file: null, original_file: given.original_file ?? given.file ?? null, original_sha256: given.original_sha256 ?? given.sha256 ?? null, sha256: null, publisher: supplied.publisher ?? null, standing: 'primary', provenance: 'given', limits, saved_at: new Date().toISOString() };
   }
   const extracted = await readText(root, supplied.file, { withHash: true }), content = extracted.content;
   if (!content.trim()) throw new Error('Source text is empty; record an unreadable-source gap instead.');
+  if (!capture && characters(content) < SOURCE_MIN_CHARACTERS) throw new Error(`Saved source text is only ${characters(content)} characters. Save the full page or the relevant section, not just the passage to quote; if the tool returned only part of it, or the whole source is this short, register it with --partial and the reason.`);
   const sha256 = extracted.sha256, originalFile = given?.original_file ?? given?.file ?? supplied.original_file ?? null;
   const original = originalFile ? await snapshot(root, originalFile) : null;
   if (given?.sha256 && original?.sha256 !== (given.original_sha256 ?? given.sha256)) throw new Error('Selected original changed; start a new run.');
@@ -80,7 +87,7 @@ export async function sourceRecord(root, state, supplied, task) {
   const id = identifier(supplied.id ?? 'source-' + hash(stable([origin, sha256])).slice(0, 20));
   const previous = state.sources.find(source => source.id === id);
   if (previous && (previous.sha256 !== sha256 || previous.origin !== origin)) throw new Error('Source IDs identify immutable revisions; register a new ID.');
-  return { id, given: given?.id ?? null, title, origin, publisher: supplied.publisher ? text(supplied.publisher, 'Publisher') : null, standing, provenance: supplied.transcribed ? 'transcribed' : given ? 'given' : 'found', pages: supplied.pages ?? null, file: supplied.file, sha256, original_file: originalFile, original_sha256: original?.sha256 ?? null, limits, source_date: supplied.source_date ?? null, saved_at: previous?.saved_at ?? new Date().toISOString() };
+  return { id, given: given?.id ?? null, title, origin, publisher: supplied.publisher ? text(supplied.publisher, 'Publisher') : null, standing, provenance: supplied.transcribed ? 'transcribed' : given ? 'given' : 'found', capture, pages: supplied.pages ?? null, file: supplied.file, sha256, original_file: originalFile, original_sha256: original?.sha256 ?? null, limits, source_date: supplied.source_date ?? null, saved_at: previous?.saved_at ?? new Date().toISOString() };
 }
 export async function citations(root, state, supplied, question) {
   if (!Array.isArray(supplied) || supplied.length < 1 || supplied.length > 5) throw new Error('A fact needs 1 to 5 registered-source quotes.');
@@ -91,6 +98,7 @@ export async function citations(root, state, supplied, question) {
     const extracted = await readText(root, source.file, { withHash: true });
     if (extracted.sha256 !== source.sha256) throw new Error('Source revision changed while reading its quote.');
     const placed = placeQuote(extracted.content, item.quote);
+    if (!source.capture && characters(placed.quote) > QUOTE_SHARE_LIMIT * characters(extracted.content)) throw new Error(`The quote is most of its saved source ${source.id}. Save the surrounding page or section so the quote can be checked in context, or register the source with --partial and the reason.`);
     result.push({ source: source.id, ...placed, quote_sha256: hash(placed.quote), source_sha256: source.sha256, locator: text(item.locator ?? (source.pages ? 'Pages ' + source.pages : 'Saved source text'), 'Quote locator') });
   }
   if (question.claim && result.every(item => sourceFor(state, item.source).original_file === question.claim.file)) throw new Error('A claim target cannot establish its own assertion. Cite independent selected evidence.');

@@ -21,7 +21,8 @@ node scripts/harness-research.mjs research start --project DIR --topic "TOPIC" \
 ```
 
 Repeat `--source` for more selected references or omit it when none were supplied.
-`--sources FILE` accepts an array of paths/URLs or `{origin,file,title}` entries.
+`--sources FILE` accepts one path or link per line (optionally a tab and a title),
+or a JSON array of paths/URLs or `{origin,file,title}` entries.
 Copy selected local originals into the project first. `--allow-web` authorizes
 additional public sources; otherwise use selected references only. Selected links
 may be read as selected sources. `--about FILE` provides audience/context.
@@ -45,7 +46,10 @@ node scripts/harness-research.mjs research next --project DIR --run RUN --worker
 ```
 
 The task includes its stage brief, sources, questions, run ID, `id`, worker,
-`lease`, `attempt` and expiry. Follow the brief using your own tools. Independent
+`lease`, `attempt` and expiry. Follow the brief using your own tools. To see what
+comes next without taking it, use `research peek` with the same arguments as
+`next`. A task taken by mistake goes back with `research release` and the lease
+tuple; that does not count as a failed attempt. Independent
 tasks may run in authorized subagents or sequential separate invocations.
 A null task means inspect `waiting_for` and status: it can mean a live lease,
 plan hold or the need for an eligible checker, not completed research.
@@ -60,18 +64,25 @@ node scripts/harness-research.mjs research submit --project DIR --run RUN \
   --task TASK --worker INVOCATION_ID --lease TOKEN --attempt N --file result.json
 ```
 
-Renew long work with `research heartbeat` and the tuple before expiry. An expired
-attempt cannot submit after reassignment. Refusals return actionable `errors`,
-record an unsuccessful attempt and retain no partial facts; take the task again
-and correct the cause. After three attempts it is blocked, not an invented
-`unavailable` finding. Address the cause, then use `research retry --project DIR
---run RUN --task TASK` to reopen it. Worker crashes can be submitted as
-`{"error":{"message":"Concrete failure"}}`.
+A lease lasts 30 minutes; renew longer work with `research heartbeat`. A lapsed
+lease can still submit while nobody else has taken the task; once another worker
+has it, the old lease is refused. A refused submission returns actionable `errors`
+and keeps your lease: correct the cause and submit again. Ten refusals in one
+attempt end it. A worker crash is submitted as
+`{"error":{"message":"Concrete failure"}}` and ends the attempt. After three
+attempts a task is `failed`, never an invented `unavailable` finding. Other
+independent tasks continue; only the stages after it wait. Address the cause,
+then reopen it with `research retry --project DIR --run RUN --task TASK`.
 
 ### Sources
 
-Read the original, save readable text with exact wording and locators, and register
-it through the current source/research task's lease. Mark chart/scan transcriptions.
+Read the original and save its full readable text with exact wording and locators:
+the whole page or document, or at least the whole relevant section, never only the
+sentence you will quote. A quote is checked against its surrounding text, so text
+shorter than 280 characters, or a quote that is most of its saved source, is
+refused. When a tool returns only part of a page, or the source really is that
+short, register it with `--partial "reason"`; its facts are labelled. Register
+through the current source/research task's lease. Mark chart/scan transcriptions.
 
 ```sh
 node scripts/harness-research.mjs research source --project DIR --run RUN \
@@ -86,12 +97,11 @@ primary|secondary|community`, `--source-date YYYY-MM-DD`, `--original-file PATH`
 or `--transcribed --pages 4-6`. For an unreadable selected source, omit `--file`
 and give a concrete `--limits` reason. Submit its source task as
 `{"sources":["the-returned-source-id"]}`.
-Retain excerpts within source-tool use limits and mark partial coverage in
-`--limits`; a summary or translation is not the original quoted text.
+A summary or translation is not the original quoted text.
 
 ### Plan and research
 
-Plan results contain `scope`, `sections` (`id`,`name`), optional `subjects`
+Plan results contain an optional short `title` for the report, `scope`, `sections` (`id`,`name`), optional `subjects`
 (`id`,`name`), and `questions` (`id`,`section`,`subject`,`kind`: `open` or `claim`, `question`, plus
 the exact `claim` object for claim questions). Include all requested claims.
 Light is about 20 questions; do not pad a narrow request or fixed claim set.

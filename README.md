@@ -15,7 +15,8 @@ prepare helper commands.
 checking, durable tasks and visible reports in `research/`. The installation
 examples below use the published 0.8.1 release. To test this development checkout,
 point your agent at its `SKILL.md` and local runtime, or install this checkout with
-the same shell installer. Guidance 0.9.0 requires runtime 0.9.0; publishing guidance
+the same shell installer. Guidance 0.9.0 still works with runtime 0.8.1, through
+the manual workflow; the queued workflow needs runtime 0.9.0, and publishing guidance
 does not update an older executable automatically.
 
 ## 1. Install once
@@ -252,25 +253,25 @@ representative guidance-start response. Bootstrap activation is shown separately
 | --- | ---: |
 | Discovery metadata | 38 |
 | Installed bootstrap | 448 |
-| Bootstrap + current guidance entry | 1,006 |
-| Skill research with independent checks and saved report | 3,140 |
-| Explicit chat-only cited answer | 1,960 |
-| Legacy manual research with saved report | 3,151 |
-| Status / resume without new findings | 1,561 |
-| Comparative routing only | 1,713 |
-| Codex comparative outline | 2,673 |
-| Codex add items | 1,878 |
-| Codex add fields | 1,898 |
-| Codex deep results | 2,561 |
-| Codex deep results + saved evidence | 3,752 |
-| Claude comparative outline | 2,690 |
-| Claude deep results | 2,583 |
-| Saved research + general web strategy | 3,637 |
-| Saved research + academic strategy | 3,729 |
-| Saved research + GitHub strategy | 3,524 |
-| Saved research + technical Q&A strategy | 3,429 |
-| Saved research + Chinese sources strategy | 3,654 |
-| Legacy migration | 1,355 |
+| Bootstrap + current guidance entry | 1,038 |
+| Skill research with independent checks and saved report | 3,365 |
+| Explicit chat-only cited answer | 1,992 |
+| Legacy manual research with saved report | 3,183 |
+| Status / resume without new findings | 1,593 |
+| Comparative routing only | 1,745 |
+| Codex comparative outline | 2,705 |
+| Codex add items | 1,910 |
+| Codex add fields | 1,930 |
+| Codex deep results | 2,593 |
+| Codex deep results + saved evidence | 3,784 |
+| Claude comparative outline | 2,722 |
+| Claude deep results | 2,615 |
+| Saved research + general web strategy | 3,862 |
+| Saved research + academic strategy | 3,954 |
+| Saved research + GitHub strategy | 3,749 |
+| Saved research + technical Q&A strategy | 3,654 |
+| Saved research + Chinese sources strategy | 3,879 |
+| Legacy migration | 1,387 |
 
 Comparative rows include the selected platform resource, not the complete bundle.
 Each strategy row includes one router and one strategy. Status/resume skips plan

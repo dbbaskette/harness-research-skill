@@ -1,6 +1,6 @@
 # Research a topic with Claude Code or Codex: a thoroughly researched, cited report
 
-Date: 2026-10-15. Status: draft 7, revised after the design review. Issue:
+Date: 2026-10-15. Status: draft 8, revised after the implementation review. Issue:
 [harness-research-skill#9](https://github.com/dbbaskette/harness-research-skill/issues/9).
 
 ## What it is for
@@ -122,7 +122,12 @@ node scripts/harness-research.mjs research next --project DIR --run RUN --worker
 node scripts/harness-research.mjs research submit --project DIR --run RUN \
   --task ID --worker INVOCATION_ID --lease TOKEN --attempt N --file result.json
 
-# Renew a live lease; explicitly retry a failed task after its cause is addressed.
+# See the next task without taking it; give a task back without a failed attempt.
+node scripts/harness-research.mjs research peek --project DIR --run RUN --worker INVOCATION_ID
+node scripts/harness-research.mjs research release --project DIR --run RUN \
+  --task ID --worker INVOCATION_ID --lease TOKEN --attempt N
+
+# Renew a lease; explicitly retry a failed task after its cause is addressed.
 node scripts/harness-research.mjs research heartbeat --project DIR --run RUN \
   --task ID --worker INVOCATION_ID --lease TOKEN --attempt N
 node scripts/harness-research.mjs research retry --project DIR --run RUN --task ID
@@ -130,7 +135,7 @@ node scripts/harness-research.mjs research retry --project DIR --run RUN --task 
 # Register the text of a source the harness has saved.
 node scripts/harness-research.mjs research source --project DIR --file research/sources/NAME.md \
   --origin URL_OR_PATH --title TEXT [--publisher TEXT] \
-  [--standing primary|secondary|community] [--transcribed --pages 4-6] \
+  [--standing primary|secondary|community] [--transcribed --pages 4-6] [--partial REASON] \
   --run RUN --task ID --worker INVOCATION_ID --lease TOKEN --attempt N
 
 # Where the run stands: stages, tasks, coverage, what is missing.
@@ -184,14 +189,19 @@ is optional; the skill must not silently start an unavailable or unauthorized on
 ### Leases, attempts and late submissions
 
 Taking a task returns its run ID, task ID, worker invocation, monotonically increasing
-attempt number, opaque lease token and expiry. An expired lease returns the task to the
-queue with a new token and attempt. `heartbeat` renews only a current unexpired lease.
-Durations are explicit in the returned task, long operations renew them, and expiry is
-decided by the helper rather than by a worker's clock.
+attempt number, opaque lease token and expiry. A lease lasts 30 minutes, because research
+and checking routinely take longer than a few; `heartbeat` renews it. An expired lease
+returns the task to the queue, but the worker holding it may still submit, renew or
+register sources until another worker takes the task: its attempt is then revived rather
+than wasted. Once a newer lease exists, the old one is refused. Expiry is decided by the
+helper rather than by a worker's clock. `peek` shows the task a worker would get without
+taking it, and `release` gives a taken task back without counting a failed attempt.
 
 Every task submission is checked under the record lock against that entire lease identity.
-New results from expired/replaced leases and submissions for old runs are refused before
-any result is saved. Within the same run, repeating an already accepted submission with the
+New results from replaced leases and submissions for old runs are refused before any
+result is saved. A submission that fails validation is refused with actionable errors but
+keeps its lease, so the worker corrects it and submits again; ten refusals in one attempt
+end that attempt. A worker crash, reported as an error, ends the attempt at once. Within the same run, repeating an already accepted submission with the
 same token and payload digest returns its recorded acknowledgement without a second write,
 even after that lease expired; a different payload is refused. Accepting the result, advancing the stage and
 recording the accepted digest are one durable state transition. Mutable source registration
@@ -201,7 +211,9 @@ task. Sources are versioned rather than overwritten beneath another worker's quo
 After three unsuccessful attempts, a task remains `failed` with its attempts and reasons.
 It is not converted into an `unavailable` finding. `research retry` explicitly reopens it
 with a new lease generation and retained history; starting another run also invalidates all
-earlier leases. Dependent tasks wait for the required successful result.
+earlier leases. A failed task holds up only the stages after it: independent tasks at its
+own stage are still handed out, and the run is `blocked` only when nothing else can
+proceed.
 
 ### Completion and saved output
 
@@ -240,6 +252,11 @@ Files supplied as claim targets are pinned separately and are not evidence-sourc
   registers it with `research source`. The text must be the source's own words. A summary, a
   translation or a tidied version is not a source, because every quote is checked against
   this text.
+- **The whole page or section, not the passage.** A quote is only checkable against the
+  text around it, so saved text under 280 characters, or a quote that is more than half of
+  its saved source, is refused. When a tool returns only part of a page, or the source
+  really is that short, the harness registers it with `--partial` and the reason; the
+  source and every fact quoting it are labelled as a partial capture.
 - **Documents:** the harness reads PDFs, Word files and slides itself. It may use whatever
   extraction it has; Claude Code and Codex can both read these formats.
 - **What has no plain text,** such as a chart, a scanned page or a table, the harness reads and
@@ -454,11 +471,15 @@ prose follows semantically from the facts.
 All in `research/`, where a person will look:
 
 - **`research/report.md`**, the report:
+  - A short title, from the plan or the topic's first sentence, with the full request beneath
+    it when they differ.
   - A header: run/output revision, status, runtime/guidance identities, topic, date, depth,
     the scope paragraph, the sources given, counts, how facts were checked and whether the
     prose was independently reviewed; then the contents.
   - **Coverage by section:** how many checked facts each section has (each subject's, when
     comparing), and which questions are partly or not answered.
+  - **When comparing,** each section opens with a table of every subject's current facts side
+    by side.
   - **The questions and answers,** in outline order: each section's questions, each with its
     one-line answer and its paragraphs. Factual sentences carry the numbers of the sources
     behind their facts; generated gap messages link to the assessed gaps.
@@ -474,8 +495,11 @@ All in `research/`, where a person will look:
   (`supplied-only` or `public-web`) and narrative `scope`, sections,
   subjects when comparing, questions with their answers (each sentence with its fact keys), sources with their provenance (`given`, `found` or `transcribed`, or `caller`
   for a file quoted through `record`), facts with their checks and citations, conflicts,
-  superseded, missing, rejected, gaps and counts. Fact keys, aliases and revision links follow
+  superseded, missing, rejected, gaps and counts, plus the report `title` and each source's
+  `capture` (null, or partial with its reason). Fact keys, aliases and revision links follow
   the identity contract above; each citation carries its source revision and quote hash.
+  Worker bookkeeping such as which invocations researched a question stays in the run
+  record; the export keeps what a reader or caller needs, including who checked each fact.
 - **`research/brief.md`**: current checked facts with keys, one per line, no quotes, followed
   by gaps, conflicts and run status. Pending, rejected, superseded or stale facts are not
   presented as current reference material. This is the downstream context, including when
@@ -609,10 +633,13 @@ These exercise the completion and trust contracts independently of the live qual
 
 ## Release and adoption
 
-- **0.9.0 is an explicit installed-runtime upgrade.** Guidance requiring the new commands
-  declares `minimumRuntime: 0.9.0`. An older Research bootstrap currently refuses incompatible
-  guidance before reading it; new instructions cannot teach that executable to fall back.
-  Keep old task/runtime pins intact and document the installer upgrade for new runs.
+- **0.9.0 is an explicit installed-runtime upgrade, and publishing it breaks no one.** An older
+  Research bootstrap refuses guidance whose minimum runtime it does not meet, and new
+  instructions cannot teach it to fall back. So the 0.9.0 guidance keeps `minimumRuntime:
+  0.8.1` and routes a 0.8.x runtime to the manual workflow; the queued workflow needs runtime
+  0.9.0. Callers pinned to 0.8.1, such as Tanzu Brand 0.13.6, keep working. Raise the minimum
+  only when the manual path is retired. Keep old task/runtime pins intact and document the
+  installer upgrade for new runs.
 - **Standalone acceptance in both harnesses is part of 0.9.0:** the Claude Code trials, the
   Codex trials and the narrow supplied-only trial precede release. Do not advertise Codex
   acceptance while deferring its trial to a later patch.

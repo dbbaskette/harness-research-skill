@@ -7,7 +7,9 @@ install examples identify this software release. Earlier changelog entries and
 saved tasks retain their recorded versions.
 
 The development candidate is **0.9.0 (unreleased)**. Its new standalone workflow
-requires runtime 0.9.0; guidance refresh cannot upgrade executable helpers.
+needs runtime 0.9.0; guidance refresh cannot upgrade executable helpers, so the
+guidance keeps a minimum runtime of 0.8.1 and routes older runtimes to the manual
+workflow. Raise the minimum only when the manual path is retired.
 Before publishing its guidance to `main`, complete the native tests, installed
 CLI/skill checks and the live acceptance matrix in the
 [design](superpowers/specs/2026-10-15-research-with-agents-design.md).
