@@ -237,6 +237,16 @@ test('abbreviations stay one sentence, and spelled-out or scaled numbers meet th
   assert.throws(() => numericSupport('Valkey 8 adds threading.', ['Valkey 8.0 adds I/O threading improvements.']), /8/);
   assert.deepEqual(numbers('hundreds of users'), []);
 });
+test('digits inside identifiers are part of a name, not numbers the evidence must contain', () => {
+  // Live 0.9.1 trials refused "sqlite3_wal_checkpoint_v2()" because 3 and 2 were not in the quotes.
+  assert.deepEqual(numbers('sqlite3_wal_checkpoint_v2() returns SQLITE_BUSY'), []);
+  assert.deepEqual(numbers('Use SHA256 and IPv6 on x86_64 hosts.'), []);
+  numericSupport('sqlite3_wal_checkpoint_v2() reports the frames in the WAL.', ['The checkpoint function reports the total number of frames in the log file.']);
+  // Numbers next to a name, units after a number and versions are still numbers.
+  assert.deepEqual(numbers('The v2 API keeps 4MB of 1000 pages since 3.11.0.'), ['4', '1000', '3.11.0']);
+  assert.throws(() => numericSupport('sqlite3 checkpoints at 1000 pages.', ['SQLite checkpoints at 100 pages.']), /1000/);
+  assert.throws(() => numericSupport('COVID-19 changed usage.', ['The pandemic changed usage.']), /19/);
+});
 test('unowned output and escaping sources are preserved', async t => {
   const project=await realpath(await mkdtemp(join(tmpdir(),'research-user-files-')));t.after(()=>rm(project,{recursive:true,force:true}));
   await mkdir(join(project,'research')); await writeFile(join(project,'research/report.md'),'User report');
@@ -400,9 +410,9 @@ test('isolated installation includes queued CLI, schema and skill guidance with 
   const installed=await install({source,home:join(f.project,'home'),shared:join(f.project,'shared')});
   const cli=join(installed.targets[2],'scripts/harness-research.mjs');
   const exec=promisify(execFile);
-  const version=await exec(process.execPath,[cli,'--version']);assert.equal(version.stdout.trim(),'harness-research 0.9.1');
+  const version=await exec(process.execPath,[cli,'--version']);assert.equal(version.stdout.trim(),'harness-research 0.9.2');
   const started=JSON.parse((await exec(process.execPath,[cli,'research','start','--project',f.project,'--topic','Installed skill flow'])).stdout);
-  assert.equal(started.runtimeVersion,'0.9.1');assert.equal(started.guidanceVersion,'0.9.1');assert.equal(started.guidanceRevision,null);
+  assert.equal(started.runtimeVersion,'0.9.2');assert.equal(started.guidanceVersion,'0.9.2');assert.equal(started.guidanceRevision,null);
   const task=JSON.parse((await exec(process.execPath,[cli,'research','next','--project',f.project,'--run',started.run,'--worker','installed-invocation'])).stdout).task;
   assert.equal(task.kind,'plan');
   assert.match(await readFile(join(installed.runtime,'references/research-run.md'),'utf8'),/helper is your ledger/);
@@ -419,12 +429,12 @@ test('legacy status repairs an interrupted projection and manual commands cannot
 test('new research records and verifies the saved bootstrap guidance identity offline', async t => {
   const f=await fixture(t,{sources:[]}),source=join(f.project,'guidance-source'),runtime=fileURLToPath(new URL('../',import.meta.url));
   await mkdir(join(source,'guidance'),{recursive:true});await writeFile(join(source,'SKILL.md'),'# Synthetic saved guidance\n');
-  await writeFile(join(source,'guidance/manifest.json'),JSON.stringify({schema:1,skill:'harness-research',entry:'SKILL.md',version:'0.9.1',minimumRuntime:'0.9.0'}));
+  await writeFile(join(source,'guidance/manifest.json'),JSON.stringify({schema:1,skill:'harness-research',entry:'SKILL.md',version:'0.9.2',minimumRuntime:'0.9.0'}));
   const exec=promisify(execFile);await exec('git',['init','-q','--initial-branch=main',source]);await exec('git',['-C',source,'add','.']);
   await exec('git',['-C',source,'-c','user.name=Fixture','-c','user.email=fixture@example.invalid','-c','commit.gpgsign=false','commit','-qm','Synthetic guidance']);
   const pin=await startGuidance({project:f.project,source,runtime});await rm(source,{recursive:true});
   const started=await startRun({project:f.project,topic:'Pinned identity',guidanceTask:pin.task});
-  assert.equal(started.guidanceTask,pin.task);assert.equal(started.guidanceRevision,pin.revision);assert.equal(started.guidanceVersion,'0.9.1');assert.equal(started.runtimeVersion,'0.9.1');
+  assert.equal(started.guidanceTask,pin.task);assert.equal(started.guidanceRevision,pin.revision);assert.equal(started.guidanceVersion,'0.9.2');assert.equal(started.runtimeVersion,'0.9.2');
   await chmod(pin.guidance,0o600);await writeFile(pin.guidance,'Changed guidance');
   await assert.rejects(startRun({project:f.project,topic:'Tampered pin',guidanceTask:pin.task}),/Saved guidance changed/);
 });
@@ -702,4 +712,13 @@ test('trial fixes: gaps name inline files, "partial" coverage is accepted, and s
   await submit(f, writer, { questions: [{ id: q.id, headline: { sentence: 'As of 2026-10-15, OrionDB permits a single writer for each database.', facts: [fact.key] }, answer: [{ sentence: fact.statement, facts: [fact.key] }], gaps: q.gaps }] });
   const exported = JSON.parse(await readFile((await runStatus(f)).facts, 'utf8'));
   assert.equal(exported.questions[0].coverage, 'partly answered'); assert.equal(exported.gaps[0].sources[0], exported.sources[0].id);
+});
+test('start names a missing project folder plainly, and peek accepts the --harness that next takes', async t => {
+  const dir = await realpath(await mkdtemp(join(tmpdir(), 'research-cli-friction-'))); t.after(() => rm(dir, { recursive: true, force: true }));
+  const missing = join(dir, 'not-created');
+  await assert.rejects(runCli(['start', '--project', missing, '--topic', 'Missing folder']), error => /does not exist/.test(error.message) && error.message.includes(missing) && !/ENOENT/.test(error.message));
+  const started = await runCli(['start', '--project', dir, '--topic', 'Peek flags']);
+  const peeked = await runCli(['peek', '--project', dir, '--run', started.run, '--worker', 'cc-peek0001', '--harness', 'claude-code']);
+  assert.equal(peeked.task.kind, 'plan');
+  assert.equal((await runCli(['peek', '--project', dir, '--run', started.run, '--worker', 'cc-peek0001'])).task.id, peeked.task.id);
 });

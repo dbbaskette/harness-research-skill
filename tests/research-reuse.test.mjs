@@ -511,3 +511,11 @@ test('a file selected again, or already carried over by reuse, is one selected s
   const twice = await startRun({ project: await newProject(t), topic: 'Twice', sources: ['sources/reference.txt', 'sources/reference.txt'] });
   assert.equal(JSON.parse(await readFile(twice.file, 'utf8')).givenSources.length, 1);
 });
+
+test('a relative --from that finds nothing says it was read against --project', async t => {
+  const origin = await completed(t), target = await newProject(t);
+  await assert.rejects(runCli(['start', '--project', target, '--from', 'elsewhere/research']), error => error.message.includes(join(target, 'elsewhere/research')) && /relative to --project/.test(error.message));
+  await assert.rejects(runCli(['start', '--project', target, '--from', join(target, 'nothing')]), error => /No saved research/.test(error.message) && !/relative to --project/.test(error.message));
+  const relative = (await import('node:path')).relative(target, origin.project);
+  assert.equal((await runCli(['start', '--project', target, '--from', relative])).status, 'complete');
+});

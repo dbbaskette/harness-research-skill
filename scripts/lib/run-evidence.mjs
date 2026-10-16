@@ -31,8 +31,12 @@ function spelled(text) {
     .replace(new RegExp(`\\b(${units})\\b`, 'gi'), word => String(UNITS[word.toLowerCase()]))
     .replace(new RegExp(`(\\d+(?:[.,]\\d+)*)\\s+(${scales})\\b(?!s)`, 'gi'), (_, number, scale) => /^\d{1,3}(?:,\d{3})+$/.test(number) ? number : shift(number.replace(/,/g, ''), SCALES[scale.toLowerCase()]));
 }
+// Digits written straight after a letter or underscore are part of a name, not a count:
+// "sqlite3_wal_checkpoint_v2", "SHA256", "IPv6", "x86_64". "4MB", "v2 API 3" and "COVID-19" keep their numbers.
+const IDENTIFIER = /[\p{L}_][\p{L}_]*\d[\p{L}\p{N}_]*(?:\.\d+(?:\.\d+)*)?/gu;
 export function numbers(value) {
-  return [...new Set((spelled(String(value).normalize('NFKC')).match(/\d+(?:[.,]\d+)*/g) ?? []).map(n => /^\d{1,3}(?:,\d{3})+$/.test(n) ? n.replaceAll(',', '') : n))];
+  const text = spelled(String(value).normalize('NFKC')).replace(IDENTIFIER, ' ');
+  return [...new Set((text.match(/\d+(?:[.,]\d+)*/g) ?? []).map(n => /^\d{1,3}(?:,\d{3})+$/.test(n) ? n.replaceAll(',', '') : n))];
 }
 export function numericSupport(statement, quotes) {
   const available = new Set(quotes.flatMap(numbers)), missing = numbers(statement).filter(number => !available.has(number));

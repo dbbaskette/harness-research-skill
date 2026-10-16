@@ -178,26 +178,26 @@ representative guidance-start response. Bootstrap activation is shown separately
 | --- | ---: |
 | Discovery metadata | 38 |
 | Installed bootstrap | 490 |
-| Bootstrap + current guidance entry | 1,106 |
-| Skill research with independent checks and saved report | 4,524 |
-| Verify, research again, reuse or refresh | 1,883 |
-| Explicit chat-only cited answer | 2,060 |
-| Legacy manual research with saved report | 3,251 |
-| Status / resume without new findings | 1,661 |
-| Comparative routing only | 1,813 |
-| Codex comparative outline | 2,773 |
-| Codex add items | 1,978 |
-| Codex add fields | 1,998 |
-| Codex deep results | 2,661 |
-| Codex deep results + saved evidence | 3,852 |
-| Claude comparative outline | 2,790 |
-| Claude deep results | 2,683 |
-| Saved research + general web strategy | 5,021 |
-| Saved research + academic strategy | 5,113 |
-| Saved research + GitHub strategy | 4,908 |
-| Saved research + technical Q&A strategy | 4,813 |
-| Saved research + Chinese sources strategy | 5,038 |
-| Legacy migration | 1,455 |
+| Bootstrap + current guidance entry | 1,113 |
+| Skill research with independent checks and saved report | 4,583 |
+| Verify, research again, reuse or refresh | 1,890 |
+| Explicit chat-only cited answer | 2,067 |
+| Legacy manual research with saved report | 3,258 |
+| Status / resume without new findings | 1,668 |
+| Comparative routing only | 1,820 |
+| Codex comparative outline | 2,780 |
+| Codex add items | 1,985 |
+| Codex add fields | 2,005 |
+| Codex deep results | 2,668 |
+| Codex deep results + saved evidence | 3,859 |
+| Claude comparative outline | 2,797 |
+| Claude deep results | 2,690 |
+| Saved research + general web strategy | 5,080 |
+| Saved research + academic strategy | 5,172 |
+| Saved research + GitHub strategy | 4,967 |
+| Saved research + technical Q&A strategy | 4,872 |
+| Saved research + Chinese sources strategy | 5,097 |
+| Legacy migration | 1,462 |
 
 Comparative rows include the selected platform resource, not the complete bundle.
 Each strategy row includes one router and one strategy. Status/resume skips plan

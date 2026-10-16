@@ -31,7 +31,7 @@ export async function runCli(argv) {
   const [action, ...extra] = positionals;
   const allowed = {
     start: ['topic', 'source', 'sources', 'claims', 'about', 'depth', 'allow-web', 'plan-only', 'source-mode', 'guidance-task', 'from'],
-    next: ['worker', 'harness'], peek: ['worker'], release: ['task', 'worker', 'lease', 'attempt'], submit: ['task', 'worker', 'lease', 'attempt', 'file'],
+    next: ['worker', 'harness'], peek: ['worker', 'harness'], release: ['task', 'worker', 'lease', 'attempt'], submit: ['task', 'worker', 'lease', 'attempt', 'file'],
     source: ['task', 'worker', 'lease', 'attempt', 'file', 'origin', 'title', 'publisher', 'standing', 'given', 'id', 'original-file', 'source-date', 'transcribed', 'pages', 'limits', 'partial'],
     heartbeat: ['task', 'worker', 'lease', 'attempt'], status: [], retry: ['task'], continue: ['file'], block: ['reason'], reassess: ['again', 'reason'],
     verify: ['keys', 'key'], approve: ['by', 'revision'], refresh: [],
@@ -51,7 +51,10 @@ export async function runCli(argv) {
   // Approval binds the content and, with --revision, the exact output the person saw.
   if (!['start', 'status', 'verify', 'approve'].includes(action) && !values.run) throw new Error('Supply the current --run ID.');
   if (['submit', 'source', 'heartbeat', 'release'].includes(action)) for (const name of ['task', 'worker', 'lease', 'attempt']) if (!values[name]) throw new Error(`Task writes require --${name}.`);
-  const root = await realpath(resolve(values.project));
+  const root = await realpath(resolve(values.project)).catch(error => {
+    if (error.code === 'ENOENT') throw new Error(`Project folder ${resolve(values.project)} does not exist; create it first or pass an existing --project.`);
+    throw error;
+  });
   const projectFile = async file => isAbsolute(file) ? relative(root, await realpath(file)) : file;
   const sourceInput = async source => {
     if (typeof source === 'string') return /^https?:\/\//i.test(source) ? source : projectFile(source);
