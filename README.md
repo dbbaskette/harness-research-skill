@@ -1,253 +1,184 @@
+![Harness Research: colorful source notes, a magnifying glass, and an evidence trail leading to a cited report.](docs/assets/harness-research-banner.png)
+
 # Harness Research
 
-Give your coding agent a research question and get a cited report saved in your
-project. Harness Research works with Codex, Claude Code and Cursor to research
-topics, compare options and fact-check claims. It keeps findings, conflicting
-evidence and unanswered questions so you can pick up the work later.
+### Ask a question. Follow the evidence. Keep the report.
 
-You describe what you need in plain language. The agent plans the research,
-reads sources and automatically saves a cited report in your project. It remains
-a skill: your agent uses its own research tools and judgement. The local helper
-tracks tasks, evidence and saved output; you do not operate a research service or
-prepare helper commands.
+A research **skill for Codex, Claude Code, and Cursor**. Give your agent a topic,
+selected documents, or claims to check. It reads sources, checks the evidence, and
+saves a cited report in your project—ready to open, share, and continue later.
 
-**Development version: 0.9.0 (unreleased).** This branch adds independent evidence
-checking, durable tasks and visible reports in `research/`. The installation
-examples below use the published 0.8.1 release. To test this development checkout,
-point your agent at its `SKILL.md` and local runtime, or install this checkout with
-the same shell installer. Guidance 0.9.0 still works with runtime 0.8.1, through
-the manual workflow; the queued workflow needs runtime 0.9.0, and publishing guidance
-does not update an older executable automatically.
+**[Get started](#get-started)** · **[See a report](#see-what-you-get)** ·
+**[User guide](docs/using-harness-research.md)** · **[Setup & updates](docs/setup.md)**
 
-## 1. Install once
+| Bring the question | Keep the useful work |
+| --- | --- |
+| Compare tools or approaches | Findings with source quotes, dates, and a comparison you can inspect. |
+| Research your documents | A clear boundary around the sources you selected. |
+| Check a set of claims | Supported, contradicted, or insufficient—with the evidence behind each verdict. |
+| Return to unfinished research | Saved progress, visible gaps, and a report that survives the chat. |
 
-You need **Node.js 20 or newer**, **Git**, and one of the supported coding agents.
-Use your existing agent setup; the skill needs no separate research account.
-You do not need to run `npm install`.
+> **You're reading the 0.9.0 preview.** The setup below installs the current code
+> from `main`. Until 0.9.0 is tagged, its checked workflow needs the explicit
+> development prompt below: ordinary installed use loads **0.8.1** guidance and
+> its earlier manual workflow.
+> [Choose a version or update an existing installation →](docs/setup.md#choose-your-version)
 
-In your terminal:
+## Get started
+
+### 1. Install the skill
+
+Have **Node.js 20+**, **Git**, **Bash**, and your coding agent ready. The skill uses
+your agent's existing research tools and model access. You don't need npm or a
+separate research account. Your agent also needs permission to start a separate
+checker for the evidence.
 
 ```sh
-git clone --branch v0.8.1 https://github.com/dbbaskette/harness-research-skill.git
+git clone --branch main https://github.com/dbbaskette/harness-research-skill.git
 cd harness-research-skill
 bash scripts/Install-Harness-Research.sh
 ```
 
-The installer creates one shared local package and registers the skill with
-Codex, Claude Code and Cursor. Successful installation prints JSON with
-`"status": "installed"`.
+The installer registers the skill for all three agents. Look for
+`"status": "installed"`, then **start a new agent session**.
+[Installation locations, tagged releases, and custom setup →](docs/setup.md)
 
-To preview the installation before making changes, run
-`bash scripts/Install-Harness-Research.sh --dry-run` first.
+### 2. Open the project where you want your research
 
-### Check or update your version
+Use your own content or code project. This is where the report will be saved.
+You can work with public sources, selected documents, or both.
 
-The current release is [v0.8.1](https://github.com/dbbaskette/harness-research-skill/releases/tag/v0.8.1).
-Check the installed helper without network access or a project:
+### 3. Ask in plain language
 
-```sh
-node "$HOME/.agents/skills/harness-research/scripts/harness-research.mjs" --version
-# harness-research 0.8.1
+**For this unreleased preview**, first tell your agent to use the development
+checkout explicitly (replace the path):
+
+```text
+Use /absolute/path/harness-research-skill/SKILL.md and its local runtime at
+/absolute/path/harness-research-skill/scripts/harness-research.mjs for this
+0.9.0 development test. Do not refresh the installed release guidance.
 ```
 
-To update an existing clone, run from its directory:
-
-```sh
-git fetch origin tag v0.8.1
-git switch --detach v0.8.1
-bash scripts/Install-Harness-Research.sh
-```
-
-On start or resume, the agent reports the installed runtime version and the
-guidance release, revision and freshness. These can differ: new tasks fetch
-instructions from the newest release your installed helper supports, while
-executable updates require the installer.
-Resumed tasks report their saved guidance and runtime, even after an installation
-update. Older guidance without a release label is reported as unknown, with its
-exact revision. An older helper without `--version` can be identified from its
-installed `package.json`; reinstall to get the new version reporting.
-
-## 2. Start your first research session
-
-Open **the project where you want the report saved** in your coding agent and
-start a new session after installation. This can be any content or code project;
-you do not need to work inside this repository.
-
-Choose the prompt for your agent:
+Then give your research request:
 
 **Codex**
 
 ```text
 $harness-research Compare PostgreSQL and SQLite for a small internal application.
-Use public primary sources. Cover deployment, concurrency and maintenance.
+Use public primary sources. Cover deployment, concurrency, and maintenance.
 ```
 
 **Claude Code**
 
 ```text
 /harness-research Compare PostgreSQL and SQLite for a small internal application.
-Use public primary sources. Cover deployment, concurrency and maintenance.
+Use public primary sources. Cover deployment, concurrency, and maintenance.
 ```
 
 **Cursor**
 
 ```text
 Use the harness-research skill to compare PostgreSQL and SQLite for a small
-internal application. Use public primary sources. Cover deployment, concurrency
-and maintenance.
+internal application. Use public primary sources and cover deployment,
+concurrency, and maintenance.
 ```
 
-Replace the example with your question. Specify whether the agent should use
-**only your documents** or may also use **public web sources**. Web research uses
-your agent's available browsing tools.
+Your agent handles planning, source reading, helper commands, and saving the
+report. If your host asks for permission to run an independent checker, allow it
+to complete the checked workflow. No extra “write the report” request is needed.
 
-### Research your own documents
-
-Put the selected documents in your project, or attach them if your agent supports
-attachments. Name the files and the source boundary in your prompt:
+**Working from your own files?** Try:
 
 ```text
 $harness-research Read sources/product-brief.pdf and sources/release-notes.md.
-Using only these documents, determine which launch claims are supported.
-Show contradictions or missing evidence.
+Using only these documents, check which launch claims are supported.
+Keep contradictions and missing evidence visible.
 ```
 
-Use `/harness-research` in Claude Code, or ask Cursor to use the skill.
-Selected private documents stay local. Unreadable or partially extracted documents
-are recorded as coverage gaps.
+[More examples: deep research, claim checks, and planning first →](docs/using-harness-research.md#prompts-to-start-from)
 
-## 3. Read the report and continue later
+## See what you get
 
-Using Harness Research on its own produces a saved cited report; no Brand skill
-or follow-up request to write it is needed. The agent returns a synthesis and a link to the report,
-which is saved at:
+The main deliverable is **`research/report.md`**: questions and answers, cited
+headlines, source quotes, comparisons, and explicit gaps. It's saved as work
+progresses, so a partial report is available while research is underway.
 
 ```text
-your-project/research/report.md                    # new 0.9.0 skill runs
-your-project/.harness-research/research-report.md   # 0.8.1 / manual runs; compatibility copy
+your-project/
+└── research/
+    ├── report.md       Read the findings and their evidence
+    ├── facts.json      Inspect structured facts, citations, and history
+    ├── brief.md        Reuse the current checked facts as context
+    ├── plan.json       Inspect the agreed scope and questions
+    ├── plan.md         Read the plan in Markdown
+    └── output.json     Identify the export revision and file hashes
 ```
 
-It includes findings, citations, contradictions, document coverage gaps and
-pending or unresolved questions. The agent updates it as findings are saved.
-In 0.9.0, a separate invocation checks evidence against the originals. Light depth
-discloses that the written prose has no separate semantic review. If checking
-cannot run, the agent returns a partial report with the execution block. Honest
-unanswered questions finish as visible gaps, with no invented findings.
-`research/facts.json` contains the evidence and assertion history;
-`research/brief.md` contains current checked facts. `research/output.json` records
-the matching export revision and hashes for consumers. These files are produced
-by the skill without extra prompt wording.
-Before returning the research result or starting dependent content, the agent
-opens the report and checks that the agreed findings, citations and gaps
-are saved. A partial handoff requires your explicit direction. Only an explicitly
-requested chat-only answer omits the saved report.
-If your file browser hides dot folders, open the report using the agent's link
-or its full path.
+Open a recorded development example:
 
-To continue, open the same project and ask:
+- **[Redis vs Valkey](docs/verification/0.9.0/claude-code-redis-valkey/new/research/report.md)** —
+  a broader Claude Code trial with 113 checked facts; [comparison notes](docs/verification/0.9.0/claude-code-redis-valkey/README.md) explain its limits.
+
+- **[PostgreSQL vs SQLite](docs/verification/0.9.0/public/research/report.md)** —
+  a narrow comparison using public primary documentation.
+- **[AsterDB vs BirchDB](docs/verification/0.9.0/supplied/research/report.md)** —
+  synthetic supplied documents, including two questions the sources cannot answer.
+
+[Understand the files, statuses, and limits →](docs/using-harness-research.md#read-the-result)
+
+## How the evidence gets checked
+
+**Plan → research → independent check → cross-check → write.**
+
+A separate invocation reads the original supporting material and can confirm,
+narrow, or reject a candidate fact. The helper checks source revisions, quote
+placement, citation references, and numbers. Unanswered questions stay visible;
+an unavailable checker produces a blocked partial report.
+
+The default **light** depth checks facts. **Standard** and **deep** also require
+an independent review of the written answers. Checked support means the cited
+source supports the statement; it does not certify the source as true or current.
+
+[Depths, source handling, and the checking process →](docs/using-harness-research.md#choose-the-depth)
+
+## Pick it up later
+
+Open the same project and ask:
 
 ```text
 $harness-research Continue the saved research in this project.
-Check for changed source files and work through the remaining questions.
+Check for changed sources and work through the remaining questions.
 ```
 
-Existing manual matching plans reuse saved findings. Changes to selected local sources mark
-affected findings stale so they can be reassessed. Saved snapshots do not prove
-that a live web page is still current. A 0.9.0 queued run resumes its saved tasks;
-changed sources block current use and require a new run to reassess. Cross-project
-reuse, approval and automated refresh commands are later milestones.
+Saved tasks keep their guidance and runtime. Changed evidence is marked stale;
+your agent will explain what needs reassessment.
+[Resume, changed sources, and recovery →](docs/using-harness-research.md#continue-or-recover-a-run)
 
-## Setup help
+## Find your next step
 
-| What you see | What to do |
+| I want to… | Open… |
 | --- | --- |
-| Node.js is missing or too old | Install Node.js 20+ and rerun the installer. Check your version with `node --version`. |
-| The agent cannot find the skill | Start a new session. Confirm installation returned `"status": "installed"`. |
-| `harness-research: command not found` in your terminal | Use the skill inside your agent as shown above. The current installer registers agent skills but does not add a terminal command to `PATH`. |
-| The installer reports an unrelated existing skill | Review the named location before moving anything. The installer preserves independent skills. |
-| The agent cannot browse or read a document | Supply readable local text, or continue with available sources and retain the gap in the report. |
+| Install, update, check my version, or fix setup | [Setup & troubleshooting](docs/setup.md) |
+| Choose sources, write a better prompt, or understand the report | [Using Harness Research](docs/using-harness-research.md) |
+| Understand helpers, schemas, or run tests | [Developer guide](docs/development.md) |
+| Continue older Tanzu Brand research | [Migration guide](references/migration.md) |
+| Inspect the agent's workflow | [Skill instructions](SKILL.md) and [research contract](references/research-run.md) |
+| See what has been verified | [Development evidence and remaining release gates](docs/verification/0.9.0/README.md) |
 
-If you previously used Tanzu Brand research, see the
-[migration guide](references/migration.md). Installation updates only links
-owned by the former Brand research bundle; copying older saved research records
-is a separate, explicit step.
+## Built for your agent, with the work kept in your project
 
-## Advanced: helper commands
+The skill uses your harness's tools and judgement. A Node.js helper tracks tasks,
+evidence, and saved outputs. Core use needs no new service, research subscription,
+or Python environment. Your normal agent/model usage still applies.
 
-Normal use happens through your agent. These helpers save and inspect research
-records; the agent handles source reading, searches and evidence assessment.
-The agent also prepares the JSON input files.
+MIT licensed. See [the license](LICENSE), [credits and adaptations](NOTICE.md),
+and [the changelog](CHANGELOG.md). Maintainers: [release procedure](docs/releases.md).
 
-Run these from this checkout or the installed skill directory. Replace
-`/absolute/project` with the directory containing your research:
+<details>
+<summary>For maintainers: measured instruction context</summary>
 
-```sh
-node scripts/harness-research.mjs --help
-node scripts/harness-research.mjs status --project /absolute/project
-```
-
-| Action | Purpose | Required options |
-| --- | --- | --- |
-| `plan` | Save or resume questions and write the report | `--project DIR --file plan.json` |
-| `record` | Save an inspected finding and refresh the report | `--project DIR --run ID --item ID --file finding.json` |
-| `status` | Refresh the report and show pending, unresolved and stale evidence | `--project DIR` |
-| `migrate` | Copy older `.tanzu-research` records while retaining originals | `--project DIR` |
-
-See the [evidence contract](references/evidence.md) for input formats and
-[comparative workflow](references/comparative.md) for item/field outlines.
-Existing item/field projects retain their configured output directory; the
-automatic report path above applies to the Node evidence workflow.
-Optional comparative field validation uses project-local Python/PyYAML, prepared
-only when needed. The core workflow requires only Node.js.
-
-Release ZIPs/checksums are available on the [release page](https://github.com/dbbaskette/harness-research-skill/releases/tag/v0.8.1).
-Maintainers can follow the [release procedure](docs/releases.md).
-
-## Guidance updates
-
-The installer registers a small local entrypoint. For new work, it quietly checks
-this public repository’s release tags, takes the newest release whose guidance the
-installed helper supports, saves an exact guidance revision, and returns only
-paths and status. Unreleased work on `main` is not served. Helpers from 0.8.1 and
-earlier read `main` directly, so `main` must hold only released guidance until
-those installations are updated. The agent reads the entry and relevant references, not
-the whole library. Git and network access are needed for first/new-task refreshes;
-no GitHub account is required.
-
-If a refresh reports a DNS/network failure inside an agent sandbox, retry the same
-command through the host's network-permission flow, or from a terminal with
-network access. Changing skill entrypoints uses the same helper and runtime.
-The helper reports the failing Git operation and a safe diagnostic; it does not
-print credentials, proxy settings or private Git URLs.
-
-Existing decks or research reports keep their saved task and runtime. Resuming
-uses that pin without fetching. Explicitly adopting newer guidance starts a new
-task and requires rechecking affected reviews. A failed fetch or incompatible
-runtime is reported; it is never described as current.
-
-**Instructions update automatically; executable helpers do not.** Rerun the trusted
-shell installer from a current repository copy to update helpers or the entrypoint.
-Guidance snapshots contain no executable scripts. The installed helper supports
-`start`, `resume`, `cached`, and `pin` through `scripts/sync-guidance.mjs --help`.
-
-
-## Development and provenance
-
-This project extracts Tanzu Brand's custom research engine and its pinned modified
-[Deep-Research-skills](https://github.com/dbbaskette/Deep-Research-skills) bundle.
-[NOTICE](NOTICE.md) records origin, license and adaptations. No private brand
-assets are included. Tanzu Brand invokes this independent skill and consumes its
-report.
-
-`npm test` checks evidence, resume, privacy boundaries, migration and installation.
-`npm run ci:local` uses the existing Tart/macOS test suite in a disposable clone.
-Tests use local synthetic documents. See
-[extraction and verification](docs/extraction.md) for recorded results.
-
-### Instruction context usage
-
-The skill loads focused guidance for the selected workflow. Counts below cover
-instruction loading, excluding documents, images and tool responses.
+The skill loads the references needed for the selected workflow. These generated
+measurements cover instructions, excluding source content and conversation.
 
 <!-- CONTEXT-USAGE:START -->
 Measured with `cl100k_base`; cumulative instruction counts, including a normalized
@@ -285,5 +216,7 @@ content, images, research task responses and conversation add separately. The JS
 report also exposes direct-handoff paths without the bootstrap/start response.
 <!-- CONTEXT-USAGE:END -->
 
-Run `npm run context:update` after guidance changes; `npm run context:check`
-catches drift.
+Run `npm run context:update` after instruction changes and
+`npm run context:check` to check the measurements. See the [developer guide](docs/development.md).
+
+</details>
