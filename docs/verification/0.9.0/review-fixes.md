@@ -16,6 +16,12 @@ case, idempotent partial-capture recovery with immutable prior metadata, and an
 end-to-end cross-section merge with both subjects in the final report. Skill
 validation, refreshed context measurements and whitespace checks also passed.
 
-The full native gate and its exact tested commit will be recorded after it runs.
+The full native gate passed on clean commit `65071d3094e12a7250bbd5dd18f9b210f4b3d7e6`: **77/77 tests,
+zero failures or skips**, on macOS 27.0, Node 22.23.2 and Python 3.9.6. Dependency
+audit reported zero vulnerabilities; context, installer and installed CLI checks
+passed. The disposable VM was deleted and its directory is absent.
+[Machine-readable evidence](ci-review-fixes/verification.json) and the
+[full test log](ci-review-fixes/tests.log) are retained. Subsequent evidence-only
+edits do not change the tested runtime, instructions, tests or example artifacts.
 The broader live release-acceptance matrix remains open as documented in
 [development verification](README.md); this work does not tag or publish 0.9.0.

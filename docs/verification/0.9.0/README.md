@@ -48,3 +48,7 @@ was deleted and its VM directory is absent. [Machine-readable evidence](ci/verif
 and [test log](ci/tests.log) are retained. No GitHub CI workflow is present in this source
 checkout; no remote CI result is claimed. Later documentation-only evidence updates do not
 change the tested implementation or example artifacts.
+
+The [follow-up review fixes](review-fixes.md) subsequently passed a fresh native gate
+with **77 tests, zero failures or skips**, on clean implementation commit
+`65071d3094e12a7250bbd5dd18f9b210f4b3d7e6`. See its separate evidence record for current coverage.
