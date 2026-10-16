@@ -66,3 +66,15 @@ context, installation and installed version 0.9.0. The disposable VM was deleted
 and its directory absence verified. [Release-candidate native evidence](ci-release-candidate/verification.json)
 records the tested tree, logs and a transient cleanup diagnostic. The broader
 live acceptance and human sampling remain separate release gates.
+
+Live acceptance subsequently exposed an original-access contract bug: a checker
+could not reject inaccessible evidence honestly without attesting an original
+read. The fix permits `read_original:false` only with rejected dependent facts,
+concrete access errors and source-linked access gaps; confirmed and narrowed
+facts still require original reads. The compromised Codex example is retained as
+failed evidence, and its authored research is checked again in a new run.
+
+The consolidated fixes passed the full native gate on `f6c15c9ef3e7ce6498d004188e23f7219826a30c`: **88 tests, zero failures or skips**, plus audit, context,
+installation and installed version checks. Cleanup was independently verified.
+[Current native evidence](ci-acceptance-fixes/verification.json) retains exact
+source identity and logs; human semantic acceptance is still pending.

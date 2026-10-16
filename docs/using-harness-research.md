@@ -131,6 +131,8 @@ Checking requires a separate invocation that did not research the assigned
 questions. It may use the same model and can run sequentially. Follow your host's
 permission rules for starting agents. If this cannot happen, the workflow saves
 a blocked partial report rather than labelling the research independently checked.
+If a checker can run but cannot open a particular original, it rejects the facts
+that depend on that source and records the access gap; other evidence can proceed.
 
 ## What happens during a run
 

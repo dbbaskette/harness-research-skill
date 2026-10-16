@@ -1,0 +1,30 @@
+
+> harness-research-skill@0.9.0 context:check
+> node tools/context-usage.mjs --check
+
+{
+  "routes": {
+    "Discovery metadata": 38,
+    "Installed bootstrap": 463,
+    "Bootstrap + current guidance entry": 1066,
+    "Skill research with independent checks and saved report": 4479,
+    "Explicit chat-only cited answer": 2020,
+    "Legacy manual research with saved report": 3211,
+    "Status / resume without new findings": 1621,
+    "Comparative routing only": 1773,
+    "Codex comparative outline": 2733,
+    "Codex add items": 1938,
+    "Codex add fields": 1958,
+    "Codex deep results": 2621,
+    "Codex deep results + saved evidence": 3812,
+    "Claude comparative outline": 2750,
+    "Claude deep results": 2643,
+    "Saved research + general web strategy": 4976,
+    "Saved research + academic strategy": 5068,
+    "Saved research + GitHub strategy": 4863,
+    "Saved research + technical Q&A strategy": 4768,
+    "Saved research + Chinese sources strategy": 4993,
+    "Legacy migration": 1415
+  },
+  "inputDigest": "fc011b8709b3c3a5b5ab744bad80f2a1d68bed081dd6dfefef59a95a30ee2d97"
+}

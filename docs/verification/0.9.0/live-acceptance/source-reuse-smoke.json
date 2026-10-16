@@ -1,0 +1,17 @@
+{
+  "runtime_commit": "93c26d6",
+  "scope": "One assigned research task only; not a completed research run or semantic acceptance",
+  "run": "0e69f8f550394fa8afa35291",
+  "worker": "cc-046abb12",
+  "task_status": "done",
+  "attempts": 1,
+  "registered_selected_sources": 1,
+  "candidate_facts": 2,
+  "quote_positions": "verified",
+  "source_mode": "supplied-only",
+  "permission_denials": [],
+  "claude_list_estimate_usd": 0.0947824,
+  "wall_seconds": 16.383077144622803,
+  "transcript_sha256": "a65f4725a30be85a6c8da869f2218fd688f6c15e4cde0f6a60085547e47a3cc2",
+  "observation": "Fresh Claude reused the existing selected source ID from the clarified task brief; no new source registration or web permission was needed."
+}

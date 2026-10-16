@@ -157,6 +157,7 @@ export async function citations(root, state, supplied, question) {
   if (!Array.isArray(supplied) || supplied.length < 1 || supplied.length > 5) throw new Error('A fact needs 1 to 5 registered-source quotes.');
   const result = [];
   for (const item of supplied) {
+    if (!item || typeof item.source !== 'string' || !item.source.trim()) throw new Error('Quote needs a registered source ID in "source". Reuse an ID from the task; a "file" citation requires registering that file in the same result.');
     const source = sourceFor(state, item.source);
     if (!source.file || !await unchanged(root, { file: evidenceFile(source), sha256: source.sha256 }) || source.original_file && !await unchanged(root, { file: source.original_file, sha256: source.original_sha256 })) throw new Error(`Source ${source.id} is unreadable or its original changed; register the current text as a new source (or run research reassess).`);
     const extracted = await readText(root, evidenceFile(source), { withHash: true });

@@ -134,9 +134,9 @@ It uses the existing Tart/macOS test-suite wrapper and a disposable clone. Read
 [the wrapper](../scripts/ci/tart-macos.sh), [guest script](../scripts/ci/guest-test.sh),
 and your host's local-CI instructions before running it. Preserve logs and confirm
 cleanup; never stop an unrelated VM. Recorded
-[native evidence](verification/0.9.0/ci-release-candidate/verification.json) covers
-86 tests with zero failures or skips, including the current queue, source-pinning
-and guidance changes. Live model acceptance is a separate outcome; see
+[native evidence](verification/0.9.0/ci-acceptance-fixes/verification.json) covers
+88 tests with zero failures or skips, including source-pinning, queue recovery,
+and honest rejection when an original is inaccessible. Live model acceptance is a separate outcome; see
 [the remaining release matrix](verification/0.9.0/README.md).
 
 Instruction-context measurements are generated from current files by
