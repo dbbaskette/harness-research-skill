@@ -25,11 +25,11 @@ export async function runCli(argv) {
   const { values, positionals } = parseArgs({ args: argv, allowPositionals: true, options: {
     project: { type: 'string' }, run: { type: 'string' }, topic: { type: 'string' }, source: { type: 'string', multiple: true }, sources: { type: 'string' }, claims: { type: 'string' }, about: { type: 'string' }, depth: { type: 'string' }, 'allow-web': { type: 'boolean' }, 'plan-only': { type: 'boolean' }, 'source-mode': { type: 'string' }, 'guidance-task': { type: 'string' },
     worker: { type: 'string' }, harness: { type: 'string' }, task: { type: 'string' }, lease: { type: 'string' }, attempt: { type: 'string' }, file: { type: 'string' }, origin: { type: 'string' }, title: { type: 'string' }, publisher: { type: 'string' }, standing: { type: 'string' }, given: { type: 'string' }, id: { type: 'string' }, 'original-file': { type: 'string' }, partial: { type: 'string' }, 'source-date': { type: 'string' }, transcribed: { type: 'boolean' }, pages: { type: 'string' }, limits: { type: 'string' }, reason: { type: 'string' }, verbose: { type: 'boolean' }, help: { type: 'boolean', short: 'h' },
-    keys: { type: 'string' }, key: { type: 'string', multiple: true }, again: { type: 'string' }, by: { type: 'string' }, revision: { type: 'string' },
+    keys: { type: 'string' }, key: { type: 'string', multiple: true }, again: { type: 'string' }, by: { type: 'string' }, revision: { type: 'string' }, from: { type: 'string', multiple: true },
   } });
   const [action, ...extra] = positionals;
   const allowed = {
-    start: ['topic', 'source', 'sources', 'claims', 'about', 'depth', 'allow-web', 'plan-only', 'source-mode', 'guidance-task'],
+    start: ['topic', 'source', 'sources', 'claims', 'about', 'depth', 'allow-web', 'plan-only', 'source-mode', 'guidance-task', 'from'],
     next: ['worker', 'harness'], peek: ['worker'], release: ['task', 'worker', 'lease', 'attempt'], submit: ['task', 'worker', 'lease', 'attempt', 'file'],
     source: ['task', 'worker', 'lease', 'attempt', 'file', 'origin', 'title', 'publisher', 'standing', 'given', 'id', 'original-file', 'source-date', 'transcribed', 'pages', 'limits', 'partial'],
     heartbeat: ['task', 'worker', 'lease', 'attempt'], status: [], retry: ['task'], continue: ['file'], block: ['reason'], reassess: ['again', 'reason'],
@@ -78,7 +78,7 @@ export async function runCli(argv) {
       const selected = [...(values.source ?? []), ...sourceList];
       const claims = values.claims ? await json(values.claims) : [];
       if (!Array.isArray(claims)) throw new Error('--claims requires a JSON array.');
-      return output(await startRun({ project: values.project, topic: values.topic, sources: await Promise.all(selected.map(sourceInput)), claims: await Promise.all(claims.map(async claim => ({ ...claim, file: await projectFile(claim.file) }))), aboutFile: values.about ? await projectFile(values.about) : undefined, depth: values.depth, allowWeb: values['allow-web'], sourceMode: values['source-mode'], planOnly: values['plan-only'], guidanceTask: values['guidance-task'] }));
+      return output(await startRun({ project: values.project, topic: values.topic, sources: await Promise.all(selected.map(sourceInput)), claims: await Promise.all(claims.map(async claim => ({ ...claim, file: await projectFile(claim.file) }))), aboutFile: values.about ? await projectFile(values.about) : undefined, depth: values.depth, allowWeb: values['allow-web'], sourceMode: values['source-mode'], planOnly: values['plan-only'], guidanceTask: values['guidance-task'], from: values.from ?? [] }));
     }
     case 'next': { const result = await nextTask(args); return output(verbose || !result.task ? result : { ...result, task: await taskFile(root, result.task) }); }
     case 'peek': return output(await peekTask(args));

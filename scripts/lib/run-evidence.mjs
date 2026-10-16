@@ -97,7 +97,7 @@ export function factFor(state, supplied) {
 // The helper keeps its own copy of every registered text, named by its hash, and checks quotes
 // against that copy. The harness's working file can then change without silently changing evidence.
 export const PINNED_DIRECTORY = 'research/sources/revisions';
-async function pin(root, sha256, content) {
+export async function pin(root, sha256, content) {
   for (const part of ['research', 'research/sources', PINNED_DIRECTORY]) await directory(join(root, part));
   const name = `${PINNED_DIRECTORY}/${sha256}.txt`, path = join(root, name);
   if (!await exists(path)) await writeFile(path, content, { flag: 'wx', mode: 0o444 }).catch(error => { if (error.code !== 'EEXIST') throw error; });

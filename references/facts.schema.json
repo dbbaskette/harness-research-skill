@@ -30,6 +30,7 @@
     "completed_at": {"type": ["string", "null"]},
     "approval": {"type": ["object", "null"], "required": ["by", "at", "output_revision", "current"]},
     "approvals": {"type": "array", "items": {"type": "object", "required": ["by", "at", "output_revision", "content"]}},
+    "origins": {"type": "array", "items": {"type": "object", "required": ["from", "run", "output_revision", "imported_at", "approvals", "warnings"]}},
     "counts": {"type": "object", "required": ["questions", "facts", "checked", "sources", "narrowed", "rejected", "gaps", "conflicts", "superseded", "failed"]}
   },
   "$defs": {

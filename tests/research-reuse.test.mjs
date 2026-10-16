@@ -130,3 +130,107 @@ test('approve records who approved which content, and a later change says it no 
   assert.equal(changed.approval.current, false); assert.match(changed.approval.reason, /changed since it was approved/);
   assert.match(await readFile(changed.report, 'utf8'), /no longer applies/);
 });
+
+const trial = new URL('../docs/verification/0.9.0/claude-code-redis-valkey/new', import.meta.url).pathname;
+async function newProject(t) { const { project } = await import('./run-fixtures.mjs'); return project(t, 'research-reuse-target-'); }
+
+test('start --from reuses finished research at once, with the same keys and the origin approval kept as history', async t => {
+  const origin = await completed(t);
+  await runCli(['approve', '--project', origin.project, '--by', 'Origin Reviewer']);
+  const key = (await factsOf(await runStatus(origin))).facts[0].key, target = await newProject(t);
+  const started = await runCli(['start', '--project', target, '--from', origin.project]);
+  assert.equal(started.status, 'complete'); assert.equal(started.approval, null);
+  const exported = await factsOf(started);
+  assert.equal(exported.topic, 'OrionDB deployment'); assert.deepEqual(exported.facts.map(fact => fact.key), [key]);
+  assert.equal(exported.origins[0].run, origin.run); assert.equal(exported.origins[0].approvals[0].by, 'Origin Reviewer');
+  assert.equal(exported.sources[0].imported.run, origin.run); assert.match(exported.sources[0].file, /^research\/sources\/revisions\//);
+  assert.equal((await verifyKeys({ project: target, keys: [key] })).keys[0].result, 'confirmed');
+  const report = await readFile(started.report, 'utf8');
+  assert.match(report, /Started from: .* approved there by Origin Reviewer .* history and not an approval of this run/);
+  assert.match(report, /OrionDB permits a single writer/);
+  // Reuse can then be approved, researched again and reused in turn, keeping the same key.
+  const again = await runCli(['start', '--project', await newProject(t), '--from', target]);
+  assert.deepEqual((await factsOf(again)).facts.map(fact => fact.key), [key]);
+});
+
+test('start --from researches again what it cannot carry: unsaved text, unchecked candidates, or found sources in a supplied-only run', async t => {
+  const target = await newProject(t);
+  const stale = await startRun({ project: target, from: [trial], allowWeb: true });
+  assert.equal(stale.status, 'in-progress'); assert.equal(stale.reassess.kind, 'import'); assert.equal(stale.reassess.questions.length, 20);
+  const exported = await factsOf(stale);
+  assert.equal(exported.facts.filter(fact => fact.status === 'stale').length, 113); assert.equal(exported.counts.checked, 0);
+  assert.match(stale.warnings[0], /without saved text/);
+  const one = (await verifyKeys({ project: target, keys: [exported.facts[0].key] })).keys[0];
+  assert.equal(one.result, 'stale'); assert.match(one.reason, /saved source text was not available/);
+  assert.equal((await nextTask({ project: target, run: stale.run, worker: 'w' })).task.kind, 'research');
+
+  const supplied = await startRun({ project: await newProject(t), from: [trial] });
+  assert.equal((await factsOf(supplied)).facts.length, 0); assert.match(supplied.warnings.join(' '), /113 facts resting on public-web sources were left out/);
+  assert.equal(supplied.reassess.questions.length, 20);
+
+  const partial = await fixture(t), partialSource = await setup(partial);
+  await submit(partial, await take(partial), finding(partialSource));
+  const fromPartial = await startRun({ project: await newProject(t), from: [partial.project] });
+  assert.equal((await factsOf(fromPartial)).facts.length, 0); assert.deepEqual(fromPartial.reassess.questions, ['writers']);
+});
+
+test('start --from refuses edited research, claims, a different depth and a replacement plan', async t => {
+  const origin = await completed(t), file = join(origin.project, 'research/facts.json');
+  const target = await newProject(t);
+  await assert.rejects(startRun({ project: target, from: [origin.project], depth: 'standard' }), /keeps its depth/);
+  await assert.rejects(startRun({ project: target, from: [origin.project], claims: [{ file: 'sources/reference.txt', quote, start: 0 }] }), /fact-check is its own run/);
+  await assert.rejects(startRun({ project: target, from: [join(target, 'nothing')] }), /No saved research/);
+  const reused = await startRun({ project: target, from: [origin.project], planOnly: true });
+  await assert.rejects(runCli(['continue', '--project', target, '--run', reused.run, '--file', file]), /extended by the planner, not replaced/);
+  const facts = JSON.parse(await readFile(file, 'utf8'));
+  facts.facts[0].citations[0].quote = facts.facts[0].citations[0].quote.replace('single', 'sole');
+  const edited = JSON.stringify(facts, null, 2) + '\n', manifest = JSON.parse(await readFile(join(origin.project, 'research/output.json'), 'utf8'));
+  const { hash } = await import('../scripts/lib/run-storage.mjs');
+  manifest.files['facts.json'] = hash(edited);
+  await writeFile(file, edited); await writeFile(join(origin.project, 'research/output.json'), JSON.stringify(manifest));
+  await assert.rejects(startRun({ project: await newProject(t), from: [origin.project] }), /does not match its saved source text/);
+  await writeFile(file, edited.replace('OrionDB', 'OrionDB '));
+  await assert.rejects(startRun({ project: await newProject(t), from: [origin.project] }), /does not match its output\.json/);
+});
+
+test('a new topic extends the reused plan; only new questions are researched, checked, cross-checked and written', async t => {
+  const origin = await completed(t), key = (await factsOf(origin.done)).facts[0].key, target = await newProject(t);
+  const started = await startRun({ project: target, from: [origin.project], topic: 'OrionDB deployment and crash safety' });
+  const f = { project: target, run: started.run };
+  let extension, researched;
+  const done = await finish(f, {
+    plan: task => { extension = task; return { sections: [{ id: 'safety', name: 'Crash safety' }], questions: [{ id: 'crash', section: 'safety', question: 'Does OrionDB lose committed transactions in a crash?' }] }; },
+    research: task => { researched = task.questions.map(q => q.id); return { coverage: 'answered', facts: [{ statement: 'OrionDB loses no committed transaction in a crash.', as_of: null, quotes: [{ source: task.sources[0].id, quote: 'The engine keeps a write-ahead log, so a crash loses no committed transaction.', locator: 'Line 1' }] }], gaps: [] }; },
+  });
+  assert.match(extension.brief, /reuses earlier checked research/); assert.deepEqual(extension.existing.questions.map(q => q.id), ['writers']);
+  assert.deepEqual(researched, ['crash']); assert.equal(done.status, 'complete');
+  const exported = await factsOf(done);
+  assert.deepEqual(exported.sections.map(s => s.id), ['deployment', 'safety']);
+  assert.ok(exported.facts.some(fact => fact.key === key)); assert.equal(exported.counts.checked, 2);
+  assert.deepEqual(exported.reassessments.map(item => [item.kind, item.questions]), [['import', ['crash']]]);
+  const tasks = JSON.parse(await readFile(done.file, 'utf8')).tasks.map(task => task.kind);
+  assert.ok(tasks.includes('gap-cross')); assert.ok(!tasks.includes('source'));
+  assert.match(await readFile(done.report, 'utf8'), /## Crash safety[\s\S]*OrionDB loses no committed transaction/);
+});
+
+test('two origins with colliding IDs are renamed, and a shared question is assessed again by one checker', async t => {
+  const first = await completed(t);
+  const otherPlan = { scope: 'Synthetic operations.', sections: [{ id: 'deployment', name: 'Operations' }], subjects: [], questions: [{ id: 'writers', section: 'deployment', kind: 'open', question: 'Does OrionDB allow several writers?' }] };
+  const second = await fixture(t), secondSource = await setup(second, otherPlan);
+  await submit(second, await take(second), finding(secondSource)); await finish(second);
+  const target = await newProject(t), started = await startRun({ project: target, from: [first.project, second.project] });
+  const done = await finish({ project: target, run: started.run }, { plan: () => ({ questions: [] }) });
+  assert.equal(done.status, 'complete');
+  const exported = await factsOf(done);
+  assert.deepEqual(exported.sections.map(s => s.id), ['deployment', 'deployment-2']);
+  assert.deepEqual(exported.questions.map(q => [q.id, q.section]), [['writers', 'deployment'], ['writers-2', 'deployment-2']]);
+  assert.deepEqual(exported.questions.map(q => q.facts.length), [1, 1]);
+  assert.equal(exported.origins.length, 2);
+
+  const twin = await completed(t), sharedProject = await newProject(t), shared = await startRun({ project: sharedProject, from: [first.project, twin.project] });
+  assert.equal(shared.reassess, null);
+  const sharedDone = await finish({ project: sharedProject, run: shared.run }, { plan: () => ({ questions: [] }), research: () => ({ coverage: 'answered', facts: [], gaps: [] }) });
+  const sharedFacts = await factsOf(sharedDone);
+  assert.equal(sharedFacts.questions.length, 1); assert.equal(sharedFacts.questions[0].facts.length, 2);
+  assert.deepEqual(sharedFacts.reassessments.map(item => item.questions), [['writers']]);
+});
