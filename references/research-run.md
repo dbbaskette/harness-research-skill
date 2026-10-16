@@ -112,7 +112,14 @@ short, register it with `"partial":"reason"`; its facts are labelled. Mark chart
 scan transcriptions with `"transcribed":true,"pages":"4-6"`. A summary or
 translation is not the original quoted text.
 
-Register sources inside the result that uses them, and cite them by file:
+Reuse sources already listed in the task by their registered IDs:
+`{"source":"source-id","quote":"Exact original wording.","locator":"Section"}`.
+Do not register the same selected source again from a research task: without
+its `given` ID a new registration is treated as a found public source. For a
+new extraction of a selected reference, include its `given` ID from the task
+source record.
+
+Register new sources inside the result that uses them, and cite them by file:
 
 ```json
 {"register":[{"file":"research/sources/valkey-docs.md","origin":"https://valkey.io/topics/persistence/","title":"Valkey persistence","publisher":"Valkey project","standing":"primary","source_date":"2026-09-01"}],
