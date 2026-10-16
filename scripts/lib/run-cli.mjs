@@ -2,6 +2,7 @@ import { parseArgs } from 'node:util';
 import { readFile, realpath } from 'node:fs/promises';
 import { resolve, relative, isAbsolute, join } from 'node:path';
 import { parseJson, atomic, directory } from './run-storage.mjs';
+import { findResearch } from './run-reuse.mjs';
 import { startRun, nextTask, peekTask, releaseTask, submitTask, registerSource, heartbeat, runStatus, retryTask, continueRun, blockRun, reassessRun, verifyKeys, approveRun } from './research-run.mjs';
 
 // Every command answers compactly by default: a coordinator calls these many times, and each reply
@@ -25,7 +26,7 @@ export async function runCli(argv) {
   const { values, positionals } = parseArgs({ args: argv, allowPositionals: true, options: {
     project: { type: 'string' }, run: { type: 'string' }, topic: { type: 'string' }, source: { type: 'string', multiple: true }, sources: { type: 'string' }, claims: { type: 'string' }, about: { type: 'string' }, depth: { type: 'string' }, 'allow-web': { type: 'boolean' }, 'plan-only': { type: 'boolean' }, 'source-mode': { type: 'string' }, 'guidance-task': { type: 'string' },
     worker: { type: 'string' }, harness: { type: 'string' }, task: { type: 'string' }, lease: { type: 'string' }, attempt: { type: 'string' }, file: { type: 'string' }, origin: { type: 'string' }, title: { type: 'string' }, publisher: { type: 'string' }, standing: { type: 'string' }, given: { type: 'string' }, id: { type: 'string' }, 'original-file': { type: 'string' }, partial: { type: 'string' }, 'source-date': { type: 'string' }, transcribed: { type: 'boolean' }, pages: { type: 'string' }, limits: { type: 'string' }, reason: { type: 'string' }, verbose: { type: 'boolean' }, help: { type: 'boolean', short: 'h' },
-    keys: { type: 'string' }, key: { type: 'string', multiple: true }, again: { type: 'string' }, by: { type: 'string' }, revision: { type: 'string' }, from: { type: 'string', multiple: true },
+    keys: { type: 'string' }, key: { type: 'string', multiple: true }, again: { type: 'string' }, by: { type: 'string' }, revision: { type: 'string' }, from: { type: 'string', multiple: true }, in: { type: 'string' }, query: { type: 'string' },
   } });
   const [action, ...extra] = positionals;
   const allowed = {
@@ -36,6 +37,12 @@ export async function runCli(argv) {
     verify: ['keys', 'key'], approve: ['by', 'revision'],
   };
   if (values.help || !action || action === 'help') return { usage: 'node scripts/harness-research.mjs research start|next|peek|submit|source|heartbeat|release|status|retry|continue|block|reassess|verify --project DIR [options] [--verbose]', note: 'The harness does the research; this helper manages durable tasks and evidence. Start requires --topic; all writes after start bind the current --run. Task writes require --task --worker --lease --attempt. next writes the full task to the file it names; --verbose prints full JSON. verify reads --keys FILE (or --key KEY) and reports what became of each cited fact.' };
+  // find searches a directory for research folders rather than working in one project.
+  if (action === 'find') {
+    if (extra.length || !values.in) throw new Error('research find needs --in DIR (and optionally --query TEXT).');
+    for (const name of Object.keys(values)) if (!['in', 'query', 'verbose'].includes(name)) throw new Error(`--${name} is not valid for research find.`);
+    return findResearch({ dir: values.in, query: values.query });
+  }
   if (extra.length || !Object.hasOwn(allowed, action) || !values.project) throw new Error('Choose a research action and --project DIR.');
   for (const name of Object.keys(values)) if (!['project', 'run', 'verbose', ...allowed[action]].includes(name)) throw new Error(`--${name} is not valid for research ${action}.`);
   const verbose = Boolean(values.verbose), output = result => verbose ? result : compact(result);

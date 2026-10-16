@@ -234,3 +234,26 @@ test('two origins with colliding IDs are renamed, and a shared question is asses
   assert.equal(sharedFacts.questions.length, 1); assert.equal(sharedFacts.questions[0].facts.length, 2);
   assert.deepEqual(sharedFacts.reassessments.map(item => item.questions), [['writers']]);
 });
+
+test('find lists research folders under a directory with their status, size, approval and source age', async t => {
+  const { mkdir, cp } = await import('node:fs/promises');
+  const base = await newProject(t);
+  const nested = async name => { const dir = join(base, name); await mkdir(join(dir, 'sources'), { recursive: true }); await writeFile(join(dir, 'sources/reference.txt'), reference + '\n'); return completed(t, { project: dir }); };
+  const a = await nested('decks/a'), b = await nested('blog/posts/b');
+  await runCli(['approve', '--project', a.project, '--by', 'Pat Reviewer']);
+  await cp(join(a.project, 'research'), join(base, 'node_modules/pkg/research'), { recursive: true });
+  await cp(join(a.project, 'research'), join(base, '.cache/research'), { recursive: true });
+  const all = await runCli(['find', '--in', base]);
+  assert.deepEqual(all.results.map(item => item.path).sort(), ['blog/posts/b', 'decks/a']);
+  const found = all.results.find(item => item.path === 'decks/a');
+  assert.equal(found.run, a.run); assert.equal(found.status, 'complete'); assert.equal(found.depth, 'light');
+  assert.equal(found.counts.facts, 1); assert.equal(found.counts.questions, 1); assert.equal(found.approval.by, 'Pat Reviewer');
+  assert.match(found.sources_saved.oldest, /^\d{4}-/); assert.equal(found.sources_age_days, 0);
+  assert.equal(all.results.find(item => item.path === 'blog/posts/b').approval, null);
+  assert.equal((await runCli(['find', '--in', base, '--query', 'how many WRITERS'])).results.length, 2);
+  assert.deepEqual((await runCli(['find', '--in', base, '--query', 'crash'])).results, []);
+  await writeFile(join(b.project, 'research/facts.json'), '{}');
+  const broken = (await runCli(['find', '--in', base])).results.find(item => item.path === 'blog/posts/b');
+  assert.match(broken.error, /does not match its output\.json/);
+  await assert.rejects(runCli(['find', '--project', base]), /--in DIR/);
+});

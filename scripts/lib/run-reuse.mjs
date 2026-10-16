@@ -1,4 +1,4 @@
-import { readFile, realpath } from 'node:fs/promises';
+import { readFile, readdir, realpath } from 'node:fs/promises';
 import { join, resolve, relative, dirname, isAbsolute } from 'node:path';
 import { hash, stable, clone, exists, readText, snapshot, parseJson } from './run-storage.mjs';
 import { pin, factFor } from './run-evidence.mjs';
@@ -184,4 +184,34 @@ export function approvalView(state, status) {
   const stale = status === 'stale', changed = last.content !== contentDigest(state);
   const current = !stale && !changed && status.startsWith('complete');
   return { by: last.by, at: last.at, output_revision: last.output_revision, current, ...(current ? {} : { reason: stale ? 'Sources changed since it was approved.' : changed ? 'The research changed since it was approved.' : `The research is ${status}.` }) };
+}
+// Research kept with the work can be found again: every research/ folder under a directory, with
+// what a person needs to choose one. Hidden directories, node_modules and symlinks are not followed.
+const FIND_DEPTH = 6, FIND_LIMIT = 20000, DAY = 24 * 60 * 60 * 1000;
+export async function findResearch({ dir, query, now = Date.now() }) {
+  const root = await realpath(resolve(dir)), projects = [];
+  let visited = 0;
+  async function walk(path, depth) {
+    if (depth > FIND_DEPTH || ++visited > FIND_LIMIT) return;
+    const entries = await readdir(path, { withFileTypes: true }).catch(() => []);
+    if (await regular(join(path, 'research', 'output.json'))) projects.push(path);
+    for (const entry of entries) if (entry.isDirectory() && !entry.name.startsWith('.') && !['node_modules', 'research'].includes(entry.name)) await walk(join(path, entry.name), depth + 1);
+  }
+  await walk(root, 0);
+  const words = String(query ?? '').toLowerCase().split(/\s+/).filter(Boolean), results = [];
+  for (const path of projects) {
+    const label = relative(root, path) || '.';
+    let facts;
+    try { facts = (await readOrigin(root, path)).facts; } catch (error) { results.push({ path: label, error: error.message }); continue; }
+    const text = [facts.title, facts.topic, ...facts.questions.map(question => question.question)].join(' ').toLowerCase();
+    if (!words.every(word => text.includes(word))) continue;
+    const saved = facts.sources.map(source => source.saved_at).filter(Boolean).sort(), dated = facts.sources.map(source => source.source_date).filter(Boolean).sort();
+    results.push({ path: label, run: facts.run, output_revision: facts.output_revision, title: facts.title ?? facts.topic, topic: facts.topic, status: facts.status, depth: facts.depth, source_mode: facts.source_mode,
+      created_at: facts.created_at ?? null, updated_at: facts.updated_at ?? null, counts: { questions: facts.counts.questions, facts: facts.counts.checked, sources: facts.counts.sources, gaps: facts.counts.gaps },
+      approval: facts.approval ?? null, sources_saved: { oldest: saved[0] ?? null, newest: saved.at(-1) ?? null }, source_dates: { oldest: dated[0] ?? null, newest: dated.at(-1) ?? null },
+      sources_age_days: saved.length ? Math.floor((now - Date.parse(saved[0])) / DAY) : null, reused_from: (facts.origins ?? []).map(origin => origin.from),
+      ...(words.length ? { matching_questions: facts.questions.filter(question => words.some(word => question.question.toLowerCase().includes(word))).map(question => question.id) } : {}) });
+  }
+  results.sort((a, b) => (b.matching_questions?.length ?? 0) - (a.matching_questions?.length ?? 0) || String(b.updated_at ?? '').localeCompare(String(a.updated_at ?? '')) || a.path.localeCompare(b.path));
+  return { in: root, query: query ?? null, count: results.length, results, note: 'Approval and status are as last exported; a folder\'s own research status shows whether its sources changed since.' };
 }
