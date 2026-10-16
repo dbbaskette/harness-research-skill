@@ -99,6 +99,62 @@ test('honest zero-fact and all-rejected questions complete with gaps and no inve
   }
 });
 const LEASE = 30 * 60 * 1000;
+test('an inaccessible original can be rejected honestly, but cannot confirm or narrow a fact', async t => {
+  const f = await fixture(t), source = await setup(f), research = await take(f);
+  await submit(f, research, finding(source));
+  const task = await take(f, 'independent-checker');
+  const payload = checked(task, { rejected: true });
+  payload.inspected_sources[0].read_original = false;
+  payload.inspected_sources[0].access_error = 'The original could not be opened: HTTP 403.';
+  payload.assessments[0].gaps = [{ kind: 'unavailable', reason: 'The checker could not open the original (HTTP 403).', sources: [source.id], attempts: ['Original read returned HTTP 403.'] }];
+  for (const result of ['confirmed', 'narrowed']) {
+    const invalid = structuredClone(payload);
+    invalid.facts[0] = { ...invalid.facts[0], result, statement: 'OrionDB permits a single writer.' };
+    const refused = await submitTask(argsFor(f, task, { data: invalid }));
+    assert.equal(refused.accepted, false);
+  }
+  for (const mutate of [
+    data => { delete data.inspected_sources[0].access_error; },
+    data => { data.inspected_sources[0].sha256 = '0'.repeat(64); },
+    data => { data.inspected_sources[0].original_sha256 = '0'.repeat(64); },
+    data => { data.inspected_sources.push({ ...data.inspected_sources[0], read_original: true }); },
+    data => { data.assessments[0].gaps = []; },
+  ]) {
+    const invalid = structuredClone(payload); mutate(invalid);
+    assert.equal((await submitTask(argsFor(f, task, { data: invalid }))).accepted, false);
+  }
+  await submit(f, task, payload);
+  const completed = await finish(f);
+  assert.equal(completed.status, 'complete-with-gaps');
+  const exported = JSON.parse(await readFile(completed.facts, 'utf8'));
+  assert.equal(exported.counts.checked, 0);
+  assert.equal(exported.rejected[0].check.inspected_sources[0].read_original, false);
+  assert.match(exported.rejected[0].check.inspected_sources[0].access_error, /403/);
+  assert.equal(exported.questions[0].headline.kind, 'gap');
+});
+test('a mixed-source check retains accessible support and records the inaccessible original as a gap', async t => {
+  const f = await fixture(t, { allowWeb: true }), first = await setup(f), research = await take(f);
+  const secondQuote = 'OrionDB readers use a consistent snapshot.';
+  await writeFile(join(f.project, 'sources/second.txt'), secondQuote + surroundings);
+  const registered = await registerSource(argsFor(f, research, { data: { file: 'sources/second.txt', origin: 'https://fixture.invalid/readers', title: 'Synthetic readers reference' } }));
+  const second = registered.source;
+  const dependent = finding(first).facts[0];
+  dependent.quotes.push({ source: second.id, quote: secondQuote, locator: 'Line 1' });
+  await submit(f, research, { coverage: 'answered', facts: [dependent, { statement: secondQuote, quotes: [{ source: second.id, quote: secondQuote, locator: 'Line 1' }] }], gaps: [] });
+  const task = await take(f, 'independent-checker'), payload = checked(task);
+  payload.facts.find(item => item.key === task.facts.find(fact => fact.citations[0].source === first.id).key).result = 'rejected';
+  payload.facts[0].reason = 'The first original cannot be opened.';
+  const inspected = payload.inspected_sources.find(item => item.source === first.id);
+  inspected.read_original = false; inspected.access_error = 'Original access returned HTTP 403.';
+  payload.assessments[0] = { id: 'writers', coverage: 'partly answered', gaps: [{ kind: 'unavailable', reason: 'The first original was inaccessible to the checker.', sources: [first.id], attempts: ['HTTP 403.'] }] };
+  await submit(f, task, payload);
+  const completed = await finish(f), exported = JSON.parse(await readFile(completed.facts, 'utf8'));
+  assert.equal(completed.status, 'complete-with-gaps');
+  assert.equal(exported.counts.checked, 1);
+  assert.equal(exported.rejected.length, 1);
+  assert.equal(exported.questions[0].coverage, 'partly answered');
+  assert.equal(exported.questions[0].headline.facts[0], exported.facts[0].key);
+});
 test('lease expiry fences old workers, renews live work and accepted replay cannot rewrite results', async t => {
   const f = await fixture(t), now = Date.now(), first = (await nextTask({...f,worker:'a',now})).task;
   assert.equal(first.expires, now + LEASE);

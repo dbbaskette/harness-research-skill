@@ -418,6 +418,12 @@ own kind of mistake.
   really there. This also catches a saved text that is not the source's own words.
 - For each fact it returns `confirmed`, `narrowed` (with the narrower statement the quotes do
   support, which must pass the number rule) or `rejected` (with a reason).
+- If the checker cannot open an original, it must not claim it did. It may retain the
+  exact revision hashes with `read_original: false` and a concrete `access_error`, but
+  every fact citing that original must be rejected with a reason. Each affected question
+  needs partial/unanswered coverage and an unavailable/unreadable gap naming the source.
+  Other facts resting only on inspected originals may remain confirmed. This completes an
+  honest access-limited assessment; it never confirms or narrows from an unread original.
 - Narrowed facts replace the original, which is kept. Rejected facts move to a rejected list
   shown at the end of the report, never deleted.
 - A narrowed replacement that passes the checks is exported as a confirmed assertion with

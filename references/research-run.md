@@ -42,8 +42,9 @@ Resume with `research status --project DIR` and take tasks from that same run.
 ## Run it as a coordinator
 
 You are the coordinator: the session the person talks to. Work is fastest when
-independent tasks run at the same time, so dispatch every ready task at once
-rather than one after another. Commands answer compactly; add `--verbose` only
+independent tasks run at the same time, so dispatch ready tasks together up to
+your host's active-agent limit. Leave excess tasks ready until a slot opens.
+Commands answer compactly; add `--verbose` only
 to debug.
 
 1. **Identities.** Each agent invocation needs its own worker ID, fixed for its
@@ -58,7 +59,7 @@ to debug.
    eligible to check, which avoids starting extra agents.
 3. **Fan out.** Call `research next --worker CHILD-ID --harness H` for a fresh
    child ID until it returns no task. Each task is written in full to the
-   `file` the answer names. Start one subagent per task, all in one turn, each
+   `file` the answer names. Start one subagent per task within available host capacity, each
    with a prompt like: *"You are worker CHILD-ID. Read FILE and follow its brief
    with your own search, fetch and reading tools. Write the result JSON to
    research/work/TASK.json and run `research submit` with this run, task, worker,
@@ -177,7 +178,13 @@ Each fact may instead be `narrowed` with a supported `statement` and `reason`, o
 contradicted or insufficient. Assess every assigned fact and question. After all
 facts are rejected, do not keep `answered`; supply a concrete assessed gap. Gaps a
 checker writes itself are labelled as its own assessment. Revision attestations do
-not mean the helper independently inspected the original.
+not mean the helper independently inspected the original. Never set
+`read_original:true` merely to satisfy validation. If an original cannot be opened,
+keep its exact revision hashes but use `read_original:false` and a concrete
+`access_error`. Reject every fact citing that source with a reason, and assess
+each affected question as partly or not answered with an `unavailable` or
+`unreadable` gap naming the source. Other facts from inspected originals can
+still be confirmed. If this cannot be assessed honestly, block the run.
 
 ## Cross-check and writing
 

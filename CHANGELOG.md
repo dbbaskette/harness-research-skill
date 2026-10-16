@@ -4,6 +4,13 @@
 
 Live acceptance follow-up (2026-10-16):
 
+- Permit honest original-access failures in independent checking: an unread
+  original can only support rejection plus explicit access gaps. Confirmation
+  and narrowing still require inspected originals and exact revision hashes.
+  Preserve the failed trial and repeat its checks rather than invent attestations.
+- Keep agent dispatch within the host's active-agent capacity.
+
+
 - Clarify reuse of selected evidence by registered source ID, identify missing
   quote source IDs with an actionable error, require cited answer-body sentences
   explicitly, and ask checkers to verify page/line locators against originals.
