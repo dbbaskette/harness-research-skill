@@ -81,3 +81,33 @@ test('verify reads cited keys from any file and needs no run ID on the command l
   await assert.rejects(runCli(['verify', '--project', f.project, '--key', key, '--run', 'a'.repeat(24)]), /run changed/);
   assert.equal((await nextTask({ project: f.project, run: f.run, worker: 'anyone' })).task, null);
 });
+
+test('reassess --again researches, checks and rewrites only the chosen question and keeps its checked facts', async t => {
+  const f = await completed(t), first = (await factsOf(f.done)).facts[0].key;
+  const opened = await runCli(['reassess', '--project', f.project, '--run', f.run, '--again', 'writers', '--reason', 'Also say whether readers wait.']);
+  assert.equal(opened.reassessing.kind, 'again'); assert.deepEqual(opened.reassessing.questions, ['writers']);
+  assert.equal((await verifyKeys({ project: f.project, keys: [first] })).keys[0].result, 'confirmed');
+  let seen;
+  const done = await finish(f, { research: task => {
+    seen = task;
+    return { coverage: 'answered', facts: [{ statement: 'OrionDB readers never wait for the writer.', as_of: null, quotes: [{ source: f.source.id, quote: readers, locator: 'Line 1' }] }], gaps: [] };
+  } });
+  assert.deepEqual(seen.questions.map(q => q.id), ['writers']); assert.equal(seen.again.reason, 'Also say whether readers wait.');
+  assert.ok(seen.facts.some(fact => fact.key === first && fact.status === 'confirmed'));
+  assert.equal(done.status, 'complete');
+  const exported = await factsOf(done);
+  assert.equal(exported.facts.filter(fact => fact.status === 'confirmed').length, 2);
+  assert.deepEqual(exported.reassessments.map(item => [item.kind, item.reason]), [['again', 'Also say whether readers wait.']]);
+  assert.match(await readFile(done.report, 'utf8'), /Researched again on request: round 1 \(1 question; Also say whether readers wait\.\)/);
+  assert.equal((await verifyKeys({ project: f.project, keys: [first] })).keys[0].result, 'confirmed');
+});
+
+test('reassess --again refuses unknown or unassessed questions, a round in progress and a reason alone', async t => {
+  const f = await fixture(t); await setup(f);
+  await assert.rejects(runCli(['reassess', '--project', f.project, '--run', f.run, '--again', 'writers']), /not been assessed/);
+  await assert.rejects(runCli(['reassess', '--project', f.project, '--run', f.run, '--again', 'nope']), /Unknown question: nope/);
+  await assert.rejects(runCli(['reassess', '--project', f.project, '--run', f.run, '--reason', 'Why']), /--reason goes with --again/);
+  const c = await completed(t);
+  await runCli(['reassess', '--project', c.project, '--run', c.run, '--again', 'writers']);
+  await assert.rejects(runCli(['reassess', '--project', c.project, '--run', c.run, '--again', 'writers']), /already in progress/);
+});

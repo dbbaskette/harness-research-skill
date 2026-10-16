@@ -74,6 +74,7 @@ export function legacyRecord(state, view) {
     items: state.questions.map(question => ({ id: question.id, question: question.question, public_query: null, claim: question.claim ?? null })), results: Object.fromEntries(results), created_at: state.createdAt };
 }
 const slug = value => String(value).toLowerCase().replace(/[^\p{L}\p{N}\s-]/gu, '').trim().replace(/\s/g, '-');
+const ROUND_LABELS = { reassess: 'Reassessed after source changes', again: 'Researched again on request', refresh: 'Researched again after a refresh', import: 'Completed after reuse' };
 const day = value => String(value ?? '').slice(0, 10) || 'unknown';
 export function renderReport(state, view) {
   const number = new Map(state.sources.map((source, i) => [source.id, i + 1]));
@@ -96,7 +97,13 @@ export function renderReport(state, view) {
     `Prose: ${state.depth === 'light' ? 'citation and number validation, but no independent semantic writing review at light depth.' : reviewed ? 'every answer was reviewed against its cited facts by a separate invocation.' : 'independent writing review is pending.'}`,
     'Facts are checked for source support, not certified as true or live-current.', ''];
   if (state.planWarnings?.length) lines.push('Plan notes: ' + state.planWarnings.map(literal).join(' '), '');
-  if (state.reassessments?.length || state.reassess) lines.push(`Reassessed after source changes: ${[...(state.reassessments ?? []), ...(state.reassess && !state.reassess.done ? [state.reassess] : [])].map(item => `round ${item.round} (${item.questions.length} questions${item.done ? '' : ', in progress'})`).join('; ')}.`, '');
+  // Rounds after the first pass, grouped by why they ran. Runs saved by 0.9.0 recorded no kind.
+  const rounds = [...(state.reassessments ?? []), ...(state.reassess && !state.reassess.done ? [state.reassess] : [])];
+  const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
+  for (const [kind, label] of Object.entries(ROUND_LABELS)) {
+    const listed = rounds.filter(item => (item.kind ?? 'reassess') === kind);
+    if (listed.length) lines.push(`${label}: ${listed.map(item => `round ${item.round} (${plural(item.questions.length, 'question')}${item.reason ? '; ' + literal(item.reason) : ''}${item.done ? '' : ', in progress'})`).join('; ')}.`, '');
+  }
   lines.push('## Contents', '', '- [Coverage](#coverage)', ...state.sections.map(section => `- [${literal(section.name)}](#${slug(section.name)})`), '- [Gaps](#gaps)', '- [Conflicts and history](#conflicts-and-history)', '- [Sources](#sources)', '- [Rejected facts and failed tasks](#rejected-facts-and-failed-tasks)', '', '## Coverage', '');
   for (const section of state.sections) {
     const questions = state.questions.filter(question => question.section === section.id);

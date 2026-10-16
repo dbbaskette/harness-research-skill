@@ -25,14 +25,14 @@ export async function runCli(argv) {
   const { values, positionals } = parseArgs({ args: argv, allowPositionals: true, options: {
     project: { type: 'string' }, run: { type: 'string' }, topic: { type: 'string' }, source: { type: 'string', multiple: true }, sources: { type: 'string' }, claims: { type: 'string' }, about: { type: 'string' }, depth: { type: 'string' }, 'allow-web': { type: 'boolean' }, 'plan-only': { type: 'boolean' }, 'source-mode': { type: 'string' }, 'guidance-task': { type: 'string' },
     worker: { type: 'string' }, harness: { type: 'string' }, task: { type: 'string' }, lease: { type: 'string' }, attempt: { type: 'string' }, file: { type: 'string' }, origin: { type: 'string' }, title: { type: 'string' }, publisher: { type: 'string' }, standing: { type: 'string' }, given: { type: 'string' }, id: { type: 'string' }, 'original-file': { type: 'string' }, partial: { type: 'string' }, 'source-date': { type: 'string' }, transcribed: { type: 'boolean' }, pages: { type: 'string' }, limits: { type: 'string' }, reason: { type: 'string' }, verbose: { type: 'boolean' }, help: { type: 'boolean', short: 'h' },
-    keys: { type: 'string' }, key: { type: 'string', multiple: true },
+    keys: { type: 'string' }, key: { type: 'string', multiple: true }, again: { type: 'string' },
   } });
   const [action, ...extra] = positionals;
   const allowed = {
     start: ['topic', 'source', 'sources', 'claims', 'about', 'depth', 'allow-web', 'plan-only', 'source-mode', 'guidance-task'],
     next: ['worker', 'harness'], peek: ['worker'], release: ['task', 'worker', 'lease', 'attempt'], submit: ['task', 'worker', 'lease', 'attempt', 'file'],
     source: ['task', 'worker', 'lease', 'attempt', 'file', 'origin', 'title', 'publisher', 'standing', 'given', 'id', 'original-file', 'source-date', 'transcribed', 'pages', 'limits', 'partial'],
-    heartbeat: ['task', 'worker', 'lease', 'attempt'], status: [], retry: ['task'], continue: ['file'], block: ['reason'], reassess: [],
+    heartbeat: ['task', 'worker', 'lease', 'attempt'], status: [], retry: ['task'], continue: ['file'], block: ['reason'], reassess: ['again', 'reason'],
     verify: ['keys', 'key'],
   };
   if (values.help || !action || action === 'help') return { usage: 'node scripts/harness-research.mjs research start|next|peek|submit|source|heartbeat|release|status|retry|continue|block|reassess|verify --project DIR [options] [--verbose]', note: 'The harness does the research; this helper manages durable tasks and evidence. Start requires --topic; all writes after start bind the current --run. Task writes require --task --worker --lease --attempt. next writes the full task to the file it names; --verbose prints full JSON. verify reads --keys FILE (or --key KEY) and reports what became of each cited fact.' };
@@ -89,7 +89,7 @@ export async function runCli(argv) {
     case 'retry': return output(await retryTask(args));
     case 'continue': return output(await continueRun({ ...args, ...(values.file ? { plan: await json(values.file) } : {}) }));
     case 'block': return output(await blockRun(args));
-    case 'reassess': return output(await reassessRun(args));
+    case 'reassess': return output(await reassessRun({ ...args, again: values.again ? values.again.split(',').map(id => id.trim()).filter(Boolean) : [] }));
     case 'verify': {
       const keys = [...(values.keys ? await keyFile(values.keys) : []), ...(values.key ?? [])];
       if (!keys.length) throw new Error(values.keys ? `${values.keys} cites no fact keys.` : 'Supply --keys FILE or --key KEY.');
