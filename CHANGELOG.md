@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.9.5 — 2026-10-16
+
+The README now shows a progressive disclosure map. No runtime behaviour changes.
+[Checks](docs/verification/0.9.5/README.md).
+
+- **Progressive disclosure map:** `docs/images/context-loading.svg` shows what
+  loads at each step. Discovery leads to the bootstrap and then the guidance entry,
+  which branches into one path: a checked run, follow-ups, status or a chat-only
+  answer. Worker subagents read only their own task contract, and the legacy paths
+  are drawn apart. `npm run context:update` generates it from the same measurements
+  as the README table, and the tests check that it is current.
+- The skill review and the README's cost figures are brought up to 0.9.4. A
+  checker reads 541 tokens; some 0.9.4 notes said 542.
+
 ## 0.9.4 — 2026-10-16
 
 Recommendations 1 and 2 of the [0.9.3 skill review](https://github.com/dbbaskette/harness-research-skill/pull/20):

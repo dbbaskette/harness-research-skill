@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile, access, readdir } from 'node:fs/promises';
-import { measureContext, renderReport, readingPath } from '../tools/context-usage.mjs';
+import { measureContext, renderReport, renderMap, readingPath } from '../tools/context-usage.mjs';
 const root = new URL('../', import.meta.url);
 
 test('routed instruction links and sections resolve', async () => {
@@ -46,4 +46,17 @@ test('reported paths count each input once and README reflects the tested instru
   assert.ok(data.readingPaths.codexdeepSaved.total > data.readingPaths.codexdeep.total);
   for (const name of ['general', 'academic', 'github', 'technical', 'chinese'])
     assert.equal(data.readingPaths[name].files.filter(x => x.path.includes('web-search-modules')).length, 1);
+});
+
+test('the README shows the progressive disclosure map, generated from the same measurements', async () => {
+  const data = await measureContext(), map = await readFile(new URL('docs/images/context-loading.svg', root), 'utf8');
+  assert.equal(map, renderMap(data), 'docs/images/context-loading.svg is stale; run npm run context:update');
+  assert.match(await readFile(new URL('README.md', root), 'utf8'), /!\[Progressive disclosure[^\]]*\]\(docs\/images\/context-loading\.svg\)/);
+  assert.ok(map.includes(data.inputDigest));
+  // Every path the map draws shows its measured total, and nothing is left unescaped.
+  for (const label of ['Discovery metadata', 'Installed bootstrap', 'Research worker subagent', 'Checker subagent', 'Writer or reviewer subagent', 'Refresh worker']) {
+    const value = data.routes[label], shown = value < 1000 ? `${value} tokens` : `~${(value / 1000).toFixed(1)}k`;
+    assert.ok(map.includes(`>${shown}<`), `${label}: ${shown}`);
+  }
+  assert.doesNotMatch(map.replace(/<!--[\s\S]*?-->/g, ''), /&(?!amp;|lt;|gt;|quot;)/);
 });

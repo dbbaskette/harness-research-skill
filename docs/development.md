@@ -166,7 +166,9 @@ npm run context:update
 npm run context:check
 ```
 
-The generated table is collapsed at the bottom of the README. Source text,
+The generated table is collapsed at the bottom of the README, and the same
+measurements draw the progressive disclosure map in
+[docs/images/context-loading.svg](images/context-loading.svg). Source text,
 research-task responses, images, and conversation add to the measured instruction
 loading; the table is not a complete per-run token or cost estimate.
 

@@ -9,14 +9,14 @@ belong in your content project; the skill installation is shared across projects
 
 | Version | What you get | Install from |
 | --- | --- | --- |
-| **0.9.4 release** | The task workflow, independent evidence checks and visible `research/` outputs, plus checking cited facts, researching questions again, reusing, approving and refreshing research; 0.9.2 and 0.9.3 fix findings from the 0.9.1 trials, and 0.9.4 makes light depth lighter. | The immutable `v0.9.4` tag. |
+| **0.9.5 release** | The task workflow, independent evidence checks and visible `research/` outputs, plus checking cited facts, researching questions again, reusing, approving and refreshing research; 0.9.2 and 0.9.3 fix findings from the 0.9.1 trials, and 0.9.4 makes light depth lighter. | The immutable `v0.9.5` tag. |
 | **0.9.0 previous release** | The task workflow without the 0.9.1 verification and reuse commands. | The immutable `v0.9.0` tag. |
 | **0.8.1 earlier release** | The earlier manual plan/finding workflow and a saved report in `.harness-research/`. | The immutable `v0.8.1` tag. |
 | **Development** | Unreleased work; guidance must be selected explicitly for testing. | `main` or a development branch; see the [developer guide](development.md). |
 
-The README and user guide describe 0.9.4. The
-[release page](https://github.com/dbbaskette/harness-research-skill/releases/tag/v0.9.4)
-has its ZIP and checksum. The [0.9.4](verification/0.9.4/README.md), [0.9.3](verification/0.9.3/README.md), [0.9.2](verification/0.9.2/README.md) and
+The README and user guide describe 0.9.5. The
+[release page](https://github.com/dbbaskette/harness-research-skill/releases/tag/v0.9.5)
+has its ZIP and checksum. The [0.9.5](verification/0.9.5/README.md), [0.9.4](verification/0.9.4/README.md), [0.9.3](verification/0.9.3/README.md), [0.9.2](verification/0.9.2/README.md) and
 [0.9.1 record](verification/0.9.1/README.md)
 separates native results, installed-helper checks and live trials. The
 [0.9.0 record](verification/0.9.0/README.md) keeps the owner's decision to refine
@@ -30,7 +30,7 @@ model access, and permission to create a separate checker invocation. The helper
 does not supply those capabilities or require another research account.
 
 ```sh
-git clone --branch v0.9.4 https://github.com/dbbaskette/harness-research-skill.git
+git clone --branch v0.9.5 https://github.com/dbbaskette/harness-research-skill.git
 cd harness-research-skill
 bash scripts/Install-Harness-Research.sh
 ```
@@ -47,13 +47,13 @@ An actual installation returns JSON with `"status": "installed"`,
 agent session, open the project where you want research saved, and invoke the
 skill using the [first-session prompts](../README.md#get-started).
 
-**Preview users:** reinstall from `v0.9.4` even if `--version` already reports
-0.9.4. Preview and final helpers can have the same version label with different
+**Preview users:** reinstall from `v0.9.5` even if `--version` already reports
+0.9.5. Preview and final helpers can have the same version label with different
 contents; a guidance refresh does not replace executable helpers.
 
 ### Use a previous release
 
-Replace `v0.9.4` with `v0.9.3`, `v0.9.2`, `v0.9.1`, `v0.9.0` or `v0.8.1` in the clone command to install an
+Replace `v0.9.5` with `v0.9.4`, `v0.9.3`, `v0.9.2`, `v0.9.1`, `v0.9.0` or `v0.8.1` in the clone command to install an
 older release. 0.9.0 lacks the verification and reuse commands. 0.8.1's
 manual workflow is documented in the [legacy evidence contract](../references/evidence.md)
 and [workflow reference](../references/workflow.md). It does not gain task commands
@@ -106,8 +106,8 @@ With the default discovery link, this works offline and needs no content project
 node "$HOME/.agents/skills/harness-research/scripts/harness-research.mjs" --version
 ```
 
-The current release reports `harness-research 0.9.4`. Previous releases report
-`harness-research 0.9.3`, `0.9.2`, `0.9.1`, `0.9.0` or `0.8.1`; a preview can also report 0.9.4, so reinstall it from the tag.
+The current release reports `harness-research 0.9.5`. Previous releases report
+`harness-research 0.9.4`, `0.9.3`, `0.9.2`, `0.9.1`, `0.9.0` or `0.8.1`; a preview can also report 0.9.5, so reinstall it from the tag.
 
 When work starts or resumes, the agent should also report the installed runtime,
 guidance release, exact guidance revision, and freshness. These identities can
@@ -115,14 +115,14 @@ differ. A newly loaded instruction set is not proof of a newer executable.
 
 ## Update an existing installation
 
-### Update to 0.9.4 for new work
+### Update to 0.9.5 for new work
 
 From your skill repository checkout, with your own changes committed or otherwise
 preserved:
 
 ```sh
-git fetch origin tag v0.9.4
-git switch --detach v0.9.4
+git fetch origin tag v0.9.5
+git switch --detach v0.9.5
 bash scripts/Install-Harness-Research.sh
 ```
 

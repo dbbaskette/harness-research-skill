@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="700" viewBox="0 0 1080 700" role="img" aria-labelledby="title description">
+  <title id="title">Harness Research: progressive context loading</title>
+  <desc id="description">Progressive disclosure, cumulative instruction tokens measured with cl100k_base. Discovery 38 tokens, installed bootstrap 490 tokens, guidance entry ~1.1k. Paths: checked research run ~4.8k, verify/again/reuse/refresh ~1.9k, status or resume ~1.7k, chat-only answer ~2.1k. Worker subagents read only their own contract: researcher ~1.1k, checker 541 tokens, writer or reviewer 580 tokens, refresh reader 668 tokens. Legacy paths: manual workflow ~3.3k, comparative outlines ~1.8k–3.9k, source strategies ~5.1k–5.4k, older Brand records ~1.5k. One path is loaded, not the sum.</desc>
+  <!-- Input digest: f0a52af4a3896d3a834c3dd16c6e7dabcc100de215d338fb1349a17b2b6238ee -->
+  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#005C8A"/></marker><marker id="arrow-worker" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#6C4B94"/></marker></defs>
+  <rect width="1080" height="700" rx="16" fill="#F5F7F9"/>
+  <g font-family="Arial, Helvetica, sans-serif" fill="#1B1D36">
+    <text x="24" y="36" font-size="24" font-weight="700">Load what the task needs</text>
+    <text x="24" y="59" font-size="15">Cumulative instruction tokens. Each request takes one path; branches are not added together.</text>
+    <g fill="none" stroke="#005C8A" stroke-width="2" marker-end="url(#arrow)">
+      <path d="M324 128 H390"/>
+      <path d="M690 128 H756"/>
+      <path d="M906 176 V202 H144 V230"/>
+      <path d="M408 202 V230"/>
+      <path d="M672 202 V230"/>
+      <path d="M936 202 V230"/>
+    </g>
+    <text x="164" y="356" font-size="14" fill="#6C4B94" font-weight="700">The coordinator hands each task a guide; a worker subagent reads only that file.</text>
+    <g fill="none" stroke="#6C4B94" stroke-width="2" stroke-dasharray="6 4">
+      <path d="M144 326 V378 H936"/>
+      <path d="M144 378 V400" marker-end="url(#arrow-worker)"/>
+      <path d="M408 378 V400" marker-end="url(#arrow-worker)"/>
+      <path d="M672 378 V400" marker-end="url(#arrow-worker)"/>
+      <path d="M936 378 V400" marker-end="url(#arrow-worker)"/>
+    </g>
+    <text x="24" y="556" font-size="14" fill="#6B7280" font-weight="700">Kept for older callers: routed from the entry only when that work is asked for.</text>
+  <g transform="translate(24 80)">
+    <rect width="300" height="96" rx="12" fill="white" stroke="#005C8A" stroke-width="2"/>
+    <text x="16" y="26" font-size="17" font-weight="700" fill="#005C8A">Skill discovery</text>
+    <text x="16" y="56" font-size="26" font-weight="700">38 tokens</text>
+    <text x="16" y="80" font-size="13">Name and description, always visible</text>
+  </g>
+  <g transform="translate(390 80)">
+    <rect width="300" height="96" rx="12" fill="white" stroke="#005C8A" stroke-width="2"/>
+    <text x="16" y="26" font-size="17" font-weight="700" fill="#005C8A">Installed bootstrap</text>
+    <text x="16" y="56" font-size="26" font-weight="700">490 tokens</text>
+    <text x="16" y="80" font-size="13">Picks and pins the guidance release</text>
+  </g>
+  <g transform="translate(756 80)">
+    <rect width="300" height="96" rx="12" fill="white" stroke="#005C8A" stroke-width="2"/>
+    <text x="16" y="26" font-size="17" font-weight="700" fill="#005C8A">Guidance entry</text>
+    <text x="16" y="56" font-size="26" font-weight="700">~1.1k</text>
+    <text x="16" y="80" font-size="13">SKILL.md routes to one path</text>
+  </g>
+  <g transform="translate(24 230)">
+    <rect width="240" height="96" rx="12" fill="white" stroke="#005C8A" stroke-width="2"/>
+    <text x="16" y="26" font-size="17" font-weight="700" fill="#005C8A">Checked research run</text>
+    <text x="16" y="56" font-size="26" font-weight="700">~4.8k</text>
+    <text x="16" y="80" font-size="13">Coordinator: run guide + 2 contracts</text>
+  </g>
+  <g transform="translate(288 230)">
+    <rect width="240" height="96" rx="12" fill="white" stroke="#005C8A" stroke-width="2"/>
+    <text x="16" y="26" font-size="17" font-weight="700" fill="#005C8A">Verify, again, reuse</text>
+    <text x="16" y="56" font-size="26" font-weight="700">~1.9k</text>
+    <text x="16" y="80" font-size="13">Follow-ups on saved research</text>
+  </g>
+  <g transform="translate(552 230)">
+    <rect width="240" height="96" rx="12" fill="white" stroke="#005C8A" stroke-width="2"/>
+    <text x="16" y="26" font-size="17" font-weight="700" fill="#005C8A">Status or resume</text>
+    <text x="16" y="56" font-size="26" font-weight="700">~1.7k</text>
+    <text x="16" y="80" font-size="13">No new findings</text>
+  </g>
+  <g transform="translate(816 230)">
+    <rect width="240" height="96" rx="12" fill="white" stroke="#005C8A" stroke-width="2"/>
+    <text x="16" y="26" font-size="17" font-weight="700" fill="#005C8A">Chat-only answer</text>
+    <text x="16" y="56" font-size="26" font-weight="700">~2.1k</text>
+    <text x="16" y="80" font-size="13">Only when asked for no saved report</text>
+  </g>
+  <g transform="translate(24 400)">
+    <rect width="240" height="96" rx="12" fill="white" stroke="#6C4B94" stroke-width="2"/>
+    <text x="16" y="26" font-size="17" font-weight="700" fill="#6C4B94">Researcher</text>
+    <text x="16" y="56" font-size="26" font-weight="700">~1.1k</text>
+    <text x="16" y="80" font-size="13">task-research.md</text>
+  </g>
+  <g transform="translate(288 400)">
+    <rect width="240" height="96" rx="12" fill="white" stroke="#6C4B94" stroke-width="2"/>
+    <text x="16" y="26" font-size="17" font-weight="700" fill="#6C4B94">Checker</text>
+    <text x="16" y="56" font-size="26" font-weight="700">541 tokens</text>
+    <text x="16" y="80" font-size="13">task-check.md</text>
+  </g>
+  <g transform="translate(552 400)">
+    <rect width="240" height="96" rx="12" fill="white" stroke="#6C4B94" stroke-width="2"/>
+    <text x="16" y="26" font-size="17" font-weight="700" fill="#6C4B94">Writer or reviewer</text>
+    <text x="16" y="56" font-size="26" font-weight="700">580 tokens</text>
+    <text x="16" y="80" font-size="13">task-write.md</text>
+  </g>
+  <g transform="translate(816 400)">
+    <rect width="240" height="96" rx="12" fill="white" stroke="#6C4B94" stroke-width="2"/>
+    <text x="16" y="26" font-size="17" font-weight="700" fill="#6C4B94">Refresh reader</text>
+    <text x="16" y="56" font-size="26" font-weight="700">668 tokens</text>
+    <text x="16" y="80" font-size="13">reuse.md</text>
+  </g>
+  <g transform="translate(24 570)">
+    <rect width="240" height="96" rx="12" fill="white" stroke="#6B7280" stroke-width="2" stroke-dasharray="6 4"/>
+    <text x="16" y="26" font-size="17" font-weight="700" fill="#6B7280">Manual 0.8 workflow</text>
+    <text x="16" y="56" font-size="26" font-weight="700">~3.3k</text>
+    <text x="16" y="80" font-size="13">plan and record commands</text>
+  </g>
+  <g transform="translate(288 570)">
+    <rect width="240" height="96" rx="12" fill="white" stroke="#6B7280" stroke-width="2" stroke-dasharray="6 4"/>
+    <text x="16" y="26" font-size="17" font-weight="700" fill="#6B7280">Comparative outlines</text>
+    <text x="16" y="56" font-size="26" font-weight="700">~1.8k–3.9k</text>
+    <text x="16" y="80" font-size="13">One preserved upstream resource</text>
+  </g>
+  <g transform="translate(552 570)">
+    <rect width="240" height="96" rx="12" fill="white" stroke="#6B7280" stroke-width="2" stroke-dasharray="6 4"/>
+    <text x="16" y="26" font-size="17" font-weight="700" fill="#6B7280">Source strategies</text>
+    <text x="16" y="56" font-size="26" font-weight="700">~5.1k–5.4k</text>
+    <text x="16" y="80" font-size="13">Run guidance + one strategy</text>
+  </g>
+  <g transform="translate(816 570)">
+    <rect width="240" height="96" rx="12" fill="white" stroke="#6B7280" stroke-width="2" stroke-dasharray="6 4"/>
+    <text x="16" y="26" font-size="17" font-weight="700" fill="#6B7280">Older Brand records</text>
+    <text x="16" y="56" font-size="26" font-weight="700">~1.5k</text>
+    <text x="16" y="80" font-size="13">Migration</text>
+  </g>
+  </g>
+</svg>

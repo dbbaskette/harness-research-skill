@@ -16,7 +16,7 @@ recommendation below.
   ran at 6; crash recovery came back only partly answered, so the limit was raised to 8
   before release. A limit of 8 has not been measured live.
 - **Per-role guidance:** three task contracts replace the shared reference. A checker
-  reads 542 tokens, a writer 580 and a researcher 1,133, rather than all 3,395. The
+  reads 541 tokens, a writer 580 and a researcher 1,133, rather than all 3,395. The
   coordinator reads 4,838, up from 4,617.
 - **Measured** in Claude Code on the same plan as the 0.9.1 trial, at a limit of 6
   ([trials](../verification/0.9.4/live/README.md)): subagent tokens 1.72M → 1.23M,
@@ -30,7 +30,7 @@ recommendation below.
 | Measure | 0.9.3 | 0.9.4 | Where |
 | --- | --- | --- | --- |
 | Instructions for a full checked run (coordinator) | 4,617 tokens (bootstrap 490, entry 623, `research-run.md` 3,395, start reply 109) | 4,838 tokens (run guidance plus the research and writing contracts) | [README, measured instruction context](../../README.md) |
-| Guidance a worker reads | all 3,395 of `research-run.md`, of which about 1,630 is coordinator-only | its own contract: checker 542, writer 580, researcher 1,133 | README table |
+| Guidance a worker reads | all 3,395 of `research-run.md`, of which about 1,630 is coordinator-only | its own contract: checker 541, writer 580, researcher 1,133 | README table |
 | Brief the helper puts in every task file | 59–258 tokens by task kind | 59–280 | `BRIEFS` in `research-run.mjs` |
 | Helper reply per call, mean over 130 calls | 393 tokens (`next` 644, `status` 322) | 401 (`next` 693 with its `guide`, `status` 320) | installed transcripts ([0.9.1](../verification/0.9.1/installed/transcript.jsonl), [0.9.4](../verification/0.9.4/installed/transcript.jsonl)) |
 | Helper time per call | 50 ms startup, 90 ms `status`, 130 calls in 12.2 s | not re-timed | timed on the 0.9.3 checkout |
@@ -76,7 +76,7 @@ In the trial the coordinator pointed each worker at two sections by hand.
   the full-run row in the README drops for workers, and the coordinator's row is unchanged.
 - **Shipped in 0.9.4** as three role files, not one, because an agent reads a whole file
   rather than the sections named in it: `task-research.md`, `task-check.md` and
-  `task-write.md`. Every task's `guide` names its worker's file. Workers read 542–1,133
+  `task-write.md`. Every task's `guide` names its worker's file. Workers read 541–1,133
   tokens; the research contract is the largest because it keeps the full source rules. The
   coordinator reads about 220 tokens more than before.
 

@@ -18,8 +18,8 @@ saves a cited report in your project—ready to open, share, and continue later.
 | Check a set of claims | Supported, contradicted, or insufficient—with the evidence behind each verdict. |
 | Return to unfinished research | Saved progress, visible gaps, and a report that survives the chat. |
 
-> **Current release: [0.9.4](https://github.com/dbbaskette/harness-research-skill/releases/tag/v0.9.4).**
-> Install the tagged version below. Already using a preview that says 0.9.4?
+> **Current release: [0.9.5](https://github.com/dbbaskette/harness-research-skill/releases/tag/v0.9.5).**
+> Install the tagged version below. Already using a preview that says 0.9.5?
 > Rerun the installer from this tag to get the final release.
 > [Versions, updates, and troubleshooting →](docs/setup.md)
 
@@ -33,7 +33,7 @@ separate research account. Your agent also needs permission to start a separate
 checker for the evidence.
 
 ```sh
-git clone --branch v0.9.4 https://github.com/dbbaskette/harness-research-skill.git
+git clone --branch v0.9.5 https://github.com/dbbaskette/harness-research-skill.git
 cd harness-research-skill
 bash scripts/Install-Harness-Research.sh
 ```
@@ -153,7 +153,7 @@ your agent will explain what needs reassessment.
 | Understand helpers, schemas, or run tests | [Developer guide](docs/development.md) |
 | Continue older Tanzu Brand research | [Migration guide](references/migration.md) |
 | Inspect the agent's workflow | [Skill instructions](SKILL.md) and [research contract](references/research-run.md) |
-| See what has been verified | [0.9.4 checks and trials](docs/verification/0.9.4/README.md); [0.9.3](docs/verification/0.9.3/README.md); [0.9.2](docs/verification/0.9.2/README.md); [0.9.1](docs/verification/0.9.1/README.md); [0.9.0 evidence and release decision](docs/verification/0.9.0/README.md) |
+| See what has been verified | [0.9.5 checks](docs/verification/0.9.5/README.md); [0.9.4 checks and trials](docs/verification/0.9.4/README.md); [0.9.3](docs/verification/0.9.3/README.md); [0.9.2](docs/verification/0.9.2/README.md); [0.9.1](docs/verification/0.9.1/README.md); [0.9.0 evidence and release decision](docs/verification/0.9.0/README.md) |
 
 ## Built for your agent, with the work kept in your project
 
@@ -163,7 +163,7 @@ or Python environment. Your normal agent/model usage still applies.
 
 **What it loads.** The skill reads about 1,100 tokens of instructions when it
 starts. For a full checked run the coordinator reads about 4,800. Each worker
-subagent reads only its own contract: 542 tokens for a checker, 580 for a writer
+subagent reads only its own contract: 541 tokens for a checker, 580 for a writer
 and 1,133 for a researcher. A helper reply is 150–900 tokens. The real cost is the
 reading your agent does. In the 0.9.4 Claude Code trial each subagent used
 77,000–101,000 tokens, mostly on the source pages themselves. A 10-question light
@@ -171,6 +171,11 @@ run used about 1.2 million subagent tokens, against 1.7 million under 0.9.1's
 larger light limits. Fewer facts per question and smaller sources cost less; see
 the measured figures below (for maintainers) and the
 [0.9.3 review](docs/reviews/2026-10-16-skill-review.md) for what drives them.
+
+![Progressive disclosure: discovery, bootstrap and guidance entry, then one path; worker subagents read only their own task contract](docs/images/context-loading.svg)
+
+The map is generated from the same measurements as the table below and checked by
+the tests.
 
 MIT licensed. See [the license](LICENSE), [credits and adaptations](NOTICE.md),
 and [the changelog](CHANGELOG.md). Maintainers: [release procedure](docs/releases.md).
@@ -199,7 +204,7 @@ The trial ran with a light limit of 6 facts per question. 0.9.4 ships 8, which
 has not been measured live. Under 0.9.1's limits the same plan used about 1.7
 million subagent tokens, 80,000–155,000 per subagent.
 
-Each worker reads only the task contract its task's `guide` names (542–1,133
+Each worker reads only the task contract its task's `guide` names (541–1,133
 tokens), not the 3,395-token run guidance that every worker read in 0.9.3. The
 coordinator reads the run guidance plus the research and writing contracts.
 Fifteen of the 26 rows below are legacy or comparative paths that no current
