@@ -59,3 +59,10 @@ with **77 tests, zero failures or skips**, on clean implementation commit
 Shared run archives redact all 26 expired task-lease tokens. Facts, sources, checks,
 quote hashes and output manifests are unchanged; the archives document completed
 work and cannot resume those disposable runs.
+
+The integrated runtime improvements and new user guides passed a fresh native
+gate on `e2465f765a124dd4799c40437fe62cce6a72e155`: **86 tests, zero failures or skips**, audit,
+context, installation and installed version 0.9.0. The disposable VM was deleted
+and its directory absence verified. [Release-candidate native evidence](ci-release-candidate/verification.json)
+records the tested tree, logs and a transient cleanup diagnostic. The broader
+live acceptance and human sampling remain separate release gates.

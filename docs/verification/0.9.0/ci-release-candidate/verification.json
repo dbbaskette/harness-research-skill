@@ -1,0 +1,36 @@
+{
+  "source_commit": "e2465f765a124dd4799c40437fe62cce6a72e155",
+  "source_tree": "d1c5c3107f1f153c1510a89d7d43b150727cf422",
+  "source_was_clean": true,
+  "environment": {
+    "os": "macOS 27.0",
+    "node": "v22.23.2",
+    "python": "3.9.6"
+  },
+  "tests": {
+    "passed": 86,
+    "failed": 0,
+    "skipped": 0
+  },
+  "audit": "0 vulnerabilities",
+  "context": "passed",
+  "installer": "passed",
+  "installed_version": "harness-research 0.9.0",
+  "owned_vm": "harness-research-test-20261016140003-88504-23b7ca6e",
+  "owned_vm_deleted": true,
+  "owned_vm_files_absent": true,
+  "cleanup_note": "Transient disk-image info lookup failed during cleanup; wrapper returned 0 and owned VM directory absence was independently verified.",
+  "host_logs": "/Users/dbbaskette/Library/Logs/MacOS Test Suite/harness-research/harness-research-test-20261016140003-88504-23b7ca6e",
+  "log_sha256": {
+    "environment.txt": "6ec17f98d3e5dc46cdfea5f6ed467d47d5dfc457955b6f8e73824f2e7b0c88bd",
+    "tests.log": "4d75df9c0974cce7e5eb00cc52d20c1c2187d9254cecfb8f680c1d59a55176f0",
+    "audit.log": "6d8c5c8f3d7684adb070417bd608d01ae90aa3dc26a65af03ffda4955f38d9a3",
+    "context.log": "8b023f552cf4e402b7ecb3259e3afcf22734b8f66ba0c59bdcc220239fb16dc8",
+    "installer.log": "6fb029b119e6829ae1762d90eb841f2513e854ed2d5d218f8c7c7192a93e765d",
+    "installed-version.log": "38be90bc72a08dc548dc1054adce9b1cfe5c8f1f7baea1c173c1a9363820aea2",
+    "result.txt": "c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431",
+    "run.txt": "c002b0d1dcd461dd094e372c3c77b7b242b809ebcff3f443693e27cbb815e356",
+    "cleanup.log": "7ba0b4f738f4d441462798b63a0a8399edfdbdba1aa97ac32aad13428e70b1b4"
+  },
+  "release_acceptance": "Broader live matrix and human sample remain pending; native verification alone does not authorize a stable tag."
+}
