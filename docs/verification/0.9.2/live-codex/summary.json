@@ -1,0 +1,127 @@
+{
+ "run": "76c693a80fa045c6a7e090cf",
+ "output_revision": 29,
+ "status": "complete",
+ "questions": 8,
+ "checked_facts": 38,
+ "narrowed": 2,
+ "gaps": 0,
+ "checker_invocations": 4,
+ "wall_seconds": 389,
+ "usage": {
+  "input_tokens": 2760697,
+  "cached_input_tokens": 2527616,
+  "cache_write_input_tokens": 0,
+  "output_tokens": 16226,
+  "reasoning_output_tokens": 3066
+ },
+ "project_root_entries": [
+  ".harness-research",
+  "research"
+ ],
+ "manifest_ok": true,
+ "helper_commands": [
+  {
+   "command": "other",
+   "exit": 0
+  },
+  {
+   "command": "other",
+   "exit": 0
+  },
+  {
+   "command": "research start",
+   "exit": 1,
+   "output": "Project folder <live>/codex/sqlite-wal does not exist; create it first or pass an existing --project.\n"
+  },
+  {
+   "command": "research start",
+   "exit": 0
+  },
+  {
+   "command": "research next",
+   "exit": 1,
+   "output": "Supply the current --run ID.\n"
+  },
+  {
+   "command": "research next",
+   "exit": 0
+  },
+  {
+   "command": "research submit",
+   "exit": 0
+  },
+  {
+   "command": "research status",
+   "exit": 0
+  },
+  {
+   "command": "research peek",
+   "exit": 0
+  },
+  {
+   "command": "research next",
+   "exit": 0
+  },
+  {
+   "command": "research submit",
+   "exit": 0
+  },
+  {
+   "command": "research status",
+   "exit": 0
+  },
+  {
+   "command": "research peek",
+   "exit": 0
+  },
+  {
+   "command": "research next",
+   "exit": 0
+  },
+  {
+   "command": "research submit",
+   "exit": 0
+  },
+  {
+   "command": "research next",
+   "exit": 0
+  },
+  {
+   "command": "research submit",
+   "exit": 0
+  },
+  {
+   "command": "research next",
+   "exit": 0
+  },
+  {
+   "command": "research submit",
+   "exit": 0
+  },
+  {
+   "command": "research next",
+   "exit": 0
+  },
+  {
+   "command": "research submit",
+   "exit": 0
+  },
+  {
+   "command": "research next",
+   "exit": 0
+  },
+  {
+   "command": "research submit",
+   "exit": 0
+  },
+  {
+   "command": "research status",
+   "exit": 0
+  },
+  {
+   "command": "research verify",
+   "exit": 0
+  }
+ ]
+}
