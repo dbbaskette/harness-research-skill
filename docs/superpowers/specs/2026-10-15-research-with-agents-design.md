@@ -1,19 +1,23 @@
-# Research a topic with Claude Code or Codex: vetted, cited facts
+# Research a topic with Claude Code or Codex: a thoroughly researched, cited report
 
-Date: 2026-10-15. Status: draft 5, after the owner's review. Issue:
+Date: 2026-10-15. Status: draft 6, after the owner's review. Issue:
 [harness-research-skill#9](https://github.com/dbbaskette/harness-research-skill/issues/9).
 
 ## What it is for
 
 A topic and, optionally, some starting sources go in: links, and documents such as PDFs.
-What comes out is a report of facts about that topic with their citations, for people and
-studios to use as references:
+What comes out is a thoroughly researched report on that topic, written as questions and
+answers, with the checked facts it is built from underneath, for people and studios to use as
+references:
 
-- Each fact is one sentence that stands on its own.
-- Each fact quotes, exactly, the saved text of a source.
-- Each fact has been checked by a second agent that did not write it.
-- Nothing is concluded from the facts. There is no answer, summary or recommendation: the
-  caller decides what the facts mean.
+- The report follows the plan: sections, each with its questions, each question answered in
+  plain prose, starting with a one-line answer.
+- Every sentence of an answer cites the facts it rests on and says nothing they do not say.
+  Where sources disagree, or a question is only partly answered, the answer says so.
+- Each fact is one sentence, quotes exactly the saved text of a source, and has been checked
+  by a second agent that did not write it.
+- The report explains what the facts establish. It does not recommend or decide anything
+  beyond them: the reader does.
 - Coverage is planned and shown: the plan is an outline of the topic, and the report shows
   which parts of it have few facts. Any topic works: a broad one ("a report on LLMs"), one
   product, a comparison, or a set of claims to check.
@@ -39,9 +43,10 @@ referees:
 | Writes the facts | Refuses a quote that is not in its source's text, and a number that is not in its quote |
 | Checks other workers' facts against the originals | Makes sure no worker checks its own facts |
 | Finds duplicates, conflicts and missing angles | Refuses references to facts that do not exist |
+| Writes each question's answer from its checked facts | Refuses a sentence with no citation, a citation to a fact that was not confirmed, and a number that is not in the cited facts |
 | Runs several subagents at once | Leases tasks so they never collide, and returns abandoned ones |
 | | Refuses to call the run finished until every stage is done |
-| | Writes the report, `facts.json` and `brief.md` |
+| | Assembles the report, `facts.json` and `brief.md` |
 
 Agents are strong researchers and weak bookkeepers: they skip steps, stop early, paraphrase a
 quote or round a number. The helper is what keeps a run complete and its citations honest;
@@ -75,14 +80,14 @@ quote is "Valkey is a data structure server." The checks passed.
 | **What goes in** | A plan the calling agent writes: topic, purpose, scope, any supplied documents it has already turned into text, and 1 to 30 questions | A topic, the person's links and documents, a depth and a note on who it is for. The harness writes the plan |
 | **Who researches** | The calling agent, however it likes, in turn or with helpers it starts itself | The same harness, task by task from a queue, with several subagents at once |
 | **The plan** | Any 1 to 30 questions, unstructured | A stated scope and an outline of sections, each with several questions, sized by depth, up to 80 questions; subjects side by side when comparing; plus one round for missing angles |
-| **What a question produces** | One finding: a verdict (supported, contradicted, insufficient, unavailable), an optional headline, a summary of up to 12,000 characters, limits and up to 20 quotes | Many one-sentence facts, each with its own quotes; "answered / partly / not" for open questions and a verdict only for claims; no summary |
+| **What a question produces** | One finding: a verdict (supported, contradicted, insufficient, unavailable), an optional headline, a summary of up to 12,000 characters, limits and up to 20 quotes | A written answer, starting with a one-line answer, every sentence cited; underneath it, many one-sentence facts, each with its own quotes; "answered / partly / not" for open questions and a verdict for claims |
 | **Evidence check** | The quote must appear, exactly, at the offset the agent gives, in any file in the project, including one the agent wrote itself | The quote must be in a registered source's saved text; the helper finds it, allowing for spacing, quote-mark and dash differences; every number in the fact must be in its quotes |
 | **Support** | Not checked: "semantic support is the researcher's assessment" | Every fact checked by a worker that did not write it, ideally the other harness, against the original source: confirmed, narrowed or rejected |
 | **Across questions** | Nothing | Duplicates merged, conflicts and superseded facts shown, missing angles researched |
 | **Sources** | Supplied documents are registered with a hash; web pages are files the agent saves, with no register or label | Every source registered with a hash, a title, a publisher and a standing; the person's own sources are always primary; text read from charts or scans is marked transcribed |
 | **When it is done** | When no question is pending; the guidance asks the agent to open the report and check it | When every stage is done; the helper will not say complete before then |
 | **Working in parallel** | Allowed when the host permits; saves are one at a time, with "busy, retry" errors | Tasks are leased to workers, so subagents and sessions do not collide |
-| **Output** | `.harness-research/research-report.md`, a per-question list in a hidden folder, and the record | `research/report.md` with coverage by section, facts in outline order (side by side when comparing), conflicts, gaps, numbered sources and rejected facts; `research/facts.json`; `research/brief.md`. The record stays |
+| **Output** | `.harness-research/research-report.md`, a per-question list in a hidden folder, and the record | `research/report.md`: a written report in questions and answers, in outline order, with coverage by section, conflicts, gaps, numbered sources, the facts behind each answer and the rejected facts; `research/facts.json`; `research/brief.md`. The record stays |
 | **Citations** | By question; no stable IDs | Stable fact keys, with a hash of each quote, that a deck, training or blog can cite and check later |
 | **Studios** | Each builds its own research loop and confined worker tools (three copies) | One instruction to the harness; they read `facts.json` |
 
@@ -130,7 +135,9 @@ node scripts/harness-research.mjs research status --project DIR
 | 3. Check | one per question, never to the worker that researched it | each fact confirmed, narrowed or rejected |
 | 4. Cross-check | one | duplicates, conflicts, superseded facts, missing angles |
 | 5. Fill gaps | the missing angles as new questions, researched, checked and cross-checked once | more facts: up to 3 questions at `light`, all missing angles at `standard` and `deep` |
-| 6. Write | none: the helper | `research/report.md`, `facts.json`, `brief.md` |
+| 6. Write | one per section | each question's answer in prose, every sentence citing confirmed facts |
+| 7. Review the writing | at `standard` and `deep`, one per section, never the writer | sentences that say more than their facts, cut back or removed |
+| 8. Assemble | none: the helper | `research/report.md`, `facts.json`, `brief.md` |
 
 `research next` hands out tasks in that order, several at once where they are independent, so
 a harness can give one to each subagent. A task is leased to the worker that took it; if that
@@ -268,29 +275,59 @@ standing. It hands back references to existing facts only:
 ### 5. Fill the gaps
 
 The missing angles become new questions: the 3 that matter most at `light`, all of them at
-`standard` and `deep`. They are which are researched,
-checked and cross-checked once. Only one round, so a run always ends.
+`standard` and `deep`. They are researched, checked and cross-checked once. Only one round, so
+a run always ends.
 
-### 6. Output
+### 6. Write the answers
+
+One task per section, given the section's questions and their confirmed facts (and the
+conflicts and superseded facts that touch them). For each question the writer hands back:
+
+- **A one-line answer:** the direct answer to the question, as far as the facts allow.
+- **The answer:** one to four paragraphs of plain prose that explain the facts in a sensible
+  order, compare subjects where the plan compares them, and say where sources disagree, where
+  a fact is dated, and what the facts leave open.
+- Every sentence lists the fact keys it rests on. The writer may use facts from other
+  sections by key when they bear on the question.
+
+The helper refuses the section, with reasons the writer can act on, when:
+
+- A sentence cites no facts. Only the question itself and headings may stand uncited.
+- A sentence cites a fact that was rejected, superseded without saying so, or does not exist.
+- **A number in a sentence is not in any of its cited facts,** the same rule as for facts.
+- An answer leaves out a question in the section.
+
+It does not judge whether the prose says more than its facts; at `light` that rests on the
+writer's brief, and at `standard` and `deep` on the review.
+
+### 7. Review the writing
+
+At `standard` and `deep`, a worker that did not write the section reads each answer against
+its cited facts and cuts back or removes any sentence that says more than they do. It cannot
+add claims. At `light` this stage is skipped.
+
+### 8. Output
 
 All in `research/`, where a person will look:
 
-- **`research/report.md`**, a reference document:
+- **`research/report.md`**, the report:
   - A header: topic, date, depth, the scope paragraph, the sources given, how many facts and
-    sources, and how the facts were checked.
+    sources, and how the facts were checked; then the contents.
   - **Coverage by section:** how many checked facts each section has (each subject's, when
     comparing), and which questions are partly or not answered.
-  - The facts, in outline order, under their sections and questions. When comparing, each
-    subject's facts sit side by side so they can be read across. Each fact shows its citation
-    numbers, its as-of date, whether it was narrowed or transcribed, and "one source" when only
-    one publisher backs it.
+  - **The questions and answers,** in outline order: each section's questions, each with its
+    one-line answer and its paragraphs. Every sentence carries the numbers of the sources
+    behind its facts, like any well-cited report.
+  - **The facts behind each answer,** listed under it: each fact with its source numbers, its
+    as-of date, whether it was narrowed or transcribed, and "one source" when only one
+    publisher backs it. When comparing, each subject's facts sit side by side.
   - Conflicts, superseded facts and missing angles.
   - Gaps: unanswered questions, failed tasks and sources that could not be read, with why.
   - Sources, numbered: title, a clickable URL or the file name, publisher, standing, and
     "given" or the date saved.
   - Rejected facts, with the checker's reasons, for anyone auditing the run.
 - **`research/facts.json`**, schema 1, the same content for programs: the scope, sections,
-  subjects when comparing, questions, sources with their provenance (`given`, `found` or `transcribed`, or `caller`
+  subjects when comparing, questions with their answers (each sentence with its fact keys), sources with their provenance (`given`, `found` or `transcribed`, or `caller`
   for a file quoted through `record`), facts with their checks and citations, conflicts,
   superseded, missing, rejected and counts. A fact's `key` is its question ID and a short hash
   of its statement, such as `valkey.licensing.3fa9c2`. It stays the same when the run is
@@ -332,7 +369,9 @@ its gates (with `--plan-only`), and what the facts feed.
   same checks. Its citations are marked `caller` unless the quoted file is a registered source.
 - For readers that only know `status`, an open question's coverage maps to `supported` when
   answered and `insufficient` otherwise.
-- `headline` and `summary` stay accepted but are not produced by `research`.
+- `research` also fills each question's `headline` (the one-line answer) and `summary` (the
+  answer's text) in the record, so callers that read today's findings keep working while they
+  move to `facts.json`.
 
 ## Not changing
 
@@ -349,6 +388,9 @@ its gates (with `--plan-only`), and what the facts feed.
   Tested with scripted workers, no agent needed.
 - **Submissions:** each refusal; quote placing; the number rule; transcribed sources; key
   stability across runs; merging and conflict links; references to facts that do not exist.
+- **Writing:** an uncited sentence, a citation to a rejected or missing fact, a number not in
+  the cited facts, and a missing question are each refused; the review stage runs only at
+  `standard` and `deep`.
 - **Sources:** registration, hashing, gaps, sources registered after planning.
 - **Output:** `facts.json` against its schema, coverage by section, the report's sections, links
   and numbering.
@@ -374,7 +416,8 @@ fact says?
 The design is ready to release when, on all three requests:
 
 - Every sampled quote is in its source.
-- At least 9 in 10 sampled facts say no more than their quotes.
+- At least 9 in 10 sampled facts say no more than their quotes, and at least 9 in 10 of 30
+  sampled answer sentences say no more than their facts.
 - Every section of the outline has facts or a stated gap.
 - The new run is judged more useful as a reference by the person reading both.
 
@@ -395,7 +438,8 @@ cost are recorded, not limited.
    the completeness rule.
 2. Submissions: facts, the quote and number checks, checks, cross-check, the gap round, keys
    and provenance.
-3. Output: the report with its coverage grid, `facts.json`, `brief.md`.
+3. Writing and output: the answers and their checks, the review, the report with coverage by
+   section, `facts.json` and `brief.md`.
 4. Briefs and guidance; a first live trial in Claude Code; fixes from it.
 5. The live trial in Codex, the narrow-topic trial, and the 0.9.0 release.
 
@@ -407,6 +451,8 @@ cost are recorded, not limited.
   browser, subagents and judgement.
 - **Every fact traces to saved text,** and a checker confirms that text against the original.
 - **Every fact is checked by a worker that did not write it,** ideally the other harness.
+- **A report a person can read,** in questions and answers, where every sentence leads back
+  through its facts to a quoted source.
 - **Made-up numbers are refused mechanically.**
 - **Coverage is planned as an outline and reported by section,** so thin parts are visible,
   and a comparison has both sides researched to the same depth.
@@ -426,16 +472,21 @@ cost are recorded, not limited.
    harness cannot, the run is sequential unless more sessions are started on the queue.
 5. **A harness reading the web can be misled by a page.** In a person's session it has
    whatever the person allowed it; a studio decides what its headless sessions may do.
-6. **Depth costs.** The default `light` run is about 20 questions with a checker per section
-   and up to 3 gap questions: very roughly $6 to $10 and 15 to 25 minutes, judged from
+6. **Depth costs.** The default `light` run is about 20 questions with a checker and a writer
+   per section and up to 3 gap questions: very roughly $7 to $12 and 20 to 30 minutes, judged from
    Training's measured $2.31 for eight questions without checking. `deep` is about 45 questions, each checked, plus a gap
    round: very roughly $20 to $40 and 30 to 60 minutes. All to be measured in the trials.
-7. **A deep report is long.** A `light` run gives roughly 100 to 200 facts; a deep comparison
+7. **Prose can still overstate.** The helper makes sure every sentence cites confirmed facts
+   and invents no numbers, but only a reader can tell whether a sentence says more than its
+   facts. At `light` nothing but the writer's brief prevents it; at `standard` and `deep` a
+   reviewer cuts such sentences back.
+8. **A deep report is long.** A `light` run gives roughly 100 to 200 facts; a deep comparison
    can hold several hundred. Coverage by section and `brief.md` are the way in.
 
 ## Settled in review
 
-- **No answer or synthesis.** Research produces facts to use as references.
+- **A written report, in questions and answers,** built only from checked facts, every
+  sentence cited. It explains what the facts establish; it does not recommend or decide.
 - **Support check** per fact, by another worker; **question kinds**; **provenance** on every
   source and citation.
 - **Topic and starting sources as input:** links and documents such as PDFs.
@@ -477,6 +528,11 @@ comparison, `subjects` is empty and every `subject` is null. The values are illu
      "kind": "open", "round": 1,
      "question": "Under what licence is Valkey released, and has that changed?",
      "coverage": "answered", "gaps": "",
+     "headline": "Valkey is licensed under the BSD 3-Clause licence and has kept that licence since the fork.",
+     "answer": [
+       {"sentence": "Valkey is licensed under the BSD 3-Clause licence.", "facts": ["valkey.licensing.3fa9c2"]},
+       {"sentence": "It kept the licence Redis used before Redis changed its own in 2024.", "facts": ["fork-history.77d1e0", "redis.licensing.aa11bb"]}
+     ],
      "facts": ["valkey.licensing.3fa9c2"]},
     {"id": "fork-history", "section": "origin", "subject": null, "kind": "open", "round": 1,
      "question": "How and when was Valkey forked from Redis?",
