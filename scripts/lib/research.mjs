@@ -2,6 +2,7 @@ import { readFile, writeFile, mkdir, rename, realpath, lstat, unlink, readdir, c
 import { createHash, randomUUID } from 'node:crypto';
 import { join, resolve, sep, isAbsolute } from 'node:path';
 import { managedLegacyStatus } from './research-run.mjs';
+import { acquireLock, releaseLock } from './run-storage.mjs';
 
 const scopeLabels = { 'supplied-only': 'Uploaded sources only', 'public-web': 'Uploaded sources plus external research' };
 const verdicts = ['supported', 'contradicted', 'insufficient', 'unavailable'];
@@ -235,16 +236,11 @@ async function statusUnlocked(project) {
 async function withLock(project, create, action) {
   const locations = await paths(project, create);
   if (!await exists(locations.derived)) return action();
-  const lock = join(locations.derived, 'research.lock');
-  try { await writeFile(lock, String(process.pid), { flag: 'wx' }); }
-  catch (error) { if (error.code === 'EEXIST') throw new Error('Research storage is busy; retry after the current save.'); throw error; }
-  const owned = await lstat(lock);
+  const lock = join(locations.derived, 'research.lock'), owned = await acquireLock(lock);
+  let failure = null;
   try { return await action(); }
-  finally {
-    const current = await exists(lock);
-    if (!current || !current.isFile() || current.isSymbolicLink() || current.dev !== owned.dev || current.ino !== owned.ino) throw new Error('Research lock changed; inspect storage before retrying.');
-    await unlink(lock);
-  }
+  catch (error) { failure = error; throw error; }
+  finally { try { await releaseLock(lock, owned); } catch (error) { if (!failure) throw error; } }
 }
 export const planResearch = (project, plan, options) => withLock(project, true, () => planUnlocked(project, plan, options));
 export const recordResearch = (project, run, id, finding) => withLock(project, false, () => recordUnlocked(project, run, id, finding));

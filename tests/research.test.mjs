@@ -220,14 +220,12 @@ test('concurrent findings cannot lose a save and stale locks are surfaced', asyn
     recordResearch(root, initial.run, 'availability', finding()),
     recordResearch(root, initial.run, 'performance', { status: 'unavailable', summary: 'Unavailable', limits: 'No access', evidence: [] }),
   ]);
-  assert.equal(calls.filter(call => call.status === 'fulfilled').length, 1);
-  assert.match(calls.find(call => call.status === 'rejected').reason.message, /busy/);
-  const current = await researchStatus(root);
-  const remaining = current.pending[0];
-  await recordResearch(root, initial.run, remaining, remaining === 'availability' ? finding() : { status: 'unavailable', summary: 'Unavailable', limits: 'No access', evidence: [] });
+  // Concurrent saves wait their turn instead of failing.
+  assert.equal(calls.filter(call => call.status === 'fulfilled').length, 2);
   assert.equal((await researchStatus(root)).completed, 2);
   await writeFile(join(root, '.harness-research', 'research.lock'), 'external active owner');
-  await assert.rejects(researchStatus(root), /busy/);
+  process.env.HARNESS_RESEARCH_LOCK_WAIT_MS = '200';
+  try { await assert.rejects(researchStatus(root), /busy after waiting/); } finally { delete process.env.HARNESS_RESEARCH_LOCK_WAIT_MS; }
   assert.equal(await readFile(join(root, '.harness-research', 'research.lock'), 'utf8'), 'external active owner');
 });
 

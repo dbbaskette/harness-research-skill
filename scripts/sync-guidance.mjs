@@ -63,8 +63,9 @@ async function git(repository, ...args) {
       : /failed to connect|couldn.t connect|connection refused|network is unreachable/i.test(stderr) ? 'Git could not connect to the source host.'
       : /permission denied|operation not permitted|access denied/i.test(stderr) ? 'Git was denied access.'
       : Number.isInteger(error.code) ? `Git exited with status ${error.code}.` : 'Git could not complete the operation.';
-    const prefix = operation === 'fetch' ? 'Guidance fetch failed' : 'Guidance Git operation failed';
-    const recovery = operation === 'fetch'
+    const network = ['fetch', 'ls-remote'].includes(operation);
+    const prefix = network ? 'Guidance fetch failed' : 'Guidance Git operation failed';
+    const recovery = network
       ? 'If the agent sandbox restricts networking, retry this command through the host\'s permitted network-access flow. Existing work can resume its saved task without fetching.'
       : 'Check the reported Git operation and local cache; this is not necessarily a network failure.';
     throw new Error(`${prefix} (git ${operation}). ${reason} ${recovery}`);
@@ -97,6 +98,31 @@ async function blob(repository, id, size) {
   new TextDecoder('utf-8', { fatal: true }).decode(bytes);
   return bytes;
 }
+// Releases, newest first: tags named vMAJOR.MINOR.PATCH on the trusted source.
+async function releaseTags(repository, source) {
+  const listing = (await git(repository, 'ls-remote', '--tags', '--refs', source, 'refs/tags/v*')).toString('utf8');
+  return listing.split('\n').map(line => line.trim().split(/\s+/)[1]).filter(ref => /^refs\/tags\/v\d+\.\d+\.\d+$/.test(ref ?? ''))
+    .map(ref => ({ ref, parts: version(ref.slice('refs/tags/v'.length)) }))
+    .sort((a, b) => b.parts[0] - a.parts[0] || b.parts[1] - a.parts[1] || b.parts[2] - a.parts[2]);
+}
+// Read a commit's guidance inventory and manifest, refusing one the installed runtime cannot run.
+async function inspectCommit(repository, commit, config) {
+  if (!revisionPattern.test(commit)) throw new Error('Invalid guidance revision.');
+  const listing = (await git(repository, 'ls-tree', '-r', '-l', '-z', commit)).toString('utf8').split('\0').filter(Boolean).map(line => {
+    const [meta, name] = line.split('\t'), [mode, type, id, size] = meta.trim().split(/\s+/);
+    return { mode, type, id, size: Number(size), name };
+  });
+  const metadata = listing.find(item => item.name === 'guidance/manifest.json') ?? listing.find(item => item.name === 'package.json');
+  if (!metadata || metadata.mode !== '100644' || metadata.type !== 'blob') throw new Error('Guidance compatibility metadata is missing.');
+  const manifest = JSON.parse(await blob(repository, metadata.id, metadata.size));
+  const guidanceVersion = manifest.version ?? null;
+  if (guidanceVersion !== null) version(guidanceVersion);
+  if (metadata.name === 'guidance/manifest.json') {
+    if (manifest.schema !== 1 || manifest.skill !== config.skill || manifest.entry !== 'SKILL.md') throw new Error('Unsupported guidance contract.');
+    compatible(manifest.minimumRuntime, config.version);
+  } else { if (manifest.name !== config.packageName) throw new Error('Unrecognized guidance package.'); compatible(manifest.version, config.version); }
+  return { listing, guidanceVersion };
+}
 export async function start({ project, runtime = root, source, revision } = {}) {
   const config = await settings(runtime), cache = await cacheFor(project, config, true);
   const lock = await open(join(cache, '.sync-lock'), 'wx', 0o600).catch(error => { if (error.code === 'EEXIST') throw new Error('Another guidance refresh is running; retry after it finishes.'); throw error; });
@@ -109,23 +135,26 @@ export async function start({ project, runtime = root, source, revision } = {}) 
     // source is a library-only seam for local disposable test repositories.
     const trustedSource = source ?? config.repository;
     const shallow = (await git(repository, 'rev-parse', '--is-shallow-repository')).toString().trim() === 'true';
-    await git(repository, 'fetch', '--quiet', '--no-tags', ...(revision ? (shallow ? ['--unshallow'] : []) : ['--depth=1']), trustedSource, 'refs/heads/main');
-    let commit = (await git(repository, 'rev-parse', '--verify', 'FETCH_HEAD^{commit}')).toString().trim();
-    if (revision) { await git(repository, 'merge-base', '--is-ancestor', revision, commit); commit = revision; }
-    if (!revisionPattern.test(commit)) throw new Error('Invalid guidance revision.');
-    const listing = (await git(repository, 'ls-tree', '-r', '-l', '-z', commit)).toString('utf8').split('\0').filter(Boolean).map(line => {
-      const [meta, name] = line.split('\t'), [mode, type, id, size] = meta.trim().split(/\s+/);
-      return { mode, type, id, size: Number(size), name };
-    });
-    const metadata = listing.find(item => item.name === 'guidance/manifest.json') ?? listing.find(item => item.name === 'package.json');
-    if (!metadata || metadata.mode !== '100644' || metadata.type !== 'blob') throw new Error('Guidance compatibility metadata is missing.');
-    const manifest = JSON.parse(await blob(repository, metadata.id, metadata.size));
-    const guidanceVersion = manifest.version ?? null;
-    if (guidanceVersion !== null) version(guidanceVersion);
-    if (metadata.name === 'guidance/manifest.json') {
-      if (manifest.schema !== 1 || manifest.skill !== config.skill || manifest.entry !== 'SKILL.md') throw new Error('Unsupported guidance contract.');
-      compatible(manifest.minimumRuntime, config.version);
-    } else { if (manifest.name !== config.packageName) throw new Error('Unrecognized guidance package.'); compatible(manifest.version, config.version); }
+    const head = async () => (await git(repository, 'rev-parse', '--verify', 'FETCH_HEAD^{commit}')).toString().trim();
+    let commit, inspected, channel = 'main', ref = 'refs/heads/main';
+    if (revision) {
+      await git(repository, 'fetch', '--quiet', '--no-tags', ...(shallow ? ['--unshallow'] : []), trustedSource, ref);
+      await git(repository, 'merge-base', '--is-ancestor', revision, await head()); commit = revision;
+    } else {
+      // New work uses the newest release the installed runtime supports, so unreleased guidance on
+      // main never reaches installed users. A repository with no release tags is served from main.
+      const releases = await releaseTags(repository, trustedSource);
+      for (const release of releases.slice(0, 10)) {
+        await git(repository, 'fetch', '--quiet', '--no-tags', '--depth=1', trustedSource, release.ref);
+        const candidate = await head();
+        try { inspected = await inspectCommit(repository, candidate, config); commit = candidate; channel = 'release'; ref = release.ref; break; }
+        catch (error) { if (!/newer installed runtime/.test(error.message)) throw error; }
+      }
+      if (!commit && releases.length) throw new Error('No guidance release supports this installed runtime; it needs a newer installed runtime. Update with this skill’s trusted installer.');
+      if (!commit) { await git(repository, 'fetch', '--quiet', '--no-tags', '--depth=1', trustedSource, ref); commit = await head(); }
+    }
+    inspected ??= await inspectCommit(repository, commit, config);
+    const { listing, guidanceVersion } = inspected;
     const selected = listing.filter(item => allowed(item.name));
     if (!selected.some(item => item.name === 'SKILL.md') || selected.length > 500 || selected.reduce((n, item) => n + item.size, 0) > 8 * 1024 * 1024) throw new Error('Guidance inventory is missing or too large.');
     const task = randomUUID().replaceAll('-', '');
@@ -138,10 +167,10 @@ export async function start({ project, runtime = root, source, revision } = {}) 
       await mkdir(dirname(path), { recursive: true, mode: 0o700 }); await writeFile(path, bytes, { flag: 'wx', mode: 0o400 });
       hashes[item.name] = sha(bytes);
     }
-    const pin = { schema: 1, skill: config.skill, repository: config.repository, revision: commit, guidanceVersion, task, createdAt: new Date().toISOString(), runtime: config.runtime, runtimeVersion: config.version, runtimeFiles: await runtimeHashes(config.runtime), files: hashes };
+    const pin = { schema: 1, skill: config.skill, repository: config.repository, revision: commit, channel, ref, guidanceVersion, task, createdAt: new Date().toISOString(), runtime: config.runtime, runtimeVersion: config.version, runtimeFiles: await runtimeHashes(config.runtime), files: hashes };
     await writeFile(join(stage, 'pin.json'), JSON.stringify(pin, null, 2) + '\n', { flag: 'wx', mode: 0o400 });
     const snapshot = join(cache, 'tasks', task); await rename(stage, snapshot); stage = null;
-    return { freshness: 'current-at-start', runtimeVersion: config.version, guidanceVersion, revision: commit, task, guidance: join(snapshot, 'SKILL.md'), runtime: config.runtime };
+    return { freshness: 'current-at-start', channel, ref, runtimeVersion: config.version, guidanceVersion, revision: commit, task, guidance: join(snapshot, 'SKILL.md'), runtime: config.runtime };
   } finally { if (stage) await rm(stage, { recursive: true, force: true }); await lock.close(); await rm(join(cache, '.sync-lock')); }
 }
 export async function resume({ project, task, runtime = root, cached = false } = {}) {

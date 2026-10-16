@@ -2,6 +2,32 @@
 
 ## 0.9.0 (unreleased)
 
+Review follow-up (2026-10-16):
+
+- Speed: stages are pipelined per section instead of whole-stage waves; light research takes
+  a section per task; light skips the gap-round cross-check so writing overlaps it; results
+  can register their sources inline and cite them by file; commands answer compactly and
+  `next` writes the full task to a file; worker payloads carry only what the task needs. The
+  guidance gives a coordinator recipe for parallel subagents in Claude Code and Codex.
+- The store lock waits up to 30 seconds for a busy save instead of failing, and recovers a
+  lock left by an exited process.
+- Registered source text is pinned under `research/sources/revisions/` and quotes are checked
+  against that copy. A changed original makes only the facts, questions and answers resting
+  on it stale; `research reassess` redoes just that work.
+- Sentence checks accept abbreviations and initials ("vs.", "U.S.", "J. Smith"); the number
+  rule reads spelled-out and scaled numbers ("five", "twenty-five", "1.5 million").
+- Plans outside the usual size for their depth, or uneven across comparison subjects, are
+  accepted with warnings. Reports add counts, dates, the given sources, who checked facts,
+  contents, open questions per section, a Gaps section and side-by-side conflicts.
+- Gaps a checker or cross-checker writes itself are labelled as its own assessment.
+- New tasks take guidance from the newest release tag the installed helper supports, not
+  from `main`; a repository without release tags is still served from `main`.
+- First Claude Code trial (Redis vs Valkey, light): 13 min 50 s against 4 min 59 s for the
+  0.8.1 skill on the same request, with 20 questions and 113 independently checked facts
+  (31 narrowed) against 8 unchecked findings. Fixes from it: gaps may name inline-registered
+  files, coverage accepts "partial", answer sentences may state a cited fact's date, and
+  cross-cutting sections no longer show an empty subject breakdown.
+
 - Keep plain-language skill invocation as the product interface; the agent researches
   with its harness tools and uses the Node-only helper for bookkeeping and validation.
 - Add durable leased research tasks, separate evidence checks, one bounded gap round,

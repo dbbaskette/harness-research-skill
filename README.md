@@ -60,7 +60,8 @@ bash scripts/Install-Harness-Research.sh
 
 On start or resume, the agent reports the installed runtime version and the
 guidance release, revision and freshness. These can differ: new tasks fetch
-instructions from `main`, while executable updates require the installer.
+instructions from the newest release your installed helper supports, while
+executable updates require the installer.
 Resumed tasks report their saved guidance and runtime, even after an installation
 update. Older guidance without a release label is reported as unknown, with its
 exact revision. An older helper without `--version` can be identified from its
@@ -205,8 +206,11 @@ Maintainers can follow the [release procedure](docs/releases.md).
 ## Guidance updates
 
 The installer registers a small local entrypoint. For new work, it quietly checks
-this public repository’s `main`, saves an exact guidance revision, and returns
-only paths and status. The agent reads the entry and relevant references, not
+this public repository’s release tags, takes the newest release whose guidance the
+installed helper supports, saves an exact guidance revision, and returns only
+paths and status. Unreleased work on `main` is not served. Helpers from 0.8.1 and
+earlier read `main` directly, so `main` must hold only released guidance until
+those installations are updated. The agent reads the entry and relevant references, not
 the whole library. Git and network access are needed for first/new-task refreshes;
 no GitHub account is required.
 
@@ -252,26 +256,26 @@ representative guidance-start response. Bootstrap activation is shown separately
 | Reading path | Tokens |
 | --- | ---: |
 | Discovery metadata | 38 |
-| Installed bootstrap | 448 |
-| Bootstrap + current guidance entry | 1,038 |
-| Skill research with independent checks and saved report | 3,483 |
-| Explicit chat-only cited answer | 1,992 |
-| Legacy manual research with saved report | 3,183 |
-| Status / resume without new findings | 1,593 |
-| Comparative routing only | 1,745 |
-| Codex comparative outline | 2,705 |
-| Codex add items | 1,910 |
-| Codex add fields | 1,930 |
-| Codex deep results | 2,593 |
-| Codex deep results + saved evidence | 3,784 |
-| Claude comparative outline | 2,722 |
-| Claude deep results | 2,615 |
-| Saved research + general web strategy | 3,980 |
-| Saved research + academic strategy | 4,072 |
-| Saved research + GitHub strategy | 3,867 |
-| Saved research + technical Q&A strategy | 3,772 |
-| Saved research + Chinese sources strategy | 3,997 |
-| Legacy migration | 1,387 |
+| Installed bootstrap | 463 |
+| Bootstrap + current guidance entry | 1,066 |
+| Skill research with independent checks and saved report | 4,257 |
+| Explicit chat-only cited answer | 2,020 |
+| Legacy manual research with saved report | 3,211 |
+| Status / resume without new findings | 1,621 |
+| Comparative routing only | 1,773 |
+| Codex comparative outline | 2,733 |
+| Codex add items | 1,938 |
+| Codex add fields | 1,958 |
+| Codex deep results | 2,621 |
+| Codex deep results + saved evidence | 3,812 |
+| Claude comparative outline | 2,750 |
+| Claude deep results | 2,643 |
+| Saved research + general web strategy | 4,754 |
+| Saved research + academic strategy | 4,846 |
+| Saved research + GitHub strategy | 4,641 |
+| Saved research + technical Q&A strategy | 4,546 |
+| Saved research + Chinese sources strategy | 4,771 |
+| Legacy migration | 1,415 |
 
 Comparative rows include the selected platform resource, not the complete bundle.
 Each strategy row includes one router and one strategy. Status/resume skips plan

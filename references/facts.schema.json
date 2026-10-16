@@ -23,6 +23,11 @@
     "gaps": {"type": "array", "items": {"type": "object", "required": ["id", "question", "kind", "reason", "sources", "check"], "properties": {"kind": {"enum": ["insufficient", "unreadable", "unavailable"]}, "sources": {"type": "array", "items": {"type": "string"}}, "reason": {"type": "string"}}}},
     "rejected": {"type": "array", "items": {"$ref": "#/$defs/fact"}},
     "failed": {"type": "array", "items": {"type": "object", "required": ["id", "kind", "reason", "attempts"]}},
+    "stale_questions": {"type": "array", "items": {"type": "string"}},
+    "plan_warnings": {"type": "array", "items": {"type": "string"}},
+    "checkers": {"type": "array", "items": {"type": "object", "required": ["id", "harness"]}},
+    "reassessments": {"type": "array", "items": {"type": "object", "required": ["round", "questions"]}},
+    "completed_at": {"type": ["string", "null"]},
     "counts": {"type": "object", "required": ["questions", "facts", "checked", "sources", "narrowed", "rejected", "gaps", "conflicts", "superseded", "failed"]}
   },
   "$defs": {
@@ -32,7 +37,7 @@
     },
     "source": {
       "type": "object", "required": ["id", "title", "origin", "file", "sha256", "original_file", "original_sha256", "standing", "provenance", "limits"],
-      "properties": {"id": {"type": "string"}, "title": {"type": "string"}, "origin": {"type": "string"}, "file": {"type": ["string", "null"]}, "sha256": {"type": ["string", "null"]}, "original_file": {"type": ["string", "null"]}, "original_sha256": {"type": ["string", "null"]}, "standing": {"enum": ["primary", "secondary", "community"]}, "provenance": {"enum": ["given", "found", "transcribed"]}, "limits": {"type": "string"}}
+      "properties": {"id": {"type": "string"}, "title": {"type": "string"}, "origin": {"type": "string"}, "file": {"type": ["string", "null"]}, "sha256": {"type": ["string", "null"]}, "original_file": {"type": ["string", "null"]}, "original_sha256": {"type": ["string", "null"]}, "standing": {"enum": ["primary", "secondary", "community"]}, "provenance": {"enum": ["given", "found", "transcribed"]}, "limits": {"type": "string"}, "pinned": {"type": ["string", "null"]}, "capture": {"type": ["object", "null"]}, "stale_since": {"type": ["string", "null"]}}
     },
     "fact": {
       "type": "object", "required": ["key", "statement", "questions", "section", "subject", "as_of", "authored_by", "status", "check", "citations", "original_statement", "conflicts_with", "superseded_by"],

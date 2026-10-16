@@ -229,7 +229,7 @@ its research, and whoever can see the repository can use it.
 | Release | What | For |
 | --- | --- | --- |
 | **0.9.0** | Queue and lease fencing, independent invocations, sources and exact claim targets, immutable fact identity/history, checks, cross-check, gap completion, partial/final output and the light default; acceptance trials in both Claude Code and Codex, including supplied-only work; explicit runtime upgrade | Standalone |
-| **0.9.x** | `research verify`; reuse: `start --from`, `find`, `approve`, `refresh`; any compatible-guidance fallback requires an installed executable update and explicit freshness reporting | Standalone; prerequisite for Brand adoption |
+| **0.9.x** | `research verify`; `--again ID,...` to re-research chosen questions (standalone "research these again" and the studios' research gate); reuse: `start --from`, `find`, `approve`, `refresh`; any compatible-guidance fallback requires an installed executable update and explicit freshness reporting | Standalone; prerequisite for Brand adoption |
 | **Brand 0.14** | Research handoff to its guidance; plan shown with the deck; Slides fact-key citation checks available; `verify` before delivery; pin the tested 0.9.x release with all required commands | Tanzu Brand |
 | **Slides** | `outline check` warns on uncited content slides in a researched deck | Tanzu Brand |
 | **Studios** | Blog first, then Presentation, Training and Marketing move to the run, with Start from existing research and approval at their gates; `studio_research` shrinks | Studios |

@@ -134,8 +134,10 @@ test('preserved comparative validator detects missing fields without requiring s
 
 test('macOS system aliases normalize without allowing user directory symlinks', { skip: process.platform !== 'darwin' }, async t => {
   const options = await fixture(t);
-  assert.ok(options.root.startsWith('/private/var/'));
-  const alias = options.root.replace('/private/var/', '/var/');
+  // The temporary directory sits under one of macOS's OS-owned root aliases: /var or /tmp.
+  const prefix = ['/private/var/', '/private/tmp/'].find(item => options.root.startsWith(item));
+  assert.ok(prefix, `Temporary root ${options.root} is not under a macOS system alias.`);
+  const alias = options.root.replace(prefix, prefix.slice('/private'.length));
   const result = await install({ ...options, home: join(alias, 'home'), shared: join(alias, 'shared') });
   assert.equal(result.shared, options.shared);
   for (const target of result.targets) await access(join(target, 'SKILL.md'));

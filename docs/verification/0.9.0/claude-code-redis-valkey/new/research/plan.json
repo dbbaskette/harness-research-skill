@@ -1,0 +1,192 @@
+{
+  "run": "e0649dcf34db4d849bc76ffe",
+  "output_revision": 96,
+  "scope": "Redis (Redis Ltd.'s open-source Redis / Redis Open Source) and Valkey (the Linux Foundation fork) as in-memory data stores, as of late 2026, for a platform team choosing between them: licensing, governance and project history, architecture, persistence, clustering and replication, published performance claims, compatibility, and migration. Primary documentation, licence texts and project announcements first. Out of scope: managed-service pricing, client-library comparisons, and vendor enterprise editions beyond what bears on licensing.",
+  "source_mode": "public-web",
+  "sections": [
+    {
+      "id": "licensing",
+      "name": "Licensing"
+    },
+    {
+      "id": "governance",
+      "name": "Governance and history"
+    },
+    {
+      "id": "architecture",
+      "name": "Architecture"
+    },
+    {
+      "id": "persistence",
+      "name": "Persistence"
+    },
+    {
+      "id": "clustering",
+      "name": "Clustering and replication"
+    },
+    {
+      "id": "performance",
+      "name": "Performance"
+    },
+    {
+      "id": "compatibility",
+      "name": "Compatibility"
+    },
+    {
+      "id": "migration",
+      "name": "Migration"
+    }
+  ],
+  "subjects": [
+    {
+      "id": "redis",
+      "name": "Redis"
+    },
+    {
+      "id": "valkey",
+      "name": "Valkey"
+    }
+  ],
+  "questions": [
+    {
+      "id": "redis-licence",
+      "question": "Under which licences is current Redis released, and how have they changed since 2024?",
+      "section": "licensing",
+      "subject": "redis",
+      "kind": "open"
+    },
+    {
+      "id": "valkey-licence",
+      "question": "Under which licence is Valkey released?",
+      "section": "licensing",
+      "subject": "valkey",
+      "kind": "open"
+    },
+    {
+      "id": "redis-governance",
+      "question": "Who owns and governs the Redis project?",
+      "section": "governance",
+      "subject": "redis",
+      "kind": "open"
+    },
+    {
+      "id": "valkey-governance",
+      "question": "Who governs Valkey, and under which foundation?",
+      "section": "governance",
+      "subject": "valkey",
+      "kind": "open"
+    },
+    {
+      "id": "fork-origin",
+      "question": "Why and from which Redis version was Valkey forked?",
+      "section": "governance",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "redis-architecture",
+      "question": "How does Redis use threads to process commands and network I/O?",
+      "section": "architecture",
+      "subject": "redis",
+      "kind": "open"
+    },
+    {
+      "id": "valkey-architecture",
+      "question": "How does Valkey use threads to process commands and network I/O?",
+      "section": "architecture",
+      "subject": "valkey",
+      "kind": "open"
+    },
+    {
+      "id": "redis-persistence",
+      "question": "Which persistence options does Redis document?",
+      "section": "persistence",
+      "subject": "redis",
+      "kind": "open"
+    },
+    {
+      "id": "valkey-persistence",
+      "question": "Which persistence options does Valkey document?",
+      "section": "persistence",
+      "subject": "valkey",
+      "kind": "open"
+    },
+    {
+      "id": "redis-clustering",
+      "question": "How does Redis Cluster shard data and handle replication and failover?",
+      "section": "clustering",
+      "subject": "redis",
+      "kind": "open"
+    },
+    {
+      "id": "valkey-clustering",
+      "question": "How does Valkey cluster mode shard data and handle replication and failover?",
+      "section": "clustering",
+      "subject": "valkey",
+      "kind": "open"
+    },
+    {
+      "id": "redis-performance",
+      "question": "What performance improvements do recent Redis releases claim?",
+      "section": "performance",
+      "subject": "redis",
+      "kind": "open"
+    },
+    {
+      "id": "valkey-performance",
+      "question": "What performance improvements do recent Valkey releases claim?",
+      "section": "performance",
+      "subject": "valkey",
+      "kind": "open"
+    },
+    {
+      "id": "redis-compatibility",
+      "question": "Which data types and features does Redis offer that Valkey does not document?",
+      "section": "compatibility",
+      "subject": "redis",
+      "kind": "open"
+    },
+    {
+      "id": "valkey-compatibility",
+      "question": "How compatible is Valkey with Redis commands, protocol and data files?",
+      "section": "compatibility",
+      "subject": "valkey",
+      "kind": "open"
+    },
+    {
+      "id": "migration-path",
+      "question": "What migration path from Redis to Valkey does the Valkey project document?",
+      "section": "migration",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "migration-limits",
+      "question": "Which Redis versions or features limit a straightforward migration to Valkey?",
+      "section": "migration",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "valkey-new-commands",
+      "question": "Which commands added in Redis 7.4 and 8.x does Valkey implement or lack?",
+      "section": "compatibility",
+      "subject": "valkey",
+      "kind": "open"
+    },
+    {
+      "id": "independent-benchmarks",
+      "question": "What independent, third-party benchmarks compare recent Redis and Valkey releases?",
+      "section": "performance",
+      "subject": null,
+      "kind": "open"
+    },
+    {
+      "id": "migration-tools",
+      "question": "Which tools or managed services support migrating data from Redis 7.4 or later to Valkey?",
+      "section": "migration",
+      "subject": null,
+      "kind": "open"
+    }
+  ]
+}
