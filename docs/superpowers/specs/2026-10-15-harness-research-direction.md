@@ -1,11 +1,11 @@
 # harness-research: one research component, three ways in
 
-Date: 2026-10-15. Status: draft for the owner to correct. Builds on
+Date: 2026-10-15. Status: draft 2; the owner confirmed the aim and asked for saved research. Builds on
 [the run design](2026-10-15-research-with-agents-design.md).
 
 ## What this is for
 
-My understanding of the longer-term aim, to be corrected:
+The longer-term aim, as confirmed by the owner:
 
 - **Content made with Claude Code or Codex, in an organisation's brand.** Tanzu Brand and
   Harness Slides make decks today. The studios (Training, Presentation, Blog, and Marketing
@@ -16,6 +16,8 @@ My understanding of the longer-term aim, to be corrected:
   be checked again later, when a source changes or before publishing.
 - **Research is done once per piece of work and reused** by everything downstream: the outline,
   the slides and speaker notes, the learner guide, the blog draft, the fact-check.
+- **Research is kept.** A finished run can be saved to a library and used again later, by a
+  person or by any studio, instead of being researched from scratch.
 - **One implementation.** A person asking for research directly, Brand, and every studio use
   the same component, not three copies of it.
 - **The agents do the work at full strength,** and the code keeps them honest.
@@ -123,6 +125,7 @@ The studios keep what is theirs and hand over what is not:
   | `research/brief.md` | Every fact with its key, one per line |
   | `research/sources/` | The saved text of every source |
   | `.harness-research/` | The record, its history, the queue and each task's folder |
+| the library | Saved runs, outside any one project (see below) |
 
 - **`facts.json`** has a `schema` number. Fields are only ever added within a schema; a change
   that removes or renames one is a new schema, and the helper can still read the old one.
@@ -138,32 +141,82 @@ The studios keep what is theirs and hand over what is not:
   a release. As Harness Slides now does, an older runtime falls back to the last guidance it
   supports instead of being refused.
 
-## Reuse beyond one piece of work (later)
+## Saving research for later
 
-Today a run belongs to one deck, training or blog. The same facts about Valkey could serve a
-deck, a blog and a training, and a team could share them. That is not in the first releases,
-but the contract leaves room for it: facts carry their sources and checks, keys are stable,
-and staleness is by source. A later `research import` could bring a reviewed run into a new
-item, and a team library could sit behind it, alongside Blog Studio's Team Hub.
+A run belongs to one deck, training or blog while it is made. Once it is done, it can be saved
+to a **research library** and used again: the facts about Valkey gathered for a deck can start
+a blog a month later.
+
+### The library
+
+- A folder of saved runs. Each person has one by default, in the same place the runtime is
+  installed; `--library DIR` or `HARNESS_RESEARCH_LIBRARY` points at another, such as a team's
+  shared folder or repository. Who can see a library is decided by where it is.
+- **A saved entry** is a copy of the finished run: the plan, the report, `facts.json`,
+  `brief.md`, the saved text of every source, and the record. It also holds a title, the topic,
+  the scope, tags, the depth, the date it was made, the date each source was saved, and, when a
+  person approved it at a gate, who approved it and when.
+- The saved text of documents the person gave is part of the entry, because their facts cannot
+  be checked without it. Saving to a shared library shares them; the save says so before it
+  happens.
+
+### Commands
+
+```sh
+node scripts/harness-research.mjs research save --project DIR [--title TEXT] [--tag WORD ...] [--library DIR]
+node scripts/harness-research.mjs research library [--query WORDS] [--library DIR]
+node scripts/harness-research.mjs research start --project DIR --from ENTRY [--topic TEXT] ...
+node scripts/harness-research.mjs research refresh --project DIR
+```
+
+- **`save`** copies a complete run into the library and returns its entry ID. An incomplete run
+  is refused unless saved as a draft, which is marked as one.
+- **`library`** lists entries with their title, topic, scope, date, depth, fact count, approval
+  and how old their sources are; `--query` matches the title, topic, tags and questions.
+- **`start --from`** begins a new run from a saved entry instead of from nothing:
+  - Its plan, facts, checks and sources come across with their keys unchanged, so citations
+    made against the entry still work. The new run records which entry it came from.
+  - A new topic or `--about` text adds questions where the saved plan does not cover it; only
+    those are researched. With no change, the run is complete as soon as it starts.
+  - Several entries can be combined with `--from` more than once. The same fact found in two
+    entries has the same key and is merged.
+- **`refresh`** has the harness look at every source again. A source that changed makes its
+  facts stale; their questions are researched and checked again, and everything else is kept.
+  Use it before relying on an entry that is months old.
+
+### In the studios
+
+- The research gate offers **Save to library** once research is approved, with a title and tags
+  the studio suggests from the item.
+- The research step offers **Start from saved research,** listing library entries that match
+  the item's topic, with their age and approval. Choosing one runs `start --from`, then only
+  what the new item needs.
+- Before publishing, `research verify` checks the item's citations whether its facts were
+  researched for it or brought from the library.
+- A team that shares a library sees each other's saved research. Blog Studio's Team Hub and,
+  later, the monorepo's data root are natural places for it.
 
 ## Roadmap
 
 | Release | What | For |
 | --- | --- | --- |
 | **0.9.0** | The run design: queue, sources, facts, checks, cross-check, the Q/A report, `facts.json`, the light default; guidance for a person's own Claude Code; the acceptance comparison with today's skill | Standalone |
-| **0.9.x** | Codex trial and fixes; `research verify`; the guidance fallback for older runtimes | Standalone, Brand |
+| **0.9.x** | Codex trial and fixes; `research verify`; the library: `save`, `library`, `start --from`, `refresh`; the guidance fallback for older runtimes | Standalone, Brand |
 | **Brand 0.14** | The research handoff as one call; plan shown with the deck; Slides draft citing fact keys; `verify` before delivery; the new pin | Tanzu Brand |
 | **Slides** | `outline check` warns on uncited content slides in a researched deck | Tanzu Brand |
-| **Studios** | Blog first, then Presentation, Training and Marketing move to the run; `studio_research` shrinks | Studios |
-| **Later** | Reuse across items; a team library | Everyone |
+| **Studios** | Blog first, then Presentation, Training and Marketing move to the run, with Save to library and Start from saved research at their gates; `studio_research` shrinks | Studios |
+| **Later** | A team library behind the studios' shared data; searching the library by fact, not only by topic | Everyone |
 
-## Questions for the owner
+## Settled
 
-1. **Is the aim above right,** especially that content should cite fact keys and be checked
-   again before publishing?
-2. **Plan approval standalone:** run straight through at `light`, and ask for approval only
-   when the topic is broad? Or always show the plan first?
-3. **Slides and uncited slides:** should `outline check` only warn when a content slide in a
-   researched deck cites no fact, or refuse?
-4. **Order:** standalone first and then Brand, as above, or Brand's handoff at the same time as
-   0.9.0?
+- **The aim** above, including citing fact keys and checking them before publishing.
+- **Saved research:** a library, with save, list, start-from and refresh, used by the studios'
+  gates and by people directly.
+
+## Defaults taken unless the owner says otherwise
+
+- **Plan approval standalone:** a `light` run goes straight through; the plan is shown for
+  approval first when the topic is broad or the person asks.
+- **Uncited slides:** Slides' `outline check` warns, and does not refuse, when a content slide
+  in a researched deck cites no fact.
+- **Order:** standalone first (0.9.0), then the library and Brand, then the studios.
