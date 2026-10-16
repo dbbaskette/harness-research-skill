@@ -462,9 +462,9 @@ comparison, `subjects` is empty and every `subject` is null. The values are illu
   "scope": "public-web",
   "status": "complete",
   "created_at": "2026-10-16T14:00:03Z",
-  "completed_at": "2026-10-16T14:48:51Z",
-  "counts": {"questions": 42, "facts": 318, "narrowed": 41, "rejected": 27,
-             "sources": 96, "conflicts": 6, "superseded": 4, "failed": 0},
+  "completed_at": "2026-10-16T14:13:40Z",
+  "counts": {"questions": 14, "facts": 86, "narrowed": 9, "rejected": 6,
+             "sources": 31, "conflicts": 2, "superseded": 1, "failed": 0},
 
   "scope": "The two engines as products: technology, licensing, ecosystem and migration, as of late 2026. Not every managed service's pricing.",
   "sections": [{"id": "licensing", "name": "Licensing"}, {"id": "origin", "name": "Origin and governance"}],
