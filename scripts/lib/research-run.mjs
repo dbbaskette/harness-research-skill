@@ -5,6 +5,7 @@ import { resume as resumeGuidance } from '../sync-guidance.mjs';
 import { withStore, preserveRun, snapshot, readText, text, identifier, key, hash, stable, clone } from './run-storage.mjs';
 import { DEPTHS, sourceRecord, sourceFor, candidate, gaps, coverage, validateAssessment, validateAnswer, changedState, factFor } from './run-evidence.mjs';
 import { persist, ensureOutput, legacyRecord } from './run-output.mjs';
+import { contentDigest, approvalView } from './run-reuse.mjs';
 
 const packageRoot = new URL('../../', import.meta.url);
 // Research and checking routinely take longer than a few minutes, so a lease lasts 30 minutes and
@@ -166,7 +167,7 @@ async function viewFor(locations, state) {
   const stale = changes.sources.length > 0 || changes.claims.length > 0;
   const status = stale ? 'stale' : blockReasons.length ? 'blocked' : finished(state) ? hasGaps ? 'complete-with-gaps' : 'complete' : 'in-progress';
   const staleFacts = new Set(changes.facts);
-  return { run: state.run, status, output_revision: state.revision, runtimeVersion: state.runtimeVersion, guidanceVersion: state.guidanceVersion, guidanceRevision: state.guidanceRevision, guidanceTask: state.guidanceTask ?? null,
+  return { run: state.run, status, output_revision: state.revision, approval: approvalView(state, status), runtimeVersion: state.runtimeVersion, guidanceVersion: state.guidanceVersion, guidanceRevision: state.guidanceRevision, guidanceTask: state.guidanceTask ?? null,
     report: join(locations.output, 'report.md'), facts: join(locations.output, 'facts.json'), brief: join(locations.output, 'brief.md'), manifest: join(locations.output, 'output.json'), file: locations.state,
     blockReasons, staleInputs: changes.files, stale: { sources: changes.sources, facts: changes.facts, questions: changes.research, rewrite: changes.rewrite, claims: changes.claims }, changedInputs: changes.informational,
     ...(stale ? { next_step: changes.claims.length ? 'Claim targets changed; start a new run with the updated --claims.' : 'Registered sources changed; run research reassess to redo only the affected questions.' } : {}),
@@ -642,6 +643,18 @@ export async function reassessRun({ project, run, again = [], reason, now = Date
     openRound(state, at, { kind: changed.size ? 'reassess' : 'again', sources: [...changed], questions: [...research], rewrite: [...rewrite], ...(again.length ? { again: [...new Set(again)], reason: reason === undefined ? null : text(reason, 'Reason for researching again', 1000) } : {}) });
     advance(state);
     return { ...(await save(locations, state)), reassessing: state.reassess };
+  });
+}
+// A research gate records who approved the research and exactly what they approved. Any later change
+// to the content or its sources means the approval no longer applies; it is kept as history.
+export async function approveRun({ project, run, by, revision, now = Date.now() }) {
+  return withStore(project, async (locations, state) => {
+    requireState(state, run);
+    const approver = text(by, 'Approver (--by)', 200), view = await viewFor(locations, state);
+    if (!view.status.startsWith('complete')) throw new Error(`The research is ${view.status}; approve once it is complete or complete with gaps.`);
+    if (revision !== undefined && Number(revision) !== state.revision) throw new Error(`The research changed since output revision ${revision} was reviewed (now ${state.revision}); show the current report and approve again.`);
+    state.approvals = [...(state.approvals ?? []), { by: approver, at: new Date(now).toISOString(), run: state.run, output_revision: state.revision, content: contentDigest(state) }];
+    return save(locations, state);
   });
 }
 // What became of each cited fact key. Read-only: it checks the saved record and evidence, not whether

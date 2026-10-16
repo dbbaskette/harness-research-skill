@@ -48,6 +48,7 @@ export function exportFacts(state, view) {
     counts: { questions: state.questions.length, facts: state.facts.filter(fact => fact.status !== 'rejected').length, checked: state.facts.filter(fact => current(fact, view)).length, sources: state.sources.length, narrowed: state.factRevisions.filter(item => item.kind === 'narrowed').length, rejected: state.facts.filter(fact => fact.status === 'rejected').length, gaps: state.gaps.length, conflicts: state.conflicts.length, superseded: state.superseded.length, failed: state.tasks.filter(task => task.status === 'failed').length },
     block_reasons: view.blockReasons, stale_inputs: view.staleInputs, stale_questions: view.stale?.questions ?? [],
     checkers: checkers(state), plan_warnings: state.planWarnings ?? [], reassessments: state.reassessments ?? [],
+    approval: view.approval ?? null, approvals: state.approvals ?? [],
     completed_at: view.status.startsWith('complete') ? state.updatedAt : null,
   };
 }
@@ -96,6 +97,8 @@ export function renderReport(state, view) {
     `How facts were checked: ${who.length ? `each fact by a separate invocation from the one that researched it, against the original source (checkers: ${who.map(item => `${literal(item.id)} on ${literal(item.harness)}`).join(', ')}).` : 'not yet checked.'}`,
     `Prose: ${state.depth === 'light' ? 'citation and number validation, but no independent semantic writing review at light depth.' : reviewed ? 'every answer was reviewed against its cited facts by a separate invocation.' : 'independent writing review is pending.'}`,
     'Facts are checked for source support, not certified as true or live-current.', ''];
+  const approval = view.approval;
+  if (approval) lines.push(approval.current ? `Approval: approved by ${literal(approval.by)} on ${day(approval.at)} (output revision ${approval.output_revision}).` : `Approval: ${literal(approval.by)} approved output revision ${approval.output_revision} on ${day(approval.at)}; it no longer applies. ${literal(approval.reason)}`, '');
   if (state.planWarnings?.length) lines.push('Plan notes: ' + state.planWarnings.map(literal).join(' '), '');
   // Rounds after the first pass, grouped by why they ran. Runs saved by 0.9.0 recorded no kind.
   const rounds = [...(state.reassessments ?? []), ...(state.reassess && !state.reassess.done ? [state.reassess] : [])];

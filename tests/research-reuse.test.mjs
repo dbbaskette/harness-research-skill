@@ -111,3 +111,22 @@ test('reassess --again refuses unknown or unassessed questions, a round in progr
   await runCli(['reassess', '--project', c.project, '--run', c.run, '--again', 'writers']);
   await assert.rejects(runCli(['reassess', '--project', c.project, '--run', c.run, '--again', 'writers']), /already in progress/);
 });
+
+test('approve records who approved which content, and a later change says it no longer applies', async t => {
+  const f = await fixture(t); await setup(f);
+  await assert.rejects(runCli(['approve', '--project', f.project, '--by', 'Pat Reviewer']), /approve once it is complete/);
+  const c = await completed(t);
+  await assert.rejects(runCli(['approve', '--project', c.project, '--by', 'Pat Reviewer', '--revision', String(c.done.output_revision - 1)]), /changed since output revision/);
+  await assert.rejects(runCli(['approve', '--project', c.project]), /--by/);
+  const approved = await runCli(['approve', '--project', c.project, '--run', c.run, '--by', 'Pat Reviewer', '--revision', String(c.done.output_revision)]);
+  assert.equal(approved.approval.by, 'Pat Reviewer'); assert.equal(approved.approval.output_revision, c.done.output_revision); assert.equal(approved.approval.current, true);
+  const status = await runStatus(c); assert.equal(status.approval.current, true);
+  const exported = await factsOf(status);
+  assert.equal(exported.approval.by, 'Pat Reviewer'); assert.equal(exported.approvals.length, 1); assert.match(exported.approvals[0].content, /^[a-f0-9]{64}$/);
+  assert.match(await readFile(status.report, 'utf8'), /Approval: approved by Pat Reviewer on \d{4}-\d{2}-\d{2} \(output revision \d+\)\./);
+  assert.equal((await verifyKeys({ project: c.project, keys: [exported.facts[0].key] })).approval.current, true);
+  await runCli(['reassess', '--project', c.project, '--run', c.run, '--again', 'writers']);
+  const changed = await runStatus(c);
+  assert.equal(changed.approval.current, false); assert.match(changed.approval.reason, /changed since it was approved/);
+  assert.match(await readFile(changed.report, 'utf8'), /no longer applies/);
+});

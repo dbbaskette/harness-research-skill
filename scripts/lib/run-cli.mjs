@@ -2,7 +2,7 @@ import { parseArgs } from 'node:util';
 import { readFile, realpath } from 'node:fs/promises';
 import { resolve, relative, isAbsolute, join } from 'node:path';
 import { parseJson, atomic, directory } from './run-storage.mjs';
-import { startRun, nextTask, peekTask, releaseTask, submitTask, registerSource, heartbeat, runStatus, retryTask, continueRun, blockRun, reassessRun, verifyKeys } from './research-run.mjs';
+import { startRun, nextTask, peekTask, releaseTask, submitTask, registerSource, heartbeat, runStatus, retryTask, continueRun, blockRun, reassessRun, verifyKeys, approveRun } from './research-run.mjs';
 
 // Every command answers compactly by default: a coordinator calls these many times, and each reply
 // costs it time and context. The full task payload goes to a file its worker reads; --verbose shows all.
@@ -25,7 +25,7 @@ export async function runCli(argv) {
   const { values, positionals } = parseArgs({ args: argv, allowPositionals: true, options: {
     project: { type: 'string' }, run: { type: 'string' }, topic: { type: 'string' }, source: { type: 'string', multiple: true }, sources: { type: 'string' }, claims: { type: 'string' }, about: { type: 'string' }, depth: { type: 'string' }, 'allow-web': { type: 'boolean' }, 'plan-only': { type: 'boolean' }, 'source-mode': { type: 'string' }, 'guidance-task': { type: 'string' },
     worker: { type: 'string' }, harness: { type: 'string' }, task: { type: 'string' }, lease: { type: 'string' }, attempt: { type: 'string' }, file: { type: 'string' }, origin: { type: 'string' }, title: { type: 'string' }, publisher: { type: 'string' }, standing: { type: 'string' }, given: { type: 'string' }, id: { type: 'string' }, 'original-file': { type: 'string' }, partial: { type: 'string' }, 'source-date': { type: 'string' }, transcribed: { type: 'boolean' }, pages: { type: 'string' }, limits: { type: 'string' }, reason: { type: 'string' }, verbose: { type: 'boolean' }, help: { type: 'boolean', short: 'h' },
-    keys: { type: 'string' }, key: { type: 'string', multiple: true }, again: { type: 'string' },
+    keys: { type: 'string' }, key: { type: 'string', multiple: true }, again: { type: 'string' }, by: { type: 'string' }, revision: { type: 'string' },
   } });
   const [action, ...extra] = positionals;
   const allowed = {
@@ -33,7 +33,7 @@ export async function runCli(argv) {
     next: ['worker', 'harness'], peek: ['worker'], release: ['task', 'worker', 'lease', 'attempt'], submit: ['task', 'worker', 'lease', 'attempt', 'file'],
     source: ['task', 'worker', 'lease', 'attempt', 'file', 'origin', 'title', 'publisher', 'standing', 'given', 'id', 'original-file', 'source-date', 'transcribed', 'pages', 'limits', 'partial'],
     heartbeat: ['task', 'worker', 'lease', 'attempt'], status: [], retry: ['task'], continue: ['file'], block: ['reason'], reassess: ['again', 'reason'],
-    verify: ['keys', 'key'],
+    verify: ['keys', 'key'], approve: ['by', 'revision'],
   };
   if (values.help || !action || action === 'help') return { usage: 'node scripts/harness-research.mjs research start|next|peek|submit|source|heartbeat|release|status|retry|continue|block|reassess|verify --project DIR [options] [--verbose]', note: 'The harness does the research; this helper manages durable tasks and evidence. Start requires --topic; all writes after start bind the current --run. Task writes require --task --worker --lease --attempt. next writes the full task to the file it names; --verbose prints full JSON. verify reads --keys FILE (or --key KEY) and reports what became of each cited fact.' };
   if (extra.length || !Object.hasOwn(allowed, action) || !values.project) throw new Error('Choose a research action and --project DIR.');
@@ -41,7 +41,8 @@ export async function runCli(argv) {
   const verbose = Boolean(values.verbose), output = result => verbose ? result : compact(result);
   if (action === 'start' && values.run) throw new Error('research start creates a new run; omit --run.');
   // Reading commands may name the run to make sure it is the one they mean; writes must.
-  if (!['start', 'status', 'verify'].includes(action) && !values.run) throw new Error('Supply the current --run ID.');
+  // Approval binds the content and, with --revision, the exact output the person saw.
+  if (!['start', 'status', 'verify', 'approve'].includes(action) && !values.run) throw new Error('Supply the current --run ID.');
   if (['submit', 'source', 'heartbeat', 'release'].includes(action)) for (const name of ['task', 'worker', 'lease', 'attempt']) if (!values[name]) throw new Error(`Task writes require --${name}.`);
   const root = await realpath(resolve(values.project));
   const projectFile = async file => isAbsolute(file) ? relative(root, await realpath(file)) : file;
@@ -90,6 +91,7 @@ export async function runCli(argv) {
     case 'continue': return output(await continueRun({ ...args, ...(values.file ? { plan: await json(values.file) } : {}) }));
     case 'block': return output(await blockRun(args));
     case 'reassess': return output(await reassessRun({ ...args, again: values.again ? values.again.split(',').map(id => id.trim()).filter(Boolean) : [] }));
+    case 'approve': return output(await approveRun(args));
     case 'verify': {
       const keys = [...(values.keys ? await keyFile(values.keys) : []), ...(values.key ?? [])];
       if (!keys.length) throw new Error(values.keys ? `${values.keys} cites no fact keys.` : 'Supply --keys FILE or --key KEY.');
