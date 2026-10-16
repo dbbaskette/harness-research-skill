@@ -60,8 +60,9 @@ to debug.
 3. **Fan out.** Call `research next --worker CHILD-ID --harness H` for a fresh
    child ID until it returns no task. Each task is written in full to the
    `file` the answer names. Start one subagent per task within available host capacity, each
-   with a prompt like: *"You are worker CHILD-ID. Read FILE and follow its brief
-   with your own search, fetch and reading tools. Write the result JSON to
+   with a prompt like: *"You are worker CHILD-ID. Read FILE and follow its brief;
+   read the guidance sections its `guide` names, and use your own search, fetch
+   and reading tools. Write the result JSON to
    research/work/TASK.json and run `research submit` with this run, task, worker,
    lease and attempt. If it is refused, fix the reported errors and submit again
    with the same lease. Reply with the final accepted/errors line only."*
@@ -102,118 +103,13 @@ your participation, so you cannot check that question later.
 The helper serialises saves and waits up to 30 seconds for a busy store, so many
 subagents may call it at once. "Busy after waiting" means retry the same command.
 
-## Sources
+## Worker tasks
 
-Read the original and save its full readable text with exact wording and locators:
-the whole page or document, or at least the whole relevant section, never only the
-sentence you will quote. A quote is checked against its surrounding text, so text
-shorter than 280 characters, or a quote that is most of its saved source, is
-refused. When a tool returns only part of a page, or the source really is that
-short, register it with `"partial":"reason"`; its facts are labelled. Mark chart or
-scan transcriptions with `"transcribed":true,"pages":"4-6"`. Keep markup that
-changes meaning: write struck-through or deleted text as `~~text~~`, never as
-plain current wording, and do not cite it as current. A summary or translation
-is not the original quoted text.
-
-Reuse sources already listed in the task by their registered IDs:
-`{"source":"source-id","quote":"Exact original wording.","locator":"Section"}`.
-Do not register the same selected source again from a research task: without
-its `given` ID a new registration is treated as a found public source. For a
-new extraction of a selected reference, include its `given` ID from the task
-source record.
-
-Register new sources inside the result that uses them, and cite them by file:
-
-```json
-{"register":[{"file":"research/sources/valkey-docs.md","origin":"https://valkey.io/topics/persistence/","title":"Valkey persistence","publisher":"Valkey project","standing":"primary","source_date":"2026-09-01"}],
- "questions":[{"id":"question-id","coverage":"answered","gaps":[],
-   "facts":[{"statement":"One atomic assertion naming its subject.","as_of":null,
-     "quotes":[{"file":"research/sources/valkey-docs.md","quote":"The inspected original wording.","locator":"Section heading"}]}]}]}
-```
-
-The helper pins a copy of each registered text under
-`research/sources/revisions/` and checks every quote against that copy, so a later
-overwrite of the working file cannot change evidence. Use one file name per page
-and do not reuse a name for different content. A source task binds its selected
-original automatically: submit `{"register":[{"file":"...","title":"...","publisher":"..."}]}`.
-For an unreadable selected source register `{"title":"...","limits":"concrete reason"}`
-without a file. Found sources require public permission and an HTTP(S) `origin`;
-`standing` is `primary`, `secondary` or `community`. `research source` registers one
-source by command when that is easier, with the same fields as flags.
-
-## Plan and research
-
-Plan results contain an optional short `title`, `scope`, `sections` (`id`,`name`),
-optional `subjects` (`id`,`name`), and `questions` (`id`,`section`,`subject`,`kind`:
-`open` or `claim`, `question`, plus the exact `claim` object for claim questions).
-Include all requested claims. Light is about 20 questions in 6 to 10 sections; do
-not pad a narrow request or fixed claim set. When comparing, ask each section's
-questions of every subject. A plan outside the usual size, or uneven across
-subjects, is accepted with `warnings`; fix it or say why it is right.
-
-At light depth a research task covers a whole section; at standard and deep, one
-question. Return every assigned question in `questions` as above. Facts are single
-sentences of at most 40 words, with 1–5 exact source quotes of 20–900 characters.
-Every number must occur in its quotes, including spelled-out numbers ("five"),
-preserving decimal and version distinctions; that filter does not prove semantic
-support. Comparison facts must name their subject. An honest `not answered` can
-contain no facts. Every gap names what it rests on: the sources inspected (source
-IDs, or files registered in the same result) or, when nothing could be read, the
-access attempts:
-`{"kind":"insufficient","reason":"Concrete limitation","sources":["research/sources/x.md"]}`
-or `{"kind":"unavailable","reason":"...","attempts":["https://... returned 403"]}`.
-Source-access limitations may be assessed gaps; execution failures are not absence
-of evidence.
-
-## Independent checking
-
-The checker receives the candidate facts, their pinned sources and the questions,
-not the researcher's reasoning. It opens the originals, verifies page/line locators
-against them, reads context, and returns:
-
-```json
-{"facts":[{"key":"assigned-fact-key","result":"confirmed"}],"inspected_sources":[{"source":"source-id","sha256":"extraction-hash-from-task","original_sha256":"original-hash-from-task-or-null","read_original":true}],"assessments":[{"id":"question-id","coverage":"answered","gaps":[]}]}
-```
-
-Each fact may instead be `narrowed` with a supported `statement` and `reason`, or
-`rejected` with a reason. Claim assessments also give `verdict`: supported,
-contradicted or insufficient. Assess every assigned fact and question. After all
-facts are rejected, do not keep `answered`; supply a concrete assessed gap. Gaps a
-checker writes itself are labelled as its own assessment. Revision attestations do
-not mean the helper independently inspected the original. Never set
-`read_original:true` merely to satisfy validation. If an original cannot be opened,
-keep its exact revision hashes but use `read_original:false` and a concrete
-`access_error`. Reject every fact citing that source with a reason, and assess
-each affected question as partly or not answered with an `unavailable` or
-`unreadable` gap naming the source. Other facts from inspected originals can
-still be confirmed. If this cannot be assessed honestly, block the run.
-
-## Cross-check and writing
-
-Cross-check results contain `merges`, `conflicts`, `superseded` and `missing`
-arrays, empty when none apply. Merge entries name `canonical`, `duplicates` and
-a reason; different wording needs `same_assertion:true` and compatible context.
-Conflicts name fact keys and a note. Supersession names `fact`,`by`,`note`.
-Missing angles name an existing section/subject and a focused question, most
-important first; the task says how many become gap questions. The gap round is
-researched and checked once; standard and deep also cross-check it.
-
-Writing results contain each assigned question exactly once:
-
-```json
-{"questions":[{"id":"question-id","headline":{"sentence":"The supported one-line answer.","facts":["confirmed-fact-key"]},"answer":[{"sentence":"A supported explanatory sentence.","facts":["confirmed-fact-key"],"paragraph":1}],"gaps":[]}]}
-```
-
-The writing task carries the section's current facts; other sections' facts are in
-`research/brief.md` and may be cited by key. Every factual headline and sentence
-needs current keys and supported numbers. An answered question needs 1–40 cited body sentences in addition to its headline,
-in up to four paragraphs; explain
-conflicts, dates and limitations without recommendations beyond the facts.
-Preserve gap IDs. A question assessed `not answered` instead has
-`headline:{kind:"gap",gaps:[IDs]}`, `answer:[]` and those gap IDs; the helper
-renders the bounded gap message. At standard/deep a separate writing reviewer
-returns the same structure after cutting overstatement and cannot add fact
-references. Light omits independent prose review; the report discloses it.
+Each task names the file and sections its worker needs in `guide`, so a worker
+reads only its own contract: [source, plan and research](task-research.md),
+[independent checking](task-check.md), or [cross-check, writing and
+review](task-write.md). Read the matching file yourself before a source, plan or
+cross-check task.
 
 ## Changed sources
 

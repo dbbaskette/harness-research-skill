@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.9.4 — unreleased
+
+Recommendations 1 and 2 of the [0.9.3 skill review](https://github.com/dbbaskette/harness-research-skill/pull/20):
+a lighter light depth and per-role guidance. Not released until it is verified
+and tagged.
+
+- **Light depth is lighter.** A research submission records at most 6 facts per
+  question at light (was 12), and an answer has at most 10 cited body sentences
+  (was 40). Standard keeps 20 facts and deep 30, both with 40 sentences. Tasks
+  carry `facts_per_question` and `sentences_per_answer`, and the briefs say these
+  are limits, not quotas. In the 0.9.1 Claude Code trial, researchers hit the old
+  12-fact limit on 8 of 10 questions.
+- **Workers read only their own contract.** The task contract moved out of
+  `references/research-run.md` into three role files: `task-research.md`
+  (sources, plan and research), `task-check.md` (independent checking) and
+  `task-write.md` (cross-check, writing and review). Every task carries a `guide`
+  naming its worker's file and sections. A pinned task points into its own saved
+  guidance snapshot and falls back to `research-run.md` in older snapshots. The
+  coordinator still reads the run guidance plus the research and writing files.
+
 ## 0.9.3 — 2026-10-16
 
 The remaining minor findings from the 0.9.1 live trials

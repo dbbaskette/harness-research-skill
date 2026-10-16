@@ -65,9 +65,12 @@ Rounds after the first pass (`reassess`, `again`, `refresh`, and `import` for
 work a reused run must redo) research and check only their questions, rewrite
 only their answers, and are listed in `facts.json` under `reassessments`.
 
-Read the [research contract](../references/research-run.md) for flags, input
-shapes, source registration, partial-capture corrections, independent checker
-attestations, and writing results. Result-file paths resolve against `--project`.
+Read the [run guidance](../references/research-run.md) for starting, dispatching
+and finishing a run, and the task contracts ([source, plan and research](../references/task-research.md),
+[checking](../references/task-check.md), [cross-check, writing and review](../references/task-write.md))
+for input shapes, source registration, partial-capture corrections, independent
+checker attestations and writing results. Each task's `guide` names the one file
+and the sections its worker needs. Result-file paths resolve against `--project`.
 Found sources require explicit public-web permission; a claim target cannot be
 its own sole evidence.
 

@@ -19,7 +19,7 @@ async function taskFile(root, task) {
   const name = `.harness-research/tasks/${task.id}-attempt-${task.attempt}.json`;
   await atomic(join(root, name), JSON.stringify(task, null, 2) + '\n');
   const { id, kind, run, worker, lease, attempt, expires, section, questions } = task;
-  return { id, kind, run, worker, lease, attempt, expires, ...(section ? { section } : {}), questions: (questions ?? []).map(question => question.id), file: name, brief: task.brief };
+  return { id, kind, run, worker, lease, attempt, expires, ...(section ? { section } : {}), questions: (questions ?? []).map(question => question.id), file: name, brief: task.brief, guide: task.guide ?? null };
 }
 
 export async function runCli(argv) {

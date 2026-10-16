@@ -179,7 +179,11 @@ representative guidance-start response. Bootstrap activation is shown separately
 | Discovery metadata | 38 |
 | Installed bootstrap | 490 |
 | Bootstrap + current guidance entry | 1,113 |
-| Skill research with independent checks and saved report | 4,617 |
+| Research worker subagent | 1,133 |
+| Checker subagent | 501 |
+| Writer or reviewer subagent | 580 |
+| Refresh worker | 668 |
+| Coordinator: skill research with independent checks and saved report | 4,838 |
 | Verify, research again, reuse or refresh | 1,890 |
 | Explicit chat-only cited answer | 2,067 |
 | Legacy manual research with saved report | 3,258 |
@@ -192,15 +196,16 @@ representative guidance-start response. Bootstrap activation is shown separately
 | Codex deep results + saved evidence | 3,859 |
 | Claude comparative outline | 2,797 |
 | Claude deep results | 2,690 |
-| Saved research + general web strategy | 5,114 |
-| Saved research + academic strategy | 5,206 |
-| Saved research + GitHub strategy | 5,001 |
-| Saved research + technical Q&A strategy | 4,906 |
-| Saved research + Chinese sources strategy | 5,131 |
+| Saved research + general web strategy | 5,335 |
+| Saved research + academic strategy | 5,427 |
+| Saved research + GitHub strategy | 5,222 |
+| Saved research + technical Q&A strategy | 5,127 |
+| Saved research + Chinese sources strategy | 5,352 |
 | Legacy migration | 1,462 |
 
 Comparative rows include the selected platform resource, not the complete bundle.
-Each strategy row includes one router and one strategy. Status/resume skips plan
+Worker rows count only the file a task's `guide` names, without the
+bootstrap or entry. Each strategy row includes one router and one strategy. Status/resume skips plan
 and finding schemas until a new save is needed. Only explicitly requested chat-only
 answers omit saved artifacts; default research uses the skill task/evidence workflow. Source
 content, images, research task responses and conversation add separately. The JSON

@@ -32,6 +32,10 @@ test('reported paths count each input once and README reflects the tested instru
   assert.equal(readingPath(['entry', 'entry'], { entry: 3 }).total, 3);
   assert.throws(() => readingPath(['missing'], {}), /Unknown instruction/);
   assert.equal(data.readingPaths.resume.files.some(x => x.path.endsWith('evidence.md') || x.path.endsWith('workflow.md')), false);
+  for (const [route, file] of [['researchWorker', 'task-research.md'], ['checkWorker', 'task-check.md'], ['writeWorker', 'task-write.md']]) assert.deepEqual(data.readingPaths[route].files.map(x => x.path), ['references/' + file]);
+  assert.deepEqual(data.readingPaths.queued.files.map(x => x.path).filter(x => x.startsWith('references/')), ['references/research-run.md', 'references/task-research.md', 'references/task-write.md']);
+  // Each worker reads less than the whole run guidance did in 0.9.3 (3,395 tokens in one file).
+  for (const route of ['researchWorker', 'checkWorker', 'writeWorker']) assert.ok(data.readingPaths[route].total < 1500, route);
   assert.equal(data.readingPaths.quick.files.some(x => x.path.endsWith('evidence.md')), false);
   assert.ok(data.readingPaths.focused.files.some(x => x.path.endsWith('evidence.md')));
   for (const platform of ['codex', 'claude']) for (const operation of ['outline', 'items', 'fields', 'deep']) {
