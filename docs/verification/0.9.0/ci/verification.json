@@ -1,0 +1,36 @@
+{
+  "source_commit": "d0a865b1fbe15922b42aa87ea0bc4070b76ee023",
+  "source_tree": "e1bf1cfd23b545ce949527ae8f5108acfed58126",
+  "source_was_clean": true,
+  "environment": {
+    "os": "macOS 27.0",
+    "node": "v22.23.2",
+    "python": "3.9.6"
+  },
+  "tests": {
+    "passed": 67,
+    "failed": 0,
+    "skipped": 0
+  },
+  "audit": "0 vulnerabilities",
+  "context": "passed",
+  "installer": "passed",
+  "installed_version": "harness-research 0.9.0",
+  "owned_vm": "harness-research-test-20261016042348-60411-18093eec",
+  "owned_vm_deleted": true,
+  "owned_vm_files_absent": true,
+  "host_logs": "/Users/dbbaskette/Library/Logs/MacOS Test Suite/harness-research/harness-research-test-20261016042348-60411-18093eec",
+  "log_sha256": {
+    "environment.txt": "e6c85fe994f5d0ebfffb5aa91b420ec5a7f5b4227869843bb36fab2fe41a86ea",
+    "tests.log": "3a5c65604cbf3ea318e5932369e673766e40bdacb361c044d07202345fcf37da",
+    "audit.log": "6d8c5c8f3d7684adb070417bd608d01ae90aa3dc26a65af03ffda4955f38d9a3",
+    "context.log": "6a7a57e7777cbb08ab4fa6df9108d5889f1f19fbd25fe0704b8802090a48b490",
+    "installer.log": "1557ea01df94c19e9ca82f68aa5a49073234f77fa126ba2f20c64242748f1abe",
+    "installed-version.log": "38be90bc72a08dc548dc1054adce9b1cfe5c8f1f7baea1c173c1a9363820aea2",
+    "installed-help.log": "9f2ef034a752b713d6798aa0a4fd9f9600b29bfdd6922cc732093d1a738b7a4b",
+    "result.txt": "c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431",
+    "run.txt": "dfe4e834daf403370acd1daf9122b32c76142c3ca695e8d57e082128d2be5b31"
+  },
+  "remote_ci": "No CI workflow present in this source tree; no remote run claimed.",
+  "release_acceptance": "Partial: two independent Codex skill examples; Claude not logged in; broader matrix remains before release."
+}

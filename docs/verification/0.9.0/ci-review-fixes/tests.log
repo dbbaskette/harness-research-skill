@@ -1,0 +1,476 @@
+
+> harness-research-skill@0.9.0 test
+> node --test tests/*.test.mjs
+
+TAP version 13
+# Subtest: routed instruction links and sections resolve
+ok 1 - routed instruction links and sections resolve
+  ---
+  duration_ms: 9.830375
+  type: 'test'
+  ...
+# Subtest: reported paths count each input once and README reflects the tested instructions
+ok 2 - reported paths count each input once and README reflects the tested instructions
+  ---
+  duration_ms: 214.928458
+  type: 'test'
+  ...
+# Subtest: shared shell installation is repeatable, isolated and usable in three harnesses without npm dependencies
+ok 3 - shared shell installation is repeatable, isolated and usable in three harnesses without npm dependencies
+  ---
+  duration_ms: 238.076333
+  type: 'test'
+  ...
+# Subtest: installer migrates exact Brand-owned aliases and agents while preserving independent skills
+ok 4 - installer migrates exact Brand-owned aliases and agents while preserving independent skills
+  ---
+  duration_ms: 101.936042
+  type: 'test'
+  ...
+# Subtest: installer rejects unsafe parents and unrelated destinations before writes
+ok 5 - installer rejects unsafe parents and unrelated destinations before writes
+  ---
+  duration_ms: 18.678833
+  type: 'test'
+  ...
+# Subtest: legacy migration preserves originals, scope, run IDs, evidence and history; stale inputs stay stale
+ok 6 - legacy migration preserves originals, scope, run IDs, evidence and history; stale inputs stay stale
+  ---
+  duration_ms: 25.529209
+  type: 'test'
+  ...
+# Subtest: legacy migration refuses active locks, unowned state and hostile history without changing old files
+ok 7 - legacy migration refuses active locks, unowned state and hostile history without changing old files
+  ---
+  duration_ms: 43.550917
+  type: 'test'
+  ...
+# Subtest: generic entrypoint routes valid local resources and CLI refuses irrelevant flags
+ok 8 - generic entrypoint routes valid local resources and CLI refuses irrelevant flags
+  ---
+  duration_ms: 192.987792
+  type: 'test'
+  ...
+# Subtest: preserved comparative validator detects missing fields without requiring system Python changes
+ok 9 - preserved comparative validator detects missing fields without requiring system Python changes
+  ---
+  duration_ms: 111.721917
+  type: 'test'
+  ...
+# Subtest: macOS system aliases normalize without allowing user directory symlinks
+ok 10 - macOS system aliases normalize without allowing user directory symlinks
+  ---
+  duration_ms: 77.485375
+  type: 'test'
+  ...
+# Subtest: new work sees main advancement; resumed work retains guidance and installed runtime without network
+ok 11 - new work sees main advancement; resumed work retains guidance and installed runtime without network
+  ---
+  duration_ms: 514.442958
+  type: 'test'
+  ...
+# Subtest: older guidance and task pins report unknown release without inventing a version
+ok 12 - older guidance and task pins report unknown release without inventing a version
+  ---
+  duration_ms: 382.387
+  type: 'test'
+  ...
+# Subtest: malformed guidance release cannot create a task
+ok 13 - malformed guidance release cannot create a task
+  ---
+  duration_ms: 441.974083
+  type: 'test'
+  ...
+# Subtest: guidance and executable changes are detected when resuming saved work
+ok 14 - guidance and executable changes are detected when resuming saved work
+  ---
+  duration_ms: 324.215
+  type: 'test'
+  ...
+# Subtest: incompatible guidance does not create a task and releases the refresh lock
+ok 15 - incompatible guidance does not create a task and releases the refresh lock
+  ---
+  duration_ms: 1194.481875
+  type: 'test'
+  ...
+# Subtest: fetch failures preserve existing tasks and never claim current guidance
+ok 16 - fetch failures preserve existing tasks and never claim current guidance
+  ---
+  duration_ms: 645.833167
+  type: 'test'
+  ...
+# Subtest: DNS failures identify the network restriction without leaking Git URLs and allow a retry
+ok 17 - DNS failures identify the network restriction without leaking Git URLs and allow a retry
+  ---
+  duration_ms: 899.897167
+  type: 'test'
+  ...
+# Subtest: missing Git reports the actual local operation instead of a fetch failure
+ok 18 - missing Git reports the actual local operation instead of a fetch failure
+  ---
+  duration_ms: 231.725542
+  type: 'test'
+  ...
+# Subtest: rejects symlink or executable guidance and unsafe caches
+ok 19 - rejects symlink or executable guidance and unsafe caches
+  ---
+  duration_ms: 445.977917
+  type: 'test'
+  ...
+# Subtest: pins an approved ancestor explicitly and rejects other commits or malformed task IDs
+ok 20 - pins an approved ancestor explicitly and rejects other commits or malformed task IDs
+  ---
+  duration_ms: 398.79125
+  type: 'test'
+  ...
+# Subtest: refresh lock refuses concurrent updates without deleting another owner’s lock
+ok 21 - refresh lock refuses concurrent updates without deleting another owner’s lock
+  ---
+  duration_ms: 63.103208
+  type: 'test'
+  ...
+# Subtest: installed discovery entry is the small bootstrap while executable helpers stay local
+ok 22 - installed discovery entry is the small bootstrap while executable helpers stay local
+  ---
+  duration_ms: 98.192125
+  type: 'test'
+  ...
+# Subtest: queued research completes with a checked cited answer, matching exports and a legacy projection
+ok 23 - queued research completes with a checked cited answer, matching exports and a legacy projection
+  ---
+  duration_ms: 180.167959
+  type: 'test'
+  ...
+# Subtest: honest zero-fact and all-rejected questions complete with gaps and no invented citation
+ok 24 - honest zero-fact and all-rejected questions complete with gaps and no invented citation
+  ---
+  duration_ms: 604.277333
+  type: 'test'
+  ...
+# Subtest: lease expiry fences old workers, renews live work and accepted replay cannot rewrite results
+ok 25 - lease expiry fences old workers, renews live work and accepted replay cannot rewrite results
+  ---
+  duration_ms: 43.144667
+  type: 'test'
+  ...
+# Subtest: a lapsed lease still submits while nobody else has taken the task
+ok 26 - a lapsed lease still submits while nobody else has taken the task
+  ---
+  duration_ms: 96.655958
+  type: 'test'
+  ...
+# Subtest: a refused submission keeps its lease for correction, and ten refusals end the attempt
+ok 27 - a refused submission keeps its lease for correction, and ten refusals end the attempt
+  ---
+  duration_ms: 115.59875
+  type: 'test'
+  ...
+# Subtest: three failed attempts block instead of fabricating unavailable, explicit retry retains history
+ok 28 - three failed attempts block instead of fabricating unavailable, explicit retry retains history
+  ---
+  duration_ms: 46.6015
+  type: 'test'
+  ...
+# Subtest: plan-only hold supports validated edits and cannot accidentally run research early
+ok 29 - plan-only hold supports validated edits and cannot accidentally run research early
+  ---
+  duration_ms: 66.964792
+  type: 'test'
+  ...
+# Subtest: unavailable independent checker is a visible execution block with partial artifacts
+ok 30 - unavailable independent checker is a visible execution block with partial artifacts
+  ---
+  duration_ms: 54.085709
+  type: 'test'
+  ...
+# Subtest: number/quote validation and failure rollback retain no partially accepted facts
+ok 31 - number/quote validation and failure rollback retain no partially accepted facts
+  ---
+  duration_ms: 71.4955
+  type: 'test'
+  ...
+# Subtest: normalized quotes preserve exact original wording and Unicode offsets; numeric boundaries remain distinct
+ok 32 - normalized quotes preserve exact original wording and Unicode offsets; numeric boundaries remain distinct
+  ---
+  duration_ms: 0.94875
+  type: 'test'
+  ...
+# Subtest: unowned output and escaping sources are preserved
+ok 33 - unowned output and escaping sources are preserved
+  ---
+  duration_ms: 3.371167
+  type: 'test'
+  ...
+# Subtest: narrowing creates a new assertion key and retains the rejected wording in history
+ok 34 - narrowing creates a new assertion key and retains the rejected wording in history
+  ---
+  duration_ms: 173.569959
+  type: 'test'
+  ...
+# Subtest: cross-check merges checked duplicates, preserves aliases, and rejects supersession cycles
+ok 35 - cross-check merges checked duplicates, preserves aliases, and rejects supersession cycles
+  ---
+  duration_ms: 1297.312125
+  type: 'test'
+  ...
+# Subtest: one light gap round is capped and unresearched angles remain explicit completion gaps
+ok 36 - one light gap round is capped and unresearched angles remain explicit completion gaps
+  ---
+  duration_ms: 384.386042
+  type: 'test'
+  ...
+# Subtest: standard depth requires a different writing reviewer and rejects unsupported headlines
+ok 37 - standard depth requires a different writing reviewer and rejects unsupported headlines
+  ---
+  duration_ms: 170.980791
+  type: 'test'
+  ...
+# Subtest: source original and extraction revisions are pinned separately; changed originals invalidate current use
+ok 38 - source original and extraction revisions are pinned separately; changed originals invalidate current use
+  ---
+  duration_ms: 591.515167
+  type: 'test'
+  ...
+# Subtest: UTF-8 BOM hashes use original bytes, and unreadable selected originals become assessed gaps
+ok 39 - UTF-8 BOM hashes use original bytes, and unreadable selected originals become assessed gaps
+  ---
+  duration_ms: 270.992084
+  type: 'test'
+  ...
+# Subtest: public-source permissions and exact Unicode claim targets cannot be bypassed by self-citation
+ok 40 - public-source permissions and exact Unicode claim targets cannot be bypassed by self-citation
+  ---
+  duration_ms: 75.245708
+  type: 'test'
+  ...
+# Subtest: status repairs interrupted derived writes without changing revision and refuses stale run writes
+ok 41 - status repairs interrupted derived writes without changing revision and refuses stale run writes
+  ---
+  duration_ms: 166.072583
+  type: 'test'
+  ...
+# Subtest: concurrent task claims use the shared lock and never return the same lease
+ok 42 - concurrent task claims use the shared lock and never return the same lease
+  ---
+  duration_ms: 38.906916
+  type: 'test'
+  ...
+# Subtest: CLI JSON and source paths resolve against project; help and malformed payload errors are actionable
+ok 43 - CLI JSON and source paths resolve against project; help and malformed payload errors are actionable
+  ---
+  duration_ms: 25.059125
+  type: 'test'
+  ...
+# Subtest: published schema validates the complete design fixture and rejects malformed external exports
+ok 44 - published schema validates the complete design fixture and rejects malformed external exports
+  ---
+  duration_ms: 1.00925
+  type: 'test'
+  ...
+# Subtest: isolated installation includes queued CLI, schema and skill guidance with no runtime dependencies
+ok 45 - isolated installation includes queued CLI, schema and skill guidance with no runtime dependencies
+  ---
+  duration_ms: 289.775625
+  type: 'test'
+  ...
+# Subtest: legacy status repairs an interrupted projection and manual commands cannot replace canonical work
+ok 46 - legacy status repairs an interrupted projection and manual commands cannot replace canonical work
+  ---
+  duration_ms: 207.1285
+  type: 'test'
+  ...
+# Subtest: new research records and verifies the saved bootstrap guidance identity offline
+ok 47 - new research records and verifies the saved bootstrap guidance identity offline
+  ---
+  duration_ms: 222.435792
+  type: 'test'
+  ...
+# Subtest: programmatic research imports work from stdin without treating it as a guidance executable
+ok 48 - programmatic research imports work from stdin without treating it as a guidance executable
+  ---
+  duration_ms: 61.095708
+  type: 'test'
+  ...
+# Subtest: preserved live skill examples keep valid exports, exact evidence and independent check identities
+ok 49 - preserved live skill examples keep valid exports, exact evidence and independent check identities
+  ---
+  duration_ms: 7.212792
+  type: 'test'
+  ...
+# Subtest: a failed question holds up only the stages after it; the other questions continue
+ok 50 - a failed question holds up only the stages after it; the other questions continue
+  ---
+  duration_ms: 148.113917
+  type: 'test'
+  ...
+# Subtest: peek shows the next task without taking it, and release gives it back without a failed attempt
+ok 51 - peek shows the next task without taking it, and release gives it back without a failed attempt
+  ---
+  duration_ms: 21.810417
+  type: 'test'
+  ...
+# Subtest: releasing research preserves checker exclusion, including after a refused finding
+ok 52 - releasing research preserves checker exclusion, including after a refused finding
+  ---
+  duration_ms: 191.078708
+  type: 'test'
+  ...
+# Subtest: saved source text must carry its surroundings unless registered as a partial capture
+ok 53 - saved source text must carry its surroundings unless registered as a partial capture
+  ---
+  duration_ms: 239.835167
+  type: 'test'
+  ...
+# Subtest: reports take a short title, compare subjects side by side, and export no worker bookkeeping
+ok 54 - reports take a short title, compare subjects side by side, and export no worker bookkeeping
+  ---
+  duration_ms: 111.425625
+  type: 'test'
+  ...
+# Subtest: comparison tables keep merged facts in every linked question section
+ok 55 - comparison tables keep merged facts in every linked question section
+  ---
+  duration_ms: 174.665333
+  type: 'test'
+  ...
+# Subtest: the sources list reads one path or link per line, and peek and release work from the command line
+ok 56 - the sources list reads one path or link per line, and peek and release work from the command line
+  ---
+  duration_ms: 19.530667
+  type: 'test'
+  ...
+# Subtest: published guidance still accepts runtime 0.8.1 and routes it to the manual workflow
+ok 57 - published guidance still accepts runtime 0.8.1 and routes it to the manual workflow
+  ---
+  duration_ms: 0.384583
+  type: 'test'
+  ...
+# Subtest: plan and every recorded finding automatically produce a cited report including unresolved questions
+ok 58 - plan and every recorded finding automatically produce a cited report including unresolved questions
+  ---
+  duration_ms: 210.744084
+  type: 'test'
+  ...
+# Subtest: matching plans resume findings and changes retain history with a new run
+ok 59 - matching plans resume findings and changes retain history with a new run
+  ---
+  duration_ms: 17.113458
+  type: 'test'
+  ...
+# Subtest: a changed plan keeps the findings of questions that did not change
+ok 60 - a changed plan keeps the findings of questions that did not change
+  ---
+  duration_ms: 15.12
+  type: 'test'
+  ...
+# Subtest: a reworded or removed question loses its finding and the rest keep theirs
+ok 61 - a reworded or removed question loses its finding and the rest keep theirs
+  ---
+  duration_ms: 47.453083
+  type: 'test'
+  ...
+# Subtest: a changed topic, purpose, scope, selected sources or input keeps no finding
+ok 62 - a changed topic, purpose, scope, selected sources or input keeps no finding
+  ---
+  duration_ms: 86.878709
+  type: 'test'
+  ...
+# Subtest: unchanged selected sources keep a finding when a question is added
+ok 63 - unchanged selected sources keep a finding when a question is added
+  ---
+  duration_ms: 9.182833
+  type: 'test'
+  ...
+# Subtest: a kept finding whose snapshot changed is reported stale
+ok 64 - a kept finding whose snapshot changed is reported stale
+  ---
+  duration_ms: 8.570542
+  type: 'test'
+  ...
+# Subtest: a finding may carry a one-line headline, shown as its answer
+ok 65 - a finding may carry a one-line headline, shown as its answer
+  ---
+  duration_ms: 18.787666
+  type: 'test'
+  ...
+# Subtest: changed content or evidence is stale and cannot silently be counted as current
+ok 66 - changed content or evidence is stale and cannot silently be counted as current
+  ---
+  duration_ms: 10.282875
+  type: 'test'
+  ...
+# Subtest: verdicts require actual exact passages and unknown questions or bad quotations preserve the record
+ok 67 - verdicts require actual exact passages and unknown questions or bad quotations preserve the record
+  ---
+  duration_ms: 37.5515
+  type: 'test'
+  ...
+# Subtest: supplied-only and private-query protections persist across replanning
+ok 68 - supplied-only and private-query protections persist across replanning
+  ---
+  duration_ms: 8.540917
+  type: 'test'
+  ...
+# Subtest: fact-checks bind exact Unicode claims to a content snapshot and keep contradictory findings
+ok 69 - fact-checks bind exact Unicode claims to a content snapshot and keep contradictory findings
+  ---
+  duration_ms: 8.995417
+  type: 'test'
+  ...
+# Subtest: source traversal, symlinks and unowned storage cannot overwrite external or user files
+ok 70 - source traversal, symlinks and unowned storage cannot overwrite external or user files
+  ---
+  duration_ms: 5.579917
+  type: 'test'
+  ...
+# Subtest: concurrent findings cannot lose a save and stale locks are surfaced
+ok 71 - concurrent findings cannot lose a save and stale locks are surfaced
+  ---
+  duration_ms: 12.051125
+  type: 'test'
+  ...
+# Subtest: question IDs matching object properties start pending and the packaged CLI writes the automatic report
+ok 72 - question IDs matching object properties start pending and the packaged CLI writes the automatic report
+  ---
+  duration_ms: 197.956208
+  type: 'test'
+  ...
+# Subtest: uploaded-only research pins the original and extraction, binds citations and excludes unselected documents
+ok 73 - uploaded-only research pins the original and extraction, binds citations and excludes unselected documents
+  ---
+  duration_ms: 12.796625
+  type: 'test'
+  ...
+# Subtest: combined research retains uploaded and contrary public evidence in the same report
+ok 74 - combined research retains uploaded and contrary public evidence in the same report
+  ---
+  duration_ms: 14.651083
+  type: 'test'
+  ...
+# Subtest: uncited uploads and changed extractions invalidate research and retain earlier revisions
+ok 75 - uncited uploads and changed extractions invalidate research and retain earlier revisions
+  ---
+  duration_ms: 12.528792
+  type: 'test'
+  ...
+# Subtest: unreadable and partial uploads remain explicit coverage gaps without preventing an uploaded-only report
+ok 76 - unreadable and partial uploads remain explicit coverage gaps without preventing an uploaded-only report
+  ---
+  duration_ms: 11.654292
+  type: 'test'
+  ...
+# Subtest: binary uploads cannot be cited as text and selected documents obey project path boundaries
+ok 77 - binary uploads cannot be cited as text and selected documents obey project path boundaries
+  ---
+  duration_ms: 6.519458
+  type: 'test'
+  ...
+1..77
+# tests 77
+# suites 0
+# pass 77
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 6585.56175

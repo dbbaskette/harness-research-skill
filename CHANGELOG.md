@@ -1,5 +1,36 @@
 # Changelog
 
+## 0.9.0 (unreleased)
+
+- Keep plain-language skill invocation as the product interface; the agent researches
+  with its harness tools and uses the Node-only helper for bookkeeping and validation.
+- Add durable leased research tasks, separate evidence checks, one bounded gap round,
+  cited headlines and answers, and independent prose review at standard/deep depth.
+- Save partial and final reports under `research/`, alongside checked facts, a brief,
+  plan and revision/hash manifest. Preserve a legacy report/record projection.
+- Track immutable fact keys, narrowed assertion history, duplicate aliases, conflicts,
+  source revisions, exact quote offsets and honest unanswered gaps.
+- Fence stale leases, reject self-checking and unleased managed-run writes, repair
+  interrupted exports, and exclude changed evidence from the current facts brief.
+- Guidance keeps accepting runtime 0.8.1 and sends older runtimes to the manual
+  workflow, so publishing it does not break pinned callers such as Tanzu Brand 0.13.6.
+  The queued workflow needs runtime 0.9.0. Runtime installation remains explicit;
+  reuse/refresh/approval commands and consumer migrations remain later milestones.
+- Saved source text must be the full page or relevant section: text under 280
+  characters, or a quote that is most of its source, is refused unless registered
+  as a partial capture with its reason. Partial captures are labelled.
+- A refused submission keeps its lease for correction; ten refusals end the attempt.
+  Leases last 30 minutes, and a lapsed lease may still submit until the task is
+  taken by someone else. A failed task holds up only later stages.
+- `research peek` shows the next task without taking it; `research release` gives a
+  task back without counting a failed attempt and retains researcher/checker separation.
+- Partial-capture corrections receive a new source revision automatically while old
+  metadata and citations remain immutable. Comparison tables retain facts shared by
+  questions in different sections after duplicate merging.
+- Reports take a short title; comparisons show each section's facts side by side;
+  `facts.json` leaves out worker bookkeeping; `--sources` also reads one path or
+  link per line.
+
 ## 0.8.1
 
 - A changed plan keeps the findings of questions whose definition is unchanged, when the topic, purpose, scope, selected sources and input files are unchanged. `plan` reports them in `carried`.

@@ -1,0 +1,5 @@
+Project: /Users/dbbaskette/Projects/harness-research-skill
+Test suite: harness-research
+Base VM: tanzu-brand-golden-gate-base
+Test VM: harness-research-test-20261016123015-56235-892b3e96
+Source commit: 65071d3094e12a7250bbd5dd18f9b210f4b3d7e6

@@ -1,0 +1,74 @@
+{
+  "run": "15fd7b055f744d61b0eb14ae",
+  "output_revision": 38,
+  "scope": "Compare AsterDB and BirchDB for a small internal application using only the two supplied synthetic notes, revised 2026-10-15. Cover deployment, concurrent writes and backup retention. Do not infer performance, production suitability or retention periods from backup mechanics.",
+  "source_mode": "supplied-only",
+  "sections": [
+    {
+      "id": "deployment",
+      "name": "Deployment"
+    },
+    {
+      "id": "writes",
+      "name": "Concurrent writes"
+    },
+    {
+      "id": "retention",
+      "name": "Backup retention"
+    }
+  ],
+  "subjects": [
+    {
+      "id": "aster",
+      "name": "AsterDB"
+    },
+    {
+      "id": "birch",
+      "name": "BirchDB"
+    }
+  ],
+  "questions": [
+    {
+      "id": "aster-deployment",
+      "question": "How is AsterDB deployed?",
+      "section": "deployment",
+      "subject": "aster",
+      "kind": "open"
+    },
+    {
+      "id": "birch-deployment",
+      "question": "How is BirchDB deployed?",
+      "section": "deployment",
+      "subject": "birch",
+      "kind": "open"
+    },
+    {
+      "id": "aster-writes",
+      "question": "What concurrent-write behavior is specified for AsterDB?",
+      "section": "writes",
+      "subject": "aster",
+      "kind": "open"
+    },
+    {
+      "id": "birch-writes",
+      "question": "What concurrent-write behavior is specified for BirchDB?",
+      "section": "writes",
+      "subject": "birch",
+      "kind": "open"
+    },
+    {
+      "id": "aster-retention",
+      "question": "What backup retention period is specified for AsterDB?",
+      "section": "retention",
+      "subject": "aster",
+      "kind": "open"
+    },
+    {
+      "id": "birch-retention",
+      "question": "What backup retention period is specified for BirchDB?",
+      "section": "retention",
+      "subject": "birch",
+      "kind": "open"
+    }
+  ]
+}

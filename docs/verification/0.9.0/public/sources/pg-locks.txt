@@ -1,0 +1,1 @@
+Row-level locks do not affect data querying; they block only writers and lockers to the same row.

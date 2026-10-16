@@ -1,0 +1,1 @@
+in MVCC locks acquired for querying (reading) data do not conflict with locks acquired for writing data

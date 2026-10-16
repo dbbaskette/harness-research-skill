@@ -1,0 +1,3 @@
+The database engine runs within the same process, thread, and address space as the application.
+
+There is no intermediary server process.

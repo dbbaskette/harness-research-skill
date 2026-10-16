@@ -1,0 +1,3 @@
+Usage: node scripts/harness-research.mjs research ACTION --project DIR [options]
+       node scripts/harness-research.mjs plan|record|status|migrate --project DIR [--file JSON] [--run ID --item ID] [--allow-web]
+       node scripts/harness-research.mjs --version
