@@ -1,0 +1,171 @@
+{
+ "claude_code": {
+  "0.9.1": {
+   "wall_seconds": 1517,
+   "subagents": 14,
+   "tokens_total": 1716769,
+   "by_role_mean": {
+    "research": 117993,
+    "check": 138470,
+    "write": 108614
+   },
+   "by_role_range": {
+    "research": [
+     105990,
+     132398
+    ],
+    "check": [
+     113420,
+     153188
+    ],
+    "write": [
+     98507,
+     115141
+    ]
+   },
+   "final_run_after_follow_ups": {
+    "run": "430fd4b5583c409fb2dab837",
+    "status": "complete-with-gaps",
+    "questions": 10,
+    "confirmed_facts": 125,
+    "max_facts_per_question": 24,
+    "narrowed": 15,
+    "rejected": 0,
+    "gaps": 4,
+    "answer_sentences": 154,
+    "answer_prose_words": 4292,
+    "checker_invocations": 6,
+    "report_words": 19577,
+    "evidence_words": 12917,
+    "outside_evidence_words": 6660
+   },
+   "nine_questions_not_researched_again": {
+    "run": "430fd4b5583c409fb2dab837",
+    "status": "complete-with-gaps",
+    "questions": 9,
+    "confirmed_facts": 101,
+    "max_facts_per_question": 12,
+    "narrowed": 15,
+    "rejected": 0,
+    "gaps": 4,
+    "answer_sentences": 128,
+    "answer_prose_words": 3509,
+    "checker_invocations": 6
+   },
+   "first_pass": {
+    "questions": 10,
+    "facts": 111,
+    "narrowed": 14,
+    "gaps": 3,
+    "checker_invocations": 5
+   }
+  },
+  "0.9.4": {
+   "wall_seconds": 592,
+   "subagents": 14,
+   "tokens_total": 1230707,
+   "by_role_mean": {
+    "research": 88872,
+    "check": 91837,
+    "write": 81790
+   },
+   "by_role_range": {
+    "research": [
+     78698,
+     94730
+    ],
+    "check": [
+     76580,
+     100883
+    ],
+    "write": [
+     77871,
+     85417
+    ]
+   },
+   "run": {
+    "run": "3107f434abc44f3daead217d",
+    "status": "complete-with-gaps",
+    "questions": 10,
+    "confirmed_facts": 60,
+    "max_facts_per_question": 6,
+    "narrowed": 7,
+    "rejected": 0,
+    "gaps": 2,
+    "answer_sentences": 70,
+    "answer_prose_words": 2050,
+    "checker_invocations": 5,
+    "report_words": 9751,
+    "evidence_words": 6239,
+    "outside_evidence_words": 3512
+   },
+   "nine_questions_not_researched_again": {
+    "run": "3107f434abc44f3daead217d",
+    "status": "complete-with-gaps",
+    "questions": 9,
+    "confirmed_facts": 54,
+    "max_facts_per_question": 6,
+    "narrowed": 7,
+    "rejected": 0,
+    "gaps": 2,
+    "answer_sentences": 62,
+    "answer_prose_words": 1805,
+    "checker_invocations": 5
+   }
+  }
+ },
+ "codex": {
+  "0.9.2 (0.9.1 limits)": {
+   "wall_seconds": 389,
+   "coordinator_usage": {
+    "input_tokens": 2760697,
+    "cached_input_tokens": 2527616,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 16226,
+    "reasoning_output_tokens": 3066
+   },
+   "run": {
+    "run": "76c693a80fa045c6a7e090cf",
+    "status": "complete",
+    "questions": 8,
+    "confirmed_facts": 39,
+    "max_facts_per_question": 7,
+    "narrowed": 2,
+    "rejected": 0,
+    "gaps": 0,
+    "answer_sentences": 32,
+    "answer_prose_words": 818,
+    "checker_invocations": 4,
+    "report_words": 5692,
+    "evidence_words": 4019,
+    "outside_evidence_words": 1673
+   }
+  },
+  "0.9.4": {
+   "wall_seconds": 293,
+   "coordinator_usage": {
+    "input_tokens": 2865704,
+    "cached_input_tokens": 2708608,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 12945,
+    "reasoning_output_tokens": 2552
+   },
+   "run": {
+    "run": "84c16de8f7574291b49a6495",
+    "status": "complete",
+    "questions": 7,
+    "confirmed_facts": 35,
+    "max_facts_per_question": 6,
+    "narrowed": 2,
+    "rejected": 0,
+    "gaps": 0,
+    "answer_sentences": 23,
+    "answer_prose_words": 558,
+    "checker_invocations": 1,
+    "report_words": 5407,
+    "evidence_words": 4183,
+    "outside_evidence_words": 1224
+   }
+  }
+ }
+}

@@ -60,6 +60,8 @@ test('each task names the guidance sections its worker needs, from the runtime w
   assert.deepEqual(cross.guide, { file: guide('task-write.md'), sections: ['Cross-check and writing'] });
   await submit(f, cross, { merges: [], conflicts: [], superseded: [], missing: [] });
   assert.deepEqual((await take(f, 'writer-invocation')).guide, { file: guide('task-write.md'), sections: ['Cross-check and writing'] });
+  // Researchers save struck text as ~~text~~; checkers must read it the same way.
+  for (const name of ['task-research.md', 'task-check.md']) assert.match(await readFile(guide(name), 'utf8'), /~~[^~]+~~[\s\S]*not current|not cite it as current/, name);
   const fresh = await fixture(t), plain = await take(fresh);
   assert.equal(plain.kind, 'source'); assert.deepEqual(plain.guide.sections, ['Sources']);
 });

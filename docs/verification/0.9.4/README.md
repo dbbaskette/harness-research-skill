@@ -8,7 +8,7 @@ recommendations 1 and 2 of the 0.9.3 skill review.
 | Facts per question at light | up to 12; researchers hit it on 8 of 10 trial questions | up to 6; standard 20, deep 30 unchanged |
 | Answer body sentences at light | 1–40 | 1–10; standard and deep keep 40 |
 | Guidance a researcher subagent reads | `research-run.md`, 3,395 tokens | `task-research.md`, 1,133 tokens |
-| Guidance a checker subagent reads | 3,395 tokens | `task-check.md`, 501 tokens |
+| Guidance a checker subagent reads | 3,395 tokens | `task-check.md`, 542 tokens |
 | Guidance a writer or reviewer subagent reads | 3,395 tokens | `task-write.md`, 580 tokens |
 | Coordinator's full checked run | 4,617 tokens | 4,838 tokens (run guidance plus the research and writing contracts) |
 
@@ -28,6 +28,8 @@ points into its saved guidance snapshot, and an older snapshot falls back to
   research tasks named `task-research.md`, checks `task-check.md`, and
   cross-checks and writing `task-write.md`.
 
-No live model trial has run on 0.9.4. Whether shorter light reports read better,
-and whether a subagent's own token use falls as much as its guidance did, still
-needs a trial. The guidance tokens above are only the instructions it loads.
+[Live trials](live/README.md) in Claude Code and Codex compare one fresh run each
+with the 0.9.1-limit baselines. In Claude Code, subagent tokens fell 28%, wall time
+61% and report length 50%, with one question only partly answered. The trials also
+showed that checkers had lost the strikethrough rule in the split; `task-check.md`
+now carries it.

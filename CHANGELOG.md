@@ -19,6 +19,11 @@ and tagged.
   naming its worker's file and sections. A pinned task points into its own saved
   guidance snapshot and falls back to `research-run.md` in older snapshots. The
   coordinator still reads the run guidance plus the research and writing files.
+  Checkers carry the rule that text marked `~~struck~~` is not current wording.
+- [Live trials](docs/verification/0.9.4/live/README.md): in Claude Code, subagent
+  tokens fell 28% (checkers 34%), wall time 61% and report length 50% against the
+  0.9.1 run of the same plan, with similar narrowing and one question only partly
+  answered.
 
 ## 0.9.3 — 2026-10-16
 

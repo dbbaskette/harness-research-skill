@@ -180,7 +180,7 @@ representative guidance-start response. Bootstrap activation is shown separately
 | Installed bootstrap | 490 |
 | Bootstrap + current guidance entry | 1,113 |
 | Research worker subagent | 1,133 |
-| Checker subagent | 501 |
+| Checker subagent | 541 |
 | Writer or reviewer subagent | 580 |
 | Refresh worker | 668 |
 | Coordinator: skill research with independent checks and saved report | 4,838 |

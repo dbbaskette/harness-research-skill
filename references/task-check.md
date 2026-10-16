@@ -14,6 +14,9 @@ into a finding. Renew work longer than 30 minutes with `research heartbeat`.
 
 ## Independent checking
 
+Text marked `~~like this~~` in a saved source is struck through or deleted in
+the original: it is not current wording, so no fact, narrowing or gap may rest on it.
+
 The checker receives the candidate facts, their pinned sources and the questions,
 not the researcher's reasoning. It opens the originals, verifies page/line locators
 against them, reads context, and returns:
