@@ -1,0 +1,7 @@
+Harness Research README banner
+
+Generated with the built-in image_gen tool on October 16, 2026.
+Original output: 2172 × 724 pixels, PNG. Copied into this project without editing.
+
+Final prompt:
+Use case: illustration-story. Asset type: a polished landscape GitHub README banner for an open-source coding-agent skill named Harness Research. Make a wide 3:1 composition, ideally 1536 by 512 pixels. Primary request: a fun, colorful editorial illustration of research turning scattered source documents into a clear cited report. Show an oversized magnifying glass over layered paper notes, small quotation marks and source-number tabs, connected colorful paper paths, and a crisp finished report with a small check mark. Use bold paper-cut shapes, a little risograph grain, warm ivory background, deep ink outlines, vibrant teal, cobalt, coral and sunny yellow; confident playful geometry with excellent visual hierarchy and generous breathing room. The project name should be the hero typography, large and beautifully typeset, spelled exactly 'HARNESS RESEARCH', with the research illustration integrated around the name. No other text, no tiny labels, no robot characters, no brains, no brand logos, no gradients or corporate stock-art look. Keep all text and important objects comfortably away from the outer edges. A charming, purposeful research workbench that feels handmade yet precise, attractive and readable when reduced to GitHub README width.
