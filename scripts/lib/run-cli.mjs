@@ -3,7 +3,7 @@ import { readFile, realpath } from 'node:fs/promises';
 import { resolve, relative, isAbsolute, join } from 'node:path';
 import { parseJson, atomic, directory } from './run-storage.mjs';
 import { findResearch } from './run-reuse.mjs';
-import { startRun, nextTask, peekTask, releaseTask, submitTask, registerSource, heartbeat, runStatus, retryTask, continueRun, blockRun, reassessRun, verifyKeys, approveRun } from './research-run.mjs';
+import { startRun, nextTask, peekTask, releaseTask, submitTask, registerSource, heartbeat, runStatus, retryTask, continueRun, blockRun, reassessRun, verifyKeys, approveRun, refreshRun } from './research-run.mjs';
 
 // Every command answers compactly by default: a coordinator calls these many times, and each reply
 // costs it time and context. The full task payload goes to a file its worker reads; --verbose shows all.
@@ -34,7 +34,7 @@ export async function runCli(argv) {
     next: ['worker', 'harness'], peek: ['worker'], release: ['task', 'worker', 'lease', 'attempt'], submit: ['task', 'worker', 'lease', 'attempt', 'file'],
     source: ['task', 'worker', 'lease', 'attempt', 'file', 'origin', 'title', 'publisher', 'standing', 'given', 'id', 'original-file', 'source-date', 'transcribed', 'pages', 'limits', 'partial'],
     heartbeat: ['task', 'worker', 'lease', 'attempt'], status: [], retry: ['task'], continue: ['file'], block: ['reason'], reassess: ['again', 'reason'],
-    verify: ['keys', 'key'], approve: ['by', 'revision'],
+    verify: ['keys', 'key'], approve: ['by', 'revision'], refresh: [],
   };
   if (values.help || !action || action === 'help') return { usage: 'node scripts/harness-research.mjs research start|next|peek|submit|source|heartbeat|release|status|retry|continue|block|reassess|verify --project DIR [options] [--verbose]', note: 'The harness does the research; this helper manages durable tasks and evidence. Start requires --topic; all writes after start bind the current --run. Task writes require --task --worker --lease --attempt. next writes the full task to the file it names; --verbose prints full JSON. verify reads --keys FILE (or --key KEY) and reports what became of each cited fact.' };
   // find searches a directory for research folders rather than working in one project.
@@ -99,6 +99,7 @@ export async function runCli(argv) {
     case 'block': return output(await blockRun(args));
     case 'reassess': return output(await reassessRun({ ...args, again: values.again ? values.again.split(',').map(id => id.trim()).filter(Boolean) : [] }));
     case 'approve': return output(await approveRun(args));
+    case 'refresh': return output(await refreshRun(args));
     case 'verify': {
       const keys = [...(values.keys ? await keyFile(values.keys) : []), ...(values.key ?? [])];
       if (!keys.length) throw new Error(values.keys ? `${values.keys} cites no fact keys.` : 'Supply --keys FILE or --key KEY.');

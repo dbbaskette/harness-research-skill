@@ -75,7 +75,8 @@ export function legacyRecord(state, view) {
     items: state.questions.map(question => ({ id: question.id, question: question.question, public_query: null, claim: question.claim ?? null })), results: Object.fromEntries(results), created_at: state.createdAt };
 }
 const slug = value => String(value).toLowerCase().replace(/[^\p{L}\p{N}\s-]/gu, '').trim().replace(/\s/g, '-');
-const ROUND_LABELS = { reassess: 'Reassessed after source changes', again: 'Researched again on request', refresh: 'Researched again after a refresh', import: 'Completed after reuse' };
+const ROUND_LABELS = { reassess: 'Reassessed after source changes', again: 'Researched again on request', refresh: 'Sources re-read', import: 'Completed after reuse' };
+const REFRESHED = { unchanged: 'unchanged', changed: 'changed', unavailable: 'could not be opened' };
 const day = value => String(value ?? '').slice(0, 10) || 'unknown';
 export function renderReport(state, view) {
   const number = new Map(state.sources.map((source, i) => [source.id, i + 1]));
@@ -110,9 +111,12 @@ export function renderReport(state, view) {
   // Rounds after the first pass, grouped by why they ran. Runs saved by 0.9.0 recorded no kind.
   const rounds = [...(state.reassessments ?? []), ...(state.reassess && !state.reassess.done ? [state.reassess] : [])];
   const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
+  const described = item => item.kind === 'refresh'
+    ? `round ${item.round} on ${day(item.at)} (${item.read ? `${item.read.unchanged} unchanged, ${item.read.changed} changed, ${item.read.unavailable} could not be opened; ${plural(item.questions.length, 'question')} researched again` : 'reading'}${item.done ? '' : ', in progress'})`
+    : `round ${item.round} (${plural(item.questions.length, 'question')}${item.reason ? '; ' + literal(item.reason) : ''}${item.done ? '' : ', in progress'})`;
   for (const [kind, label] of Object.entries(ROUND_LABELS)) {
     const listed = rounds.filter(item => (item.kind ?? 'reassess') === kind);
-    if (listed.length) lines.push(`${label}: ${listed.map(item => `round ${item.round} (${plural(item.questions.length, 'question')}${item.reason ? '; ' + literal(item.reason) : ''}${item.done ? '' : ', in progress'})`).join('; ')}.`, '');
+    if (listed.length) lines.push(`${label}: ${listed.map(described).join('; ')}.`, '');
   }
   lines.push('## Contents', '', '- [Coverage](#coverage)', ...state.sections.map(section => `- [${literal(section.name)}](#${slug(section.name)})`), '- [Gaps](#gaps)', '- [Conflicts and history](#conflicts-and-history)', '- [Sources](#sources)', '- [Rejected facts and failed tasks](#rejected-facts-and-failed-tasks)', '', '## Coverage', '');
   for (const section of state.sections) {
@@ -181,7 +185,7 @@ export function renderReport(state, view) {
     const selected = state.givenSources.find(item => item.id === source.given);
     const local = source.original_file ?? selected?.file ?? source.file;
     const origin = /^https?:\/\//.test(source.origin) ? `[${literal(source.title)}](${source.origin.replace(/[()\s]/g, c => encodeURIComponent(c))})` : local ? `[${literal(source.title)}](../${local.split('/').map(encodeURIComponent).join('/')})` : `${literal(source.title)} (${literal(source.origin)})`;
-    lines.push(`${number.get(source.id)}. ${origin}; ${literal(source.publisher ?? 'publisher unknown')}; ${source.standing}; ${source.provenance}; saved ${source.saved_at}; source date ${literal(source.source_date ?? 'unknown')}${source.imported?.missing_text ? '; its saved text was missing from the research it was reused from' : source.stale_since ? '; superseded by a newer revision' : ''}${source.imported ? `; reused from ${literal(source.imported.from)}` : ''}.`);
+    lines.push(`${number.get(source.id)}. ${origin}; ${literal(source.publisher ?? 'publisher unknown')}; ${source.standing}; ${source.provenance}; saved ${source.saved_at}; source date ${literal(source.source_date ?? 'unknown')}${source.imported?.missing_text ? '; its saved text was missing from the research it was reused from' : source.stale_since ? '; superseded by a newer revision' : ''}${source.imported ? `; reused from ${literal(source.imported.from)}` : ''}${source.refreshed ? `; re-read ${day(source.refreshed.at)}: ${REFRESHED[source.refreshed.result]}` : ''}.`);
     if (source.capture) lines.push('   Partial capture: ' + literal(source.capture.reason));
     if (source.limits !== 'none') lines.push('   Coverage gap: ' + literal(source.limits));
   }

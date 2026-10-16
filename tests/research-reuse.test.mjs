@@ -257,3 +257,75 @@ test('find lists research folders under a directory with their status, size, app
   assert.match(broken.error, /does not match its output\.json/);
   await assert.rejects(runCli(['find', '--project', base]), /--in DIR/);
 });
+
+// A finished public-web run whose one fact rests on a page found on the web.
+async function webRun(t) {
+  const f = await fixture(t, { allowWeb: true }); await setup(f);
+  await writeFile(join(f.project, 'research/sources/orion-web.md'), reference + '\n');
+  await submit(f, await take(f), { register: [{ file: 'research/sources/orion-web.md', origin: 'https://fixture.invalid/orion', title: 'OrionDB web page', publisher: 'Fixture web' }], coverage: 'answered', facts: [{ statement: quote, as_of: null, quotes: [{ file: 'research/sources/orion-web.md', quote, locator: 'Line 1' }] }], gaps: [] });
+  const done = await finish(f);
+  return { ...f, done, key: (await factsOf(done)).facts[0].key };
+}
+const reread = (f, content) => async task => {
+  await writeFile(join(f.project, 'research/sources/orion-web-current.md'), content);
+  return { sources: task.sources.map(source => ({ source: source.id, read_original: true, file: 'research/sources/orion-web-current.md' })) };
+};
+
+test('refresh re-reads web sources; unchanged text keeps every fact current', async t => {
+  const f = await webRun(t);
+  const opened = await runCli(['refresh', '--project', f.project, '--run', f.run]);
+  assert.equal(opened.refreshing.kind, 'refresh'); assert.equal(opened.refreshing.phase, 'reading');
+  let task;
+  const done = await finish(f, { refresh: async item => { task = item; return reread(f, reference + '\n')(item); } });
+  assert.deepEqual(task.sources.map(source => source.origin), ['https://fixture.invalid/orion']); assert.deepEqual(task.sources[0].quotes, [quote]);
+  assert.match(task.brief, /Open each listed original again/);
+  assert.equal(done.status, 'complete');
+  const exported = await factsOf(done), source = exported.sources.find(item => item.origin === 'https://fixture.invalid/orion');
+  assert.equal(source.refreshed.result, 'unchanged'); assert.equal(exported.facts.find(fact => fact.key === f.key).status, 'confirmed');
+  assert.match(await readFile(done.report, 'utf8'), /Sources re-read: round 1 on \d{4}-\d{2}-\d{2} \(1 unchanged, 0 changed, 0 could not be opened; 0 questions researched again\)/);
+});
+
+test('refresh makes a fact stale when its passage is gone, and researches, checks and rewrites just its question', async t => {
+  const f = await webRun(t);
+  await runCli(['refresh', '--project', f.project, '--run', f.run]);
+  const changed = reference.replace(quote, 'OrionDB now permits two writers for each database, one per region.') + '\n';
+  let researched;
+  const done = await finish(f, { refresh: reread(f, changed), research: task => {
+    researched = task;
+    const current = task.sources.find(source => source.origin === 'https://fixture.invalid/orion');
+    return { coverage: 'answered', facts: [{ statement: 'OrionDB now permits two writers for each database.', as_of: null, quotes: [{ source: current.id, quote: 'OrionDB now permits two writers for each database, one per region.', locator: 'Line 1' }] }], gaps: [] };
+  } });
+  assert.deepEqual(researched.questions.map(q => q.id), ['writers']);
+  assert.equal(done.status, 'complete');
+  const exported = await factsOf(done), sources = exported.sources.filter(item => item.origin === 'https://fixture.invalid/orion');
+  assert.equal(sources.length, 2); assert.equal(sources[1].revision_of, sources[0].id); assert.ok(sources[0].stale_since);
+  assert.equal(sources[0].refreshed.result, 'changed'); assert.equal(sources[0].refreshed.passages_missing, 1);
+  const old = (await verifyKeys({ project: f.project, keys: [f.key] })).keys[0];
+  assert.equal(old.result, 'stale'); assert.match(old.reason, /no longer in the current original/);
+  assert.match(exported.questions[0].headline.sentence, /two writers/);
+  assert.match(await readFile(done.report, 'utf8'), /Sources re-read: round 1 .*\(0 unchanged, 1 changed, 0 could not be opened; 1 question researched again\)/);
+});
+
+test('refresh keeps facts whose passages remain, records unreadable originals, and needs a finished run', async t => {
+  const f = await webRun(t);
+  await runCli(['refresh', '--project', f.project, '--run', f.run]);
+  const done = await finish(f, { refresh: reread(f, reference + ' A later paragraph adds release notes that do not touch the writer rule at all.\n') });
+  const exported = await factsOf(done);
+  assert.equal(exported.facts.find(fact => fact.key === f.key).status, 'confirmed');
+  assert.equal(exported.sources.filter(item => item.origin === 'https://fixture.invalid/orion').length, 2);
+  assert.equal(exported.reassessments.at(-1).questions.length, 0);
+
+  await runCli(['refresh', '--project', f.project, '--run', f.run]);
+  const unread = await finish(f, { refresh: task => ({ sources: task.sources.map(source => ({ source: source.id, read_original: false, access_error: 'HTTP 503 from the site.' })) }) });
+  const after = (await factsOf(unread)).sources.find(item => item.origin === 'https://fixture.invalid/orion' && !item.stale_since);
+  assert.equal(after.refreshed.result, 'unavailable'); assert.match(after.refreshed.reason, /503/);
+  assert.equal((await verifyKeys({ project: f.project, keys: [f.key] })).keys[0].result, 'confirmed');
+
+  const local = await completed(t);
+  const nothing = await runCli(['refresh', '--project', local.project, '--run', local.run]);
+  assert.equal(nothing.status, 'complete'); assert.equal(nothing.refreshing.done, true); assert.match(nothing.note, /local files/);
+  const open = await fixture(t); await setup(open);
+  await assert.rejects(runCli(['refresh', '--project', open.project, '--run', open.run]), /finished run/);
+  await writeFile(join(local.project, 'sources/reference.txt'), reference.replace('single', 'sole') + '\n');
+  await assert.rejects(runCli(['refresh', '--project', local.project, '--run', local.run]), /reassess first/);
+});
