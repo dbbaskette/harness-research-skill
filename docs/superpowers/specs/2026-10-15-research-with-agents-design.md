@@ -370,3 +370,96 @@ its gates (with `--plan-only`), and what the facts feed.
 - **The harness does all the work.** The helper does no fetching, extraction or agent starting;
   it is a queue, a set of checks and the record. No `pdftotext` dependency.
 - **Private words in searches:** not a concern.
+
+## Appendix: `facts.json`, by example
+
+Shortened, with one entry of each kind. The values are illustrative.
+
+```json
+{
+  "schema": 1,
+  "run": "8f3c2a91d0e4b7a6c5f1e2d3",
+  "topic": "Redis vs Valkey",
+  "about": "For solutions architects advising customers on in-memory data stores.",
+  "depth": "deep",
+  "scope": "public-web",
+  "status": "complete",
+  "created_at": "2026-10-16T14:00:03Z",
+  "completed_at": "2026-10-16T14:48:51Z",
+  "counts": {"questions": 42, "facts": 318, "narrowed": 41, "rejected": 27,
+             "sources": 96, "conflicts": 6, "superseded": 4, "failed": 0},
+
+  "subjects":   [{"id": "redis", "name": "Redis"}, {"id": "valkey", "name": "Valkey"}],
+  "dimensions": [{"id": "licensing", "name": "Licensing and its history"}],
+
+  "questions": [
+    {"id": "valkey.licensing", "subject": "valkey", "dimension": "licensing",
+     "kind": "open", "round": 1,
+     "question": "Under what licence is Valkey released, and has that changed?",
+     "coverage": "answered", "gaps": "",
+     "facts": ["valkey.licensing.3fa9c2"]},
+    {"id": "fork-history", "subject": null, "dimension": "origin", "kind": "open", "round": 1,
+     "question": "How and when was Valkey forked from Redis?",
+     "coverage": "partly answered",
+     "gaps": "No primary source gives the date the first Valkey release was tagged.",
+     "facts": ["fork-history.77d1e0"]}
+  ],
+
+  "sources": [
+    {"id": "s07", "title": "Valkey licence", "origin": "https://github.com/valkey-io/valkey/blob/unstable/COPYING",
+     "publisher": "valkey-io", "standing": "primary", "provenance": "found",
+     "saved_at": "2026-10-16T14:09:40Z", "source_date": null,
+     "file": "research/sources/valkey-copying.md", "sha256": "c41e…", "limits": "none"},
+    {"id": "s02", "title": "Platform architecture review", "origin": "given: docs/architecture-review.pdf",
+     "publisher": null, "standing": "primary", "provenance": "transcribed", "pages": "12-13",
+     "saved_at": "2026-10-16T14:01:12Z", "source_date": "2026-06-30",
+     "file": "research/sources/architecture-review-p12-13.md", "sha256": "9ab0…",
+     "limits": "Pages 12-13 are a chart; the text is the harness's reading of it."}
+  ],
+
+  "facts": [
+    {"key": "valkey.licensing.3fa9c2",
+     "statement": "Valkey is licensed under the BSD 3-Clause licence.",
+     "subject": "valkey", "dimension": "licensing", "questions": ["valkey.licensing"],
+     "as_of": null,
+     "check": {"result": "confirmed", "by": "codex", "at": "2026-10-16T14:31:05Z"},
+     "original_statement": null,
+     "sources_count": 2, "best_standing": "primary",
+     "conflicts_with": [], "superseded_by": null,
+     "citations": [
+       {"source": "s07", "quote": "Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met",
+        "quote_sha256": "5d2f…", "start": 118, "locator": "COPYING, opening paragraph"}
+     ]}
+  ],
+
+  "conflicts": [
+    {"facts": ["redis.performance.1b2c3d", "valkey.performance.9e8f7a"],
+     "note": "Each vendor's benchmark uses a different instance size and client count."}
+  ],
+  "superseded": [
+    {"fact": "redis.licensing.aa11bb", "by": "redis.licensing.cc22dd",
+     "note": "A later release added another licence option."}
+  ],
+  "missing": [
+    {"angle": "Support lifecycle and end-of-life policy", "became": ["redis.support", "valkey.support"]}
+  ],
+  "rejected": [
+    {"statement": "Redis Cluster supports active-active writes across regions.",
+     "question": "redis.clustering",
+     "reason": "The quote describes Redis Enterprise's Active-Active feature, not open-source Redis Cluster.",
+     "by": "codex", "citations": [{"source": "s31", "quote": "…"}]}
+  ],
+  "failed": []
+}
+```
+
+- **Keys** are stable: the question ID and a short hash of the statement. A deck, training or
+  blog cites `valkey.licensing.3fa9c2`, and can later look the key up to check the fact still
+  stands, unchanged (`quote_sha256`), not narrowed, rejected or superseded.
+- **`statement` is what a consumer uses;** `original_statement` shows what a narrowed fact said
+  before the checker cut it back.
+- **`sources_count` and `best_standing`** let a consumer prefer facts backed by more than one
+  publisher, or by primary sources.
+- **Questions list their facts and facts list their questions,** because a merged duplicate can
+  answer more than one question.
+- **`rejected` and `failed`** are kept for auditing. Consumers should not cite them.
