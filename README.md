@@ -179,7 +179,7 @@ representative guidance-start response. Bootstrap activation is shown separately
 | Discovery metadata | 38 |
 | Installed bootstrap | 490 |
 | Bootstrap + current guidance entry | 1,113 |
-| Skill research with independent checks and saved report | 4,583 |
+| Skill research with independent checks and saved report | 4,617 |
 | Verify, research again, reuse or refresh | 1,890 |
 | Explicit chat-only cited answer | 2,067 |
 | Legacy manual research with saved report | 3,258 |
@@ -192,11 +192,11 @@ representative guidance-start response. Bootstrap activation is shown separately
 | Codex deep results + saved evidence | 3,859 |
 | Claude comparative outline | 2,797 |
 | Claude deep results | 2,690 |
-| Saved research + general web strategy | 5,080 |
-| Saved research + academic strategy | 5,172 |
-| Saved research + GitHub strategy | 4,967 |
-| Saved research + technical Q&A strategy | 4,872 |
-| Saved research + Chinese sources strategy | 5,097 |
+| Saved research + general web strategy | 5,114 |
+| Saved research + academic strategy | 5,206 |
+| Saved research + GitHub strategy | 5,001 |
+| Saved research + technical Q&A strategy | 4,906 |
+| Saved research + Chinese sources strategy | 5,131 |
 | Legacy migration | 1,462 |
 
 Comparative rows include the selected platform resource, not the complete bundle.

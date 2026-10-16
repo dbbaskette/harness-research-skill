@@ -5,7 +5,7 @@ description: Research topics, compare options and fact-check claims using select
 
 # Harness Research
 
-Guidance release: **0.9.2**. Report the installed runtime version, guidance
+Guidance release: **0.9.3**. Report the installed runtime version, guidance
 release/revision and freshness on start/resume; these identities can differ.
 
 You conduct the research with your harness's search, browser, document tools and

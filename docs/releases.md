@@ -13,6 +13,11 @@ runtimes to the manual workflow. Raise the minimum only when that manual path is
 retired. Preview users must reinstall from `v0.9.2` even if their helper already
 reports 0.9.2: the immutable content digest distinguishes the bits.
 
+**0.9.3 in development.** The development branch labels its package and guidance
+0.9.3 (see the [changelog](../CHANGELOG.md)). The current release stays 0.9.2
+until `v0.9.3` is tagged after its own verification; keep the branch off `main`
+until then.
+
 **0.9.2 acceptance scope (2026-10-16).** 0.9.2 fixes five findings from the
 0.9.1 trials. The owner asked for it to be implemented, merged and released
 ("implement the 92 followup push pr merge and cut that release"). Its checks are

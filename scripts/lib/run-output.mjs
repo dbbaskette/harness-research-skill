@@ -155,12 +155,14 @@ export function renderReport(state, view) {
       } else lines.push('Answer pending. Coverage: ' + literal(question.assessment ? question.coverage : 'not yet checked') + '.', '');
       for (const id of question.gaps ?? []) { const gap = state.gaps.find(item => item.id === id); lines.push(`Gap (${id}${gap.check ? ', ' + (gap.check.result === 'confirmed' ? 'assessed' : gap.check.result) : ', awaiting check'}): ${literal(gap.reason)} ${gap.sources.map(source => `[${number.get(source)}]`).join(' ')}`, ''); }
       const facts = state.facts.filter(fact => fact.questions.includes(question.id) && fact.status !== 'rejected');
-      if (facts.length) lines.push('Facts behind this answer:', '');
+      // The evidence is folded under the answer: the cited prose reads first, every quote stays one click away.
+      if (facts.length) lines.push('<details>', `<summary>Facts behind this answer (${facts.length})</summary>`, '');
       for (const fact of facts) {
         lines.push(`- ${fact.key} [${shownStatus(fact, view)}${fact.superseded_by ? ', superseded' : ''}]: ${literal(fact.statement)} ${cite([fact.key])}; as of ${literal(fact.as_of ?? 'unknown')}; ${sourceCount(state, fact) === null ? 'publisher independence unknown' : sourceCount(state, fact) === 1 ? 'one publisher' : sourceCount(state, fact) + ' publishers'}.`);
         for (const citation of fact.citations) lines.push(`  > ${literal(citation.quote).replace(/\n/g, '\n  > ')} [${number.get(citation.source)}], ${literal(citation.locator)}${sourceFor(state, citation.source).provenance === 'transcribed' ? ' (transcribed)' : ''}${sourceFor(state, citation.source).capture ? ' (partial capture)' : ''}`);
         lines.push('');
       }
+      if (facts.length) lines.push('</details>', '');
     }
   }
   lines.push('', '## Gaps', '');

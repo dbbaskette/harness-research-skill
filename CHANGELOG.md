@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.9.3 — unreleased
+
+The remaining minor findings from the 0.9.1 live trials
+([findings](docs/verification/0.9.1/live-acceptance/README.md#findings)).
+Not released until it is verified and tagged.
+
+- Each answer's "Facts behind this answer" list is folded into a collapsed
+  `<details>` block after the cited prose. The evidence lists were 49–69% of
+  the trial reports; every quote stays in the report and in `facts.json`.
+- Reusing research for a new topic or audience lets the planner restate the
+  report's `scope` and `title`, so the scope paragraph no longer describes only
+  the origin. Without them the origin's scope is kept.
+- The guidance says to keep struck-through or deleted text as `~~text~~` when
+  saving sources and never cite it as current. The trial extractor in
+  `docs/verification/0.9.3/tools/` now keeps that markup.
+
 ## 0.9.2 — 2026-10-16
 
 Fixes for the helper and guidance findings from the 0.9.1 live trials
