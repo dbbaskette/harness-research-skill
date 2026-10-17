@@ -34,8 +34,16 @@ test('reported paths count each input once and README reflects the tested instru
   assert.equal(data.readingPaths.resume.files.some(x => x.path.endsWith('evidence.md') || x.path.endsWith('workflow.md')), false);
   for (const [route, file] of [['researchWorker', 'task-research.md'], ['checkWorker', 'task-check.md'], ['writeWorker', 'task-write.md']]) assert.deepEqual(data.readingPaths[route].files.map(x => x.path), ['references/' + file]);
   assert.deepEqual(data.readingPaths.queued.files.map(x => x.path).filter(x => x.startsWith('references/')), ['references/research-run.md', 'references/task-research.md', 'references/task-write.md']);
-  // Each worker reads less than the whole run guidance did in 0.9.3 (3,395 tokens in one file).
-  for (const route of ['researchWorker', 'checkWorker', 'writeWorker']) assert.ok(data.readingPaths[route].total < 1500, route);
+  // New work is routed independently of the retained question queue and manual schemas.
+  assert.deepEqual(data.readingPaths.synthesisCoordinator.files.map(x => x.path), ['SKILL.md', 'references/synthesis-workflow.md']);
+  assert.deepEqual(data.readingPaths.synthesisReuse.files.map(x => x.path), ['SKILL.md', 'references/synthesis-reuse.md']);
+  for (const [route, file] of [['investigator', 'investigate.md'], ['synthesisWriter', 'synthesize.md'], ['synthesisReviewer', 'review-synthesis.md']]) {
+    assert.deepEqual(data.readingPaths[route].files.map(x => x.path), ['references/' + file]);
+    assert.ok(data.readingPaths[route].total < 3000, `${route} should stay a focused stage contract`);
+  }
+  assert.deepEqual(data.readingPaths.synthesisFull.files.map(x => x.path), ['SKILL.md', 'references/synthesis-workflow.md', 'references/investigate.md', 'references/synthesize.md', 'references/review-synthesis.md']);
+  assert.ok(data.readingPaths.synthesisFull.total > data.readingPaths.synthesisCoordinator.total);
+  for (const route of ['synthesisCoordinator', 'synthesisFull', 'synthesisReuse']) assert.equal(data.readingPaths[route].files.some(x => /task-|research-run|evidence\.md|comparative/.test(x.path)), false);
   assert.equal(data.readingPaths.quick.files.some(x => x.path.endsWith('evidence.md')), false);
   assert.ok(data.readingPaths.focused.files.some(x => x.path.endsWith('evidence.md')));
   for (const platform of ['codex', 'claude']) for (const operation of ['outline', 'items', 'fields', 'deep']) {
@@ -54,7 +62,7 @@ test('the README shows the progressive disclosure map, generated from the same m
   assert.match(await readFile(new URL('README.md', root), 'utf8'), /!\[Progressive disclosure[^\]]*\]\(docs\/images\/context-loading\.svg\)/);
   assert.ok(map.includes(data.inputDigest));
   // Every path the map draws shows its measured total, and nothing is left unescaped.
-  for (const label of ['Discovery metadata', 'Installed bootstrap', 'Research worker subagent', 'Checker subagent', 'Writer or reviewer subagent', 'Refresh worker']) {
+  for (const label of ['Discovery metadata', 'Installed bootstrap', 'Investigator stage', 'Synthesis writer stage', 'Independent reviewer stage']) {
     const value = data.routes[label], shown = value < 1000 ? `${value} tokens` : `~${(value / 1000).toFixed(1)}k`;
     assert.ok(map.includes(`>${shown}<`), `${label}: ${shown}`);
   }

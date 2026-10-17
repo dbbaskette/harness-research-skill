@@ -1,6 +1,6 @@
 ---
 name: harness-research
-description: Research topics, compare options and fact-check claims using selected documents and permitted public sources, with cited findings, coverage gaps and resumable local reports.
+description: Research topics and compare options using selected documents and permitted public sources, then save a cited synthesis, reusable brief and checked evidence.
 ---
 
 # Harness Research
@@ -30,7 +30,7 @@ start a new task merely to resume, inspect status, or revise the same work.
 Existing work retains its instructions and runtime. Explicitly adopting new
 guidance starts a new task and requires rechecking affected review conclusions.
 
-New tasks use the newest release this runtime supports (main only when the
+New tasks use the newest stable release this runtime supports (main only when the
 repository has no release tags). When a newer release needs a newer runtime,
 `freshness` is `older-compatible-release`: tell the user its `notice`. A failed
 fetch or incompatible runtime is reported, not described as current. An existing task can resume without fetching. For an
@@ -42,4 +42,9 @@ choice. Update executable helpers with the trusted shell installer; guidance
 refresh never installs or executes repository scripts.
 
 Honor the user’s scope, sources, editing freedom, and completion boundary.
-Research and slide delivery requirements live in the selected guidance.
+Research output requirements live in the selected guidance. New synthesis guidance
+requires runtime 1.0.0-alpha.1 or newer; guidance refresh cannot upgrade helpers.
+During prerelease development, use the trusted checkout’s guidance and runtime
+together, or explicitly pin an approved main-branch commit with `sync-guidance.mjs
+pin --project "<content-project>" --revision <commit>`. Automatic refresh continues
+to select stable releases; installing an alpha does not opt into alpha guidance.

@@ -1,9 +1,9 @@
 {
   "name": "harness-research-skill",
-  "version": "0.9.5",
+  "version": "1.0.0-alpha.1",
   "type": "module",
   "license": "MIT",
-  "description": "Scoped research, evidence tracking and resumable reports across agent harnesses.",
+  "description": "Synthesis-first research skill with cited reports, reusable briefs and independently reviewed evidence.",
   "engines": {
     "node": ">=20"
   },

@@ -1,0 +1,22 @@
+{
+  "repository": "https://github.com/anthropics/knowledge-work-plugins",
+  "commit": "33eeda1e8fd856455b05479d13a0f85b5f803744",
+  "license": "Apache-2.0",
+  "files": [
+    {
+      "file": "knowledge-synthesis/SKILL.md",
+      "upstream_path": "enterprise-search/skills/knowledge-synthesis/SKILL.md",
+      "sha256": "8dc66c66ef0004010bbf2d569251163e90a6675b982e0cb99ef26b4dd1c5a0f6"
+    },
+    {
+      "file": "LICENSE",
+      "upstream_path": "enterprise-search/LICENSE",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    }
+  ],
+  "adaptations": [
+    "SKILL.md",
+    "references/synthesize.md"
+  ],
+  "modifications": "Harness Research adapts enterprise knowledge synthesis for bounded public or supplied-source investigation, saved cited artifacts, independently reviewed evidence and narrative, and revision-aware reuse. The retained original files are unmodified."
+}

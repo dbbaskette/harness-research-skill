@@ -15,3 +15,18 @@ Harness Research adds one progressively disclosed entrypoint, a shared installer
 explicit migration from Brand's records, and cross-harness routing. No proprietary
 brand assets or provider credentials are included. The retained upstream skill
 names are compatibility resources; they are not installed for new users by default.
+
+## Anthropic Knowledge Synthesis adaptation
+
+The default synthesis workflow adapts Anthropic’s Knowledge Synthesis from
+[anthropics/knowledge-work-plugins](https://github.com/anthropics/knowledge-work-plugins),
+`enterprise-search/skills/knowledge-synthesis/SKILL.md`, pinned to commit
+`33eeda1e8fd856455b05479d13a0f85b5f803744`. That component is licensed under
+Apache License 2.0. Its unmodified source, complete license and hashes are retained
+in `upstream/anthropic/`; the root MIT license does not replace that license.
+
+Modified files `SKILL.md` and `references/synthesize.md` identify the adaptation.
+Harness Research adds bounded investigation, public/supplied source scope, saved
+evidence and narrative artifacts, independent review, revision invalidation and
+reuse. It changes enterprise-specific source heuristics into context-sensitive
+evidence judgments. This attribution does not imply Anthropic endorsement.

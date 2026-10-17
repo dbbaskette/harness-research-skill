@@ -6,6 +6,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { execFile } from 'node:child_process';
 import { promisify, parseArgs } from 'node:util';
 import { createHash, randomUUID } from 'node:crypto';
+import { parseVersion, compareVersions } from './lib/version.mjs';
 const exec = promisify(execFile), root = fileURLToPath(new URL('../', import.meta.url));
 const sources = {
   'harness-slides': { skill: 'harness-slides', repository: 'https://github.com/dbbaskette/harness-slides-skill.git' },
@@ -14,7 +15,7 @@ const sources = {
 const sha = bytes => createHash('sha256').update(bytes).digest('hex');
 const revisionPattern = /^[a-f0-9]{40,64}$/;
 const taskPattern = /^[a-f0-9]{32}$/;
-const allowed = name => name === 'SKILL.md' || /^(references|upstream)\/[\w./ -]+\.(md|json|toml|txt|yaml|yml)$/.test(name);
+const allowed = name => ['SKILL.md', 'NOTICE.md', 'LICENSE'].includes(name) || /^upstream\/(?:[\w./ -]+\/)?LICENSE$/.test(name) || /^(references|upstream)\/[\w./ -]+\.(md|json|toml|txt|yaml|yml)$/.test(name);
 const validPath = name => typeof name === 'string' && !name.startsWith('/') && !name.split('/').includes('..') && !name.includes('\\');
 async function settings(runtime) {
   runtime = await realpath(runtime);
@@ -71,13 +72,8 @@ async function git(repository, ...args) {
     throw new Error(`${prefix} (git ${operation}). ${reason} ${recovery}`);
   }
 }
-function version(value) {
-  if (!/^\d+\.\d+\.\d+$/.test(value)) throw new Error('Invalid guidance/runtime version.');
-  return value.split('.').map(Number);
-}
 function compatible(required, actual) {
-  const a = version(required), b = version(actual);
-  if (a.some((n, i) => n > b[i] && a.slice(0, i).every((v, j) => v === b[j]))) throw Object.assign(new Error('Current guidance needs a newer installed runtime. Update with this skill’s trusted installer.'), { minimumRuntime: required });
+  if (compareVersions(required, actual) > 0) throw Object.assign(new Error('Current guidance needs a newer installed runtime. Update with this skill’s trusted installer.'), { minimumRuntime: required });
 }
 async function runtimeHashes(runtime) {
   const hashes = {};
@@ -102,7 +98,7 @@ async function blob(repository, id, size) {
 async function releaseTags(repository, source) {
   const listing = (await git(repository, 'ls-remote', '--tags', '--refs', source, 'refs/tags/v*')).toString('utf8');
   return listing.split('\n').map(line => line.trim().split(/\s+/)[1]).filter(ref => /^refs\/tags\/v\d+\.\d+\.\d+$/.test(ref ?? ''))
-    .map(ref => ({ ref, parts: version(ref.slice('refs/tags/v'.length)) }))
+    .map(ref => ({ ref, parts: parseVersion(ref.slice('refs/tags/v'.length)).core }))
     .sort((a, b) => b.parts[0] - a.parts[0] || b.parts[1] - a.parts[1] || b.parts[2] - a.parts[2]);
 }
 // Read a commit's guidance inventory and manifest, refusing one the installed runtime cannot run.
@@ -116,7 +112,7 @@ async function inspectCommit(repository, commit, config) {
   if (!metadata || metadata.mode !== '100644' || metadata.type !== 'blob') throw new Error('Guidance compatibility metadata is missing.');
   const manifest = JSON.parse(await blob(repository, metadata.id, metadata.size));
   const guidanceVersion = manifest.version ?? null;
-  if (guidanceVersion !== null) version(guidanceVersion);
+  if (guidanceVersion !== null) parseVersion(guidanceVersion);
   if (metadata.name === 'guidance/manifest.json') {
     if (manifest.schema !== 1 || manifest.skill !== config.skill || manifest.entry !== 'SKILL.md') throw new Error('Unsupported guidance contract.');
     compatible(manifest.minimumRuntime, config.version);
@@ -185,7 +181,7 @@ export async function resume({ project, task, runtime = root, cached = false } =
   for (const path of [tasks, snapshot]) { const stat = await lstat(path); if (!stat.isDirectory() || stat.isSymbolicLink()) throw new Error('Unsafe saved guidance directory.'); }
   const pin = JSON.parse(await file(join(snapshot, 'pin.json')));
   if (pin.schema !== 1 || pin.task !== task || pin.skill !== config.skill || pin.repository !== config.repository || !revisionPattern.test(pin.revision) || !pin.files?.['SKILL.md']) throw new Error('Invalid saved guidance pin.');
-  if (pin.guidanceVersion !== undefined && pin.guidanceVersion !== null) version(pin.guidanceVersion);
+  if (pin.guidanceVersion !== undefined && pin.guidanceVersion !== null) parseVersion(pin.guidanceVersion);
   for (const [name, digest] of Object.entries(pin.files)) {
     if (!validPath(name) || !allowed(name)) throw new Error('Invalid saved guidance path.');
     let parent = dirname(join(snapshot, name));

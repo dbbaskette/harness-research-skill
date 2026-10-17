@@ -1,0 +1,278 @@
+Title: Redis licenses
+Origin: https://redis.io/legal/licenses/
+Publisher: Redis
+Accessed: 2026-10-17T13:47:03.397594+00:00
+Version/context: Version-specific license table at access
+
+Licenses | Redis
+Skip to:
+Home
+Content
+Footer navigation
+86.5% accuracy. ~$0.07 per session. See how Redis stacks up in the Agent Memory Benchmark.Read the report
+Redis Iris
+Platform
+Platform
+Redis IrisReal-time context for agents
+Redis LangCacheSave on tokens for common questions
+Redis Context RetrieverLeverage context from anywhere
+Redis Agent MemoryAgentic memory for consistent experiences
+Redis Data IntegrationCDC across your structured data
+Redis FlexMore data, more speed, less cost
+CachingSub-ms read/write at scale
+StreamingEvent-driven messaging & data pipelines
+Session managementFast, persistent storage for sessions
+SearchSearch & query for structured data
+Feature storeReal-time ML feature pipeline for apps & agents
+Latest
+Design, build, and scale agent memory
+Oct. 21, 2026
+Get RedisDownloads
+Deploy
+Deploy
+Redis CloudFully managed, fully flexible
+Redis SoftwareOn-prem
+Redis open source frameworkRedis 8.8
+PricingLet’s talk numbers
+Redis on AWSBuy with cloud commits
+Azure Managed RedisMicrosoft-supported Redis
+Redis on Google CloudRedis from the marketplace
+saw a 40% increase in revenue generation through their new Redis powered online experience. See how
+uses Redis for 100+ vector search queries per second. See how
+achieved 37% faster API response times while having a 15% lower memory footprint with Redis. See how
+saw over a billon API request per month with Redis. See how
+Tools
+Redis InsightUI to visualize, query, & debug
+RIOTGet data into Redis from anywhere
+Client librariesPython, Node, Java, Go, .Net, & more
+SDKsConnect Redis to your apps
+Get RedisDownloads
+Solutions
+AI & ML Apps
+Scale agent & agentic systems Everything you need to be successful
+RAGUnderstand how Redis powers RAG
+Semantic searchRight answers, right now
+MLLeverage your features, fast
+Token optimizationAll the AI without all the cost
+AI cost optimizationControl AI costs without compromise
+Core Workloads
+Fraud detectionStop fraud, protect customers
+Real-time decisionsAct on data in real time
+Caching & performanceOur bread & butter
+Real-time messagingStreams at the speed of thought
+Session managementConsistent experiences everywhere
+LeaderboardsKnow who’s winning
+Industries
+Financial services
+E-commerce & retail
+Gaming
+Healthcare
+Telco
+Get RedisDownloads
+Devs
+Docs
+Redis CloudThe nitty gritty
+Welcome to the communityJoin the largest open source community in cache
+Dev HubAll the tools to build
+Training
+UniversityBecome a Redis expert
+TutorialsHow-to for whatever you’re trying to do
+Quick startsGo 0 to 1: Redis fast
+Knowledge baseGet support
+saw a 40% increase in revenue generation through their new Redis powered online experience. See how
+uses Redis for 100+ vector search queries per second. See how
+achieved 37% faster API response times while having a 15% lower memory footprint with Redis. See how
+saw over a billon API request per month with Redis. See how
+Learning
+BlogAll the words
+Resource centerEverything you need, in one place
+Demo centerAnything & everything, in action
+Reference architecturesNo guessing, just deploy
+Resources
+Customers
+Resource Center
+Events
+Virtual & live eventsCome say hello
+Partners
+Join the Redis Partner Network
+Find a partner
+AWS
+Google
+Microsoft
+saw a 40% increase in revenue generation through their new Redis powered online experience. See how
+uses Redis for 100+ vector search queries per second. See how
+achieved 37% faster API response times while having a 15% lower memory footprint with Redis. See how
+saw over a billon API request per month with Redis. See how
+Latest
+Design, build, and scale agent memory
+Oct. 21, 2026
+Learn how to BuildVisit our dev hub
+SearchBook a meetingTry Redis
+Redis Iris
+Platform
+Platform
+Redis IrisReal-time context for agents Redis LangCacheSave on tokens for common questionsRedis Context RetrieverLeverage context from anywhereRedis Agent MemoryAgentic memory for consistent experiencesRedis Data IntegrationCDC across your structured data Redis FlexMore data, more speed, less costCachingSub-ms read/write at scaleStreamingEvent-driven messaging & data pipelinesSession managementFast, persistent storage for sessions SearchSearch & query for structured dataFeature storeReal-time ML feature pipeline for apps & agents
+Get RedisDownloads
+Deploy
+Deploy
+Redis CloudFully managed, fully flexibleRedis SoftwareOn-premRedis open source frameworkRedis 8.8PricingLet’s talk numbersRedis on AWSBuy with cloud commitsAzure Managed RedisMicrosoft-supported RedisRedis on Google CloudRedis from the marketplace
+Tools
+Redis InsightUI to visualize, query, & debugRIOTGet data into Redis from anywhereClient librariesPython, Node, Java, Go, .Net, & moreSDKsConnect Redis to your apps
+Get RedisDownloads
+Solutions
+AI & ML Apps
+Scale agent & agentic systems Everything you need to be successful RAGUnderstand how Redis powers RAGSemantic searchRight answers, right nowMLLeverage your features, fastToken optimizationAll the AI without all the costAI cost optimizationControl AI costs without compromise
+Core Workloads
+Fraud detectionStop fraud, protect customersReal-time decisionsAct on data in real timeCaching & performanceOur bread & butter Real-time messagingStreams at the speed of thoughtSession managementConsistent experiences everywhereLeaderboardsKnow who’s winning
+Industries
+Financial servicesE-commerce & retailGamingHealthcareTelco
+Get RedisDownloads
+Devs
+Docs
+Redis CloudThe nitty grittyWelcome to the communityJoin the largest open source community in cacheDev HubAll the tools to build
+Training
+UniversityBecome a Redis expertTutorialsHow-to for whatever you’re trying to doQuick startsGo 0 to 1: Redis fastKnowledge baseGet support
+Learning
+BlogAll the wordsResource centerEverything you need, in one placeDemo centerAnything & everything, in actionReference architecturesNo guessing, just deploy
+Resources
+Customers
+Resource Center
+Events
+Virtual & live eventsCome say hello
+Partners
+Join the Redis Partner NetworkFind a partnerAWSGoogleMicrosoft
+Learn how to BuildVisit our dev hub
+Try RedisBook a meeting
+Legal hub
+Licenses
+Back to legal hub
+Licenses
+Redis Licensing Overview
+Redis Open Source is available as both source available and OSI-compliant open source software. A user may select one of the following three license options to use Redis Open Source (starting with Redis 8) and subsequent versions: the Redis Source Available License v2 (RSALv2), the Server Side Public License v1 (SSPLv1), and the GNU Affero General Public License v3 (AGPLv3).
+Redis proprietary products are closed source and require a commercial license from Redis Ltd. For information on Redis Cloud licensing, read more here. For more information on Redis Software licensing, read more here.
+About RSALv2
+RSALv2 is a permissive, non-copyleft license created by Redis Ltd., allowing users the right to “use, copy, distribute, make available, and prepare derivative works of the software” and has only two primary limitations. You may not:
+Commercialize the software or provide it to others as a managed service in a way that provides the functionality of the Software available to third parties; and
+Remove or obscure any licensing, copyright, or other notices.
+RSALv2 is not an open source license.
+About SSPLv1
+SSPLv1 is a source-available license created by MongoDB, allowing free and unrestricted use, modification, and redistribution, with the simple requirement that if you provide the product as a service to others, you must also publicly release any modifications as well as the source code of your management layers under SSPL.
+SSPLv1 is based on GPLv3, and is considered a copyleft license. This means that if you use the source code and create derivative works, those derivative works must also be licensed under SSPL and released publicly. For more information, please consult this MongoDB FAQ.
+SSPLv1 is not an open source license.
+About AGPLv3
+AGPLv3 is an open source license introduced by the Free Software Foundation specifically designed for code that runs over a network and requires users to make the complete source code and any modifications publicly available upon distribution
+AGPLv3 is a copyleft license. This means that if you use the source code and create derivative works, those derivative works must also be licensed under AGPLv3 and released publicly. For more information, please consult this Free Software Foundation FAQ.
+AGPLv3 is an OSI-approved open source license.
+About our tri-license
+Redis 8 in Redis Open Source and later versions are available under our tri-license, allowing us to be both source-available and open source software. Our tri-license includes RSALv2, SSPLv1, and AGPLv3.
+RediSearch, RedisJSON, RedisTimeSeries, and RedisBloom are now included as integral components of Redis Open Source and subject to the same tri-license. Starting with Redis 8, the version numbers of all included modules are identical to the version number of Redis Open Source they are included in.
+About past licenses
+Redis 7.2.x of Redis Open Source and earlier versions remain subject to the BSD3 license. Redis Community Edition 7.4.x to 7.8.x remain subject to the dual RSALv2/SSPLv1 license.
+Certain Redis modules created by Redis Ltd. (e.g., RediSearch, RedisJSON, RedisTimeSeries, and RedisBloom) are now also tri-licensed under RSALv2, SSPLv1, and AGPLv3 with the general availability of Redis 8.
+Read more about the full version history in the table below.
+Version7.2 and earlier 	7.4	8+
+Referred to asRedisRedis Community EditionRedis Open Source
+LicenseBSD-3-ClauseRSALv2 or SSPLv1RSALv2 or SSPLv1 or AGPLv3
+About Redis Insight and Redis for VS Code
+Redis Insight and Redis for VS Code are visual tools that let you explore data, design, develop, and optimize your applications while also serving as a platform for Redis education and onboarding. Redis Insight specifically integrates Redis Copilot, a natural language AI assistant that improves the experience when working with data and commands.
+Both Redis Insight and Redis for VS Code are provided under a commercial license to paying Redis customers. Community users and non-paying individuals use these tools under the SSPLv1 license.
+FAQ
+What is the new license for Redis Open Source?
+Redis Ltd. is adding a third license option to its Redis Open Source offerings. In addition to SSPLv1 and RSALv2, users can now choose the free and OSI-approved open-source AGPLv3 license. This update is effective starting with the general availability release of Redis 8. This is not a license change, but rather the inclusion of an option to provide more flexibility for the Redis community.
+Why did Redis add AGPLv3?
+Some community members were frustrated by our March 2024 license change to the dual-license RSALv2 and SSPLv1, neither of which are OSI-approved licenses. Our license change was in response to the managed service providers who used Redis 7.2 and prior versions under the BSD3 license but provided limited contributions. The license change forced those providers to face a choice – share their source code according to the SSPLv1 license, or move on from Redis. Some chose to move on.
+Quoting our CEO’s blog post from March 2024: “Organizations providing competitive offerings to Redis will no longer be permitted to use new versions of the source code of Redis free of charge under either of the dual licenses. If you are building a solution that leverages Redis, but does not specifically compete with Redis itself, there is no impact.”
+Redis has been able to innovate more rapidly in the year following the change and is excited to again provide Redis Open Source under an OSI-approved license.
+How is AGPLv3 different from the BSD3 license?
+The BSD3 license and AGPLv3 represent different approaches to open source licensing. BSD3 is a permissive license that allows users to do almost anything with the code—including using it in proprietary software—as long as they retain the copyright notice and disclaimers. In contrast, AGPLv3 is a copyleft license that requires any modified versions to be distributed under the same terms, with the additional requirement that source code must be made available to users who interact with the software over a network. This “network clause” is AGPLv3’s defining feature, designed specifically to ensure that users of web applications can access the source code.
+Sure, but what if Redis changes the license again?
+There are no plans to change or add to the current Redis Open Source license configuration. Because our primary motivation for changing our license to RSALv2/SSPLv1 has now been successfully achieved, we can better align with Redis community expectations. We invested a lot of time to consider different licenses and to analyze the market dynamics before choosing AGPLv3. Other companies have made AGPLv3 an option for their communities as well.
+Let us be clear: we plan to keep Redis Open Source under the AGPLv3 license because we concluded that this license suits our business model and license stability is essential for the community. We recognize that our community is a founding pillar of Redis and we will keep it this way forever.
+I am a Redis community user. Am I impacted by the addition of AGPLv3?
+The short answer is: most likely not.
+If you are switching from Redis Community Edition (version 7.4.x or later) or from Redis Stack to Redis 8 the answer is simple: No.
+If you are switching from an earlier Redis Open Source version (7.2 or earlier) and using the code or artifacts provided by Redis, as-is, the answer is simple again: No.
+If you are switching from an earlier Redis Open Source version (7.2 or earlier), using modified code, and it is offered as a network server, the operators of those servers are required to provide the source code of the modified version running there to the users of that server.
+I’m a customer or partner; how does AGPLv3 as a license option affect me?
+This change does not affect customers and partners using our Redis Cloud or Software products under a commercial license.
+I am using a Redis fork. Why should I consider Redis?
+Redis Ltd. is the company that stands behind Redis. Our main mission as a company is focused on furthering Redis for the benefit of the Redis community. Redis does not have conflicting interests. We set the vision for Redis and execute on it. No other entity is prioritizing and investing in a Redis-like product as much as we do in Redis. We are laser-focused on making Redis more performant, scalable, user-friendly, and innovative. We constantly see forks and imitators copying portions of our innovation and APIs, but they are many months and often years behind us.
+Our investments extend beyond Redis Open Source to the Redis ecosystem. We make sure all developer tools and resources in other repositories fully support our latest innovations. That includes our official Redis client libraries, Redis Insight, Redis Copilot, and Redis for VS Code. And of course, we maintain the official Redis documentation.
+We also stand behind our community. Whenever we introduce new features, we help onboard them with Redis Insight interactive guides and tutorials, support our community on a dedicated discord channel, are very attentive to community requests on Github, and help community members on Stack Overflow and Reddit. Our official documentation covers not just Redis APIs, but also all the client library APIs.
+For further clarification, please reach us at redis_licensing@redis.com.
+Full license information
+ProductVersionLicense & Terms
+Redis (Open Source)<= 7.2BSD-3-Clause
+Redis Community Edition7.4RSALv2 or SSPLv1
+Redis Open Source>= 8.0.0RSALv2 or SSPLv1 or AGPLv3
+Redis Stack<= 6.2.4RSALv1
+Redis Stack>= 6.2.6RSALv2 or SSPLv1
+Redis Softwareanysee https://redis.io/software-subscription-agreement/
+Redis Data Integrationanysame as Redis Software
+Redis Cloudanysee https://redis.io/legal/cloud-tos/
+ModuleVersionLicense & Terms
+RediSearch<= 1.2AGPLv3
+RediSearch>= 1.4 to <= 1.4.3Apache v2.0 modified with Commons Clause
+RediSearch>= 1.4.4 to <= 2.4RSALv1
+RediSearch>= 2.6 to <= 2.10RSALv2 or SSPLv1
+RedisJSON<= 1.0.2AGPLv3
+RedisJSON1.0.3Apache v2.0 modified with Commons Clause
+RedisJSON>= 1.0.4 to <= 2.2RSALv1
+RedisJSON>= 2.4 to <= 2.8RSALv2 or SSPLv1
+RedisBloom< 2.0AGPLv3
+RedisBloom>= 2.0 to <= 2.2RSALv1
+RedisBloom>= 2.4 to <= 2.8RSALv2 or SSPLv1
+RedisTimeSeries<=1.6RSALv1
+RedisTimeSeries>=1.8 to <= 1.12RSALv2 or SSPLv1
+RedisGraph< 1.0.14Apache v2.0 modified with Commons Clause
+RedisGraph>= 1.0.14 to <= 2.8RSALv1
+RedisGraph>= 2.10RSALv2 or SSPLv1
+RedisGears<= 1.2RSALv1
+RedisGears>= 2.0RSALv2 or SSPLv1
+ToolVersionLicense & Terms
+Redis Insight< 2.0see https://redis.io/legal/redis-insight-license-terms/
+Redis Insight>= 2.0SSPLv1
+Redis for VS CodeanySSPLv1
+Client & LibraryVersionLicense & Terms
+redis-pyanyMIT
+redis-vl-pythonanyMIT
+NRedisStackanyMIT
+ioredisanyMIT
+node-redisanyMIT
+jedisanyMIT
+lettuceanyMIT
+redis-rbanyMIT
+hiredisanyBSD-3-Clause
+go-redisanyBSD-2-Clause
+rueidisanyApache v2.0
+Sections
+Redis Licensing Overview
+About RSALv2About SSPLv1About AGPLv3About our tri-licenseAbout past licensesAbout Redis Insight and Redis for VS Code
+FAQ
+What is the new license for Redis Open Source?Why did Redis add AGPLv3?How is AGPLv3 different from the BSD3 license?Sure, but what if Redis changes the license again?I am a Redis community user. Am I impacted by the addition of AGPLv3?I’m a customer or partner; how does AGPLv3 as a license option affect me?I am using a Redis fork. Why should I consider Redis?
+Full license information
+Get started with Redis today
+Speak to a Redis expert and learn more about enterprise-grade Redis today.
+Try for freeTalk to sales
+TrustPrivacyTerms of useLegal noticesCookie preferences
+EnglishEspañolFrançaisDeutsch한국어ItalianoPortuguês
+Use cases
+Vector databaseFeature FormSemantic cacheCachingNoSQL databaseLeaderboardsData deduplicationMessagingAuthentication token storageFast data ingestRedis SearchAll solutions
+Industries
+Financial ServicesGamingHealthcareRetailTelcoAll industries
+Compare
+Redis vs. ElastiCacheRedis vs. MemcachedRedis vs. MemorystoreRedis vs. Redis Open Source
+Company
+Mission & valuesCareersNews
+Connect
+CommunityEvents & Webinars
+Partners
+Amazon Web ServicesGoogle CloudAzureAll partners
+Support
+Professional ServicesSupportRedis for Agents Documentation
+EnglishEspañolFrançaisDeutsch한국어ItalianoPortuguês
+Trust
+Privacy
+Terms of use
+Legal notices
+Cookie preferences

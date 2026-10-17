@@ -1,17 +1,12 @@
 # Versioned releases
 
-The current release is **0.9.5**. Package/lockfile versions,
-`guidance/manifest.json`, the guidance release label in `SKILL.md`, and current
-install examples identify this software release. Earlier changelog entries and
-saved tasks retain their recorded versions.
+The working tree is **1.0.0-alpha.1**, an unpublished synthesis-first preview. The most recent published stable version at the start of this work is **0.9.5**. Do not describe an unpushed branch, successful local test or preview install as a release.
 
-The checked standalone workflow needs runtime 0.9.0; its verification and reuse
-commands (`verify`, `reassess --again`, `start --from`, `find`, `approve`,
-`refresh`) need runtime 0.9.1. Guidance refresh cannot upgrade executable
-helpers, so the guidance keeps a minimum runtime of 0.8.1 and routes older
-runtimes to the manual workflow. Raise the minimum only when that manual path is
-retired. Preview users must reinstall from `v0.9.5` even if their helper already
-reports 0.9.5: the immutable content digest distinguishes the bits.
+The new guidance requires runtime 1.0.0-alpha.1 or newer. Published automatic refresh selects compatible stable tags; a development checkout is selected explicitly. The 0.9 runtime and pinned guidance remain the correct resume path for existing question-queue runs.
+
+The new [specification](superpowers/specs/2026-10-17-synthesis-first.md) and [acceptance record](verification/1.0.0-alpha.1/README.md) govern this redesign. Before any authorized release, require the integrated native suite, isolated installation/context checks, source/license verification and the requested live research with independent review. Record exact scope and untested environments. Existing remote release gates remain required. Publishing, tagging and merging require separate authorization; this implementation request does not provide it.
+
+## Historical releases
 
 **0.9.5 acceptance scope (2026-10-16).** 0.9.5 adds the README's progressive
 disclosure map and documentation updates, with no runtime behaviour change. The
@@ -58,43 +53,30 @@ The [live record](verification/0.9.0/live-acceptance/README.md) retains the deci
 measurements and limitations. This is a scoped release exception, not removal of
 future acceptance criteria or evidence-validation requirements.
 
-For subsequent releases, complete native tests, installed CLI/skill checks and
-the live acceptance matrix in the
-[design](superpowers/specs/2026-10-15-research-with-agents-design.md), or record an
-explicit owner-approved change to the acceptance scope.
+## Preparing a future release
 
-**Where guidance is served from.** From runtime 0.9.0, new tasks take guidance
-from the newest `vMAJOR.MINOR.PATCH` tag whose `minimumRuntime` the installed
-helper meets, falling back to `main` only when the repository has no release tags.
-Tagging a release is therefore what publishes its guidance. From runtime 0.9.1,
-a task that skips a newer release because it needs a newer runtime reports
-`freshness: older-compatible-release` and a notice naming that release. Installed helpers up
-to 0.8.1 still read `main` directly: until they are updated, keep `main` at
-released guidance and develop on branches, merging to `main` when the release is
-tagged.
-[Release verification](verification/0.9.5/README.md) records completed checks
-and the scope of the recorded acceptance evidence. Do not cut the release from
-narrow examples alone.
+Release only after explicit publication authorization. Record the chosen version,
+exact tested tree, acceptance scope and any remaining platform or live-model gaps.
+A development preview passing one live research case is not a claim of broad
+cross-harness acceptance.
 
-After the relevant full native gate passes, merge the PR and verify its merged
-tree matches the tested tree. Brand's combined macOS gate can own shared
-verification when it runs the exact pinned Research commit's complete suite,
-installer, installed helper and saved-report flow. Reuse that evidence; do not
-repeat an unchanged suite merely because the merge SHA differs.
+1. Run the applicable integrated native gate and isolated installer/CLI checks.
+   Reuse valid evidence for unchanged code; rerun affected checks after corrections.
+2. Verify progressive-disclosure measurements, attribution/license packaging and
+   the saved research manifest. Record independent live review separately from
+   mechanical tests.
+3. When authorized, merge the reviewed change and verify the merged source matches
+   the tested source. Keep required remote gates; local success does not bypass them.
+4. Archive the exact release commit, publish an unused immutable version tag and
+   checksum, then download the assets and verify their contents and installation.
+   Do not overwrite an existing release tag.
 
-Archive the exact verified merge commit, never a mutable working directory:
+Automatic guidance refresh enumerates stable `vMAJOR.MINOR.PATCH` tags and selects
+the newest one compatible with the installed runtime. A development prerelease
+requires explicit checkout guidance or an approved pinned commit. Guidance cannot
+upgrade executable helpers. After a stable 1.0 release, users must install its
+runtime before its synthesis guidance becomes eligible.
 
-```sh
-git archive --format=zip --prefix=harness-research-v0.9.5/ --output /private/tmp/harness-research-v0.9.5.zip COMMIT
-shasum -a 256 /private/tmp/harness-research-v0.9.5.zip
-```
-
-Extract into disposable state, compare every file with the tagged tree, run its
-installer with disposable `--home`/`--shared` paths, and verify the installed
-`--version` reports 0.9.5. Publish the ZIP and checksum at an unused immutable
-`v0.9.5` tag, then download and verify both assets. Keep logs, exact commits,
-artifact hashes and cleanup results. No model or real-account access is needed.
-
-Installing updates the entrypoint for new tasks. Existing tasks keep their saved
-runtime/guidance; retain those immutable directories. Guidance refresh never
-executes downloaded code. To roll back new work, rerun a prior release's installer.
+Retain immutable runtimes and guidance for existing tasks. New research can use a
+new release while old projects resume their own contract. Rollback changes the
+entrypoint used for new tasks; it does not convert existing research formats.

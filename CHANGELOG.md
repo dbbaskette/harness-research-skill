@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.0-alpha.1 — unreleased
+
+- Rebuild the default skill around Anthropic Knowledge Synthesis with progressive investigation, synthesis, review and reuse guidance.
+- Add a document-first evidence helper with digest-bound independent factual/semantic review and saved report, findings brief and evidence view.
+- Align comparisons by explicit criterion; preserve source snapshots, draft/revision/stale states and output ownership.
+- Keep the 0.9 queue/manual commands as legacy compatibility paths; introduce an explicit schema-2 consumer boundary.
+- Rewrite first-use docs and architecture; add a colorful README illustration and upstream attribution.
+- Acceptance and live Valkey/Redis results are recorded separately under docs/verification/1.0.0-alpha.1.
+
 ## 0.9.5 — 2026-10-16
 
 The README now shows a progressive disclosure map. No runtime behaviour changes.

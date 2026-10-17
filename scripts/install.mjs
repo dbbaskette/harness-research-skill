@@ -6,6 +6,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
 import { randomUUID } from 'node:crypto';
 import { hash, digest } from './lib/common.mjs';
+import { parseVersion } from './lib/version.mjs';
 
 const packageRoot = fileURLToPath(new URL('../', import.meta.url));
 const roots = ['SKILL.md', 'LICENSE', 'NOTICE.md', 'package.json', 'package-lock.json', 'bootstrap', 'guidance', 'references', 'scripts', 'upstream', 'examples'];
@@ -81,10 +82,11 @@ export async function install({ source = packageRoot, home = homedir(), claudeCo
   if (new Set(targets).size !== targets.length || targets.some(path => path === shared || path.startsWith(shared + '/') || shared.startsWith(path + '/'))) throw new Error('Install destinations overlap.');
   const payload = await files(source), checks = Object.fromEntries([...payload].map(([name, bytes]) => [name, hash(bytes)]));
   const pkg = JSON.parse(payload.get('package.json'));
-  if (pkg.name !== 'harness-research-skill' || !/^\d+\.\d+\.\d+$/.test(pkg.version) || !/^name: harness-research$/m.test(payload.get('SKILL.md').toString())) throw new Error('Unrecognized research package.');
+  try { parseVersion(pkg.version); } catch { throw new Error('Unrecognized research package.'); }
+  if (pkg.name !== 'harness-research-skill' || !/^name: harness-research$/m.test(payload.get('SKILL.md').toString())) throw new Error('Unrecognized research package.');
   const contentDigest = digest(checks), id = `${pkg.version}-${contentDigest.slice(0, 20)}`, runtime = join(shared, 'versions', id), current = join(shared, 'current');
   const previous = await state(current);
-  if (previous && (!previous.link || !/^versions\/[\w.-]+$/.test(previous.link))) throw new Error('Unrecognized shared pointer; preserve it.');
+  if (previous && (!previous.link || !/^versions\/[\w.+-]+$/.test(previous.link))) throw new Error('Unrecognized shared pointer; preserve it.');
   for (const target of targets) {
     await checkParents(dirname(target));
     const existing = await state(target);

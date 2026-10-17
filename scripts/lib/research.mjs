@@ -238,7 +238,10 @@ async function withLock(project, create, action) {
   if (!await exists(locations.derived)) return action();
   const lock = join(locations.derived, 'research.lock'), owned = await acquireLock(lock);
   let failure = null;
-  try { return await action(); }
+  try {
+    if (await exists(join(locations.derived, 'synthesis.json'))) throw new Error('This project uses synthesis research; use synthesis status/save/review or a separate project for legacy work.');
+    return await action();
+  }
   catch (error) { failure = error; throw error; }
   finally { try { await releaseLock(lock, owned); } catch (error) { if (!failure) throw error; } }
 }
