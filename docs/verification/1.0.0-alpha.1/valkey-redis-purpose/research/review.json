@@ -1,0 +1,450 @@
+{
+  "schema": 2,
+  "digest": "a581995344103ace82f05066bd22de1457d4645df35480d8ed3cb2cacaed6ef1",
+  "originals": [
+    {
+      "source": "src-migration",
+      "sha256": "eea9887f392bdc51d42bc211122451f71c23e05b3aaa9ff080a4427ccd4d19a4",
+      "read_original": true
+    },
+    {
+      "source": "src-valkey-download",
+      "sha256": "86a6b1bee55fc3adcb8f6590ece4a05bada99864ffc2b11cf0b193462796d9ab",
+      "read_original": true
+    },
+    {
+      "source": "src-valkey-8-release",
+      "sha256": "cecf9155785c92408a78d4eea97ec42e3d0c1316d00d0293b5225b7826120eac",
+      "read_original": true
+    },
+    {
+      "source": "src-valkey-9-release",
+      "sha256": "50e9b70d6379f717001b8cc27dbd3abae9972b0c6ae377c327ae9933238f14e7",
+      "read_original": true
+    },
+    {
+      "source": "src-valkey-search",
+      "sha256": "86273b00d0ca3646c29232841e1c975fa0c360fec068b16112a2c1d1a85b723a",
+      "read_original": true
+    },
+    {
+      "source": "src-redis-license",
+      "sha256": "b6b6f489c788357b858ad373cc071cf8f7ffd0196d30167e7e762efe5d053dea",
+      "read_original": true
+    },
+    {
+      "source": "src-redis-release",
+      "sha256": "6c3ccdf27fcabf8ffd6491366571636d2f1ffe9f21c1f8d1aa5beaa19dc551bb",
+      "read_original": true
+    },
+    {
+      "source": "src-active-active",
+      "sha256": "b546139255fafab0ab1eb0f9972ddecf764c882f4df19c03942822519fbe64d6",
+      "read_original": true
+    },
+    {
+      "source": "src-replication",
+      "sha256": "acf492a46ce29bc6af585812fac82b3581417c0aaed5c171f02ba354c3da00de",
+      "read_original": true
+    },
+    {
+      "source": "src-persistence",
+      "sha256": "b354043de4b51b4fad46675cf74166d37ebae24f5c4d43b5f607de8b54331203",
+      "read_original": true
+    },
+    {
+      "source": "src-aws-upgrade",
+      "sha256": "f629eaa719d0d0a1deaa499af028531d932ee076adaf244e385a4e0cbaae266b",
+      "read_original": true
+    },
+    {
+      "source": "src-valkey-json",
+      "sha256": "8a8ad9cbb37c4510f00964507e762f2845345b4f78166ce8a2d8134e0a35e01e",
+      "read_original": true
+    },
+    {
+      "source": "src-valkey-license",
+      "sha256": "bbb0919072f229f6146c50f9b39a156f3a6fc7eff7277865a3420f9bf046d75f",
+      "read_original": true
+    },
+    {
+      "source": "src-valkey-performance",
+      "sha256": "fd012db1abea0568b5dd256934fbb1ddcb54e3bd7d7e32d8c8763638c9c5daea",
+      "read_original": true
+    },
+    {
+      "source": "src-governance",
+      "sha256": "2e314116c14fafafe718c55668b849a5f0cf3081305d6e342583c2f5649267a3",
+      "read_original": true
+    },
+    {
+      "source": "src-redis-governance",
+      "sha256": "11bf74f2bfc35b44befd0166ac3bf413c083b25deb866560170cc9b7933a4a77",
+      "read_original": true
+    },
+    {
+      "source": "src-search-compatibility",
+      "sha256": "20490eb6f84b0ba8feb328b58435920c999883b398f20d542e1234901e1467aa",
+      "original_sha256": "20490eb6f84b0ba8feb328b58435920c999883b398f20d542e1234901e1467aa",
+      "read_original": true
+    },
+    {
+      "source": "src-redis-performance",
+      "sha256": "b808ffef0c39ea13efddccd15dd7bcbb0922ff4dd4c049a40e458a03edf6ee3c",
+      "read_original": true
+    },
+    {
+      "source": "src-benchmark-method",
+      "sha256": "b8664ef8c9dd3ad8acdda68ef02b78e284bbb19465b3b99290328a1377e9b56c",
+      "read_original": true
+    },
+    {
+      "source": "src-redis-wait",
+      "sha256": "00aac1fbeee6d4640775ae70dc56b1f793cab7be853526e6e712f20a813263a1",
+      "original_sha256": "00aac1fbeee6d4640775ae70dc56b1f793cab7be853526e6e712f20a813263a1",
+      "read_original": true
+    },
+    {
+      "source": "src-redis-persistence",
+      "sha256": "100d094718bc6485db2394355778363e626d8eb8c7cdd88e1bcfd09bb6cd41ea",
+      "original_sha256": "4bfcca2befb867404c3dd0a804388dfc1cc2180a35ed4aa12ded55ecda03acad",
+      "read_original": true
+    }
+  ],
+  "facts": [
+    {
+      "id": "compatible-base",
+      "verdict": "supported",
+      "note": "Migration introduction and version table explicitly bound compatibility to Redis OSS 7.2 and earlier; attribution avoids claiming tested application equivalence."
+    },
+    {
+      "id": "ce74-files-incompatible",
+      "verdict": "supported",
+      "note": "Exact statement appears before the migration table; surrounding text says alternate migration is outside this guide, matching the narrowed file-format claim."
+    },
+    {
+      "id": "protocol-client",
+      "verdict": "supported",
+      "note": "RESP2/RESP3 and existing-client connection statement appears in compatibility details; report separately warns that connection success is insufficient."
+    },
+    {
+      "id": "module-api",
+      "verdict": "supported",
+      "note": "Compatibility details explicitly name Redis OSS modules and RedisModule_ API; neither fact nor synthesis promises arbitrary Redis Stack binary parity."
+    },
+    {
+      "id": "info-version",
+      "verdict": "supported",
+      "note": "INFO paragraph supplies 7.2.4 and both actual-engine/version fields."
+    },
+    {
+      "id": "migration-example",
+      "verdict": "supported",
+      "note": "Standalone section explicitly supplies Redis 7.2.5 and Valkey 7.2.6; report keeps these distinct from current captured release anchors."
+    },
+    {
+      "id": "snapshot-quiesce",
+      "verdict": "supported",
+      "note": "Physical-migration tradeoffs and first procedure step require disconnecting active connections and describe shutdown/load downtime."
+    },
+    {
+      "id": "replica-cutover",
+      "verdict": "supported",
+      "note": "Cluster migration introduction states add replicas, promote one for each Redis primary, and remove old nodes; no universal version claim added."
+    },
+    {
+      "id": "transaction-difference",
+      "verdict": "supported",
+      "note": "Valkey 8.0 Behavior Changes - Core contains the quoted nested MULTI/WATCH abort change."
+    },
+    {
+      "id": "lua-packaging",
+      "verdict": "supported",
+      "note": "The 9.1 release-note history records static linking by default in rc2; later captured notes do not reverse it and describe the built-in engine."
+    },
+    {
+      "id": "lua-module",
+      "verdict": "supported",
+      "note": "The 9.1 release-note history records the module extraction in rc1; report correctly pairs it with the static-default packaging qualifier."
+    },
+    {
+      "id": "valkey-version",
+      "verdict": "supported",
+      "note": "Saved download capture lists 9.1.2 under Version 9.x.x. Supported as the dated capture, not a live refresh."
+    },
+    {
+      "id": "redis-version",
+      "verdict": "supported",
+      "note": "Saved GitHub API JSON contains tag 8.10.2 and published_at 2026-09-17T15:06:56Z; draft and prerelease are false. Dated capture only."
+    },
+    {
+      "id": "valkey-license",
+      "verdict": "supported",
+      "note": "Tagged 9.1.2 COPYING capture declares BSD-3-Clause and includes the terms. Fact does not offer a legal conclusion about a deployment."
+    },
+    {
+      "id": "redis-license-options",
+      "verdict": "supported",
+      "note": "About our tri-license and FAQ identify all three choices for Redis 8+. Commercial products remain separately identified in surrounding material."
+    },
+    {
+      "id": "redis-old-licenses",
+      "verdict": "supported",
+      "note": "About past licenses explicitly supplies BSD for <=7.2.x and RSAL/SSPL for CE 7.4.x-7.8.x."
+    },
+    {
+      "id": "redis-integrated-types",
+      "verdict": "supported",
+      "note": "Tri-license section names all four integrated components and identical versioning starting at Redis 8."
+    },
+    {
+      "id": "valkey-search-capability",
+      "verdict": "supported",
+      "note": "README introduction explicitly names ANN/KNN, Numeric, Tag, Full-text, hashes and JSON; fact preserves main-branch status rather than release availability."
+    },
+    {
+      "id": "valkey-json-capability",
+      "verdict": "supported",
+      "note": "Unstable README introduction describes native JSON support; branch limitation is retained."
+    },
+    {
+      "id": "active-active-semantics",
+      "verdict": "supported",
+      "note": "Redis Software planning section names CRDT technology and additional replication/networking complexity. Synthesis keeps this edition-specific."
+    },
+    {
+      "id": "async-replication",
+      "verdict": "supported",
+      "note": "Replication introduction and important-facts list establish asynchronous operation; adjacent optional WAIT semantics are retained elsewhere."
+    },
+    {
+      "id": "wait-not-strong",
+      "verdict": "supported",
+      "note": "Replication context expressly states WAIT acknowledgments do not create strong consistency and failover loss depends on persistence."
+    },
+    {
+      "id": "persistence-cost",
+      "verdict": "supported",
+      "note": "RDB disadvantages contain the quoted dataset/CPU-dependent fork pause and AOF rewrite distinction; fact does not turn worst-case pause into universal latency."
+    },
+    {
+      "id": "aof-durability",
+      "verdict": "supported",
+      "note": "Append-only durability section lists everysec and possible one-second loss, alongside always/no alternatives."
+    },
+    {
+      "id": "aws-rollback",
+      "verdict": "supported",
+      "note": "Rollback requirements explicitly restrict the pair to Valkey 7.2 -> Redis OSS 7.1 even for earlier source versions; surrounding snapshot alternative does not expand versions."
+    },
+    {
+      "id": "aws-parameters",
+      "verdict": "supported",
+      "note": "Custom replication-group upgrade paragraph requires matching Redis OSS static parameters in the new Valkey custom group."
+    },
+    {
+      "id": "valkey-performance-claim",
+      "verdict": "supported",
+      "note": "Announcement performance section supplies 2.1M requests/s, 512 bytes, nine IO threads and pipeline ten; publisher attribution preserved."
+    },
+    {
+      "id": "aws-rollback-identity",
+      "verdict": "supported",
+      "note": "Rollback requirements name associated users and user groups and REDIS engine type."
+    },
+    {
+      "id": "search-dialect-boundary",
+      "verdict": "supported",
+      "note": "Original compatibility Markdown and extraction bound the expected contract to implemented Dialect 2 features, directing readers to release-specific documentation."
+    },
+    {
+      "id": "search-rebuild",
+      "verdict": "supported",
+      "note": "Original compatibility Markdown persistence subsection explicitly rejects direct Redisearch RDB loads in either direction and requires rebuilding from hashes/JSON."
+    },
+    {
+      "id": "valkey-governance",
+      "verdict": "supported",
+      "note": "Governance opening defines TSC management and repository-maintainer composition; later provisions allow membership changes, without contradicting this attributed governance description."
+    },
+    {
+      "id": "valkey-affiliation-cap",
+      "verdict": "supported",
+      "note": "TSC section explicitly caps employees, contractors or representatives of same/affiliated organizations at one third and provides remediation procedure."
+    },
+    {
+      "id": "redis-direction",
+      "verdict": "supported",
+      "note": "FAQ and retained browser capture place the statement in Redis Ltd. first-person self-description. No formal governance selection policy is inferred."
+    },
+    {
+      "id": "redis-performance-claim",
+      "verdict": "supported",
+      "note": "Saved performance section and retained browser capture explicitly report >5x Redis 8.6 vs 7.2. This is not a measurement against Valkey."
+    },
+    {
+      "id": "redis-performance-config",
+      "verdict": "supported",
+      "note": "Caption in both saved section and retained browser capture supplies every listed setting for the >5x caching comparison, distinct from the following pipeline-16 result."
+    },
+    {
+      "id": "matched-benchmark-method",
+      "verdict": "supported",
+      "note": "Benchmark context explicitly calls for matching operations, workload behavior, connections and pipelining; recommendation uses that comparability principle."
+    },
+    {
+      "id": "redis-wait-limit",
+      "verdict": "supported",
+      "note": "Original WAIT Markdown and extraction identify best-effort Sentinel/Cluster safety improvement and continued possibility of lost acknowledged writes."
+    },
+    {
+      "id": "redis-aof-window",
+      "verdict": "supported",
+      "note": "Inspected original HTML durability list and adjacent paragraphs as well as extraction; everysec possible one-second disaster loss is explicit."
+    }
+  ],
+  "findings": [
+    {
+      "id": "bounded-takeout",
+      "verdict": "supported",
+      "note": "Support chain establishes shared baseline and connection support, while counterevidence and preserved conditions explain semantic differences and later-file incompatibility. The pilot is conditional, not a completed migration claim."
+    },
+    {
+      "id": "feature-dependencies",
+      "verdict": "supported",
+      "note": "Summary and brief preserve feature presence, implemented Dialect 2 and index rebuild boundaries, rolling-source scope, and commercial CRDT counterexample. No product parity or absence-of-capability inference is asserted."
+    },
+    {
+      "id": "license-choice",
+      "verdict": "supported",
+      "note": "Version-specific facts support licensing distinction; formal Valkey governance is distinguished from Redis company self-description. Brief preserves the AGPL counterargument and does not promise lower costs."
+    },
+    {
+      "id": "operational-fit",
+      "verdict": "supported",
+      "note": "Both publisher benchmarks retain conditions and attribution; Redis upgrade is a real alternative. Both durability limitations are represented, and no matched benchmark or cost model is claimed."
+    },
+    {
+      "id": "rollback-design",
+      "verdict": "supported",
+      "note": "Clearly labeled inference distinguishes forward migration from reverse compatibility and post-cutover write recovery. Provider-specific pair and unresolved replay method remain visible."
+    }
+  ],
+  "prose": [
+    {
+      "id": "answer:0",
+      "verdict": "supported",
+      "note": "Useful conditional answer supported by baseline, dependency and licensing findings; no universal winner asserted."
+    },
+    {
+      "id": "answer:1",
+      "verdict": "supported",
+      "note": "Captured release values and older worked example pair are accurate, explicitly dated and not recommended as a target pair."
+    },
+    {
+      "id": "boundaries:0",
+      "verdict": "supported",
+      "note": "Risk-sensitive cache/state recommendation is a reasonable inference from asynchronous replication and durability limits; no workload testing is implied."
+    },
+    {
+      "id": "boundaries:1",
+      "verdict": "supported",
+      "note": "File compatibility is appropriately narrower than migration feasibility; alternative transfer is conditional and explicitly unvalidated."
+    },
+    {
+      "id": "boundaries:2",
+      "verdict": "supported",
+      "note": "Integrates existence, implemented Dialect 2, index rebuild and rolling-version limitations without promising parity. Appropriate high-level Search treatment for recorded introductory purpose."
+    },
+    {
+      "id": "boundaries:3",
+      "verdict": "supported",
+      "note": "Commercial CRDT capability and ordinary asynchronous replication are not conflated; staying or redesigning remains conditional."
+    },
+    {
+      "id": "dependencies:0",
+      "verdict": "supported",
+      "note": "Inventory is a recommendation, with a concrete release-note semantic difference explaining why it matters."
+    },
+    {
+      "id": "dependencies:1",
+      "verdict": "supported",
+      "note": "Example is explicitly illustrative and not executed. Nested MULTI scenario follows the cited abort change and makes no unsupported universal transaction claim."
+    },
+    {
+      "id": "dependencies:2",
+      "verdict": "supported",
+      "note": "INFO fields match source; Lua extraction is qualified by static linking, avoiding a false dynamic-library requirement."
+    },
+    {
+      "id": "operations:0",
+      "verdict": "supported",
+      "note": "Publisher-specific settings and versions retained. Explicitly rejects head-to-head ranking and identifies Redis upgrade as an alternative."
+    },
+    {
+      "id": "operations:1",
+      "verdict": "supported",
+      "note": "Matched-workload testing recommendation is justified and explicitly not a benchmark result."
+    },
+    {
+      "id": "operations:2",
+      "verdict": "supported",
+      "note": "Both stores receive equivalent treatment for WAIT/AOF limitations; recovery-testing implication is justified."
+    },
+    {
+      "id": "operations:3",
+      "verdict": "supported",
+      "note": "Cost components are proposed decision inputs; AWS static-parameter example is supported and savings are expressly unestablished."
+    },
+    {
+      "id": "migration:0",
+      "verdict": "supported",
+      "note": "Application/state acceptance checks are recommendations justified by compatibility limits, not claims of performed validation."
+    },
+    {
+      "id": "migration:1",
+      "verdict": "supported",
+      "note": "Snapshot and cluster paths are bounded to verified versions; added writer fencing and state checks are conditional recovery recommendations."
+    },
+    {
+      "id": "migration:2",
+      "verdict": "supported",
+      "note": "Preserved source cannot contain isolated target writes; rollback recommendation correctly distinguishes pre/post-write stages and makes no reverse-file guarantee."
+    },
+    {
+      "id": "migration:3",
+      "verdict": "supported",
+      "note": "Explicit hypothetical illustrates missing writes by construction; no observed incident or successful replay tool is claimed."
+    },
+    {
+      "id": "migration:4",
+      "verdict": "supported",
+      "note": "AWS version pair and identity requirements match dated capture; upstream and provider capability remain distinct."
+    },
+    {
+      "id": "license:0",
+      "verdict": "supported",
+      "note": "Version-specific licensing claims match captured terms. No application-specific legal suitability is asserted."
+    },
+    {
+      "id": "license:1",
+      "verdict": "supported",
+      "note": "Governance contrast follows sources and expressly marks Redis self-description limits; no operational superiority is inferred."
+    },
+    {
+      "id": "unknowns:0",
+      "verdict": "supported",
+      "note": "Open inputs and absence of workload execution are honestly reported for this generic decision input."
+    },
+    {
+      "id": "unknowns:1",
+      "verdict": "supported",
+      "note": "Conditional conclusion preserves staying/upgrading alternatives and reversal criteria; instructional reuse correctly treats examples as illustrative."
+    }
+  ],
+  "assessment": {
+    "coverage": "accurate",
+    "usefulness": "adequate",
+    "note": "Independent review of this exact saved digest found all 38 facts, five findings and 22 prose blocks supported for the recorded decision-input and introductory-training purpose. Report and brief explain compatibility boundaries, substantive counterarguments, consequences and reversal conditions. Original-read attestations cover inspected saved source material and surrounding context, including both original Markdown files, original Redis persistence HTML, readable extracts and retained browser contexts. This is dated-capture review, not live-source freshness verification. Three Redis sources have documented HTTP 403/partial-capture limitations; their cited prose and context remain available in retained browser captures. Charts were not inspected or used as independent evidence. No workload benchmark, migration/restore execution, legal analysis or total-cost validation is established."
+  }
+}

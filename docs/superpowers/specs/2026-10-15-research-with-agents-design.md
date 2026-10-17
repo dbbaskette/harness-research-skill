@@ -1,5 +1,7 @@
 # Research a topic with Claude Code or Codex: a thoroughly researched, cited report
 
+> Historical design for 0.9. New-work architecture is specified in [Synthesis-first Harness Research](2026-10-17-synthesis-first.md). Existing runs retain their original contracts.
+
 Date: 2026-10-15. Status: draft 9, revised after the 0.9.0 review for speed, selective staleness and
 release-tag guidance (2026-10-16). Issue:
 [harness-research-skill#9](https://github.com/dbbaskette/harness-research-skill/issues/9).

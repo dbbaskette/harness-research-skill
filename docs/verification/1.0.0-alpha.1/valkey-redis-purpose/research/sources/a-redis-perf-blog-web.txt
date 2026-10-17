@@ -1,0 +1,316 @@
+Announcing Redis 8.6: Performance improvements (https://redis.io/blog/announcing-redis-86-performance-improvements-streams/)
+citeturn39view0 [wordlim: 200] Crawled: today; Content type: text/html; Source: open({"ref_id":"https://redis.io/blog/announcing-redis-86-performance-improvements-streams/","lineno":null}); Total lines: 461
+L0: Skip to:
+L1: 
+L2:   * cite0†Home L3:   * cite1†Content L4:   * cite2†Footer navigation L5: 
+L6: 86.5% accuracy. ~$0.07 per session. See how Redis stacks up in the Agent Memory Benchmark.
+L7: 
+L8: cite3†Read the report L9: 
+L10: cite4†Redis Iris L11: 
+L12:   * cite5†Platform L13: 
+L14: Platform
+L15:     * cite4†Redis IrisReal-time context for agents  L16:     * cite6†Redis LangCacheSave on tokens for common questions L17:     * cite7†Redis Context RetrieverLeverage context from anywhere L18:     * cite8†Redis Agent MemoryAgentic memory for consistent experiences L19:     * cite9†Redis Data IntegrationCDC across your structured data  L20:     * cite10†Redis FlexMore data, more speed, less cost L21:     * cite11†CachingSub-ms read/write at scale L22:     * cite12†StreamingEvent-driven messaging & data pipelines L23:     * cite13†Session managementFast, persistent storage for sessions  L24:     * cite14†SearchSearch & query for structured data L25:     * cite15†Feature storeReal-time ML feature pipeline for apps & agents L26: Latest
+L27: 
+L28: cite16†Image: Agent memory workshop†cdn.sanity.io L29: 
+L30: Design, build, and scale agent memory
+L31: 
+L32: Oct. 21, 2026
+L33: 
+L34: Get Rediscite17†Downloads L35: 
+L36:   * cite5†Deploy L37: 
+L38: Deploy
+L39: 
+L40:     * cite18†Redis CloudFully managed, fully flexible L41:     * cite19†Redis SoftwareOn-prem L42:     * cite20†Redis open source frameworkRedis 8.8 L43:     * cite21†PricingLet’s talk numbers L44:     * cite22†Redis on AWSBuy with cloud commits L45:     * cite23†Azure Managed RedisMicrosoft-supported Redis L46:     * cite24†Redis on Google CloudRedis from the marketplace L47: Tools
+L48:     * cite25†Redis InsightUI to visualize, query, & debug L49:     * cite26†RIOTGet data into Redis from anywhere L50:     * cite27†Client librariesPython, Node, Java, Go, .Net, & more L51:     * cite28†SDKsConnect Redis to your apps L52: 
+L53: Get Rediscite17†Downloads L54: 
+L55:   * cite5†Solutions L56: AI & ML Apps
+L57:     * cite29†Scale agent & agentic systems Everything you need to be successful  L58:     * cite30†RAGUnderstand how Redis powers RAG L59:     * cite31†Semantic searchRight answers, right now L60:     * cite32†MLLeverage your features, fast L61:     * cite6†Token optimizationAll the AI without all the cost L62:     * cite33†AI cost optimizationControl AI costs without compromise L63: Core Workloads
+L64:     * cite34†Fraud detectionStop fraud, protect customers L65:     * cite35†Real-time decisionsAct on data in real time L66:     * cite11†Caching & performanceOur bread & butter  L67:     * cite12†Real-time messagingStreams at the speed of thought L68:     * cite36†Session managementConsistent experiences everywhere L69:     * cite37†LeaderboardsKnow who’s winning L70: 
+L71: Industries
+L72:     * cite38†Financial services L73:     * cite39†E-commerce & retail L74:     * cite40†Gaming L75:     * cite41†Healthcare L76:     * cite42†Telco L77: 
+L78: Get Rediscite17†Downloads L79:   * cite5†Devs L80: 
+L81: Docs
+L82:     * cite43†Redis CloudThe nitty gritty L83:     * cite44†Welcome to the communityJoin the largest open source community in cache L84:     * cite45†Dev HubAll the tools to build L85: 
+L86: Training
+L87:     * cite46†UniversityBecome a Redis expert†university.redis.io L88:     * cite47†TutorialsHow-to for whatever you’re trying to do L89:     * cite48†Quick startsGo 0 to 1: Redis fast L90:     * cite49†Knowledge baseGet support†support.redislabs.com L91: Learning
+L92:     * cite50†BlogAll the words L93:     * cite51†Resource centerEverything you need, in one place L94:     * cite52†Demo centerAnything & everything, in action L95:     * cite53†Reference architecturesNo guessing, just deploy L96: 
+L97:   * cite5†Resources L98: 
+L99: Customers
+L100:     * cite51†Resource Center L101: 
+L102: Events
+L103:     * cite54†Virtual & live eventsCome say hello L104: 
+L105: Partners
+L106:     * Join the Redis Partner Network
+L107: 
+L108:     * cite55†Find a partner L109:     * cite22†AWS L110:     * cite24†Google L111:     * cite23†Microsoft L112: 
+L113: Latest
+L114: 
+L115: cite16†Image: Agent memory workshop†cdn.sanity.io L116: Design, build, and scale agent memory
+L117: 
+L118: Oct. 21, 2026
+L119: 
+L120: Learn how to Buildcite45†Visit our dev hub L121: 
+L122:   * Searchcite56†Book a meeting cite57†Try Redis L123: 
+L124: cite4†Redis Iris L125: 
+L126: Platform
+L127: 
+L128: Platform
+L129: cite4†Redis IrisReal-time context for agents  cite6†Redis LangCacheSave on tokens for common questions cite7†Redis Context RetrieverLeverage context from anywhere cite8†Redis Agent MemoryAgentic memory for consistent experiences cite9†Redis Data IntegrationCDC across your structured data  cite10†Redis FlexMore data, more speed, less cost cite11†CachingSub-ms read/write at scale cite12†StreamingEvent-driven messaging & data pipelines cite13†Session managementFast, persistent storage for sessions  cite14†SearchSearch & query for structured data cite15†Feature storeReal-time ML feature pipeline for apps & agents L130: Get Rediscite17†Downloads L131: 
+L132: Deploy
+L133: 
+L134: Deploy
+L135: 
+L136: cite18†Redis CloudFully managed, fully flexible cite19†Redis SoftwareOn-prem cite20†Redis open source frameworkRedis 8.8 cite21†PricingLet’s talk numbers cite22†Redis on AWSBuy with cloud commits cite23†Azure Managed RedisMicrosoft-supported Redis cite24†Redis on Google CloudRedis from the marketplace L137: 
+L138: Tools
+L139: cite25†Redis InsightUI to visualize, query, & debug cite26†RIOTGet data into Redis from anywhere cite27†Client librariesPython, Node, Java, Go, .Net, & more cite28†SDKsConnect Redis to your apps L140: 
+L141: Get Rediscite17†Downloads L142: 
+L143: Solutions
+L144: 
+L145: AI & ML Apps
+L146: cite29†Scale agent & agentic systems Everything you need to be successful  cite30†RAGUnderstand how Redis powers RAG cite31†Semantic searchRight answers, right now cite32†MLLeverage your features, fast cite6†Token optimizationAll the AI without all the cost cite33†AI cost optimizationControl AI costs without compromise L147: 
+L148: Core Workloads
+L149: cite34†Fraud detectionStop fraud, protect customers cite35†Real-time decisionsAct on data in real time cite11†Caching & performanceOur bread & butter  cite12†Real-time messagingStreams at the speed of thought cite36†Session managementConsistent experiences everywhere cite37†LeaderboardsKnow who’s winning L150: 
+L151: Industries
+L152: 
+L153: cite38†Financial services cite39†E-commerce & retail cite40†Gaming cite41†Healthcare cite42†Telco L154: 
+L155: Get Rediscite17†Downloads L156: 
+L157: Devs
+L158: 
+L159: Docs
+L160: cite43†Redis CloudThe nitty gritty cite44†Welcome to the communityJoin the largest open source community in cache cite45†Dev HubAll the tools to build L161: 
+L162: Training
+L163: 
+L164: cite46†UniversityBecome a Redis expert†university.redis.io cite47†TutorialsHow-to for whatever you’re trying to do cite48†Quick startsGo 0 to 1: Redis fast cite49†Knowledge baseGet support†support.redislabs.com L165: 
+L166: Learning
+L167: cite50†BlogAll the words cite51†Resource centerEverything you need, in one place cite52†Demo centerAnything & everything, in action cite53†Reference architecturesNo guessing, just deploy L168: 
+L169: Resources
+L170: 
+L171: Customers
+L172: 
+L173: cite51†Resource Center L174: 
+L175: Events
+L176: 
+L177: cite54†Virtual & live eventsCome say hello L178: 
+L179: Partners
+L180: 
+L181: Join the Redis Partner Networkcite55†Find a partner cite22†AWS cite24†Google cite23†Microsoft L182: 
+L183: Learn how to Buildcite45†Visit our dev hub L184: 
+L185: cite57†Try Redis cite56†Book a meeting L186: 
+L187: Resource Center
+L188: cite54†Events & webinars cite50†Blog cite58†Videos cite59†Glossary cite60†Resources cite53†Architecture Diagrams cite52†Demo Center L189: 
+L190: Resource Center
+L191: 
+L192: cite54†Events & webinars cite50†Blog cite58†Videos cite59†Glossary cite60†Resources cite53†Architecture Diagrams cite52†Demo Center L193: 
+L194: cite61†Back to blog L195: 
+L196: Blog
+L197: # Announcing Redis 8.6: Performance improvements, streams enhancements, new eviction policies, & more
+L198: 
+L199: February 10, 2026 14 minute read
+L200: 
+L201: cite62†Image: Lior Kogan†cdn.sanity.io L202: 
+L203: Lior Kogan
+L204: 
+L205: Summarize with AI
+L206:   *   *   * Redis 8.6 in Redis Open Source is now available. This release delivers performance and resource utilization improvements, plus a set of community-requested updates that make day-to-day development and operations smoother. It includes new Streams safeguards, more eviction control, better hotkey visibility, simpler TLS auth, and more flexible time series handling.
+L207:   * cite63†Performance and resource utilization improvements in Redis 8.6 L208:   * New features explained:
+L209:     * cite64†Streams: At-most-once production guarantee L210:     * cite65†Eviction: Least recently modified policies L211:     * cite66†Hotkeys: Detection and reporting L212:     * cite67†Security: TLS certificate-based automatic client authentication L213:     * cite68†Time series: Support for NaN values L214: With Redis 8.6 in Redis Open Source, we continue to deliver on our commitment to continuous performance improvement. The chart below shows our steady throughput increase (operations per second) for a typical caching workload use case across successive releases of Redis.
+L215: ### Redis 8.6 in Redis Open Source: More than 5x throughput compared to Redis 7.2
+L216: 
+L217: cite69†Image: Redis†cdn.sanity.io L218: 
+L219: Single node; using only 16 cores on an m8g.24xlarge instance (ARM, Graviton4); 11 io-threads; Pipeline size: 1; 2000 clients Caching use case: 1:10 SET : GET ratio; 1M keys; 1K string values
+L220: 
+L221: With pipeline size set to 16, Redis 8.6 reaches 3.5M ops/sec.
+L222: Redis performance improvements are not limited to better multithreading. We continuously reduce the latency of many commands. Compared to Redis 8.4, in Redis 8.6, we achieved:
+L223: 
+L224:   * Up to 35% lower latency for sorted set commands
+L225:   * Up to 15% lower latency for GET command on short strings
+L226:   * Up to 11% lower latency on list commands
+L227:   * Up to 7% lower latency on hash commands
+L228: ### Redis 8.6 max latency improvement compared to Redis 8.4 (single core)
+L229: 
+L230: cite70†Image: Redis†cdn.sanity.io L231: 
+L232: Single node; using a single thread on a m8g.24xlarge instance (ARM, Graviton4)
+L233: 
+L234: The throughput and latency improvements are similar on Intel and AMD processors.
+L235: 
+L236: In addition, in 8.6 we achieved a tremendous reduction in the memory footprint of hashes and sorted sets - up to 16.7% and 30.5% respectively.
+L237: ### Redis 8.6 max memory reduction by data type compared to Redis 8.4
+L238: 
+L239: cite71†Image: Redis†cdn.sanity.io L240: 
+L241: Compared to Redis 8.4, in Redis 8.6, we improve vector sets vector insertion performance by up to 43% and querying performance by up to 58%.
+L242: 
+L243: ### VADD improvements on binary and 8-bit quantization for x86-64 architecture
+L244: 
+L245: cite72†Image: Redis†cdn.sanity.io L246: 
+L247: Single node; m8i.24xlarge machine (Intel)
+L248: ## Summary of new features in 8.6
+L249: Our investment in improving Redis Streams continues. cite73†Redis 8.2 simplified message acknowledgment and deletion across multiple consumer groups, and cite74†Redis 8.4 made it much easier for consumers to read both new messages and idle pending ones. In Redis 8.6, we take another step forward by introducing idempotent production: a new guarantee that a message will be added to a stream at most once, even if producers need to resend messages following app crashes or network failures.
+L250: Redis has two cite75†eviction policies for evicting the least-recently used keys first (either all keys or only volatile keys). In the same spirit, we introduce in 8.6 two new eviction policies for least-recently modified keys. These policies better match AI and other use cases which are explained below.
+L251: Optimizing a Redis cluster often requires detecting and handling hot nodes, hot slots, and hot keys, where “hot” means a node, slot, or key that requires an inappropriate amount of CPU or network resources. In 8.2 we introduced cite76†`CLUSTER SLOT-STATS` to detect hot slots, and in 8.4 we introduced Atomic Slot Migration to migrate them. In 8.6, we introduce a new command, `HOTKEYS`, to allow detection of hot keys as well.
+L252: Redis supports both one-way TLS and mutual TLS (mTLS). Prior to Redis 8.6, mTLS clients still had to authenticate at the application layer using `AUTH`. Starting with Redis 8.6, Redis can automatically authenticate mTLS clients to an ACL user based on the certificate Common Name (CN). When enabled, clients no longer need to issue `AUTH`, and certificate possession becomes the sole credential, simplifying authentication and eliminating the need to manage ACL passwords.
+L253: Time series users often need to mark measurements as “unavailable” at the time of insertion, and fill the data later. In Redis 8.6 we added support for NaN values as a way to mark unavailable data, and extended existing commands to better support such usage.
+L254: 
+L255: cite77†Image: Database†cdn.sanity.io L256: ## Get started with Redis for high-performance caching
+L257: 
+L258: Reduce latency and offload your database with in-memory caching.
+L259: 
+L260: cite57†Try Redis L261: 
+L262: ## cite64†The new features explained L263: ### Streams: At-most-once production guarantee
+L264: 
+L265: In Redis 8.6, we introduce idempotent production. Streams now provide a way to ensure that adding the same message to a stream multiple times has the same behavior as adding it only once. This is often called an at-most-once production guarantee meaning Redis will add the same message to a stream only once, even if a producer retries after a crash or network failure.
+L266: #### Why is this guarantee needed?
+L267: 
+L268: Imagine a food delivery order. Each message is consumed by multiple consumer groups: the kitchen (for preparation), the inventory management system (for ordering supplies), the delivery company (for physically delivering the order), accounting (for bookkeeping), as well as other services. Adding the same message multiple times to the stream may lead to financial loss, incorrect inventory, and confusion.
+L269: Before Redis 8.6, if a disconnection occurs after the producer calls `XADD` but before it receives the reply, the producer has no way of knowing if that message was delivered. This can happen in two situations:
+L270: 
+L271:   1. If a disconnection occurs after the producer executes `XADD` but before it receives the reply.
+L272:   2. If the producer crashes after calling `XADD` but before receiving the reply and marking a message as delivered.
+L273: In both cases, to guarantee that the message is added to the stream, the producer must call `XADD` again with the same message. Without idempotent production, resending may result in a message being delivered twice. With idempotent message processing, producers can guarantee at-most-once production even under such scenarios.
+L274: #### Behavior without at-most-once production guarantee
+L275: 
+L276: cite78†Image: Redis†cdn.sanity.io L277: ####
+L278: Why entry IDs cannot be used as idempotent IDs?
+L279: In `XADD key .. <id|*> field value [field value ...]`Each message has an entry ID which is either timestamp-seq or auto-generated. The entry IDs must be monotonically increasing. Generating monotonically increasing IDs is straightforward when there is a single producer, but with multiple producers, it can be very challenging and often impossible. Therefore, multiple producers are usually forced to use auto-generated entry IDs (‘*’).
+L280: `XADD` replies with the auto-generated entry ID, but here is the problem: if the app doesn’t receive the reply, it can’t resend this message with the same ID. And therefore, if a message is re-sent, there is no identifier by which Redis can detect it as a duplicate.
+L281: To summarize, we want to allow multiple producers to add entries to a stream in an idempotent way: we want to ensure that Redis adds duplicate entries to the stream at most once, even if`XADD` is called multiple times with the same message. We need this guarantee to hold even when facing network disconnections and reconnections, and when producer apps crash and recover.
+L282: #### Introducing idempotent IDs
+L283: 
+L284: Providing at-most-once production guarantee requires coordination between Redis and producers. Starting with Redis 8.6, producers can associate a unique, idempotent ID, with each message they add to the stream:
+L285: 
+L286: There are two ways to assign idempotent ids:
+L287:   1. `IDMP pid iid` - producers need to provide a unique producer id (`pid`) for each producer and a unique idempotent id (`iid`) for each message. The iid can be a counter (per producer), some identifier that is already associated with this message (e.g., a transaction id), or a universally unique identifier (UUID).
+L288:   2. `IDMPAUTO pid` - producers need to provide only a unique producer id (`pid`) for each producer. Redis generates an iid based on the message’s content.
+L289: The most important point is that if a message is added to a stream more than once – the same pid and iid must be used. Therefore, the application should ensure that:
+L290: 
+L291:   * pid is unique for each producer and consistent across application restarts
+L292:   * iid is unique for each message (per pid) and consistent across resends
+L293: When `XADD` is called, Redis checks if the (pid, iid) pair is identical to a recently-added (pid, iid). If so, the message is assumed to be identical, a duplicate message is not added to the stream, and the reply is the same entry id as before.
+L294: 
+L295: Note that if the message content in different messages can be identical, apps should avoid `IDMPAUTO pid` and use `IDMP pid iid`.
+L296: 
+L297: cite79†Image: Redis†cdn.sanity.io L298: #### Idempotence configuration
+L299: 
+L300: In order to detect duplicate messages, Redis needs to keep the recently seen iids per pid. Keeping more iids than necessary requires more memory and may also slower ingestion through `XADD`. Therefore, it is important to determine the optimal configuration values.
+L301: 
+L302: In Redis 8.6, we introduced a new command for Setting a stream’s duration and maxsize:
+L303: When `XCFGSET` is called with different duration or maxsize values than the current, Redis updates the values and clears the IDMP map for the given key (i.e., discards all tracked pids and iids).
+L304: 
+L305: Two idempotence configuration parameters are associated with each stream:
+L306: 
+L307:   * maxsize is the maximum number of most recent iids that Redis keeps per pid
+L308:   * duration is the duration, in seconds, that Redis keeps each iid (but note that Redis never keeps more than maxsize iids per pid).
+L309: duration is an operational guarantee: Redis will not discard a previously seen iid for that duration (unless reaching maxsize iids for a pid). If a producer app crashes and stops sending messages to Redis, Redis will keep each iid for duration seconds, and then will discard it. You should set this value based on how long it may take your producer app to recover from a crash and start resending messages. If set too high, Redis will waste memory bykeeping iids for a longer duration than necessary.
+L310: Example: If it can take up to 1000 seconds for a producer to recover and restart sending messages, duration should be set to 1000 seconds.
+L311: When a producer app retrieves an `XADD` reply from Redis, it usually marks the message as “delivered” (e.g., in some transactions log) or deletes it (e.g., from a transactions table). If a producer app crashes, after restarting, the app sends messages that are not marked as “delivered”. Since a few messages may have not been marked as “delivered” as a result of the crash, the app may resend these messages.
+L312: This is exactly why we need idempotent IDs: to allow Redis to detect such messages as duplicates and filter them.
+L313: Setting maxsize correctly ensures that Redis keeps enough iids. If set too high, Redis will waste memory by keeping too many iids. Usually this number can be small.
+L314: If your app marks messages as “delivered” (or deletes them) upon retrieval of `XADD` replies from Redis (it should, to support messaging resending after recovering from a crash), then you should set maxsize based on how long it may take from the time the app retrieves an `XADD`reply from Redis till this message is marked as “delivered” or deleted. Let’s name this period mark-delay. maxsize should be set to mark-delay [in msec] * (messages/msec from one producer) + some margin.
+L315: Example: A producer is sending 1000 msgs/sec (1 msg/msec), and takes up to 80 msec to mark a message as “delivered” or delete it. maxsize should be set to 1*80 + margin = 100 iids.
+L316: 
+L317: We also introduced two new global configuration parameters:
+L318: 
+L319: stream-idmp-duration - the default idempotence duration (in seconds)
+L320: 
+L321: stream-idmp-maxsize - the default idempotence maxsize (number of iids for each pid)
+L322: 
+L323: These default values apply to each new stream for which `XCFGSET` is not called.
+L324: ### New eviction policies: Least recently modified
+L325: 
+L326: Redis eviction policies define how Redis frees memory when it reaches the maximum memory limit. Redis supports cite75†multiple eviction policies . Applications may choose the policy that best suits their use case. For example, for pure caching use cases, allkeys-lru or allkeys-lfu are often used, while volatile-lru is often used when there are keys with no associated expiration that you don’t want to evict.
+L327: In 8.6, we introduce two new least recently modified (LRM) eviction policies: volatile-lrm and allkeys-lrm. These eviction policies are useful for evicting keys that haven't been modified recently, regardless of how frequently they are read.
+L328: 
+L329: Compared to least recently used (LRU) policies:
+L330: 
+L331:   * LRU refresh keys on both read and write operations
+L332:   * LRM refresh keys only on write operations
+L333: The volatile policies evict only keys that have an associated expiration time (TTL), while the allkeys policies evict all keys.
+L334: #### When to use the new LRM policies?
+L335: 
+L336: If you have keys that are read constantly but stop being updated, LRU will keep them because reads keep refreshing recency, but the new LRM policy will evict them because reads don’t count - only writes do.
+L337: 
+L338: Examples:
+L339: 
+L340:   * Cached responses that should disappear if the producer stopped refreshing them.
+L341:   * Aggregated data that should be periodically refreshed
+L342: Another use case is when you have two sets of keys - short-lived (say, 1h TTL - cache) and long-lived (say, 7 days TTL - semantic cache, which are not modified), and you want to evict keys from the second group first, regardless of the current remaining TTL. By introducing an LRM eviction policy, since long-lived keys are not modified, you can ensure that these keys will be evicted first, regardless of the read patterns.
+L343: ### Detecting and reporting hotkeys
+L344: 
+L345: Hot keys are keys whose internal structure or access patterns result in a disproportionate consumption of resources - either CPU or network bandwidth.
+L346: 
+L347: A key may become hot not because it is accessed frequently, but because the operations performed on it are computationally expensive or because they involve transferring large volumes of data over the network.
+L348: When such resource-intensive operations are concentrated on a single node, that node can become overloaded, even if the overall request rate is relatively low. In many cases, node overload can be alleviated by redistributing slots across the cluster. Redis 8.4 introduced Atomic Slot Migration, which enables safe and efficient migration of slots to rebalance load. However, this approach assumes that resource usage within a node is reasonably distributed across its slots.
+L349: If one or more hot keys dominate the resource consumption within a node, migrating slots may simply transfer the overload to another node. In such scenarios, hot keys must be identified and examined at the per-key level within the affected slots, and mitigated directly, by optimizing command usage, reducing payload sizes, or redesigning data models and access patterns.
+L350: 
+L351: Redis 8.6 introduces a new mechanism for collecting and reporting hot keys within specified hash slots.
+L352: The `HOTKEYS START <METRICS count [CPU] [NET]> [COUNT k] [DURATION duration] [SAMPLE ratio] [SLOTS count slot…]` command starts collecting resource consumption for the specified metrics, which can include CPU consumption and network utilization.
+L353: 
+L354: During the collection period, Redis maintains, for each requested metric, a list of the top-k keys with the highest resource consumption:
+L355:   * CPU: Redis tracks the keys with the highest CPU time consumption.
+L356:   * NET: Redis tracks the keys with the highest network utilization.
+L357: Collection can be limited to specific hash slots using the `SLOTS` option. If no slots are specified, Redis collects data for all slots hosted on the node. The collection continues for the specified duration (in milliseconds) or until `HOTKEYS STOP` is called. At any point during the collection, or after it has completed, the results of the most recent collection session can be retrieved using `HOTKEYS GET.`
+L358: 
+L359: Reporting and metrics
+L360: `HOTKEYS GET` reports the names of the top-k keys for each requested metric. In addition:
+L361: 
+L362:   * For `CPU`, the report value represents CPU time consumed (in milliseconds) during the collection period.
+L363:   * For `NET,` the reported value represents network utilization (in bytes) during the collection period.
+L364: 
+L365: Additional metrics are included to support normalization and interpretation of these values.
+L366: #### Performance considerations
+L367: 
+L368: The `HOTKEYS` collection process consumes system resources, and during collection Redis performance may be impacted. This impact can be reduced by increasing the `SAMPLE` ratio.
+L369: When a sampling ratio is set, Redis measures only one out of every ratio commands (selected randomly). A higher sampling ratio reduces overhead but may decrease accuracy. In practice, sampled measurements are often sufficiently accurate for identifying hot keys, especially over longer collection periods (for example, a sampling ratio of 100 over 24 hours).
+L370: #### Accuracy considerations
+L371: 
+L372: The`HOTKEYS` implementation is based on a probabilistic top-k data structure. As a result, some inaccuracies in the reported keys or rankings are possible. These inaccuracies are generally bounded and acceptable for diagnostic and troubleshooting purposes.
+L373: ### TLS certificate-based automatic client authentication
+L374: Redis supports both one-way TLS (client authenticates the server) or mutual authentication (mTLS). Prior to Redis 8.6, even when mTLS was active (`tls-auth-clients yes`), clients still needed to authenticate at the application layer using the `AUTH` command with a legacy global password (`requirepass`) or an ACL username and password. Starting with Redis 8.6, a new feature allows the server to automatically authenticate mTLS clients to a specific ACL user based on the certificate's Common Name (CN).
+L375: When this feature is enabled (`tls-auth-clients-user CN`), clients no longer need to call `AUTH` after the TLS handshake. This eliminates the operational burden of managing and rotating separate ACL passwords. In this model, you simply define an ACL user with `nopass` (e.g., `ACL SETUSER <CommonName> on nopass` … ) and the possession of a valid, signed certificate serves as the sole, secure credential.
+L376: ### Time series: Support NaN values
+L377: 
+L378: cite80†Redis’ time series data type is often used to track prices, volumes, exchange rates, yield, etc. of financial instruments (such as stocks, commodities, currencies, etc.) Before Redis 8.6, time series values were required to be valid floating-point values. NaN was specifically disallowed.
+L379: Multiple users requested a way to mark timestamps with unknown data - often these are values that weren’t available at real-time and need to be filled later. To support such use cases, we now allow adding NaN values to mark unavailable data. We added the following to Redis 8.6:
+L380: 
+L381: cite81†Image: Redis Cloud†cdn.sanity.io L382: ## Build faster with Redis Cloud
+L383: 
+L384: Get Redis up and running in minutes, then scale as you grow.
+L385: 
+L386: cite57†Try for free L387: 
+L388:   * `TS.ADD` and `TS.MADD` support NaN values
+L389:   * All raw measurement reports include NaN values
+L390:   * All the existing aggregators (e.g., `COUNT`, `MIN`, `MAX`, `SUM`) ignore NaN values
+L391:   * Two new aggregators are introduced:
+L392:     * `countNaN`- counts the number of NaN values
+L393:     * `countAll` - counts the number of values (both numeric and NaN values)
+L394: ## Getting started
+L395: 
+L396: All these enhancements are generally available on Redis 8.6 today. You can start using the new commands by cite17†downloading Redis 8.6 and experimenting with them in your existing workflows.
+L397: 
+L398: Have feedback or questions? Join the discussion on our cite82†Discord server†discord.gg or reach out to your account manager.
+L399: 
+L400: Sections
+L401: 
+L402: cite83†Redis 8.6 in Redis Open Source: More than 5x throughput compared to Redis 7.2 L403: 
+L404: cite84†Redis 8.6 max latency improvement compared to Redis 8.4 (single core) L405: cite85†Redis 8.6 max memory reduction by data type compared to Redis 8.4 L406: 
+L407: cite86†VADD improvements on binary and 8-bit quantization for x86-64 architecture L408: 
+L409: cite87†Summary of new features in 8.6 L410: 
+L411: cite88†The new features explained L412: cite89†Streams: At-most-once production guarantee cite90†Why is this guarantee needed? cite91†Behavior without at-most-once production guarantee cite92†Why entry IDs cannot be used as idempotent IDs? cite93†Introducing idempotent IDs cite94†Idempotence configuration cite95†New eviction policies: Least recently modified cite96†When to use the new LRM policies? cite97†Detecting and reporting hotkeys cite98†Performance considerations cite99†Accuracy considerations cite100†TLS certificate-based automatic client authentication cite101†Time series: Support NaN values L413: cite102†Getting started L414: 
+L415: cite103†View as Markdown L416: 
+L417: Share
+L418: ## Get started with Redis today
+L419: 
+L420: Speak to a Redis expert and learn more about enterprise-grade Redis today.
+L421: 
+L422: cite57†Try for free cite56†Talk to sales L423: 
+L424: cite104†Trust†trust.redis.io cite105†Privacy cite106†Terms of use cite107†Legal notices Cookie preferences
+L425: 
+L426: [Select]
+L427: 
+L428: Use cases
+L429: 
+L430: cite108†Vector database cite15†Feature Form cite109†Semantic cache cite11†Caching cite110†NoSQL database cite37†Leaderboards cite111†Data deduplication cite12†Messaging cite112†Authentication token storage cite113†Fast data ingest cite14†Redis Search cite114†All solutions L431: Industries
+L432: 
+L433: cite38†Financial Services cite40†Gaming cite41†Healthcare cite39†Retail cite42†Telco cite115†All industries L434: 
+L435: Compare
+L436: 
+

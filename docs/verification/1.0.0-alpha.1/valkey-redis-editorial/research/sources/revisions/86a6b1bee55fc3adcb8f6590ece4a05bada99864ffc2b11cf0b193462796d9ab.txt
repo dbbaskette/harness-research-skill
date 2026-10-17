@@ -1,0 +1,94 @@
+Title: Valkey download
+Origin: https://valkey.io/download/
+Publisher: Valkey
+Accessed: 2026-10-17T13:47:03.004224+00:00
+Version/context: Live release listing
+
+Valkey · Download
+Download
+Documentation
+Command Reference
+Documentation by Topic
+Client Libraries
+Blog
+Community
+Events
+Planet
+Participants
+Try Valkey
+GitHub
+Download Latest
+You can get the latest releases of Valkey from this page.
+For installation instructions, supported package managers, and how to configure Valkey, see the installation page.
+The releases page contains links to download all current and previous releases (including any security fixes for previous released versions).
+Version 9.x.x
+Release Date:  2026-09-01
+GitHub Release: 9.1.2
+Docker Hub (valkey/valkey)
+Tags:
+valkey/valkey:9.1.2
+valkey/valkey:9.1.2-trixie
+valkey/valkey:9.1.2-alpine
+valkey/valkey:9.1.2-alpine3.24
+Example: docker run --rm valkey/valkey:9.1.2
+Binary Artifacts
+arm64 / jammy (sha256)
+x86_64 / jammy (sha256)
+arm64 / noble (sha256)
+x86_64 / noble (sha256)
+Latest supported version of past releases
+Version 8.x.x
+Release Date:  2026-09-01
+GitHub Release: 8.1.10
+Docker Hub (valkey/valkey)
+Tags:
+valkey/valkey:8.1.10
+valkey/valkey:8.1.10-trixie
+valkey/valkey:8.1.10-alpine
+valkey/valkey:8.1.10-alpine3.24
+Example: docker run --rm valkey/valkey:8.1.10
+Binary Artifacts
+arm64 / jammy (sha256)
+x86_64 / jammy (sha256)
+arm64 / noble (sha256)
+x86_64 / noble (sha256)
+Version 7.x.x
+Release Date:  2026-09-01
+GitHub Release: 7.2.14
+Docker Hub (valkey/valkey)
+Tags:
+valkey/valkey:7.2.14
+valkey/valkey:7.2.14-trixie
+valkey/valkey:7.2.14-alpine
+valkey/valkey:7.2.14-alpine3.24
+Example: docker run --rm valkey/valkey:7.2.14
+Binary Artifacts
+arm64 / jammy (sha256)
+x86_64 / jammy (sha256)
+arm64 / noble (sha256)
+x86_64 / noble (sha256)
+Slack
+GitHub
+LinkedIn
+X.com
+YouTube
+Connect
+Code of Conduct
+Meetup Groups
+Forum
+Planet
+About
+Leadership
+FAQ
+Subscribe for updates, event info, and the latest Valkey news
+Stay connected with everything happening in the Valkey ecosystem: news, community stories, updates, and opportunities to get involved.
+Subscriptions are open to all, so invite a friend or teammate. Thanks for joining and happy reading!
+© Valkey contributors.
+Valkey and the Valkey logo are trademarks of LF Projects, LLC.
+Trademark Policy.
+Privacy Policy.
+Terms of Use.
+For other policies, please see lfprojects.org.
+Valkey includes certain 3-Clause BSD-licensed Redis code from Redis Ltd. and other source code. Redis Ltd. is
+not the source of that other source code. Redis is a registered trademark of Redis Ltd.
+Logo design by Ziyang.

@@ -1,0 +1,1276 @@
+{
+  "owner": "harness-research-synthesis",
+  "schema": 2,
+  "dossier": {
+    "schema": 2,
+    "topic": "Valkey versus Redis: when Redis takeout is practical",
+    "audience": "Application and platform engineers",
+    "purpose": "Decision input for presentations, blogs and training",
+    "scope": "Version and edition boundaries, workload dependencies, operations, migration validation and rollback as of 2026-10-17",
+    "source_mode": "public",
+    "sources": [
+      {
+        "id": "src-migration",
+        "file": "research/sources/migration.txt",
+        "origin": "https://raw.githubusercontent.com/valkey-io/valkey-doc/main/topics/migration.md",
+        "title": "Migration from Redis to Valkey",
+        "publisher": "Valkey",
+        "permission": "public",
+        "context": "full",
+        "accessed_at": "2026-10-17T13:47:02.856335+00:00",
+        "version": "Redis OSS <=7.2; example Redis 7.2.5/Valkey 7.2.6"
+      },
+      {
+        "id": "src-valkey-download",
+        "file": "research/sources/valkey-download.txt",
+        "origin": "https://valkey.io/download/",
+        "title": "Valkey download",
+        "publisher": "Valkey",
+        "permission": "public",
+        "context": "full",
+        "accessed_at": "2026-10-17T13:47:03.004224+00:00",
+        "version": "Live release listing"
+      },
+      {
+        "id": "src-valkey-8-release",
+        "file": "research/sources/valkey-8-release.txt",
+        "origin": "https://raw.githubusercontent.com/valkey-io/valkey/8.0.0/00-RELEASENOTES",
+        "title": "Valkey 8.0 release notes",
+        "publisher": "Valkey",
+        "permission": "public",
+        "context": "full",
+        "accessed_at": "2026-10-17T13:47:02.938541+00:00",
+        "version": "8.0.0"
+      },
+      {
+        "id": "src-valkey-9-release",
+        "file": "research/sources/valkey-9-release.txt",
+        "origin": "https://raw.githubusercontent.com/valkey-io/valkey/9.1.2/00-RELEASENOTES",
+        "title": "Valkey 9.1 release notes",
+        "publisher": "Valkey",
+        "permission": "public",
+        "context": "full",
+        "accessed_at": "2026-10-17T13:47:02.934031+00:00",
+        "version": "9.1.2",
+        "source_date": "2026-08-31"
+      },
+      {
+        "id": "src-valkey-search",
+        "file": "research/sources/valkey-search.txt",
+        "origin": "https://raw.githubusercontent.com/valkey-io/valkey-search/main/README.md",
+        "title": "Valkey Search README",
+        "publisher": "Valkey",
+        "permission": "public",
+        "context": "full",
+        "accessed_at": "2026-10-17T13:47:02.932905+00:00",
+        "version": "main at access"
+      },
+      {
+        "id": "src-redis-license",
+        "file": "research/sources/redis-license.txt",
+        "origin": "https://redis.io/legal/licenses/",
+        "title": "Redis licenses",
+        "publisher": "Redis",
+        "permission": "public",
+        "context": "full",
+        "accessed_at": "2026-10-17T13:47:03.397594+00:00",
+        "version": "Version-specific license table at access"
+      },
+      {
+        "id": "src-redis-release",
+        "file": "research/sources/redis-release.txt",
+        "origin": "https://api.github.com/repos/redis/redis/releases/latest",
+        "title": "Latest Redis GitHub release",
+        "publisher": "Redis",
+        "permission": "public",
+        "context": "full",
+        "accessed_at": "2026-10-17T13:47:03.165196+00:00",
+        "version": "8.10.2",
+        "source_date": "2026-09-17"
+      },
+      {
+        "id": "src-active-active",
+        "file": "research/sources/active-active.txt",
+        "origin": "https://redis.io/docs/latest/operate/rs/databases/active-active/planning/",
+        "title": "Planning Active-Active databases",
+        "publisher": "Redis",
+        "permission": "public",
+        "context": "full",
+        "accessed_at": "2026-10-17T13:47:03.336964+00:00",
+        "version": "Redis Software latest docs"
+      },
+      {
+        "id": "src-replication",
+        "file": "research/sources/replication.txt",
+        "origin": "https://raw.githubusercontent.com/valkey-io/valkey-doc/main/topics/replication.md",
+        "title": "Valkey replication",
+        "publisher": "Valkey",
+        "permission": "public",
+        "context": "full",
+        "accessed_at": "2026-10-17T13:47:03.213502+00:00",
+        "version": "main at access"
+      },
+      {
+        "id": "src-persistence",
+        "file": "research/sources/persistence.txt",
+        "origin": "https://raw.githubusercontent.com/valkey-io/valkey-doc/main/topics/persistence.md",
+        "title": "Valkey persistence",
+        "publisher": "Valkey",
+        "permission": "public",
+        "context": "full",
+        "accessed_at": "2026-10-17T13:47:03.196507+00:00",
+        "version": "main at access"
+      },
+      {
+        "id": "src-aws-upgrade",
+        "file": "research/sources/aws-upgrade.txt",
+        "origin": "https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/VersionManagement.HowTo.html",
+        "title": "ElastiCache cross-engine upgrades",
+        "publisher": "AWS",
+        "permission": "public",
+        "context": "full",
+        "accessed_at": "2026-10-17T13:47:03.526050+00:00",
+        "version": "Live ElastiCache service docs"
+      },
+      {
+        "id": "src-valkey-json",
+        "file": "research/sources/valkey-json.txt",
+        "origin": "https://raw.githubusercontent.com/valkey-io/valkey-json/unstable/README.md",
+        "title": "Valkey JSON README",
+        "publisher": "Valkey",
+        "permission": "public",
+        "context": "full",
+        "accessed_at": "2026-10-17T13:48:00.583522+00:00",
+        "version": "unstable at access; feature presence, not release guarantee"
+      },
+      {
+        "id": "src-valkey-license",
+        "file": "research/sources/valkey-license.txt",
+        "origin": "https://raw.githubusercontent.com/valkey-io/valkey/9.1.2/COPYING",
+        "title": "Valkey license",
+        "publisher": "Valkey",
+        "permission": "public",
+        "context": "full",
+        "accessed_at": "2026-10-17T13:48:00.846249+00:00",
+        "version": "9.1.2"
+      },
+      {
+        "id": "src-valkey-performance",
+        "file": "research/sources/valkey-performance.txt",
+        "origin": "https://valkey.io/blog/valkey-9-1-delivers-improvements-in-security-performance-and-more/",
+        "title": "Valkey 9.1 announcement",
+        "publisher": "Valkey",
+        "permission": "public",
+        "context": "full",
+        "accessed_at": "2026-10-17T13:48:00.970959+00:00",
+        "version": "9.1.0; published 2026-05-19",
+        "source_date": "2026-05-19"
+      }
+    ],
+    "facts": [
+      {
+        "id": "compatible-base",
+        "statement": "Valkey documents Redis OSS 7.2 and earlier as its compatibility baseline; Valkey 7.2.4 forked Redis OSS 7.2.4.",
+        "author": "valkey-research",
+        "citations": [
+          {
+            "source": "src-migration",
+            "quote": "Valkey is compatible with Redis OSS 7.2 and all earlier open-source Redis versions, as Valkey 7.2.4 is a fork of Redis OSS 7.2.4."
+          }
+        ]
+      },
+      {
+        "id": "newer-data-boundary",
+        "statement": "The Valkey migration guide says Redis CE 7.4 and later data files are incompatible and require another migration method outside that guide.",
+        "author": "valkey-research",
+        "citations": [
+          {
+            "source": "src-migration",
+            "quote": "Redis Community Edition (CE) version 7.4 and later produce data files that are not compatible with Valkey.\nIt may be possible to migrate the data to Valkey from proprietary Redis versions and other Redis-like software, but it requires another method and is not covered by this document."
+          }
+        ]
+      },
+      {
+        "id": "protocol-client",
+        "statement": "Valkey documents RESP2/RESP3 and connection support for existing Redis client libraries.",
+        "author": "valkey-research",
+        "citations": [
+          {
+            "source": "src-migration",
+            "quote": "Protocol: Valkey uses the RESP wire protocol and supports both RESP2 and RESP3. Existing Redis client libraries can connect to Valkey without code changes."
+          }
+        ]
+      },
+      {
+        "id": "module-api",
+        "statement": "Valkey documents support for Redis OSS modules using the RedisModule_ API.",
+        "author": "valkey-research",
+        "citations": [
+          {
+            "source": "src-migration",
+            "quote": "Modules: Modules written for Redis OSS using the `RedisModule_` API work in Valkey."
+          }
+        ]
+      },
+      {
+        "id": "info-version",
+        "statement": "Valkey reports redis_version:7.2.4 for backward compatibility; its actual version is exposed separately.",
+        "author": "valkey-research",
+        "citations": [
+          {
+            "source": "src-migration",
+            "quote": "INFO: Valkey reports `redis_version:7.2.4` in the [INFO](../commands/info.md) output for backward compatibility. Use `server_name` and `valkey_version` to detect the actual Valkey server and version."
+          }
+        ]
+      },
+      {
+        "id": "migration-example",
+        "statement": "The standalone migration examples use Redis 7.2.5 and Valkey 7.2.6.",
+        "author": "valkey-research",
+        "citations": [
+          {
+            "source": "src-migration",
+            "quote": "The example migration steps are provided for Redis 7.2.5 and Valkey version 7.2.6."
+          }
+        ]
+      },
+      {
+        "id": "snapshot-quiesce",
+        "statement": "The documented physical migration incurs shutdown/load downtime and requires disconnecting active connections to prevent write loss.",
+        "author": "valkey-research",
+        "citations": [
+          {
+            "source": "src-migration",
+            "quote": "* The downtime to shutdown Redis and wait for Valkey to load the data. \n* Potential risk of data loss on instances with heavy writes. To prevent it, you must disconnect all active connections before starting the migration."
+          }
+        ]
+      },
+      {
+        "id": "replica-cutover",
+        "statement": "The migration guide describes adding Valkey cluster replicas, promoting one per Redis primary, and removing Redis nodes.",
+        "author": "valkey-research",
+        "citations": [
+          {
+            "source": "src-migration",
+            "quote": "The first step is to add the required number of Valkey nodes to the existing cluster as replicas. Once the new Valkey nodes replicate the data, one Valkey replica is promoted to be a new primary for each Redis primary. After the migration, the Redis nodes are removed from the cluster."
+          }
+        ]
+      },
+      {
+        "id": "transaction-difference",
+        "statement": "Valkey 8.0 release notes include aborting transactions on nested MULTI or WATCH commands.",
+        "author": "valkey-research",
+        "citations": [
+          {
+            "source": "src-valkey-8-release",
+            "quote": "Abort transactions on nested `MULTI` or `WATCH` commands."
+          }
+        ]
+      },
+      {
+        "id": "lua-packaging",
+        "statement": "Valkey 9.1 release notes say the Lua scripting engine is statically linked by default.",
+        "author": "valkey-research",
+        "citations": [
+          {
+            "source": "src-valkey-9-release",
+            "quote": "Lua scripting engine is now statically linked by default instead of dynamically linked"
+          }
+        ]
+      },
+      {
+        "id": "lua-module",
+        "statement": "Valkey 9.1 release notes record extracting Lua scripting into a Valkey module.",
+        "author": "valkey-research",
+        "citations": [
+          {
+            "source": "src-valkey-9-release",
+            "quote": "Move Lua scripting engine into a Valkey module"
+          }
+        ]
+      },
+      {
+        "id": "valkey-version",
+        "statement": "The live Valkey download page lists 9.1.2 as its 9.x release.",
+        "author": "valkey-research",
+        "citations": [
+          {
+            "source": "src-valkey-download",
+            "quote": "GitHub Release: 9.1.2"
+          }
+        ]
+      },
+      {
+        "id": "redis-version",
+        "statement": "The Redis GitHub latest-release API returns 8.10.2, published 2026-09-17.",
+        "author": "valkey-research",
+        "citations": [
+          {
+            "source": "src-redis-release",
+            "quote": "\"tag_name\": \"8.10.2\""
+          },
+          {
+            "source": "src-redis-release",
+            "quote": "\"published_at\": \"2026-09-17T15:06:56Z\""
+          }
+        ]
+      },
+      {
+        "id": "valkey-license",
+        "statement": "Valkey 9.1.2 declares BSD-3-Clause licensing.",
+        "author": "valkey-research",
+        "citations": [
+          {
+            "source": "src-valkey-license",
+            "quote": "SPDX-License-Identifier: BSD-3-Clause"
+          }
+        ]
+      },
+      {
+        "id": "redis-license-options",
+        "statement": "Redis 8 and later offer a choice of RSALv2, SSPLv1 or AGPLv3; the earlier license boundary differs.",
+        "author": "valkey-research",
+        "citations": [
+          {
+            "source": "src-redis-license",
+            "quote": "Redis 8 in Redis Open Source and later versions are available under our tri-license, allowing us to be both source-available and open source software. Our tri-license includes RSALv2, SSPLv1, and AGPLv3."
+          }
+        ]
+      },
+      {
+        "id": "redis-old-licenses",
+        "statement": "Redis 7.2.x and earlier retain BSD3; Redis CE 7.4.x–7.8.x use RSALv2/SSPLv1.",
+        "author": "valkey-research",
+        "citations": [
+          {
+            "source": "src-redis-license",
+            "quote": "Redis 7.2.x of Redis Open Source and earlier versions remain subject to the BSD3 license. Redis Community Edition 7.4.x to 7.8.x remain subject to the dual RSALv2/SSPLv1 license."
+          }
+        ]
+      },
+      {
+        "id": "redis-integrated-types",
+        "statement": "Redis 8 includes RediSearch, RedisJSON, RedisTimeSeries and RedisBloom under the Redis tri-license.",
+        "author": "valkey-research",
+        "citations": [
+          {
+            "source": "src-redis-license",
+            "quote": "RediSearch, RedisJSON, RedisTimeSeries, and RedisBloom are now included as integral components of Redis Open Source and subject to the same tri-license. Starting with Redis 8, the version numbers of all included modules are identical to the version number of Redis Open Source they are included in."
+          }
+        ]
+      },
+      {
+        "id": "valkey-search-capability",
+        "statement": "The live Valkey Search README documents vector ANN/KNN and Numeric, Tag and Full-text search, indexing Hash or Valkey JSON data. This is a main-branch capability description.",
+        "author": "valkey-research",
+        "citations": [
+          {
+            "source": "src-valkey-search",
+            "quote": "It also provides\nsupport for hybrid / pure non vector workloads including Numeric, Tag, and Full-text searches.\n\nValkey-Search allows users to create indexes and perform searches, incorporating complex filters.\nUsers can index data using either **[Valkey Hash](hashes.md)** or **[Valkey-JSON](valkey-json.md)** data types.\nThe vector queries support Approximate Nearest Neighbor (ANN) search with HNSW and exact matching using K-Nearest Neighbors (KNN)."
+          }
+        ]
+      },
+      {
+        "id": "valkey-json-capability",
+        "statement": "The live Valkey JSON README describes a module for native JSON support; its captured branch is unstable.",
+        "author": "valkey-research",
+        "citations": [
+          {
+            "source": "src-valkey-json",
+            "quote": "Valkey-json is a Valkey module written in C++ that provides native JSON (JavaScript Object Notation) support for Valkey."
+          }
+        ]
+      },
+      {
+        "id": "active-active-semantics",
+        "statement": "Redis Software Active-Active uses CRDTs and entails different data types plus more complex replication/networking than a database without geo-distribution.",
+        "author": "valkey-research",
+        "citations": [
+          {
+            "source": "src-active-active",
+            "quote": "In Redis Software, Active-Active geo-distribution is based on conflict-free replicated data type (CRDT) technology. Compared to databases without geo-distribution, Active-Active databases have more complex replication and networking, as well as a different data type."
+          }
+        ]
+      },
+      {
+        "id": "async-replication",
+        "statement": "Valkey replication is asynchronous.",
+        "author": "valkey-research",
+        "citations": [
+          {
+            "source": "src-replication",
+            "quote": "Valkey uses asynchronous replication, with asynchronous replica-to-primary acknowledges of the amount of data processed."
+          }
+        ]
+      },
+      {
+        "id": "wait-not-strong",
+        "statement": "Valkey WAIT does not create strong consistency; acknowledged writes may still be lost on failover depending on persistence configuration.",
+        "author": "valkey-research",
+        "citations": [
+          {
+            "source": "src-replication",
+            "quote": "the `WAIT` command. However `WAIT` is only able to ensure there are the\nspecified number of acknowledged copies in the other Valkey instances, it does not\nturn a set of Valkey instances into a CP system with strong consistency: acknowledged\nwrites can still be lost during a failover, depending on the exact configuration\nof the Valkey persistence."
+          }
+        ]
+      },
+      {
+        "id": "persistence-cost",
+        "statement": "Valkey documents fork pauses for RDB persistence on large datasets; AOF also forks, with rewrite frequency configurable.",
+        "author": "valkey-research",
+        "citations": [
+          {
+            "source": "src-persistence",
+            "quote": "RDB needs to fork() often in order to persist on disk using a child process. fork() can be time consuming if the dataset is big, and may result in Valkey stopping serving clients for some milliseconds or even for one second if the dataset is very big and the CPU performance is not great. AOF also needs to fork() but less frequently and you can tune how often you want to rewrite your logs without any trade-off on durability."
+          }
+        ]
+      },
+      {
+        "id": "aof-durability",
+        "statement": "Valkey documents appendfsync everysec as potentially losing one second of data during a disaster.",
+        "author": "valkey-research",
+        "citations": [
+          {
+            "source": "src-persistence",
+            "quote": "`appendfsync everysec`: `fsync` every second. Fast enough and you may lose 1 second of data if there is a disaster."
+          }
+        ]
+      },
+      {
+        "id": "aws-rollback",
+        "statement": "ElastiCache only documents engine rollback from Valkey 7.2 to Redis OSS 7.1, even if the original source was older.",
+        "author": "valkey-research",
+        "citations": [
+          {
+            "source": "src-aws-upgrade",
+            "quote": "ElastiCache only supports rolling back from Valkey 7.2 to Redis OSS 7.1. This is true even if you\nupgraded to Valkey 7.2 from an earlier version than Redis OSS 7.1."
+          }
+        ]
+      },
+      {
+        "id": "aws-parameters",
+        "statement": "ElastiCache cross-engine upgrades using custom parameter groups require a Valkey group with the same Redis OSS static parameter values.",
+        "author": "valkey-research",
+        "citations": [
+          {
+            "source": "src-aws-upgrade",
+            "quote": "If you have a custom cache parameter group applied to the existing Redis OSS replication group you wish to upgrade, you will need to pass a custom Valkey cache parameter group in the request as well. The input Valkey custom parameter group must have the same Redis OSS static parameter values as the existing Redis OSS custom parameter group."
+          }
+        ]
+      },
+      {
+        "id": "valkey-performance-claim",
+        "statement": "The Valkey 9.1 announcement reports 2.1 million requests/second with 512-byte payloads, nine IO threads and pipeline depth ten; this is a project-reported result.",
+        "author": "valkey-research",
+        "citations": [
+          {
+            "source": "src-valkey-performance",
+            "quote": "Valkey 9.1.0 pushes single server throughput to 2.1 million requests per second using 512-byte payloads, 9 IO threads, and a pipeline depth of 10 commands."
+          }
+        ]
+      },
+      {
+        "id": "aws-rollback-identity",
+        "statement": "ElastiCache rollback requires associated users and user groups to use engine type REDIS.",
+        "author": "valkey-research",
+        "citations": [
+          {
+            "source": "src-aws-upgrade",
+            "quote": "Any user group and user associated with the replication group or serverless cache being rolled back\nmust be configured with engine type REDIS."
+          }
+        ]
+      }
+    ],
+    "findings": [
+      {
+        "id": "bounded-takeout",
+        "title": "Redis takeout is strongest at the OSS 7.2 compatibility baseline",
+        "summary": {
+          "text": "Core workloads originating on Redis OSS 7.2 or earlier are practical Valkey migration candidates, subject to application and operations validation. Later Redis data formats make the migration a different engineering problem.",
+          "refs": [
+            "compatible-base",
+            "protocol-client",
+            "newer-data-boundary"
+          ],
+          "kind": "inference"
+        },
+        "support": [
+          "compatible-base",
+          "protocol-client",
+          "newer-data-boundary"
+        ],
+        "counter": [
+          "transaction-difference"
+        ],
+        "conditions": [
+          {
+            "text": "Pin the exact server, client, module and hosting versions before selecting a migration method.",
+            "refs": [
+              "migration-example",
+              "module-api"
+            ],
+            "kind": "recommendation"
+          }
+        ],
+        "gaps": [],
+        "implications": []
+      },
+      {
+        "id": "feature-dependencies",
+        "title": "Feature labels do not establish interchangeability",
+        "summary": {
+          "text": "Redis 8 includes richer data capabilities and Valkey has JSON/search modules; neither the shared names nor module API compatibility establish parity for a particular query, persistence image or framework.",
+          "refs": [
+            "redis-integrated-types",
+            "valkey-search-capability",
+            "valkey-json-capability",
+            "module-api"
+          ],
+          "kind": "inference"
+        },
+        "support": [
+          "redis-integrated-types",
+          "valkey-search-capability",
+          "valkey-json-capability",
+          "module-api"
+        ],
+        "counter": [],
+        "conditions": [],
+        "gaps": [
+          {
+            "text": "No specific Redis Stack module, ORM, query dialect, module binary or production dataset was supplied.",
+            "refs": [],
+            "kind": "gap"
+          }
+        ],
+        "implications": [
+          {
+            "text": "Keep a dependent workload on its existing service until its required behavior is proven on a pinned target.",
+            "refs": [
+              "active-active-semantics",
+              "newer-data-boundary"
+            ],
+            "kind": "recommendation"
+          }
+        ]
+      },
+      {
+        "id": "license-choice",
+        "title": "License choice remains material without predetermining the engine",
+        "summary": {
+          "text": "Valkey BSD and Redis 8 AGPL/RSAL/SSPL options are materially different choices. Calling all current Redis closed source would misstate its available licensing.",
+          "refs": [
+            "valkey-license",
+            "redis-license-options",
+            "redis-old-licenses"
+          ],
+          "kind": "inference"
+        },
+        "support": [
+          "valkey-license",
+          "redis-license-options",
+          "redis-old-licenses"
+        ],
+        "counter": [],
+        "conditions": [],
+        "gaps": [],
+        "implications": []
+      },
+      {
+        "id": "operational-fit",
+        "title": "Capacity and resilience need workload evidence",
+        "summary": {
+          "text": "Valkey performance claims are configuration-specific, and its asynchronous replication and persistence trade-offs still require explicit latency, recovery and durability targets.",
+          "refs": [
+            "valkey-performance-claim",
+            "async-replication",
+            "wait-not-strong",
+            "persistence-cost",
+            "aof-durability"
+          ],
+          "kind": "inference"
+        },
+        "support": [
+          "valkey-performance-claim",
+          "async-replication",
+          "wait-not-strong",
+          "persistence-cost",
+          "aof-durability"
+        ],
+        "counter": [],
+        "conditions": [],
+        "gaps": [
+          {
+            "text": "No workload measurement or total-cost model was run; a universal performance or cost ranking is unsupported.",
+            "refs": [],
+            "kind": "gap"
+          }
+        ],
+        "implications": []
+      },
+      {
+        "id": "rollback-design",
+        "title": "Rollback is a data-path design, not just an endpoint change",
+        "summary": {
+          "text": "A supported forward migration does not prove reverse compatibility or recovery of writes accepted after cutover. Managed services can impose especially narrow rollback versions.",
+          "refs": [
+            "newer-data-boundary",
+            "async-replication",
+            "aws-rollback",
+            "replica-cutover"
+          ],
+          "kind": "inference"
+        },
+        "support": [
+          "newer-data-boundary",
+          "async-replication",
+          "aws-rollback",
+          "replica-cutover"
+        ],
+        "counter": [],
+        "conditions": [],
+        "gaps": [],
+        "implications": [
+          {
+            "text": "Rehearse recovery of post-cutover writes and define the rollback boundary before moving durable state.",
+            "refs": [
+              "aws-rollback",
+              "wait-not-strong"
+            ],
+            "kind": "recommendation"
+          }
+        ]
+      }
+    ],
+    "sections": [
+      {
+        "id": "answer",
+        "title": "Where replacement makes sense",
+        "blocks": [
+          {
+            "text": "Valkey is a credible replacement candidate for applications using the core Redis OSS 7.2-or-earlier surface, particularly when a permissive license is valuable. Treat replacement as a versioned compatibility project: the strongest evidence concerns that shared baseline, while newer Redis persistence, data capabilities and commercial service behavior need separate proof. There is no universal winner without the workload and operating requirements.",
+            "refs": [
+              "bounded-takeout",
+              "feature-dependencies",
+              "license-choice"
+            ],
+            "kind": "inference"
+          },
+          {
+            "text": "As of the 2026-10-17 source check, Valkey’s download page lists 9.1.2 and Redis’s latest-release API returns 8.10.2. These are currency anchors, not a recommended target pair. The migration guide’s worked standalone examples use Redis 7.2.5 and Valkey 7.2.6; do not apply their commands blindly to newer major versions or hosted products.",
+            "refs": [
+              "valkey-version",
+              "redis-version",
+              "migration-example"
+            ],
+            "kind": "summary"
+          }
+        ]
+      },
+      {
+        "id": "boundaries",
+        "title": "Separate the engine, edition and dependency boundaries",
+        "blocks": [
+          {
+            "text": "For a reconstructible cache using familiar core commands, a Valkey pilot is a reasonable first move. Sessions, queues, stream consumers, counters or locks deserve a higher validation bar when missing, duplicated or reordered operations affect correctness. This distinction follows from the documented asynchronous replication and persistence loss windows; the mere ability to connect a Redis client is insufficient.",
+            "refs": [
+              "protocol-client",
+              "async-replication",
+              "aof-durability"
+            ],
+            "kind": "recommendation"
+          },
+          {
+            "text": "Redis 7.4+ is outside the documented file-compatibility path. A logical export/import or application-mediated rebuild may be feasible, but it must account for the exact data types and changes made while copying. This research has not validated a specific tool or a universal live migration from Redis 8; retaining Redis can be the better decision when redesign or downtime exceeds the expected benefit.",
+            "refs": [
+              "newer-data-boundary"
+            ],
+            "kind": "recommendation"
+          },
+          {
+            "text": "Redis 8 integrates search, JSON, time series and probabilistic structures. Valkey Search and Valkey JSON also exist, so “Valkey has no JSON or search” is an unreliable comparison. Their captured READMEs describe main/unstable branches, however: confirm the released package, supported commands, query syntax, index lifecycle and persisted formats for the chosen deployment. Module API compatibility alone does not prove that a specific Redis Stack component or application abstraction can be swapped.",
+            "refs": [
+              "redis-integrated-types",
+              "valkey-search-capability",
+              "valkey-json-capability",
+              "module-api"
+            ],
+            "kind": "inference"
+          },
+          {
+            "text": "Redis Software Active-Active is a separate service capability based on CRDTs. A workload relying on its conflict resolution should not be mapped to ordinary Valkey asynchronous replication without a redesign and correctness proof. This is a concrete reason to stay with the existing product, or to assess another managed architecture separately from an engine swap.",
+            "refs": [
+              "active-active-semantics",
+              "async-replication"
+            ],
+            "kind": "recommendation"
+          }
+        ]
+      },
+      {
+        "id": "dependencies",
+        "title": "Validate the application contract",
+        "blocks": [
+          {
+            "text": "Inventory commands and options, scripts/functions, transactions, modules, serialization, client/framework versions, connection pooling, retries, TLS/ACL settings and topology discovery. Exercise representative success and error paths on the selected target. For example, Valkey 8.0 changes nested MULTI/WATCH behavior to abort a transaction; connection success would not catch that semantic difference.",
+            "refs": [
+              "protocol-client",
+              "module-api",
+              "transaction-difference"
+            ],
+            "kind": "recommendation"
+          },
+          {
+            "text": "Include operational consumers of the protocol. Valkey’s compatibility INFO field reports redis_version:7.2.4; identify the actual engine with server_name and valkey_version when checking versions or interpreting telemetry. Check packaging as well: Valkey 9.1 moved Lua into a module, but its release notes also say the engine is statically linked by default. Do not infer that every deployment requires a separate dynamically loaded Lua library.",
+            "refs": [
+              "info-version",
+              "lua-module",
+              "lua-packaging"
+            ],
+            "kind": "summary"
+          }
+        ]
+      },
+      {
+        "id": "operations",
+        "title": "Compare operating outcomes, not headline throughput",
+        "blocks": [
+          {
+            "text": "Valkey’s 9.1 announcement reports 2.1 million requests per second with specified payload, IO-thread and pipeline settings. That is a project-reported result, not a measured advantage for this application or against an equivalent Redis deployment. Compare p95/p99 latency and throughput under the same command mix, key/value sizes, concurrency, TLS, persistence, replica topology and failure conditions. Include memory/RSS, evictions, saturation, restart and backup/rewrite behavior.",
+            "refs": [
+              "valkey-performance-claim",
+              "persistence-cost"
+            ],
+            "kind": "recommendation"
+          },
+          {
+            "text": "Recovery objectives must survive the engine change. Valkey replication is asynchronous; WAIT can reduce exposure but does not guarantee strong consistency. AOF everysec can lose roughly one second of writes in a disaster, and snapshot/rewrite work can affect latency. A team using the store as durable state needs recovery tests, not only cache hit-rate tests.",
+            "refs": [
+              "async-replication",
+              "wait-not-strong",
+              "aof-durability",
+              "persistence-cost"
+            ],
+            "kind": "inference"
+          },
+          {
+            "text": "Compare the complete service bill and ownership: capacity, replicas, network, backups, patching, observability, support and migration effort. Managed-service parameters and rollback rules belong to that comparison; for example, ElastiCache requires matching static parameter values when moving custom groups to Valkey. No prices, contract terms or staffing costs were supplied, so this report cannot establish savings.",
+            "refs": [
+              "aws-parameters",
+              "operational-fit"
+            ],
+            "kind": "recommendation"
+          }
+        ]
+      },
+      {
+        "id": "migration",
+        "title": "A migration should prove correctness and recoverability",
+        "blocks": [
+          {
+            "text": "First define acceptance thresholds and test the exact source/target packages in an isolated environment. Restore a representative backup and replay representative application traffic. Check values and types, remaining TTLs, scripts, transaction outcomes, stream pending/consumer state where used, and index/query results where used. Key counts are a useful check but cannot establish semantic equivalence. Also test client reconnection, failover, shard routing and authentication.",
+            "refs": [
+              "bounded-takeout",
+              "feature-dependencies",
+              "transaction-difference"
+            ],
+            "kind": "recommendation"
+          },
+          {
+            "text": "Select a path consistent with the verified versions. A quiesced snapshot restore trades downtime for simplicity. For a compatible cluster, the project describes adding Valkey replicas and promoting them per primary. Rehearse the full cutover: stop or fence writers, let replication catch up, verify offsets and application state, promote, redirect/reconnect clients, and watch correctness plus latency. A live replication link alone does not prove that every final write was applied.",
+            "refs": [
+              "snapshot-quiesce",
+              "replica-cutover",
+              "async-replication"
+            ],
+            "kind": "recommendation"
+          },
+          {
+            "text": "Define rollback before cutover. Keep a tested pre-cutover recovery point and specify who owns writes at each stage. Before new writes reach the target, returning to the preserved source may be straightforward; afterward, returning to an unchanged source discards those writes unless they can be reconciled or replayed. Test that recovery path explicitly. Do not assume newer Valkey files or features can be consumed by the old Redis source.",
+            "refs": [
+              "rollback-design"
+            ],
+            "kind": "recommendation"
+          },
+          {
+            "text": "For hosted services, use the provider’s exact version matrix and recovery procedure. ElastiCache currently documents rollback only from Valkey 7.2 to Redis OSS 7.1, with user/user-group engine requirements. That is not evidence for an in-place rollback from Valkey 8 or 9. Keep this provider-specific constraint separate from upstream Valkey capability.",
+            "refs": [
+              "aws-rollback",
+              "aws-rollback-identity"
+            ],
+            "kind": "inference"
+          }
+        ]
+      },
+      {
+        "id": "license",
+        "title": "License choice is distinct from technical fit",
+        "blocks": [
+          {
+            "text": "Valkey 9.1.2 declares BSD-3-Clause. Redis OSS through 7.2 remains BSD; Redis CE 7.4–7.8 uses RSAL/SSPL, and Redis 8+ adds AGPLv3 as a choice alongside those licenses. Select the terms that fit the intended use and distribution model; the presence of an AGPL option means “Redis is no longer open source” is not an accurate blanket statement about current Redis. License preference can motivate evaluation, but it does not eliminate migration work.",
+            "refs": [
+              "valkey-license",
+              "redis-old-licenses",
+              "redis-license-options"
+            ],
+            "kind": "inference"
+          }
+        ]
+      },
+      {
+        "id": "unknowns",
+        "title": "What would change the decision",
+        "blocks": [
+          {
+            "text": "The unresolved inputs are the current Redis product/version and host; actual commands, modules and clients; cache versus authoritative-state role; data size and growth; peak traffic and hot keys; latency, availability and recovery objectives; multi-region conflict semantics; acceptable downtime; support obligations; and available migration capacity. No application benchmark, restore drill or production compatibility test was run.",
+            "refs": [],
+            "kind": "gap"
+          },
+          {
+            "text": "Proceed to a bounded Valkey pilot when the shared command surface and recovery requirements fit. Keep or upgrade Redis when a required feature/service behavior remains unproven, or migration effort and risk outweigh the expected gain. Revisit the choice after measuring the real workload. These decision inputs can feed later slides, blogs and training, with the stated version boundaries and workload gaps preserved.",
+            "refs": [
+              "bounded-takeout",
+              "feature-dependencies",
+              "operational-fit",
+              "rollback-design"
+            ],
+            "kind": "recommendation"
+          }
+        ]
+      }
+    ],
+    "invocation_note": "Actual author invocation /root/valkey_live_research is mapped to CLI worker label valkey-research. This invocation investigated and wrote the report; it did not perform independent review."
+  },
+  "author": "valkey-research",
+  "digest": "558c5b0e7701a43ccc333a5dc056022f4087e0a18dc6ec32f082e915ca3ace70",
+  "sources": [
+    {
+      "id": "src-migration",
+      "file": "research/sources/migration.txt",
+      "sha256": "eea9887f392bdc51d42bc211122451f71c23e05b3aaa9ff080a4427ccd4d19a4",
+      "snapshot": "research/sources/revisions/eea9887f392bdc51d42bc211122451f71c23e05b3aaa9ff080a4427ccd4d19a4.txt"
+    },
+    {
+      "id": "src-valkey-download",
+      "file": "research/sources/valkey-download.txt",
+      "sha256": "86a6b1bee55fc3adcb8f6590ece4a05bada99864ffc2b11cf0b193462796d9ab",
+      "snapshot": "research/sources/revisions/86a6b1bee55fc3adcb8f6590ece4a05bada99864ffc2b11cf0b193462796d9ab.txt"
+    },
+    {
+      "id": "src-valkey-8-release",
+      "file": "research/sources/valkey-8-release.txt",
+      "sha256": "cecf9155785c92408a78d4eea97ec42e3d0c1316d00d0293b5225b7826120eac",
+      "snapshot": "research/sources/revisions/cecf9155785c92408a78d4eea97ec42e3d0c1316d00d0293b5225b7826120eac.txt"
+    },
+    {
+      "id": "src-valkey-9-release",
+      "file": "research/sources/valkey-9-release.txt",
+      "sha256": "50e9b70d6379f717001b8cc27dbd3abae9972b0c6ae377c327ae9933238f14e7",
+      "snapshot": "research/sources/revisions/50e9b70d6379f717001b8cc27dbd3abae9972b0c6ae377c327ae9933238f14e7.txt"
+    },
+    {
+      "id": "src-valkey-search",
+      "file": "research/sources/valkey-search.txt",
+      "sha256": "86273b00d0ca3646c29232841e1c975fa0c360fec068b16112a2c1d1a85b723a",
+      "snapshot": "research/sources/revisions/86273b00d0ca3646c29232841e1c975fa0c360fec068b16112a2c1d1a85b723a.txt"
+    },
+    {
+      "id": "src-redis-license",
+      "file": "research/sources/redis-license.txt",
+      "sha256": "b6b6f489c788357b858ad373cc071cf8f7ffd0196d30167e7e762efe5d053dea",
+      "snapshot": "research/sources/revisions/b6b6f489c788357b858ad373cc071cf8f7ffd0196d30167e7e762efe5d053dea.txt"
+    },
+    {
+      "id": "src-redis-release",
+      "file": "research/sources/redis-release.txt",
+      "sha256": "6c3ccdf27fcabf8ffd6491366571636d2f1ffe9f21c1f8d1aa5beaa19dc551bb",
+      "snapshot": "research/sources/revisions/6c3ccdf27fcabf8ffd6491366571636d2f1ffe9f21c1f8d1aa5beaa19dc551bb.txt"
+    },
+    {
+      "id": "src-active-active",
+      "file": "research/sources/active-active.txt",
+      "sha256": "b546139255fafab0ab1eb0f9972ddecf764c882f4df19c03942822519fbe64d6",
+      "snapshot": "research/sources/revisions/b546139255fafab0ab1eb0f9972ddecf764c882f4df19c03942822519fbe64d6.txt"
+    },
+    {
+      "id": "src-replication",
+      "file": "research/sources/replication.txt",
+      "sha256": "acf492a46ce29bc6af585812fac82b3581417c0aaed5c171f02ba354c3da00de",
+      "snapshot": "research/sources/revisions/acf492a46ce29bc6af585812fac82b3581417c0aaed5c171f02ba354c3da00de.txt"
+    },
+    {
+      "id": "src-persistence",
+      "file": "research/sources/persistence.txt",
+      "sha256": "b354043de4b51b4fad46675cf74166d37ebae24f5c4d43b5f607de8b54331203",
+      "snapshot": "research/sources/revisions/b354043de4b51b4fad46675cf74166d37ebae24f5c4d43b5f607de8b54331203.txt"
+    },
+    {
+      "id": "src-aws-upgrade",
+      "file": "research/sources/aws-upgrade.txt",
+      "sha256": "f629eaa719d0d0a1deaa499af028531d932ee076adaf244e385a4e0cbaae266b",
+      "snapshot": "research/sources/revisions/f629eaa719d0d0a1deaa499af028531d932ee076adaf244e385a4e0cbaae266b.txt"
+    },
+    {
+      "id": "src-valkey-json",
+      "file": "research/sources/valkey-json.txt",
+      "sha256": "8a8ad9cbb37c4510f00964507e762f2845345b4f78166ce8a2d8134e0a35e01e",
+      "snapshot": "research/sources/revisions/8a8ad9cbb37c4510f00964507e762f2845345b4f78166ce8a2d8134e0a35e01e.txt"
+    },
+    {
+      "id": "src-valkey-license",
+      "file": "research/sources/valkey-license.txt",
+      "sha256": "bbb0919072f229f6146c50f9b39a156f3a6fc7eff7277865a3420f9bf046d75f",
+      "snapshot": "research/sources/revisions/bbb0919072f229f6146c50f9b39a156f3a6fc7eff7277865a3420f9bf046d75f.txt"
+    },
+    {
+      "id": "src-valkey-performance",
+      "file": "research/sources/valkey-performance.txt",
+      "sha256": "fd012db1abea0568b5dd256934fbb1ddcb54e3bd7d7e32d8c8763638c9c5daea",
+      "snapshot": "research/sources/revisions/fd012db1abea0568b5dd256934fbb1ddcb54e3bd7d7e32d8c8763638c9c5daea.txt"
+    }
+  ],
+  "review": {
+    "schema": 2,
+    "digest": "558c5b0e7701a43ccc333a5dc056022f4087e0a18dc6ec32f082e915ca3ace70",
+    "originals": [
+      {
+        "source": "src-migration",
+        "sha256": "eea9887f392bdc51d42bc211122451f71c23e05b3aaa9ff080a4427ccd4d19a4",
+        "read_original": true
+      },
+      {
+        "source": "src-valkey-download",
+        "sha256": "86a6b1bee55fc3adcb8f6590ece4a05bada99864ffc2b11cf0b193462796d9ab",
+        "read_original": true
+      },
+      {
+        "source": "src-valkey-8-release",
+        "sha256": "cecf9155785c92408a78d4eea97ec42e3d0c1316d00d0293b5225b7826120eac",
+        "read_original": true
+      },
+      {
+        "source": "src-valkey-9-release",
+        "sha256": "50e9b70d6379f717001b8cc27dbd3abae9972b0c6ae377c327ae9933238f14e7",
+        "read_original": true
+      },
+      {
+        "source": "src-valkey-search",
+        "sha256": "86273b00d0ca3646c29232841e1c975fa0c360fec068b16112a2c1d1a85b723a",
+        "read_original": true
+      },
+      {
+        "source": "src-redis-license",
+        "sha256": "b6b6f489c788357b858ad373cc071cf8f7ffd0196d30167e7e762efe5d053dea",
+        "read_original": true
+      },
+      {
+        "source": "src-redis-release",
+        "sha256": "6c3ccdf27fcabf8ffd6491366571636d2f1ffe9f21c1f8d1aa5beaa19dc551bb",
+        "read_original": true
+      },
+      {
+        "source": "src-active-active",
+        "sha256": "b546139255fafab0ab1eb0f9972ddecf764c882f4df19c03942822519fbe64d6",
+        "read_original": true
+      },
+      {
+        "source": "src-replication",
+        "sha256": "acf492a46ce29bc6af585812fac82b3581417c0aaed5c171f02ba354c3da00de",
+        "read_original": true
+      },
+      {
+        "source": "src-persistence",
+        "sha256": "b354043de4b51b4fad46675cf74166d37ebae24f5c4d43b5f607de8b54331203",
+        "read_original": true
+      },
+      {
+        "source": "src-aws-upgrade",
+        "sha256": "f629eaa719d0d0a1deaa499af028531d932ee076adaf244e385a4e0cbaae266b",
+        "read_original": true
+      },
+      {
+        "source": "src-valkey-json",
+        "sha256": "8a8ad9cbb37c4510f00964507e762f2845345b4f78166ce8a2d8134e0a35e01e",
+        "read_original": true
+      },
+      {
+        "source": "src-valkey-license",
+        "sha256": "bbb0919072f229f6146c50f9b39a156f3a6fc7eff7277865a3420f9bf046d75f",
+        "read_original": true
+      },
+      {
+        "source": "src-valkey-performance",
+        "sha256": "fd012db1abea0568b5dd256934fbb1ddcb54e3bd7d7e32d8c8763638c9c5daea",
+        "read_original": true
+      }
+    ],
+    "facts": [
+      {
+        "id": "compatible-base",
+        "verdict": "supported",
+        "note": "Original migration introduction and version matrix explicitly establish the OSS <=7.2 baseline and 7.2.4 fork; not extrapolated to later Redis."
+      },
+      {
+        "id": "newer-data-boundary",
+        "verdict": "supported",
+        "note": "Original migration warning and matrix exclude CE 7.4+ data files while leaving other methods possible; the assertion preserves that limit."
+      },
+      {
+        "id": "protocol-client",
+        "verdict": "supported",
+        "note": "Original compatibility list states RESP2/RESP3 and existing client connectivity; report correctly separates connectivity from application semantics."
+      },
+      {
+        "id": "module-api",
+        "verdict": "supported",
+        "note": "Original compatibility list supports Redis OSS RedisModule_ modules. Surrounding report correctly requires specific component validation rather than inferring Stack parity."
+      },
+      {
+        "id": "info-version",
+        "verdict": "supported",
+        "note": "Original INFO guidance names redis_version 7.2.4, server_name and valkey_version; fact accurately distinguishes compatibility identity."
+      },
+      {
+        "id": "migration-example",
+        "verdict": "supported",
+        "note": "Original standalone introduction pins Redis 7.2.5 and Valkey 7.2.6. Report preserves example scope."
+      },
+      {
+        "id": "snapshot-quiesce",
+        "verdict": "supported",
+        "note": "Original physical-migration tradeoffs and numbered steps include disconnection, snapshot, Redis stop and Valkey load; fact remains scoped to documented procedure."
+      },
+      {
+        "id": "replica-cutover",
+        "verdict": "supported",
+        "note": "Original cluster section describes replicas, promotion per primary and removal. Context requires compatible networked nodes; report retains compatible-cluster condition."
+      },
+      {
+        "id": "transaction-difference",
+        "verdict": "supported",
+        "note": "Original 8.0 release history, Behavior Changes - Core, records nested MULTI/WATCH abort. Suitable counterexample to blanket semantic compatibility."
+      },
+      {
+        "id": "lua-packaging",
+        "verdict": "supported",
+        "note": "Original 9.1 release history records default static linkage in 9.1.0-rc2; no later reversal found in GA/patch context."
+      },
+      {
+        "id": "lua-module",
+        "verdict": "supported",
+        "note": "Original 9.1.0-rc1 feature section records Lua extraction; later static-link change is complementary and included in report."
+      },
+      {
+        "id": "valkey-version",
+        "verdict": "supported",
+        "note": "Original download page 9.x listing and fresh HTTP fetch show 9.1.2. Past supported branches are separately listed."
+      },
+      {
+        "id": "redis-version",
+        "verdict": "supported",
+        "note": "Fresh HTTP 200 latest-release API parsed as JSON: tag_name 8.10.2; published_at 2026-09-17T15:06:56Z; draft/prerelease false. Formatting differences do not change values."
+      },
+      {
+        "id": "valkey-license",
+        "verdict": "supported",
+        "note": "Original tag-pinned COPYING contains BSD-3-Clause identifier and both Valkey/Redis BSD notices. Narrow declaration claim is accurate."
+      },
+      {
+        "id": "redis-license-options",
+        "verdict": "supported",
+        "note": "Original Redis licensing page overview, tri-license paragraph and product table support choice for Redis Open Source 8+. Commercial products remain separately identified."
+      },
+      {
+        "id": "redis-old-licenses",
+        "verdict": "supported",
+        "note": "Original About past licenses explicitly retains BSD3 through 7.2.x and dual terms for CE 7.4.x-7.8.x. Report repeats documented boundary."
+      },
+      {
+        "id": "redis-integrated-types",
+        "verdict": "supported",
+        "note": "Original tri-license paragraph lists all four integral components starting Redis 8; claim makes no workload parity inference."
+      },
+      {
+        "id": "valkey-search-capability",
+        "verdict": "supported",
+        "note": "Original main README introduction, supported commands and JSON loading instructions substantiate search types and Hash/JSON indexing. Main-branch qualification prevents release guarantee."
+      },
+      {
+        "id": "valkey-json-capability",
+        "verdict": "supported",
+        "note": "Direct HTTP 200 original unstable README inspected including introduction, loading, configuration and command list. Native JSON module existence is supported; release status not inferred."
+      },
+      {
+        "id": "active-active-semantics",
+        "verdict": "supported",
+        "note": "Original Redis Software planning page introduction establishes CRDT basis and complexity; surrounding sections discuss participating clusters and metadata. Product qualifier is retained."
+      },
+      {
+        "id": "async-replication",
+        "verdict": "supported",
+        "note": "Original replication introduction and facts list support asynchronous underlying replication; optional WAIT acknowledgments are described and separately qualified in dossier."
+      },
+      {
+        "id": "wait-not-strong",
+        "verdict": "supported",
+        "note": "Original replication introduction explicitly rejects CP/strong-consistency implication and conditions failover loss on persistence. Fact preserves qualification."
+      },
+      {
+        "id": "persistence-cost",
+        "verdict": "supported",
+        "note": "Original persistence RDB disadvantages and rewrite sections describe fork stalls and AOF fork/rewrite behavior. Fact does not generalize stall magnitude to all workloads."
+      },
+      {
+        "id": "aof-durability",
+        "verdict": "supported",
+        "note": "Original fsync-policy section states everysec possible one-second loss; other policies and persistence modes are distinct. Report uses roughly, not a strict universal recovery bound."
+      },
+      {
+        "id": "aws-rollback",
+        "verdict": "supported",
+        "note": "Original AWS downgrade section restricts rollback to Valkey 7.2 -> Redis OSS 7.1 regardless of older initial source, alongside snapshot option. Report limits inference to provider."
+      },
+      {
+        "id": "aws-parameters",
+        "verdict": "supported",
+        "note": "Original AWS custom replication-group paragraph requires matching static values; report frames as a managed-service example."
+      },
+      {
+        "id": "valkey-performance-claim",
+        "verdict": "supported",
+        "note": "Original dated announcement performance section gives 2.1M, 512-byte payloads, nine IO threads and depth ten. Attribution remains project-reported; no independent speedup established."
+      },
+      {
+        "id": "aws-rollback-identity",
+        "verdict": "supported",
+        "note": "Original AWS rollback requirements apply REDIS engine type to both users and groups associated with replication group/serverless cache. Inline HTML spacing explains mechanical mismatch."
+      }
+    ],
+    "findings": [
+      {
+        "id": "bounded-takeout",
+        "verdict": "supported",
+        "note": "The chain supports a practical candidate, not guaranteed substitution. Exact-version condition and transaction counterevidence constrain the conclusion."
+      },
+      {
+        "id": "feature-dependencies",
+        "verdict": "supported",
+        "note": "Full chain establishes capability existence without parity. Branch caveat and missing application inputs are visible; recommendation to prove required behavior is justified."
+      },
+      {
+        "id": "license-choice",
+        "verdict": "supported",
+        "note": "Versioned license facts support materially different choices and rejection of blanket closed-source claims; no legal outcome or migration ease is inferred."
+      },
+      {
+        "id": "operational-fit",
+        "verdict": "supported",
+        "note": "Benchmark attribution plus replication/persistence limitations justify workload-specific criteria. Missing measurement/TCO is explicit; no unearned ranking."
+      },
+      {
+        "id": "rollback-design",
+        "verdict": "supported",
+        "note": "Forward compatibility does not logically establish reverse support. AWS restriction and replication context justify testing post-cutover recovery; no universal incompatibility claim is asserted."
+      }
+    ],
+    "prose": [
+      {
+        "id": "answer:0",
+        "verdict": "supported",
+        "note": "Fair conditional synthesis of compatibility, feature and licensing chains; no universal winner or unqualified drop-in promise."
+      },
+      {
+        "id": "answer:1",
+        "verdict": "supported",
+        "note": "Release anchors independently checked against originals/API; worked migration versions preserved and not promoted to a recommended target pair."
+      },
+      {
+        "id": "boundaries:0",
+        "verdict": "supported",
+        "note": "Recommendation correctly distinguishes reconstructible data from correctness-sensitive state; loss windows support higher validation burden, not a claim every workload fails."
+      },
+      {
+        "id": "boundaries:1",
+        "verdict": "supported",
+        "note": "File-format boundary matches guide. Logical methods remain hypothetical and explicitly unvalidated; retention option is conditional on costs/downtime."
+      },
+      {
+        "id": "boundaries:2",
+        "verdict": "supported",
+        "note": "Redis component presence and Valkey module existence are supported. Development branch/release caveat and no-parity conclusion prevent overstating substitute capability."
+      },
+      {
+        "id": "boundaries:3",
+        "verdict": "supported",
+        "note": "CRDT commercial service semantics are distinguished from ordinary primary/replica behavior. Redesign/proof requirement is a conditional engineering recommendation."
+      },
+      {
+        "id": "dependencies:0",
+        "verdict": "supported",
+        "note": "Application inventory is a useful proposed validation scope. Concrete nested transaction behavior is source-supported and illustrates semantic testing."
+      },
+      {
+        "id": "dependencies:1",
+        "verdict": "supported",
+        "note": "INFO identity and both Lua changes are verified; avoids incorrectly requiring separate shared library in every package."
+      },
+      {
+        "id": "operations:0",
+        "verdict": "supported",
+        "note": "Performance result is attributed and conditions are acknowledged; proposed controlled comparisons do not masquerade as completed benchmark."
+      },
+      {
+        "id": "operations:1",
+        "verdict": "supported",
+        "note": "Replication, WAIT, everysec and fork/rewrite chains support recovery testing. Approximate loss statement remains scoped to specified policy."
+      },
+      {
+        "id": "operations:2",
+        "verdict": "supported",
+        "note": "Ownership/cost factors are recommendations; AWS static-parameter example is correct; explicit missing costs prevents savings claim."
+      },
+      {
+        "id": "migration:0",
+        "verdict": "supported",
+        "note": "Validation checklist is appropriate downstream input and explicitly future work. Key counts alone cannot establish application contract; no test success is asserted."
+      },
+      {
+        "id": "migration:1",
+        "verdict": "supported",
+        "note": "Compatible-path condition, fencing and catch-up recommendation address documented active-write risks. Link status is not treated as all final writes applied."
+      },
+      {
+        "id": "migration:2",
+        "verdict": "supported",
+        "note": "Post-cutover write ownership/reconciliation reasoning is sound and labeled recommendation. Reverse support is an unknown to test, not an asserted absolute incompatibility."
+      },
+      {
+        "id": "migration:3",
+        "verdict": "supported",
+        "note": "AWS-specific version and identity limits match original downgrade context. Does not infer upstream limits or general rollback from newer versions."
+      },
+      {
+        "id": "license:0",
+        "verdict": "supported",
+        "note": "Matches versioned licensing originals and avoids blanket current Redis characterization. Choice guidance does not claim particular legal compliance."
+      },
+      {
+        "id": "unknowns:0",
+        "verdict": "supported",
+        "note": "Accurately identifies absent workload inputs and absence of measured application benchmark/migration proof in this dossier."
+      },
+      {
+        "id": "unknowns:1",
+        "verdict": "supported",
+        "note": "Conditional pilot/retain decision follows reviewed findings; preserves unresolved workload and version limits for downstream authors."
+      }
+    ],
+    "assessment": {
+      "coverage": "accurate",
+      "usefulness": "adequate",
+      "note": "Independent reviewer /root/valkey_evidence_review, mapped worker valkey-checker, authored none of the dossier. Reviewed all 28 facts, five findings including conditions/gaps/implications, and 18 report blocks plus original source contexts. The report answers when Redis takeout is appropriate, preserves version/edition and workload boundaries, and provides useful primary input for later content. All 14 originals inspected via web or direct public fetch; transient access errors and formatting-only checks are documented in review-notes.md. This is documentary verification, not an application migration, performance benchmark, exhaustive feature inventory or legal opinion."
+    },
+    "worker": "valkey-checker",
+    "accepted": true
+  }
+}

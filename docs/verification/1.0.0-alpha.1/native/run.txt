@@ -1,0 +1,54 @@
+Project: /private/tmp/harness-research-synthesis
+Test suite: harness-research
+Base VM: tanzu-brand-golden-gate-base
+Test VM: harness-research-test-20261017135421-15524-54c89c97
+Source commit: c7c406eb8d1d97f72748909b68020882f10544dd
+ M CHANGELOG.md
+ M NOTICE.md
+ M README.md
+ M SKILL.md
+ M bootstrap/SKILL.md
+ M docs/development.md
+ M docs/images/context-loading.svg
+ M docs/releases.md
+ M docs/setup.md
+ M docs/superpowers/specs/2026-10-15-harness-research-direction.md
+ M docs/superpowers/specs/2026-10-15-keep-findings-and-headlines-design.md
+ M docs/superpowers/specs/2026-10-15-research-with-agents-design.md
+ M docs/using-harness-research.md
+ M guidance/manifest.json
+ M package-lock.json
+ M package.json
+ M scripts/ci/guest-test.sh
+ M scripts/harness-research.mjs
+ M scripts/install.mjs
+ M scripts/lib/research.mjs
+ M scripts/sync-guidance.mjs
+ M tests/context-usage.test.mjs
+ M tests/guidance.test.mjs
+ M tests/research-run.test.mjs
+ M tools/context-usage.mjs
+?? docs/architecture.md
+?? docs/assets/harness-research-synthesis-banner.png
+?? docs/assets/synthesis-banner-prompt.txt
+?? docs/legacy-development.md
+?? docs/legacy-setup.md
+?? docs/legacy-using-harness-research.md
+?? docs/migration-v1.md
+?? docs/superpowers/plans/2026-10-17-synthesis-first.md
+?? docs/superpowers/specs/2026-10-17-synthesis-first.md
+?? docs/verification/1.0.0-alpha.1/
+?? references/investigate.md
+?? references/review-synthesis.md
+?? references/synthesis-reuse.md
+?? references/synthesis-workflow.md
+?? references/synthesis.schema.json
+?? references/synthesize.md
+?? scripts/lib/synthesis-cli.mjs
+?? scripts/lib/synthesis-model.mjs
+?? scripts/lib/synthesis-output.mjs
+?? scripts/lib/version.mjs
+?? tests/synthesis-ownership.test.mjs
+?? tests/synthesis-runtime.test.mjs
+?? tests/version.test.mjs
+?? upstream/anthropic/

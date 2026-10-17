@@ -1,259 +1,223 @@
-![Harness Research: colorful source notes, a magnifying glass, and an evidence trail leading to a cited report.](docs/assets/harness-research-banner.png)
+![Colorful source notes become a clear, connected research report.](docs/assets/harness-research-synthesis-banner.png)
 
 # Harness Research
 
-### Ask a question. Follow the evidence. Keep the report.
+### Find the evidence. Connect the ideas. Keep the understanding.
 
-A research **skill for Codex, Claude Code, and Cursor**. Give your agent a topic,
-selected documents, or claims to check. It reads sources, checks the evidence, and
-saves a cited report in your project—ready to open, share, and continue later.
+A research **skill for your coding agent**. Ask about a topic, compare options, or
+bring documents to examine. Get a saved, cited report that explains what matters,
+why it matters, and where the evidence stops—ready to inform a presentation,
+a blog, training, or a decision.
 
-**[Get started](#get-started)** · **[See a report](#see-what-you-get)** ·
-**[User guide](docs/using-harness-research.md)** · **[Setup & updates](docs/setup.md)**
+**[Start here](#your-first-research-report)** · **[What you get](#what-you-get)** ·
+**[User guide](docs/using-harness-research.md)** · **[Setup](docs/setup.md)**
 
-| Bring the question | Keep the useful work |
+> **1.0 development preview.** This checkout contains the new synthesis-first
+> implementation (`1.0.0-alpha.1`). It has not been published as a release.
+> The published [0.9.5 release](https://github.com/dbbaskette/harness-research-skill/releases/tag/v0.9.5)
+> uses the earlier question-oriented workflow. Use the preview instructions below
+> to try this code; installing 0.9.5 will not give you the new behavior.
+
+## Your first research report
+
+You need **Node.js 20+** and an agent with source-reading/search tools, such as
+Codex or Claude Code. The agent uses its existing tools and model access; there
+is no separate research service or API subscription to configure. A checked report
+also needs a separate agent invocation to review the evidence and synthesis.
+
+### 1. Open a project for the output
+
+Choose the content or code project where you want `research/report.md` saved.
+For a first preview, use a new folder so existing research stays intact.
+
+### 2. Point your agent at this checkout's skill
+
+In Codex or Claude Code, use a prompt like this, replacing the first path with
+your checkout's absolute path:
+
+```text
+Use the skill at /absolute/path/to/harness-research-skill/SKILL.md.
+Use that checkout's local runtime and guidance for this preview.
+
+Compare Valkey and Redis for an application engineering team considering
+replacing Redis. Use public primary sources. Explain where replacement is
+practical, where it is risky, and what we should verify before a migration.
+```
+
+The agent handles source collection, helper commands, writing and saving. You do
+not need to prepare JSON, run npm commands, request citations, or ask it to write
+the report afterward. If your host requests permission for an independent review,
+allow it to complete the checked workflow.
+
+**Already have a published installation?** Keep it for existing work. The preview
+uses its explicit local path. [Install, update and version details →](docs/setup.md)
+
+### 3. Open the result
+
+The agent links **`research/report.md`**. Read the central answer, findings,
+explanation, comparisons and limitations. Follow the evidence links when you want
+to inspect the underlying source passages.
+
+If source access or independent checking is incomplete, the saved output says so.
+A draft is useful progress; it is not presented as a completed checked report.
+
+## What you get
+
+Research organized for understanding, with the audit trail close at hand.
+
+| File | Use it for |
 | --- | --- |
-| Compare tools or approaches | Findings with source quotes, dates, and a comparison you can inspect. |
-| Research your documents | A clear boundary around the sources you selected. |
-| Check a set of claims | Supported, contradicted, or insufficient—with the evidence behind each verdict. |
-| Return to unfinished research | Saved progress, visible gaps, and a report that survives the chat. |
+| `research/report.md` | The main answer, themes, findings, explanations and comparisons |
+| `research/brief.md` | A prioritized handoff shaped to your task, with useful evidence and qualifications to retain |
+| `research/evidence.md` | Source passages and the factual support behind the report |
+| `research/facts.json` | Structured evidence and synthesis for compatible tools (schema 2) |
+| `research/output.json` | The saved revision, review status and artifact hashes |
+| `research/sources/` | Pinned source text used for this result |
 
-> **Current release: [0.9.5](https://github.com/dbbaskette/harness-research-skill/releases/tag/v0.9.5).**
-> Install the tagged version below. Already using a preview that says 0.9.5?
-> Rerun the installer from this tag to get the final release.
-> [Versions, updates, and troubleshooting →](docs/setup.md)
+Questions guide the investigation. They do not force every report into Q&A.
+A short factual check can stay short; a broad topic can become a coherent
+explanation. A comparison uses named criteria rather than unrelated fact lists.
 
-## Get started
+Read the [Valkey/Redis replacement report](docs/verification/1.0.0-alpha.1/valkey-redis-editorial/research/report.md):
+a revised example with 21 primary sources, 38 facts and five synthesized findings,
+independently checked against dated source captures and saved original contexts.
+Its [prioritized presentation brief](docs/verification/1.0.0-alpha.1/valkey-redis-editorial/research/brief.md)
+shows the task-shaped handoff. The
+[editorial refinement record](docs/verification/1.0.0-alpha.1/editorial-refinement/README.md)
+documents review, tests and current studio integration limits; the
+[initial acceptance record](docs/verification/1.0.0-alpha.1/README.md) preserves history.
+Earlier [0.9 examples](docs/verification/0.9.0/README.md) document the previous
+implementation and are not examples of this output contract.
 
-### 1. Install the skill
+## Start with your purpose
 
-Have **Node.js 20+**, **Git**, **Bash**, and your coding agent ready. The skill uses
-your agent's existing research tools and model access. You don't need npm or a
-separate research account. Your agent also needs permission to start a separate
-checker for the evidence.
+Add the purpose in your own words: “help us choose,” “background for a blog,” or
+“teach engineers new to the topic.” It shapes the depth, explanations and format
+of the report and brief. If you leave it out, the default is **general-purpose
+topic research**: a balanced explanation of the topic and a concise overview.
+No intake form is required. You can name more than one use and say which matters
+most. A studio can pass its actual content task as the purpose.
 
-```sh
-git clone --branch v0.9.5 https://github.com/dbbaskette/harness-research-skill.git
-cd harness-research-skill
-bash scripts/Install-Harness-Research.sh
-```
-
-The installer registers the skill for all three agents. Look for
-`"status": "installed"`, then **start a new agent session**.
-[Installation locations, tagged releases, and custom setup →](docs/setup.md)
-
-### 2. Open the project where you want your research
-
-Use your own content or code project. This is where the report will be saved.
-You can work with public sources, selected documents, or both.
-
-### 3. Ask in plain language
-
-Give your agent a research request:
-
-**Codex**
+**Understand a topic**
 
 ```text
-$harness-research Compare PostgreSQL and SQLite for a small internal application.
-Use public primary sources. Cover deployment, concurrency, and maintenance.
+Research how retrieval-augmented generation works for software architects.
+Explain the mechanisms, trade-offs, failure modes and evaluation choices.
+Use public primary sources. This will inform a technical blog and training.
 ```
 
-**Claude Code**
+**Compare alternatives**
 
 ```text
-/harness-research Compare PostgreSQL and SQLite for a small internal application.
-Use public primary sources. Cover deployment, concurrency, and maintenance.
+Compare PostgreSQL and SQLite for a small internal application.
+Cover deployment, concurrency and maintenance. Explain which constraints
+change the decision, and leave unknown workload requirements visible.
 ```
 
-**Cursor**
+**Work only from your documents**
 
 ```text
-Use the harness-research skill to compare PostgreSQL and SQLite for a small
-internal application. Use public primary sources and cover deployment,
-concurrency, and maintenance.
+Use sources/product-brief.pdf and sources/release-notes.md only.
+Check which launch claims they support, explain contradictions, and identify
+what remains unknown. The audience is our technical enablement team.
 ```
 
-Your agent handles planning, source reading, helper commands, and saving the
-report. If your host asks for permission to run an independent checker, allow it
-to complete the checked workflow. No extra “write the report” request is needed.
+After installing a published version, invoke **`$harness-research`** in Codex,
+**`/harness-research`** in Claude Code, or ask your agent to use the named skill.
+For this development preview, use the explicit checkout path above.
 
-**Working from your own files?** Try:
+[More on scope, source choices and follow-ups →](docs/using-harness-research.md)
 
-```text
-$harness-research Read sources/product-brief.pdf and sources/release-notes.md.
-Using only these documents, check which launch claims are supported.
-Keep contradictions and missing evidence visible.
-```
+## Useful input for the work that comes next
 
-[More examples: deep research, claim checks, and planning first →](docs/using-harness-research.md#prompts-to-start-from)
+The brief leads with what matters for the task and selects the strongest useful
+support. Its shape can change with the intended use:
 
-## See what you get
+- **Presentations:** key messages, a possible storyline and evidence worth visualizing.
+- **Blogs:** a central argument, mechanisms and the strongest counterarguments.
+- **Training:** a concept sequence, misconceptions and grounded examples.
+- **Decisions:** consequential tradeoffs and conditions that change the choice.
 
-The main deliverable is **`research/report.md`**: questions and answers, cited
-headlines, source quotes, comparisons, and explicit gaps. It's saved as work
-progresses, so a partial report is available while research is underway.
+These are useful emphases, not fixed templates or a bundle of separate deliverables.
+The next skill still owns the slides, prose or lesson design. A research report
+is a derived artifact, not a new independent primary source. Structured consumers
+must support schema 2 explicitly; [migration notes](docs/migration-v1.md) explain
+what changes and what remains available. [Passing a studio task →](docs/using-harness-research.md#feed-presentations-blogs-and-training)
 
-```text
-your-project/
-└── research/
-    ├── report.md       Read the findings and their evidence
-    ├── facts.json      Inspect structured facts, citations, and history
-    ├── brief.md        Reuse the current checked facts as context
-    ├── plan.json       Inspect the agreed scope and questions
-    ├── plan.md         Read the plan in Markdown
-    └── output.json     Identify the export revision and file hashes
-```
+## How it works
 
-Open a recorded development example:
+**Investigate → connect the evidence → write → independently review → save.**
 
-- **[Redis vs Valkey](docs/verification/0.9.0/claude-code-redis-valkey/new/research/report.md)** —
-  a broader Claude Code trial with 113 checked facts; [comparison notes](docs/verification/0.9.0/claude-code-redis-valkey/README.md) explain its limits.
+The synthesis approach adapts Anthropic's
+[Knowledge Synthesis](https://github.com/anthropics/knowledge-work-plugins/tree/33eeda1e8fd856455b05479d13a0f85b5f803744/enterprise-search/skills/knowledge-synthesis):
+group related evidence, prioritize what the reader needs, preserve disagreement,
+and lead with a useful answer. Harness adds scoped investigation, saved evidence,
+independent review and durable output. [Attribution and licenses →](NOTICE.md)
 
-- **[PostgreSQL vs SQLite](docs/verification/0.9.0/public/research/report.md)** —
-  a narrow comparison using public primary documentation.
-- **[AsterDB vs BirchDB](docs/verification/0.9.0/supplied/research/report.md)** —
-  synthetic supplied documents, including two questions the sources cannot answer.
+The agent does the thinking. A local helper checks quotations and references,
+pins source text, and ties review to the exact saved evidence. A different
+invocation checks both the factual support and the conclusions drawn from it.
+Source support is not a guarantee of truth or live currency.
 
-[Understand the files, statuses, and limits →](docs/using-harness-research.md#read-the-result)
+The skill loads guidance **only when that stage needs it**. Investigation,
+synthesis, checking and reuse have focused references; old queue instructions
+are loaded only to resume old work.
 
-## How the evidence gets checked
+![Progressive disclosure: load the entry and the relevant stage, not the entire instruction library.](docs/images/context-loading.svg)
 
-**Plan → research → independent check → cross-check → write.**
-
-A separate invocation reads the original supporting material and can confirm,
-narrow, or reject a candidate fact. The helper checks source revisions, quote
-placement, citation references, and numbers. Unanswered questions stay visible;
-an unavailable checker produces a blocked partial report.
-
-The default **light** depth checks facts. **Standard** and **deep** also require
-an independent review of the written answers. Checked support means the cited
-source supports the statement; it does not certify the source as true or current.
-
-[Depths, source handling, and the checking process →](docs/using-harness-research.md#choose-the-depth)
-
-## Pick it up later
-
-Open the same project and ask:
-
-```text
-$harness-research Continue the saved research in this project.
-Check for changed sources and work through the remaining questions.
-```
-
-Saved tasks keep their guidance and runtime. Changed evidence is marked stale;
-your agent will explain what needs reassessment.
-[Resume, changed sources, and recovery →](docs/using-harness-research.md#continue-or-recover-a-run)
-
-## Find your next step
-
-| I want to… | Open… |
-| --- | --- |
-| Install, update, check my version, or fix setup | [Setup & troubleshooting](docs/setup.md) |
-| Choose sources, write a better prompt, or understand the report | [Using Harness Research](docs/using-harness-research.md) |
-| Understand helpers, schemas, or run tests | [Developer guide](docs/development.md) |
-| Continue older Tanzu Brand research | [Migration guide](references/migration.md) |
-| Inspect the agent's workflow | [Skill instructions](SKILL.md) and [research contract](references/research-run.md) |
-| See what has been verified | [0.9.5 checks](docs/verification/0.9.5/README.md); [0.9.4 checks and trials](docs/verification/0.9.4/README.md); [0.9.3](docs/verification/0.9.3/README.md); [0.9.2](docs/verification/0.9.2/README.md); [0.9.1](docs/verification/0.9.1/README.md); [0.9.0 evidence and release decision](docs/verification/0.9.0/README.md) |
-
-## Built for your agent, with the work kept in your project
-
-The skill uses your harness's tools and judgement. A Node.js helper tracks tasks,
-evidence, and saved outputs. Core use needs no new service, research subscription,
-or Python environment. Your normal agent/model usage still applies.
-
-**What it loads.** The skill reads about 1,100 tokens of instructions when it
-starts. For a full checked run the coordinator reads about 4,800. Each worker
-subagent reads only its own contract: 541 tokens for a checker, 580 for a writer
-and 1,133 for a researcher. A helper reply is 150–900 tokens. The real cost is the
-reading your agent does. In the 0.9.4 Claude Code trial each subagent used
-77,000–101,000 tokens, mostly on the source pages themselves. A 10-question light
-run used about 1.2 million subagent tokens, against 1.7 million under 0.9.1's
-larger light limits. Fewer facts per question and smaller sources cost less; see
-the measured figures below (for maintainers) and the
-[0.9.3 review](docs/reviews/2026-10-16-skill-review.md) for what drives them.
-
-![Progressive disclosure: discovery, bootstrap and guidance entry, then one path; worker subagents read only their own task contract](docs/images/context-loading.svg)
-
-The map is generated from the same measurements as the table below and checked by
-the tests.
-
-MIT licensed. See [the license](LICENSE), [credits and adaptations](NOTICE.md),
-and [the changelog](CHANGELOG.md). Maintainers: [release procedure](docs/releases.md).
+[Architecture](docs/architecture.md) · [Evidence and limitations](docs/using-harness-research.md#evidence-and-review) ·
+[Developer guide](docs/development.md) · [Release history](docs/releases.md)
 
 <details>
 <summary>For maintainers: measured instruction context</summary>
 
-The skill loads the references needed for the selected workflow. The generated
-table below counts instruction files and one representative start reply for each
-reading path; it is regenerated from the current files and checked by the tests.
-
-It leaves out what a run costs beyond instructions. Measured on 2026-10-16 with
-0.9.4 ([installed checks](docs/verification/0.9.4/installed/transcript.jsonl),
-[live trials](docs/verification/0.9.4/live/README.md)):
-
-| Runtime cost | Measured |
-| --- | ---: |
-| Helper reply, mean over 130 calls (`next` 693, `status` 320) | 401 tokens |
-| Task file a worker reads (Claude Code trial; checks and cross-checks carry the cited source records) | 450–9,900 tokens |
-| Brief the helper writes into each task | 59–280 tokens |
-| `brief.md` for 60 checked facts | 3,495 tokens |
-| One researcher, checker or writer subagent (Claude Code trial) | 77,000–101,000 tokens |
-| 10-question light run, 14 subagents (Claude Code trial) | about 1.2 million tokens |
-
-The trial ran with a light limit of 6 facts per question. 0.9.4 ships 8, which
-has not been measured live. Under 0.9.1's limits the same plan used about 1.7
-million subagent tokens, 80,000–155,000 per subagent.
-
-Each worker reads only the task contract its task's `guide` names (541–1,133
-tokens), not the 3,395-token run guidance that every worker read in 0.9.3. The
-coordinator reads the run guidance plus the research and writing contracts.
-Fifteen of the 26 rows below are legacy or comparative paths that no current
-caller uses; the [0.9.3 review](docs/reviews/2026-10-16-skill-review.md) proposes
-retiring them.
-
 <!-- CONTEXT-USAGE:START -->
-Measured with `cl100k_base`; cumulative instruction counts, including a normalized
-representative guidance-start response. Bootstrap activation is shown separately.
+Measured with `cl100k_base`; cumulative instruction counts include a normalized
+representative guidance-start response. Stage-only rows count their own reference.
 
 | Reading path | Tokens |
 | --- | ---: |
-| Discovery metadata | 38 |
-| Installed bootstrap | 490 |
-| Bootstrap + current guidance entry | 1,113 |
-| Research worker subagent | 1,133 |
-| Checker subagent | 541 |
-| Writer or reviewer subagent | 580 |
-| Refresh worker | 668 |
-| Coordinator: skill research with independent checks and saved report | 4,838 |
-| Verify, research again, reuse or refresh | 1,890 |
-| Explicit chat-only cited answer | 2,067 |
-| Legacy manual research with saved report | 3,258 |
-| Status / resume without new findings | 1,668 |
-| Comparative routing only | 1,820 |
-| Codex comparative outline | 2,780 |
-| Codex add items | 1,985 |
-| Codex add fields | 2,005 |
-| Codex deep results | 2,668 |
-| Codex deep results + saved evidence | 3,859 |
-| Claude comparative outline | 2,797 |
-| Claude deep results | 2,690 |
-| Saved research + general web strategy | 5,335 |
-| Saved research + academic strategy | 5,427 |
-| Saved research + GitHub strategy | 5,222 |
-| Saved research + technical Q&A strategy | 5,127 |
-| Saved research + Chinese sources strategy | 5,352 |
-| Legacy migration | 1,462 |
+| Discovery metadata | 36 |
+| Installed bootstrap | 574 |
+| Bootstrap + current guidance entry | 1,242 |
+| Investigator stage | 1,017 |
+| Synthesis writer stage | 1,547 |
+| Independent reviewer stage | 1,330 |
+| New synthesis: coordinator entry and workflow | 3,773 |
+| New synthesis: all stages in one context | 7,667 |
+| Synthesis resume, verify or refresh | 2,132 |
+| Optional studio task handoff | 4,474 |
+| Legacy 0.9 queued coordinator | 4,973 |
+| Legacy 0.9 reuse or refresh | 2,025 |
+| Legacy explicit chat-only answer | 2,202 |
+| Legacy manual saved research | 3,393 |
+| Legacy manual status or resume | 1,803 |
+| Legacy comparative routing only | 1,955 |
+| Legacy Codex comparative outline | 2,915 |
+| Legacy Codex add items | 2,120 |
+| Legacy Codex add fields | 2,140 |
+| Legacy Codex deep results | 2,803 |
+| Legacy Codex deep results + saved evidence | 3,994 |
+| Legacy Claude comparative outline | 2,932 |
+| Legacy Claude deep results | 2,825 |
+| Investigation + general web strategy | 5,287 |
+| Investigation + academic strategy | 5,379 |
+| Investigation + GitHub strategy | 5,174 |
+| Investigation + technical Q&A strategy | 5,079 |
+| Investigation + Chinese sources strategy | 5,304 |
+| Legacy migration | 1,597 |
 
-Comparative rows include the selected platform resource, not the complete bundle.
-Worker rows count only the file a task's `guide` names, without the
-bootstrap or entry. Each strategy row includes one router and one strategy. Status/resume skips plan
-and finding schemas until a new save is needed. Only explicitly requested chat-only
-answers omit saved artifacts; default research uses the skill task/evidence workflow. Source
-content, images, research task responses and conversation add separately. The JSON
-report also exposes direct-handoff paths without the bootstrap/start response.
+The new default starts with the entry and synthesis workflow. Investigation, writing
+and independent review each load their own reference when needed. The all-stages
+row shows their cumulative cost if read in one context; delegated stage rows are
+separate contexts. Synthesis reuse does not load investigation or writing contracts
+until new work is needed. Strategy rows add exactly one source strategy. Legacy
+queue, manual and comparative paths remain available only for existing callers.
+Source documents, evidence payloads, tool responses and conversation add separately.
+The JSON output also exposes direct-checkout paths without bootstrap/start overhead.
 <!-- CONTEXT-USAGE:END -->
 
-Run `npm run context:update` after instruction changes and
-`npm run context:check` to check the measurements. See the [developer guide](docs/development.md).
-
+Measurements describe instruction loading, not total model usage or cost.
+Run `npm run context:update` after guidance changes and `npm run context:check`
+to verify the generated table and map.
 </details>

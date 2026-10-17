@@ -39,6 +39,11 @@ export async function measureContext() {
   const queued = [...entry, 'references/research-run.md', 'references/task-research.md', 'references/task-write.md'];
   const compare = [...entry, 'references/comparative.md'];
   const readingPaths = {
+    synthesisCoordinator: path([...entry, 'references/synthesis-workflow.md']),
+    synthesisFull: path([...entry, 'references/synthesis-workflow.md', 'references/investigate.md', 'references/synthesize.md', 'references/review-synthesis.md']),
+    investigator: path(['references/investigate.md']), synthesisWriter: path(['references/synthesize.md']), synthesisReviewer: path(['references/review-synthesis.md']),
+    synthesisReuse: path([...entry, 'references/synthesis-reuse.md']),
+    studioHandoff: path([...entry, 'references/synthesis-workflow.md', 'references/studio-handoff.md']),
     queued: path(queued), researchWorker: path(['references/task-research.md']), checkWorker: path(['references/task-check.md']), writeWorker: path(['references/task-write.md']), refreshWorker: path(['references/reuse.md']), focused: path(focused), quick: path([...entry, 'references/workflow.md']),
     resume: path([...entry, 'references/resume.md']),
     reuse: path([...entry, 'references/reuse.md']),
@@ -52,24 +57,24 @@ export async function measureContext() {
     }
   }
   for (const [name, strategy] of Object.entries({ general: 'general-web', academic: 'academic-papers', github: 'github-debug', technical: 'stackoverflow', chinese: 'chinese-tech' }))
-    readingPaths[name] = path([...queued, 'references/strategies.md', `upstream/codex/agents/web-search-modules/${strategy}.md`]);
+    readingPaths[name] = path([...entry, 'references/synthesis-workflow.md', 'references/investigate.md', 'references/strategies.md', `upstream/codex/agents/web-search-modules/${strategy}.md`]);
   const standalone = Object.fromEntries(Object.entries(readingPaths).map(([name, route]) => [name, path(['bootstrap/SKILL.md', ...route.files.map(x => x.path)], ['guidanceStart', ...route.helpers.map(x => x.name)])]));
   const description = contents['SKILL.md'].match(/^name:.*\n.*description:.*$/m)?.[0];
   if (!description) throw new Error('Missing skill metadata');
   const activation = files['bootstrap/SKILL.md'] + files['SKILL.md'];
   const routes = { 'Discovery metadata': count(description), 'Installed bootstrap': files['bootstrap/SKILL.md'], 'Bootstrap + current guidance entry': activation,
-    'Research worker subagent': readingPaths.researchWorker.total, 'Checker subagent': readingPaths.checkWorker.total, 'Writer or reviewer subagent': readingPaths.writeWorker.total, 'Refresh worker': readingPaths.refreshWorker.total,
-    ...Object.fromEntries(Object.entries({ queued: 'Coordinator: skill research with independent checks and saved report', reuse: 'Verify, research again, reuse or refresh', quick: 'Explicit chat-only cited answer', focused: 'Legacy manual research with saved report', resume: 'Status / resume without new findings', comparative: 'Comparative routing only', codexoutline: 'Codex comparative outline', codexitems: 'Codex add items', codexfields: 'Codex add fields', codexdeep: 'Codex deep results', codexdeepSaved: 'Codex deep results + saved evidence', claudeoutline: 'Claude comparative outline', claudedeep: 'Claude deep results', general: 'Saved research + general web strategy', academic: 'Saved research + academic strategy', github: 'Saved research + GitHub strategy', technical: 'Saved research + technical Q&A strategy', chinese: 'Saved research + Chinese sources strategy', migration: 'Legacy migration' }).map(([name, label]) => [label, standalone[name].total])) };
+    'Investigator stage': readingPaths.investigator.total, 'Synthesis writer stage': readingPaths.synthesisWriter.total, 'Independent reviewer stage': readingPaths.synthesisReviewer.total,
+    ...Object.fromEntries(Object.entries({ synthesisCoordinator: 'New synthesis: coordinator entry and workflow', synthesisFull: 'New synthesis: all stages in one context', synthesisReuse: 'Synthesis resume, verify or refresh', studioHandoff: 'Optional studio task handoff',
+      queued: 'Legacy 0.9 queued coordinator', reuse: 'Legacy 0.9 reuse or refresh', quick: 'Legacy explicit chat-only answer', focused: 'Legacy manual saved research', resume: 'Legacy manual status or resume', comparative: 'Legacy comparative routing only', codexoutline: 'Legacy Codex comparative outline', codexitems: 'Legacy Codex add items', codexfields: 'Legacy Codex add fields', codexdeep: 'Legacy Codex deep results', codexdeepSaved: 'Legacy Codex deep results + saved evidence', claudeoutline: 'Legacy Claude comparative outline', claudedeep: 'Legacy Claude deep results', general: 'Investigation + general web strategy', academic: 'Investigation + academic strategy', github: 'Investigation + GitHub strategy', technical: 'Investigation + technical Q&A strategy', chinese: 'Investigation + Chinese sources strategy', migration: 'Legacy migration' }).map(([name, label]) => [label, standalone[name].total])) };
   const hashes = Object.fromEntries(paths.map(path => [path, createHash('sha256').update(contents[path]).digest('hex')]));
   const inputDigest = createHash('sha256').update(JSON.stringify({ hashes, outputs, readingPaths, routes })).digest('hex');
   return { tokenizer: 'cl100k_base', inputDigest, files, samples, readingPaths, standalone, routes };
 }
 export function renderReport(data) {
-  return 'Measured with `cl100k_base`; cumulative instruction counts, including a normalized\nrepresentative guidance-start response. Bootstrap activation is shown separately.\n\n| Reading path | Tokens |\n| --- | ---: |\n' + Object.entries(data.routes).map(([label, value]) => `| ${label} | ${value.toLocaleString('en-US')} |`).join('\n') + '\n\nComparative rows include the selected platform resource, not the complete bundle.\nWorker rows count only the file a task\'s `guide` names, without the\nbootstrap or entry. Each strategy row includes one router and one strategy. Status/resume skips plan\nand finding schemas until a new save is needed. Only explicitly requested chat-only\nanswers omit saved artifacts; default research uses the skill task/evidence workflow. Source\ncontent, images, research task responses and conversation add separately. The JSON\nreport also exposes direct-handoff paths without the bootstrap/start response.\n';
+  return 'Measured with `cl100k_base`; cumulative instruction counts include a normalized\nrepresentative guidance-start response. Stage-only rows count their own reference.\n\n| Reading path | Tokens |\n| --- | ---: |\n' + Object.entries(data.routes).map(([label, value]) => `| ${label} | ${value.toLocaleString('en-US')} |`).join('\n') + '\n\nThe new default starts with the entry and synthesis workflow. Investigation, writing\nand independent review each load their own reference when needed. The all-stages\nrow shows their cumulative cost if read in one context; delegated stage rows are\nseparate contexts. Synthesis reuse does not load investigation or writing contracts\nuntil new work is needed. Strategy rows add exactly one source strategy. Legacy\nqueue, manual and comparative paths remain available only for existing callers.\nSource documents, evidence payloads, tool responses and conversation add separately.\nThe JSON output also exposes direct-checkout paths without bootstrap/start overhead.\n';
 }
 // The progressive disclosure map: what loads at each step, from the same measurements as the table.
 const tokens = n => n < 1000 ? `${n} tokens` : `~${(n / 1000).toFixed(1)}k`;
-const range = values => values.length ? `${tokens(Math.min(...values))}–${tokens(Math.max(...values)).replace('~', '')}` : '';
 const escape = value => String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 function box(x, y, w, color, title, value, note, dashed = false) {
   return `  <g transform="translate(${x} ${y})">
@@ -80,53 +85,37 @@ function box(x, y, w, color, title, value, note, dashed = false) {
   </g>`;
 }
 export function renderMap(data) {
-  const r = data.routes, pick = prefix => Object.entries(r).filter(([label]) => prefix(label)).map(([, value]) => value);
-  const comparative = pick(label => label === 'Comparative routing only' || /^(Codex|Claude) /.test(label)), strategies = pick(label => label.startsWith('Saved research + '));
-  const main = '#005C8A', worker = '#6C4B94', legacy = '#6B7280', W = 240, xs = [24, 288, 552, 816];
+  const r = data.routes, main = '#005C8A', stage = '#6C4B94', legacy = '#6B7280';
   const rows = [
-    box(24, 80, 300, main, 'Skill discovery', tokens(r['Discovery metadata']), 'Name and description, always visible'),
-    box(390, 80, 300, main, 'Installed bootstrap', tokens(r['Installed bootstrap']), 'Picks and pins the guidance release'),
-    box(756, 80, 300, main, 'Guidance entry', tokens(r['Bootstrap + current guidance entry']), 'SKILL.md routes to one path'),
-    box(xs[0], 230, W, main, 'Checked research run', tokens(r['Coordinator: skill research with independent checks and saved report']), 'Coordinator: run guide + 2 contracts'),
-    box(xs[1], 230, W, main, 'Verify, again, reuse', tokens(r['Verify, research again, reuse or refresh']), 'Follow-ups on saved research'),
-    box(xs[2], 230, W, main, 'Status or resume', tokens(r['Status / resume without new findings']), 'No new findings'),
-    box(xs[3], 230, W, main, 'Chat-only answer', tokens(r['Explicit chat-only cited answer']), 'Only when asked for no saved report'),
-    box(xs[0], 400, W, worker, 'Researcher', tokens(r['Research worker subagent']), 'task-research.md'),
-    box(xs[1], 400, W, worker, 'Checker', tokens(r['Checker subagent']), 'task-check.md'),
-    box(xs[2], 400, W, worker, 'Writer or reviewer', tokens(r['Writer or reviewer subagent']), 'task-write.md'),
-    box(xs[3], 400, W, worker, 'Refresh reader', tokens(r['Refresh worker']), 'reuse.md'),
-    box(xs[0], 570, W, legacy, 'Manual 0.8 workflow', tokens(r['Legacy manual research with saved report']), 'plan and record commands', true),
-    box(xs[1], 570, W, legacy, 'Comparative outlines', range(comparative), 'One preserved upstream resource', true),
-    box(xs[2], 570, W, legacy, 'Source strategies', range(strategies), 'Run guidance + one strategy', true),
-    box(xs[3], 570, W, legacy, 'Older Brand records', tokens(r['Legacy migration']), 'Migration', true),
+    box(24, 80, 328, main, 'Skill discovery', tokens(r['Discovery metadata']), 'Name and description, always visible'),
+    box(376, 80, 328, main, 'Installed bootstrap', tokens(r['Installed bootstrap']), 'Pins compatible stable guidance'),
+    box(728, 80, 328, main, 'Guidance entry', tokens(r['Bootstrap + current guidance entry']), 'Routes to the needed workflow'),
+    box(24, 230, 328, main, 'Synthesis coordinator', tokens(r['New synthesis: coordinator entry and workflow']), 'Entry + synthesis-workflow.md'),
+    box(376, 230, 328, main, 'Resume or refresh', tokens(r['Synthesis resume, verify or refresh']), 'Entry + synthesis-reuse.md'),
+    box(728, 230, 328, main, 'All stages in one context', tokens(r['New synthesis: all stages in one context']), 'Cumulative, if one agent reads all stages'),
+    box(24, 400, 328, stage, 'Investigate', tokens(r['Investigator stage']), 'investigate.md, when gathering evidence'),
+    box(376, 400, 328, stage, 'Synthesize', tokens(r['Synthesis writer stage']), 'synthesize.md, when writing the report'),
+    box(728, 400, 328, stage, 'Independent review', tokens(r['Independent reviewer stage']), 'review-synthesis.md, in a separate review'),
+    box(24, 570, 328, legacy, 'Legacy queue', tokens(r['Legacy 0.9 queued coordinator']), 'Existing 0.9 callers only', true),
+    box(376, 570, 328, legacy, 'Legacy manual research', tokens(r['Legacy manual saved research']), 'Older plan and record callers', true),
+    box(728, 570, 328, legacy, 'Legacy comparative route', tokens(r['Legacy comparative routing only']), 'One upstream resource when selected', true),
   ];
-  const centre = x => x + W / 2;
-  const arrows = [
-    'M324 128 H390', 'M690 128 H756',
-    `M906 176 V202 H${centre(xs[0])} V230`, `M${centre(xs[1])} 202 V230`, `M${centre(xs[2])} 202 V230`, `M${centre(xs[3])} 202 V230`,
-  ].map(d => `      <path d="${d}"/>`);
-  // One dashed trunk from the coordinator, then a drop to each worker; only the drops carry arrowheads.
-  const trunk = `      <path d="M${centre(xs[0])} 326 V378 H${centre(xs[3])}"/>`;
-  const workers = xs.map(x => `      <path d="M${centre(x)} 378 V400" marker-end="url(#arrow-worker)"/>`);
-  const description = `Progressive disclosure, cumulative instruction tokens measured with cl100k_base. Discovery ${tokens(r['Discovery metadata'])}, installed bootstrap ${tokens(r['Installed bootstrap'])}, guidance entry ${tokens(r['Bootstrap + current guidance entry'])}. Paths: checked research run ${tokens(r['Coordinator: skill research with independent checks and saved report'])}, verify/again/reuse/refresh ${tokens(r['Verify, research again, reuse or refresh'])}, status or resume ${tokens(r['Status / resume without new findings'])}, chat-only answer ${tokens(r['Explicit chat-only cited answer'])}. Worker subagents read only their own contract: researcher ${tokens(r['Research worker subagent'])}, checker ${tokens(r['Checker subagent'])}, writer or reviewer ${tokens(r['Writer or reviewer subagent'])}, refresh reader ${tokens(r['Refresh worker'])}. Legacy paths: manual workflow ${tokens(r['Legacy manual research with saved report'])}, comparative outlines ${range(comparative)}, source strategies ${range(strategies)}, older Brand records ${tokens(r['Legacy migration'])}. One path is loaded, not the sum.`;
+  const description = Object.entries(r).filter(([label]) => !label.startsWith('Investigation +') && !label.startsWith('Legacy')).map(([label, value]) => `${label}: ${tokens(value)}`).join('. ') + '. Each stage loads when needed. Branches are not added together; all-stages total is shown explicitly.';
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="700" viewBox="0 0 1080 700" role="img" aria-labelledby="title description">
   <title id="title">Harness Research: progressive context loading</title>
   <desc id="description">${escape(description)}</desc>
   <!-- Input digest: ${data.inputDigest} -->
-  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="${main}"/></marker><marker id="arrow-worker" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="${worker}"/></marker></defs>
+  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="${main}"/></marker></defs>
   <rect width="1080" height="700" rx="16" fill="#F5F7F9"/>
   <g font-family="Arial, Helvetica, sans-serif" fill="#1B1D36">
     <text x="24" y="36" font-size="24" font-weight="700">Load what the task needs</text>
-    <text x="24" y="59" font-size="15">Cumulative instruction tokens. Each request takes one path; branches are not added together.</text>
+    <text x="24" y="59" font-size="15">New work follows synthesis. Stage references load progressively; legacy routes stay separate.</text>
     <g fill="none" stroke="${main}" stroke-width="2" marker-end="url(#arrow)">
-${arrows.join('\n')}
+      <path d="M352 128 H376"/><path d="M704 128 H728"/>
+      <path d="M892 176 V202 H188 V230"/><path d="M540 202 V230"/>
     </g>
-    <text x="164" y="356" font-size="14" fill="${worker}" font-weight="700">The coordinator hands each task a guide; a worker subagent reads only that file.</text>
-    <g fill="none" stroke="${worker}" stroke-width="2" stroke-dasharray="6 4">
-${trunk}
-${workers.join('\n')}
-    </g>
-    <text x="24" y="556" font-size="14" fill="${legacy}" font-weight="700">Kept for older callers: routed from the entry only when that work is asked for.</text>
+    <text x="24" y="356" font-size="14" fill="${stage}" font-weight="700">Each stage reads its own contract; independent review remains a separate invocation.</text>
+    <text x="24" y="556" font-size="14" fill="${legacy}" font-weight="700">Compatibility routes are loaded only when the existing work needs them.</text>
 ${rows.join('\n')}
   </g>
 </svg>

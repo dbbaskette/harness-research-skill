@@ -1,5 +1,7 @@
 # harness-research: one research component, three ways in
 
+> Historical design for 0.9. New-work architecture is specified in [Synthesis-first Harness Research](2026-10-17-synthesis-first.md). Existing runs retain their original contracts.
+
 Date: 2026-10-15. Status: draft 4, revised after the design review; the owner confirmed the aim and wants research kept with the work. Builds on
 [the run design](2026-10-15-research-with-agents-design.md).
 

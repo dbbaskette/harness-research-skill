@@ -1,0 +1,47 @@
+{
+  "version": "1.0.0-alpha.1",
+  "status": "local-development-acceptance-passed",
+  "published": false,
+  "base_commit": "c7c406eb8d1d97f72748909b68020882f10544dd",
+  "branch": "codex/synthesis-first",
+  "tested_state": "Base commit plus working-tree source files pinned by native/source-files.sha256; subsequent changes only documentation and preserved acceptance artifacts.",
+  "native": {
+    "tests": 148,
+    "passed": 148,
+    "failed": 0,
+    "skipped": 0,
+    "os": "macOS 27.0",
+    "node": "v22.23.2",
+    "python": "3.9.6",
+    "result": "PASS",
+    "installed_synthesis": "draft save/status/help passed",
+    "audit": "0 vulnerabilities",
+    "clone": "harness-research-test-20261017135421-15524-54c89c97",
+    "cleanup": "runner exit 0 and task-owned directory absence independently confirmed; cleanup log retains transient disk-info warnings"
+  },
+  "live": {
+    "case": "Valkey vs Redis, conditional Redis replacement",
+    "status": "complete",
+    "artifact_integrity": "verified",
+    "digest": "558c5b0e7701a43ccc333a5dc056022f4087e0a18dc6ec32f082e915ca3ace70",
+    "sources": 14,
+    "facts": 28,
+    "findings": 5,
+    "prose_blocks": 18,
+    "author": "/root/valkey_live_research",
+    "reviewer": "/root/valkey_evidence_review",
+    "review_objections": 0
+  },
+  "limitations": [
+    "One live case on the available Codex host, not a cross-model or cross-harness quality benchmark.",
+    "No Redis or Valkey application migration, restore drill or workload benchmark was performed.",
+    "No production deployment, active skill installation, publication, PR or release.",
+    "Structured downstream consumers need explicit schema-2 integration; Markdown handoff is available."
+  ],
+  "recorded_at": "2026-10-17T13:57:28.716983+00:00",
+  "subsequent_review": {
+    "objection": "newer-data-boundary conflated neighboring sentences with different edition scope despite initial approval",
+    "corrected_case": "valkey-redis-purpose",
+    "record": "purpose-refinement/README.md"
+  }
+}

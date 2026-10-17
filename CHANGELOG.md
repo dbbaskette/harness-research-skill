@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.0.0-alpha.1 — unreleased
+
+- Default absent, null or blank research purpose to general-purpose topic research; preserve explicit studio tasks and intended uses.
+
+- Add independently reviewed authored briefs that adapt their organization to the user's or studio's task; retain the legacy finding-view fallback.
+- Remove repetitive type labels from reader prose while keeping typed evidence, natural qualifications and explicit draft/review states. Document the studio task handoff and actual legacy adapter boundary.
+
+- Refine purpose-led investigation and synthesis: retain consequential specifics, explain examples and counterarguments, and review sentence-level source scope.
+- Expose readable supporting evidence and counterfacts in reusable briefs alongside qualifications; purpose remains ordinary language in the existing dossier contract.
+
+- Rebuild the default skill around Anthropic Knowledge Synthesis with progressive investigation, synthesis, review and reuse guidance.
+- Add a document-first evidence helper with digest-bound independent factual/semantic review and saved report, findings brief and evidence view.
+- Align comparisons by explicit criterion; preserve source snapshots, draft/revision/stale states and output ownership.
+- Keep the 0.9 queue/manual commands as legacy compatibility paths; introduce an explicit schema-2 consumer boundary.
+- Rewrite first-use docs and architecture; add a colorful README illustration and upstream attribution.
+- Acceptance and live Valkey/Redis results are recorded separately under docs/verification/1.0.0-alpha.1.
+
 ## 0.9.5 — 2026-10-16
 
 The README now shows a progressive disclosure map. No runtime behaviour changes.

@@ -1,0 +1,588 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/dbbaskette/harness-research-skill/blob/main/references/synthesis.schema.json",
+  "title": "Harness Research synthesis dossier, schema 2",
+  "description": "Agent-authored content. Runtime additionally validates references, quote existence, source permissions and safe paths. Semantic support requires independent review.",
+  "type": "object",
+  "required": [
+    "schema",
+    "topic",
+    "audience",
+    "scope",
+    "source_mode",
+    "sources",
+    "facts",
+    "findings",
+    "sections"
+  ],
+  "properties": {
+    "schema": {
+      "const": 2
+    },
+    "topic": {
+      "type": "string",
+      "minLength": 1
+    },
+    "audience": {
+      "type": "string",
+      "minLength": 1
+    },
+    "purpose": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "default": "General-purpose topic research",
+      "description": "Optional intended use or studio task. Omitted, null or blank values normalize to General-purpose topic research; explicit nonempty purpose is preserved."
+    },
+    "scope": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_mode": {
+      "enum": [
+        "public",
+        "selected",
+        "mixed"
+      ]
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/source"
+      }
+    },
+    "facts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/fact"
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/finding"
+      }
+    },
+    "sections": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/section"
+      },
+      "minItems": 1
+    },
+    "comparisons": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/comparison"
+      }
+    },
+    "brief": {
+      "description": "Optional purpose-shaped brief, authored in priority order. When omitted, the helper renders all findings. Every supplied block requires independent prose review.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/section"
+      },
+      "minItems": 1
+    }
+  },
+  "$defs": {
+    "statement": {
+      "type": "object",
+      "required": [
+        "text",
+        "refs",
+        "kind"
+      ],
+      "properties": {
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+          },
+          "uniqueItems": true
+        },
+        "kind": {
+          "enum": [
+            "summary",
+            "inference",
+            "recommendation",
+            "gap"
+          ]
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "id",
+        "file",
+        "origin",
+        "title",
+        "publisher",
+        "permission",
+        "context"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+        },
+        "file": {
+          "type": "string",
+          "minLength": 1
+        },
+        "origin": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "publisher": {
+          "type": "string",
+          "minLength": 1
+        },
+        "permission": {
+          "enum": [
+            "public",
+            "selected"
+          ]
+        },
+        "context": {
+          "enum": [
+            "full",
+            "partial"
+          ]
+        },
+        "context_note": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_date": {
+          "type": "string",
+          "minLength": 1
+        },
+        "accessed_at": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "original_file": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Project-relative selected original file when different from readable capture; binary formats accepted. Required when origin identifies an existing local file distinct from file."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "context": {
+                "const": "partial"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "context_note"
+            ]
+          }
+        }
+      ]
+    },
+    "fact": {
+      "type": "object",
+      "required": [
+        "id",
+        "statement",
+        "author",
+        "citations"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+        },
+        "statement": {
+          "type": "string",
+          "minLength": 1
+        },
+        "author": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+        },
+        "citations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "source",
+              "quote"
+            ],
+            "properties": {
+              "source": {
+                "type": "string",
+                "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+              },
+              "quote": {
+                "type": "string",
+                "minLength": 1
+              },
+              "locator": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "minItems": 1
+        }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "summary",
+        "support",
+        "counter",
+        "implications",
+        "conditions",
+        "gaps"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "summary": {
+          "$ref": "#/$defs/statement"
+        },
+        "support": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+          },
+          "uniqueItems": true,
+          "minItems": 1
+        },
+        "counter": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+          },
+          "uniqueItems": true
+        },
+        "implications": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/statement"
+          }
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/statement"
+          }
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/statement"
+          }
+        }
+      }
+    },
+    "section": {
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "blocks"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "blocks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/statement"
+          },
+          "minItems": 1
+        }
+      }
+    },
+    "comparison": {
+      "type": "object",
+      "required": [
+        "title",
+        "subjects",
+        "rows"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "subjects": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 2,
+          "uniqueItems": true
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "criterion",
+              "cells"
+            ],
+            "properties": {
+              "criterion": {
+                "type": "string",
+                "minLength": 1
+              },
+              "cells": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "subject",
+                    "text",
+                    "refs"
+                  ],
+                  "properties": {
+                    "subject": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "text": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "refs": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+                      },
+                      "uniqueItems": true,
+                      "minItems": 1
+                    }
+                  }
+                },
+                "minItems": 2
+              }
+            }
+          }
+        }
+      }
+    },
+    "review": {
+      "type": "object",
+      "required": [
+        "schema",
+        "digest",
+        "originals",
+        "facts",
+        "findings",
+        "prose",
+        "assessment"
+      ],
+      "properties": {
+        "schema": {
+          "const": 2
+        },
+        "digest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "originals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "source",
+              "sha256",
+              "read_original"
+            ],
+            "properties": {
+              "source": {
+                "type": "string",
+                "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "read_original": {
+                "type": "boolean"
+              },
+              "access_error": {
+                "type": "string",
+                "minLength": 1
+              },
+              "original_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$",
+                "description": "Required when source pins a separate original. read_original attests inspection of both original and readable capture."
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "read_original": {
+                      "const": false
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "access_error"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        "facts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "verdict",
+              "note"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "verdict": {
+                "enum": [
+                  "supported",
+                  "unsupported",
+                  "narrow"
+                ]
+              },
+              "note": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "verdict",
+              "note"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "verdict": {
+                "enum": [
+                  "supported",
+                  "unsupported",
+                  "narrow"
+                ]
+              },
+              "note": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "prose": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "verdict",
+              "note"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "verdict": {
+                "enum": [
+                  "supported",
+                  "unsupported",
+                  "narrow"
+                ]
+              },
+              "note": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "assessment": {
+          "type": "object",
+          "required": [
+            "coverage",
+            "usefulness",
+            "note"
+          ],
+          "properties": {
+            "coverage": {
+              "enum": [
+                "accurate",
+                "needs-revision"
+              ]
+            },
+            "usefulness": {
+              "enum": [
+                "adequate",
+                "needs-revision"
+              ]
+            },
+            "note": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    }
+  }
+}
