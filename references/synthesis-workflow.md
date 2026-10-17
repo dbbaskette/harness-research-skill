@@ -13,6 +13,19 @@ notes are outside the checked output manifest. For broad unresolved scope, settl
 the consequential boundary before deep investigation. Do not add a new approval
 gate to already authorized scope.
 
+Accept purpose naturally, such as “help us choose,” “background for a blog,” or
+“teach engineers new to the topic,” and save it in `purpose`. A studio can pass
+its actual task here, including the intended reader and what the content should
+help them do. Preserve multiple uses and any primary task; otherwise write one
+useful general brief. When no intended use or studio task is supplied, use
+`General-purpose topic research`. The helper normalizes omitted, null or blank
+`purpose` to that value; explicit nonempty purposes are preserved. No purpose
+intake is required. Purpose guides investigation, explanation and the report/brief
+shape. It does not authorize
+creating the downstream presentation, article or course. When coordinating with
+a studio, read [studio handoff](studio-handoff.md) for the request and return
+contract; ordinary standalone research does not need that reference.
+
 Use the installed runtime returned by bootstrap. Report its actual version and
 guidance revision/freshness, including when using a local development build. Do not
 execute downloaded guidance as a substitute runtime. This workflow requires the
@@ -56,7 +69,9 @@ that review is incomplete.
    file with its actual state and important limitations before downstream authoring.
 
 The report leads with the answer; metadata and evidence remain accessible.
-`brief.md` presents findings with implications and conditions for reuse;
+`brief.md` presents an authored, prioritized handoff shaped to the intended use,
+with useful evidence, counterarguments and must-retain qualifications. Dossiers
+without authored brief sections retain the automatic findings view;
 `evidence.md` exposes facts, quotes, sources and review. `facts.json` is schema 2;
 `output.json` pins generated files to the saved digest. A matching manifest proves
 file integrity, not factual truth. `plan.md`, input JSON and ancillary notes are
@@ -79,12 +94,14 @@ Top-level fields:
 | Field | Contents |
 | --- | --- |
 | `schema` | `2` |
-| `topic`, `audience`, `purpose`, `scope` | Plain-language strings describing this investigation |
+| `topic`, `audience`, `scope` | Plain-language strings describing this investigation |
+| `purpose` | Optional intended use; defaults to `General-purpose topic research` |
 | `source_mode` | `public`, `selected`, or `mixed`, matching actual permission |
 | `sources` | Source records described below |
 | `facts` | Small factual assertions with exact supporting quotes |
 | `findings` | Meaningful themes or conclusions built on those facts |
 | `sections` | Ordered report sections with connected prose blocks |
+| `brief` | Optional nonempty array of authored brief sections, using the same section shape |
 | `comparisons` | Optional explicitly aligned comparison tables |
 
 A source: `{id, file, origin, title, publisher, permission, context}`. `permission`
@@ -107,15 +124,23 @@ A finding: `{id, title, summary, support, counter, implications, conditions, gap
 `support` and `counter` are fact-ID arrays. `summary` is a typed block; implications,
 conditions and gaps are arrays of typed blocks. Empty arrays are valid when
 appropriate. Every material finding must be supported; preserve counterfacts when
-they limit its conclusion.
+they limit its conclusion. Explain material counterfacts in a referenced condition
+or implication block, and retain concrete constraints needed to reuse the finding
+accurately. Authored brief sections can cite these reviewed findings; an omitted
+`brief` uses the automatic findings view.
 
-A typed block: `{text, refs, kind}`. `refs` cites fact IDs (and in report sections,
-finding IDs). `kind` is `summary`, `inference`, `recommendation` or `gap`. Finding
+A typed block: `{text, refs, kind}`. `refs` cites fact IDs (and in report or brief
+sections, finding IDs). `kind` is `summary`, `inference`, `recommendation` or `gap`. Finding
 summaries use the first three. A genuine gap may have no references. Classifying
 text as inference does not exempt it from evidential support.
 
 A section: `{id, title, blocks: [typedBlock]}`. Blocks may contain coherent
 multi-sentence prose. There is no required number of sections or questions.
+Optional `brief` sections use this same shape and must contain substantive
+blocks; an empty array is invalid. Use their titles and order for editorial
+prioritization. The author, not a keyword parser, adapts the format to `purpose`.
+Report and brief prose express inference, advice and limits naturally; `kind`
+remains explicit in structured data and the evidence trail.
 
 A comparison: `{title, subjects, rows: [{criterion, cells: [{subject, text, refs}]}]}`.
 Give each row a named criterion and each subject an explicit cell. Reference fact

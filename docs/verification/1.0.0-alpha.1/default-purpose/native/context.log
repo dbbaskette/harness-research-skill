@@ -1,0 +1,38 @@
+
+> harness-research-skill@1.0.0-alpha.1 context:check
+> node tools/context-usage.mjs --check
+
+{
+  "routes": {
+    "Discovery metadata": 36,
+    "Installed bootstrap": 574,
+    "Bootstrap + current guidance entry": 1242,
+    "Investigator stage": 1017,
+    "Synthesis writer stage": 1547,
+    "Independent reviewer stage": 1330,
+    "New synthesis: coordinator entry and workflow": 3773,
+    "New synthesis: all stages in one context": 7667,
+    "Synthesis resume, verify or refresh": 2132,
+    "Optional studio task handoff": 4474,
+    "Legacy 0.9 queued coordinator": 4973,
+    "Legacy 0.9 reuse or refresh": 2025,
+    "Legacy explicit chat-only answer": 2202,
+    "Legacy manual saved research": 3393,
+    "Legacy manual status or resume": 1803,
+    "Legacy comparative routing only": 1955,
+    "Legacy Codex comparative outline": 2915,
+    "Legacy Codex add items": 2120,
+    "Legacy Codex add fields": 2140,
+    "Legacy Codex deep results": 2803,
+    "Legacy Codex deep results + saved evidence": 3994,
+    "Legacy Claude comparative outline": 2932,
+    "Legacy Claude deep results": 2825,
+    "Investigation + general web strategy": 5287,
+    "Investigation + academic strategy": 5379,
+    "Investigation + GitHub strategy": 5174,
+    "Investigation + technical Q&A strategy": 5079,
+    "Investigation + Chinese sources strategy": 5304,
+    "Legacy migration": 1597
+  },
+  "inputDigest": "13dc8cbb2aeae3993ad91c7117c6af4f0ce7f07358f02b1911941d48b0d5f17a"
+}

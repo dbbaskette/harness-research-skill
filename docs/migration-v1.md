@@ -32,8 +32,9 @@ evidence. Reused material needs an honest review of its applicability and curren
 ## Consumer integrations
 
 Markdown consumers can start with `report.md` and `brief.md`, following evidence
-links for material assertions. They should preserve interpretation labels,
-conditions and unknowns through each transformation.
+links for material assertions. Preserve the distinction between facts and
+interpretations through natural qualifications and the typed evidence trail;
+conditions and unknowns must survive each transformation.
 
 Structured readers must inspect the owner and schema. Schema 2 is not a renamed
 schema 1, and legacy question IDs are not automatically finding IDs. The old
@@ -42,6 +43,18 @@ Training Studio's legacy-record adapter therefore needs deliberate migration;
 existing old-format runs continue to work as before. Blog and presentation
 workflows must likewise explicitly choose the new input contract rather than
 assuming every installed consumer already supports it.
+
+Pass the actual studio task in the new dossier's free-text `purpose`, with
+`audience`, `scope` and `source_mode` preserved separately. Do not put this task in
+a legacy plan's `purpose`: callers may restrict that field to `planning` or
+`fact-check`. See the [task handoff](../references/studio-handoff.md). Current
+studio adapters still use that legacy contract and require migration.
+
+Dossiers may include authored `brief` sections. Their prose is independently
+reviewed with IDs `brief:SECTION_ID:INDEX`; old dossiers without that field keep
+the generated finding view. Structured exports use `brief: null` for that absence.
+Do not copy that null into an authored dossier: omit `brief` or provide nonempty
+sections. A consumer must not treat the brief as a complete evidence inventory.
 
 A schema-2 adapter should:
 

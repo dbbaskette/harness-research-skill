@@ -1,0 +1,21 @@
+{
+  "version": "1.0.0-alpha.1",
+  "base_commit": "16582ce46e52036f51133ad057a5cc7ab8ddc0f2",
+  "tested_tree": "Working tree pinned by native/source-files.sha256",
+  "matching_runtime_test_guidance_files": 55,
+  "default_purpose": "General-purpose topic research",
+  "native": {
+    "passed": 156,
+    "failed": 0,
+    "skipped": 0,
+    "result": "PASS",
+    "os": "macOS 27.0",
+    "node": "22.23.2",
+    "python": "3.9.6",
+    "vm": "harness-research-test-20261017180038-44689-45bb85f3",
+    "cleanup": "Runner exit 0; task-owned VM directory absent; base VM preserved"
+  },
+  "active_installation_updated": false,
+  "published": false,
+  "recorded_at": "2026-10-17T18:02:44.660315+00:00"
+}

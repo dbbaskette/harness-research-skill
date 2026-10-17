@@ -1,0 +1,158 @@
+{
+  "owner": "harness-research-synthesis",
+  "schema": 2,
+  "digest": "e8a133e144f994f7da0c4584dc41d38fa71f2aab857aeac25f31180d3cdbe42d",
+  "status": "needs-revision",
+  "topic": "ExampleStore migration constraints",
+  "audience": "Platform engineers",
+  "purpose": "Understand documented migration boundaries before selecting a path",
+  "scope": "Supplied synthetic guide only; no real product claims",
+  "source_mode": "selected",
+  "sources": [
+    {
+      "id": "src-guide",
+      "file": "source.md",
+      "origin": "source.md",
+      "title": "ExampleStore migration guide",
+      "publisher": "Synthetic test fixture",
+      "permission": "selected",
+      "context": "full",
+      "sha256": "ecd172544e456cb267f47644f484672a80a014056b0ef12102d738efc959a300",
+      "snapshot": "research/sources/revisions/ecd172544e456cb267f47644f484672a80a014056b0ef12102d738efc959a300.txt"
+    }
+  ],
+  "facts": [
+    {
+      "id": "file-boundary",
+      "statement": "Community Edition 4 and later snapshot files cannot be read by Loader.",
+      "author": "fixture-author",
+      "citations": [
+        {
+          "source": "src-guide",
+          "quote": "Community Edition 4 and later produce snapshot files that Loader cannot read."
+        }
+      ]
+    },
+    {
+      "id": "transfer-method",
+      "statement": "The guide says Community Edition 4 datasets may be transferred using a custom adapter.",
+      "author": "fixture-author",
+      "citations": [
+        {
+          "source": "src-guide",
+          "quote": "Community Edition 4 and later produce snapshot files that Loader cannot read.\nEnterprise Edition datasets may be transferred using a custom adapter; that process is outside this guide."
+        }
+      ]
+    },
+    {
+      "id": "client-boundary",
+      "statement": "Wire-protocol connection support does not guarantee identical transaction semantics.",
+      "author": "fixture-author",
+      "citations": [
+        {
+          "source": "src-guide",
+          "quote": "Existing wire-protocol clients can connect to Loader 2. This does not guarantee identical transaction semantics."
+        }
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "migration-path",
+      "title": "A path for newer editions",
+      "summary": {
+        "text": "Community Edition 4 requires an adapter instead of snapshot loading.",
+        "kind": "summary",
+        "refs": [
+          "file-boundary",
+          "transfer-method"
+        ]
+      },
+      "support": [
+        "file-boundary",
+        "transfer-method"
+      ],
+      "counter": [],
+      "implications": [],
+      "conditions": [],
+      "gaps": []
+    }
+  ],
+  "sections": [
+    {
+      "id": "decision",
+      "title": "Migration approach",
+      "blocks": [
+        {
+          "text": "The guide documents a custom adapter path for Community Edition 4.",
+          "kind": "summary",
+          "refs": [
+            "transfer-method"
+          ]
+        },
+        {
+          "text": "Connection success alone does not demonstrate transaction equivalence.",
+          "kind": "summary",
+          "refs": [
+            "client-boundary"
+          ]
+        }
+      ]
+    }
+  ],
+  "comparisons": [],
+  "review": {
+    "schema": 2,
+    "digest": "e8a133e144f994f7da0c4584dc41d38fa71f2aab857aeac25f31180d3cdbe42d",
+    "originals": [
+      {
+        "source": "src-guide",
+        "sha256": "ecd172544e456cb267f47644f484672a80a014056b0ef12102d738efc959a300",
+        "read_original": true
+      }
+    ],
+    "facts": [
+      {
+        "id": "file-boundary",
+        "verdict": "supported",
+        "note": "The complete source explicitly states that Community Edition 4 and later snapshot files cannot be read by Loader. The exact quotation and edition boundary match."
+      },
+      {
+        "id": "transfer-method",
+        "verdict": "unsupported",
+        "note": "The quote exists, but its second sentence concerns Enterprise Edition datasets, not Community Edition 4. The adjacent Community Edition sentence only establishes snapshot incompatibility. The source supplies no adapter transfer path for Community Edition 4 and says the Enterprise adapter process is outside the guide."
+      },
+      {
+        "id": "client-boundary",
+        "verdict": "supported",
+        "note": "The source explicitly distinguishes existing wire-protocol clients connecting to Loader 2 from a guarantee of identical transaction semantics. This fact fairly preserves that limitation in the supplied guide's context."
+      }
+    ],
+    "findings": [
+      {
+        "id": "migration-path",
+        "verdict": "unsupported",
+        "note": "The claimed requirement for a Community Edition 4 adapter does not follow from snapshot incompatibility. The only adapter statement concerns Enterprise Edition and says datasets may be transferred, not that an adapter is required. The finding and brief must distinguish editions, preserve the outside-this-guide qualification, and identify a Community Edition 4 transfer path as unspecified by this source."
+      }
+    ],
+    "prose": [
+      {
+        "id": "decision:0",
+        "verdict": "unsupported",
+        "note": "The guide does not document a custom adapter path for Community Edition 4. The supporting fact misattributes Enterprise Edition's qualified possibility to Community Edition 4; additionally, the guide explicitly excludes the adapter process from its coverage."
+      },
+      {
+        "id": "decision:1",
+        "verdict": "supported",
+        "note": "This accurately summarizes the source's explicit warning that connecting existing wire-protocol clients to Loader 2 does not guarantee identical transaction semantics."
+      }
+    ],
+    "assessment": {
+      "coverage": "needs-revision",
+      "usefulness": "needs-revision",
+      "note": "The report and brief cannot support path selection because their central conclusion conflates Community and Enterprise editions. The source explicitly offers Community Edition 3 snapshot loading with Loader 2, but that usable path is absent from both synthesis outputs and the fact set. The report should explain the Community Edition 4-and-later snapshot boundary, the absence of a specified alternative path for those datasets in this guide, and the separate Enterprise adapter possibility with its process outside scope. Preserve the supported Loader 2 transaction-semantics qualification in the brief as well as the report. These are meaningful documented boundaries already available in the selected source, not a request for outside research. Review inspected the complete original source.md, pinned capture, dossier, report, brief and evidence; conclusions are limited to the supplied synthetic guide. No real product or live currency claim is made."
+    },
+    "worker": "scope-checker",
+    "accepted": false
+  }
+}

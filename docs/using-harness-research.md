@@ -9,8 +9,12 @@ be selected explicitly; the installed bootstrap continues to select stable relea
 ## Begin with what you need to understand
 
 Tell your agent the topic, audience and purpose, plus any source restrictions.
-The skill infers reasonable framing when these are clear and asks only when
-missing information would materially change the investigation.
+The skill accepts purpose in ordinary language: “help us choose,” “background for
+a blog,” or “teach this to new engineers.” It infers reasonable framing from your
+request and asks only when missing information would materially change the
+investigation. With no intended use or studio task, the default is **general-purpose topic
+research**: key concepts, findings, perspectives, practical implications and
+uncertainties, organized for understanding rather than a specific content format.
 
 ```text
 Use the skill at /absolute/path/to/harness-research-skill/SKILL.md with its
@@ -21,7 +25,16 @@ which dependencies make it harder, and what to test before switching.
 
 You can specify a concise brief or a deeper investigation. Depth changes the
 amount of useful investigation, not a compulsory source or question count.
-An agreed brief from another content skill can supply the audience and purpose.
+Purpose also changes the explanation: a decision needs concrete constraints and
+the strongest case for alternatives; a blog needs mechanisms and counterarguments;
+training may need a worked example and common misconceptions. Examples derived
+for teaching are labeled illustrative rather than presented as tested results.
+The report and brief can change shape as well: a presentation task can emphasize
+key messages and evidence worth visualizing; a training task can sequence concepts.
+These are flexible emphases, not mandatory templates. An agreed brief from another
+content skill can supply the audience and purpose. If you name multiple uses,
+specify a primary one when it matters; otherwise research produces one useful
+general brief rather than a separate deliverable for each use.
 The research request does not authorize publication, migration or deployment.
 
 ## Choose the source boundary
@@ -42,11 +55,18 @@ execution: your host and model provider determine how documents are processed.
 
 Open `research/report.md`. A useful report leads with its answer and important
 findings, then explains the evidence, implications, counter-evidence and limits.
-Comparison tables use named criteria and explicitly identify missing information.
+When useful, comparison tables use named criteria and explicitly identify missing
+information. Comparisons examine the strongest supported case for alternatives,
+including staying with the current option, without forcing equal source counts.
 The shape varies with the request; an explanatory article need not mimic a
 product comparison or a checklist of research questions.
 
-`research/brief.md` is the short handoff. `research/evidence.md` contains the
+`research/brief.md` is the short editorial handoff, ordered for the stated task.
+It leads with the most consequential takeaways and selects useful evidence,
+material counterarguments, qualifications to retain when shortening the message,
+and unresolved gaps. There is no compulsory number of takeaways. The full fact
+inventory stays in the evidence appendix. Older dossiers without authored brief
+sections keep their automatic findings view. `research/evidence.md` contains the
 inspectable facts and source passages. `facts.json` and `output.json` serve
 compatible structured consumers; their schema and hashes matter when moving or
 reusing the work. Saved files are the deliverable, not a promise to write later.
@@ -101,14 +121,36 @@ Live refresh requires the agent to read permitted originals again.
 
 ## Feed presentations, blogs and training
 
-Give the next skill the report and brief, preserving access to the evidence.
-A finding can suggest a slide message; a mechanism can anchor a blog explanation;
-a distinction can inform a lesson. The content skill remains responsible for its
-own structure, voice, examples and learning outcomes.
+A studio can send its actual task in natural language instead of asking research
+to guess how its output will be used. For example:
+
+```text
+Research Valkey versus Redis for a 20-minute technical presentation to application
+architects considering Redis replacement. Help the audience distinguish practical
+migration candidates from workloads that need a deeper compatibility assessment.
+Prioritize the key messages and evidence we could explain visually, keeping
+version and workload qualifications beside each takeaway. Use public primary
+sources. Return the saved research report and brief for presentation authoring.
+```
+
+Research records that task in `purpose`, with the audience, scope and source
+permissions in their existing fields. It adapts the report and brief through
+editorial judgment; no format code, keyword parser or mandatory intake form is
+needed. A blog or training studio can pass its own task in the same way.
+
+Give the next skill paths to the report and brief, access to the evidence, the
+actual status and the saved digest from `research/output.json`. A presentation
+can use the key messages; a blog can develop the mechanism; training can build
+on the concept sequence. The content skill remains responsible for its structure,
+voice and learning outcomes. The [studio handoff reference](../references/studio-handoff.md)
+describes the request and artifact return contract.
 
 Keep hypothetical examples labeled. Do not turn an inference into an asserted
-fact, or cite the generated report as a second independent source. Consumers
-using structured data need a deliberate [schema-2 integration](migration-v1.md).
+fact, or cite the generated report as a second independent source. This request
+contract does not automatically wire installed studios to the new runtime.
+Existing adapters using legacy planning/recording commands must be migrated
+explicitly; consumers using structured data need a deliberate
+[schema-2 integration](migration-v1.md).
 
 ## Existing research and recovery
 

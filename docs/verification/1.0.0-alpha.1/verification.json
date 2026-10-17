@@ -38,5 +38,10 @@
     "No production deployment, active skill installation, publication, PR or release.",
     "Structured downstream consumers need explicit schema-2 integration; Markdown handoff is available."
   ],
-  "recorded_at": "2026-10-17T13:57:28.716983+00:00"
+  "recorded_at": "2026-10-17T13:57:28.716983+00:00",
+  "subsequent_review": {
+    "objection": "newer-data-boundary conflated neighboring sentences with different edition scope despite initial approval",
+    "corrected_case": "valkey-redis-purpose",
+    "record": "purpose-refinement/README.md"
+  }
 }

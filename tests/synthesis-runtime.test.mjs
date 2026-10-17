@@ -21,6 +21,33 @@ test('draft -> independent checked report; hashes and criterion-aligned output; 
   await writeFile(join(f.project,'research/report.md'),'damaged derived output'); const repaired = await f.status(); assert.equal(repaired.artifact_integrity,'repaired'); assert.ok(repaired.regenerated_files.includes('research/report.md')); assert.equal((await f.status()).artifact_integrity,'verified'); assert.match(await readFile(join(f.project,'research/report.md'),'utf8'),/Reviewed synthesis/);
   const manifest = JSON.parse(await readFile(join(f.project,'research/output.json'),'utf8')); assert.equal(manifest.artifacts.length,5); assert.ok(manifest.artifacts.some(a=>a.file.startsWith('sources/revisions/')));
 });
+test('reusable brief carries readable evidence, authored counterargument, qualifications and purpose',async t=>{
+  const f=await fixture(t);
+  f.dossier.purpose='Prepare operator training with illustrative examples.';
+  f.dossier.facts.push({id:'fact-b',statement:'Exceptions depend on workload.',author:'researcher',citations:[{source:'source-a',quote:'Exceptions depend on workload.'}]});
+  Object.assign(f.dossier.findings[0],{
+    summary:{text:'Treat the documented default as a starting point.',kind:'inference',refs:['fact-a','fact-b']},
+    counter:['fact-b'],
+    conditions:[{text:'Workload exceptions limit any recommendation to keep the default.',kind:'inference',refs:['fact-b']},{text:'Illustrative example: compare the default with an exception before choosing; this is not a measured result.',kind:'inference',refs:['fact-a','fact-b']}],
+    gaps:[{text:'The intended workload has not been measured.',kind:'gap',refs:[]}]
+  });
+  const draft=await f.save(); await f.review(draft);
+  const brief=await readFile(join(f.project,'research/brief.md'),'utf8');
+  assert.ok(brief.includes(f.dossier.purpose));
+  for (const fact of f.dossier.facts) assert.ok(brief.includes(`- ${fact.statement} ([${fact.id}](evidence.md#${fact.id}))`),`Readable linked evidence for ${fact.id}`);
+  for (const block of [...f.dossier.findings[0].conditions,...f.dossier.findings[0].implications,...f.dossier.findings[0].gaps]) {
+    assert.ok(brief.includes(block.text), 'Preserve authored meaning, qualifications and examples');
+    for (const ref of block.refs) assert.ok(brief.includes(`[${ref}](evidence.md#${ref})`));
+  }
+  assert.ok(brief.includes('Illustrative example:'),'Preserve authored qualification without procedural prefixes');
+  assert.ok(!brief.includes('**Interpretation:**'));
+  const facts=JSON.parse(await readFile(join(f.project,'research/facts.json'),'utf8'));
+  assert.deepEqual(facts.findings,f.dossier.findings);
+  f.dossier.purpose='Prepare a migration decision instead of training.';
+  const revised=await f.save(); assert.equal(revised.status,'draft'); assert.notEqual(revised.digest,draft.digest);
+  await assert.rejects(f.review(draft),/stale/);
+  for (const name of ['report.md','brief.md','facts.json']) assert.ok((await readFile(join(f.project,'research',name),'utf8')).includes(f.dossier.purpose));
+});
 test('reject unsupported references and source quotes before state persists',async t=>{
   const f=await fixture(t); f.dossier.sections[0].blocks[0].refs=['unknown']; await assert.rejects(f.save(),/unknown references/);
   f.dossier.sections[0].blocks[0].refs=['fact-a']; f.dossier.facts[0].citations[0].quote='Invented'; await assert.rejects(f.save(),/Exact quote not found/);
@@ -109,4 +136,114 @@ test('synthesis waits on the shared research lock used by legacy mutations',asyn
   const f=await fixture(t); await mkdir(join(f.project,'.harness-research')); await writeFile(join(f.project,'.harness-research/research.lock'),String(process.pid)); const before=process.env.HARNESS_RESEARCH_LOCK_WAIT_MS; process.env.HARNESS_RESEARCH_LOCK_WAIT_MS='10';
   try { await assert.rejects(f.save(),/Research storage is busy/); } finally { if (before===undefined) delete process.env.HARNESS_RESEARCH_LOCK_WAIT_MS; else process.env.HARNESS_RESEARCH_LOCK_WAIT_MS=before; }
   await assert.rejects(readFile(join(f.project,'.harness-research/synthesis.json')),/ENOENT/);
+});
+
+
+test('authored brief preserves priority, all sections, fact/finding refs and typed audit without procedural reader labels',async t=>{
+  const f=await fixture(t);
+  f.dossier.brief=[
+    {id:'decision',title:'Lead with the consequence',blocks:[{text:'For this workload, evaluate the default before committing.',kind:'recommendation',refs:['finding-a','fact-a']}]},
+    {id:'example',title:'Explain through an example',blocks:[{text:'Illustrative example: the default could be a starting point, not a measured outcome.',kind:'inference',refs:['fact-a']}]},
+    {id:'qualification',title:'Keep the exception',blocks:[{text:'The intended workload remains unmeasured.',kind:'gap',refs:[]}]},
+    {id:'support',title:'Evidence for the author',blocks:[{text:'The default is 10.',kind:'summary',refs:['fact-a']}]}
+  ];
+  f.dossier.sections[0].blocks.push(...f.dossier.brief.flatMap(s=>s.blocks));
+  const draft=await f.save();
+  const briefIds=draft.review_template.prose.filter(p=>p.id.startsWith('brief:')).map(p=>p.id);
+  assert.deepEqual(briefIds,['brief:decision:0','brief:example:0','brief:qualification:0','brief:support:0']);
+  assert.ok(draft.review_template.prose.some(p=>p.id==='decision:0'),'Report and brief section IDs cannot collide');
+  assert.equal((await f.review(draft)).status,'complete');
+  const brief=await readFile(join(f.project,'research/brief.md'),'utf8');
+  let last=-1;
+  for (const section of f.dossier.brief) {
+    const position=brief.indexOf(`## ${section.title}`); assert.ok(position>last); last=position;
+    for (const block of section.blocks) { assert.ok(brief.includes(block.text)); for (const id of block.refs) assert.ok(brief.includes(`[${id}](evidence.md#${id})`)); }
+  }
+  assert.ok(!brief.includes('## A conditional choice'),'Authored brief replaces automatic finding inventory');
+  const report=await readFile(join(f.project,'research/report.md'),'utf8');
+  for (const publicText of [brief,report]) assert.doesNotMatch(publicText,/\*\*(Interpretation|Conditional recommendation|Open question|Summary):\*\*|Source hashes/);
+  const evidence=await readFile(join(f.project,'research/evidence.md'),'utf8');
+  for (const label of ['Interpretation','Conditional recommendation','Open question','Summary']) assert.ok(evidence.includes(`**${label}:**`));
+  assert.match(evidence,/Source hashes establish capture integrity/);
+  const facts=JSON.parse(await readFile(join(f.project,'research/facts.json'),'utf8'));
+  assert.deepEqual(facts.brief,f.dossier.brief); assert.deepEqual(facts.sections,f.dossier.sections);
+});
+
+test('authored brief requires complete independent review and unsupported prose prevents completion',async t=>{
+  const f=await fixture(t);
+  f.dossier.brief=[{id:'lead',title:'Lead',blocks:[{text:'The default is 10.',kind:'summary',refs:['fact-a']}]}];
+  const draft=await f.save();
+  await assert.rejects(f.review(draft,'checker',r=>r.prose=r.prose.filter(p=>!p.id.startsWith('brief:'))),/cover each prose/);
+  await assert.rejects(f.review(draft,'checker',r=>r.prose.find(p=>p.id==='brief:lead:0').id='brief:invented:0'),/Missing review brief:lead:0/);
+  assert.equal((await f.review(draft,'checker',r=>r.prose.find(p=>p.id==='brief:lead:0').verdict='unsupported')).status,'needs-revision');
+  for (const file of ['report.md','brief.md']) assert.match(await readFile(join(f.project,'research',file),'utf8'),/Needs revision — independent review identified issues/);
+  assert.equal((await f.review(draft)).status,'complete');
+  f.dossier.brief[0].blocks[0].text='The documented default is 10.';
+  const changed=await f.save(); assert.notEqual(changed.digest,draft.digest); assert.equal(changed.status,'draft');
+  await assert.rejects(f.review(draft),/stale/);
+});
+
+test('brief draft and stale status stay explicit without technical integrity banners',async t=>{
+  const f=await fixture(t);
+  f.dossier.brief=[{id:'lead',title:'Lead',blocks:[{text:'The default is 10.',kind:'summary',refs:['finding-a']}]}];
+  const draft=await f.save();
+  for (const file of ['report.md','brief.md']) assert.match(await readFile(join(f.project,'research',file),'utf8'),/Draft — independent review is pending/);
+  await f.review(draft); await writeFile(join(f.project,'source.txt'),'Evidence changed');
+  assert.equal((await f.status()).status,'stale');
+  for (const file of ['report.md','brief.md']) assert.match(await readFile(join(f.project,'research',file),'utf8'),/Stale — evidence has changed or is unavailable/);
+});
+
+test('omitted authored brief retains every finding and explicitly exports its absence',async t=>{
+  const f=await fixture(t);
+  for (let i=1;i<5;i++) f.dossier.findings.push({...structuredClone(f.dossier.findings[0]),id:`finding-${i}`,title:`Additional finding ${i}`});
+  await f.save();
+  const brief=await readFile(join(f.project,'research/brief.md'),'utf8');
+  for (const finding of f.dossier.findings) assert.ok(brief.includes(`## ${finding.title}`));
+  assert.equal(JSON.parse(await readFile(join(f.project,'research/facts.json'),'utf8')).brief,null);
+});
+
+test('malformed authored briefs fail before writing state',async t=>{
+  const f=await fixture(t);
+  const section={id:'lead',title:'Lead',blocks:[{text:'The default is 10.',kind:'summary',refs:['fact-a']}]};
+  for (const [brief,error] of [
+    [null,/brief must be an array/],[{},/brief must be an array/],[[],/at least one section/],
+    [[section,section],/Duplicate brief section ID/],
+    [[{...section,id:'brief:lead'}],/brief section ID/],
+    [[{...section,title:''}],/title/],
+    [[{...section,blocks:[]}],/Brief sections need blocks/],
+    [[{...section,blocks:[{text:'Unsupported',kind:'summary',refs:['missing']}]}],/unknown references/],
+    [[{...section,blocks:[{text:'Source refs are not fact support',kind:'summary',refs:['source-a']}]}],/unknown references/],
+    [[{...section,blocks:[{text:'Missing support',kind:'summary',refs:[]}]}],/supporting references/],
+    [[{...section,blocks:[{text:'Bad kind',kind:'opinion',refs:['fact-a']}]}],/kind must be/]
+  ]) { f.dossier.brief=brief; await assert.rejects(f.save(),error); }
+  await assert.rejects(readFile(join(f.project,'.harness-research/synthesis.json')),/ENOENT/);
+});
+
+test('authored extras cannot override collision-safe review identities',async t=>{
+  const f=await fixture(t);
+  f.dossier.sections[0].blocks[0].id='brief:lead:0';
+  f.dossier.brief=[{id:'lead',title:'Lead',blocks:[{id:'decision:0',text:'The default is 10.',kind:'summary',refs:['fact-a']}]}];
+  f.dossier.comparisons[0].rows[0].cells[0].id='decision:0';
+  const draft=await f.save();
+  assert.deepEqual(draft.review_template.prose.map(p=>p.id),['decision:0','brief:lead:0','comparison:0:0:0','comparison:0:0:1']);
+  assert.equal((await f.review(draft)).status,'complete');
+});
+
+test('missing purpose defaults to general topic research and explicit studio tasks remain intact',async t=>{
+  const f=await fixture(t);
+  delete f.dossier.purpose;
+  const initial=await f.save();
+  const expected='General-purpose topic research';
+  for (const name of ['report.md','brief.md','facts.json']) assert.ok((await readFile(join(f.project,'research',name),'utf8')).includes(expected));
+  const stored=JSON.parse(await readFile(join(f.project,'.harness-research/synthesis.json'),'utf8'));
+  assert.equal(stored.dossier.purpose,expected);
+  for (const value of [null,'','   ',expected]) {
+    f.dossier.purpose=value;
+    const saved=await f.save(); assert.equal(saved.digest,initial.digest,'Absent purpose and explicit default have the same saved meaning');
+  }
+  f.dossier.purpose='Support a 20-minute presentation for platform engineers';
+  const custom=await f.save(); assert.notEqual(custom.digest,initial.digest);
+  const exported=JSON.parse(await readFile(join(f.project,'research/facts.json'),'utf8'));
+  assert.equal(exported.purpose,f.dossier.purpose);
+  f.dossier.purpose=42; await assert.rejects(f.save(),/purpose/);
 });

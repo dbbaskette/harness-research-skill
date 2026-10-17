@@ -1,0 +1,239 @@
+Redis benchmark | Docs (https://redis.io/docs/latest/operate/oss_and_stack/management/optimization/benchmarks/)
+citeturn38view0 [wordlim: 200] Crawled: today; Content type: text/html; Source: open({"ref_id":"https://redis.io/docs/latest/operate/oss_and_stack/management/optimization/benchmarks/","lineno":null}); Total lines: 306
+L0: {"categories":["docs","operate","stack","oss"],"description":"Use the redis-benchmark utility on a Redis server","duplicateOf":"head:data-ai-metadata","location":"body","title":"Redis benchmark","tableOfContents":{"sections":[{"id":"how-fast-is-redis","title":"How fast is Redis?"},{"id":"running-only-a-subset-of-the-tests","title":"Running only a subset of the tests"},{"id":"selecting-the-size-of-the-key-space","title":"Selecting the size of the key space"},{"id":"using-pipelining","title":"Using pipelining"},{"id":"pitfalls-and-misconceptions","title":"Pitfalls and misconceptions"},{"id":"factors-impacting-redis-performance","title":"Factors impacting Redis performance"},{"id":"other-things-to-consider","title":"Other things to consider"},{"id":"benchmark-results-on-bare-metal-servers-across-different-redis-versions","title":"Benchmark results on bare-metal servers across different Redis versions"},{"id":"other-redis-benchmarking-tools","title":"Other Redis benchmarking tools"}]},"codeExamples":[]}
+L1: cite0†iframe†www.googletagmanager.com L2: 
+L3: Open search Open main menu
+L4: 
+L5:   * cite1†Redis Iris L6: 
+L7:   * cite2†Redis install L8: 
+L9:   * cite3†Data types L10: 
+L11:   * cite4†Tools L12: 
+L13:   * cite5†Community L14: 
+L15:   * cite6†Docs L16: 
+L17:   * cite7†Sign up L18:   * cite8†Login†cloud.redis.io L19: 
+L20: cite9†Develop with Redis cite10†Libraries and tools cite11†Redis products L21: 
+L22:   * cite12†Redis Software L23: 
+L24: latest ▼ ▲
+L25: 
+L26: cite12†latest cite13†v8.0 cite14†v7.22 cite15†v7.8 cite16†v7.4 L27: 
+L28:   * cite17†Redis Cloud L29:   * cite18†Redis for Kubernetes L30: 
+L31: latest ▼ ▲
+L32: cite18†latest cite19†v8.0.18 cite20†v8.0 cite21†v7.22 cite22†v7.8.6 cite23†v7.8.4 cite24†v7.4.6 L33:   * cite5†Redis Open Source L34:     * cite25†Install and upgrade L35:     * cite26†Manage Redis L36:       * cite27†Administration L37:       * cite28†Security L38:       * cite29†Configuration L39:       * cite30†High availability with Sentinel L40:       * cite31†Replication L41:       * cite32†Scale with Redis Cluster L42:       * cite33†Persistence L43:       * cite34†Optimization L44:         * cite35†Benchmarking L45:         * cite36†CPU profiling L46:         * cite37†Latency diagnosis L47:         * cite38†Latency monitoring L48:         * cite39†Memory optimization L49:       * cite40†Troubleshooting L50:       * cite41†Debugging L51:     * cite42†Redis Open Source and Redis Software L52:     * cite43†Reference L53:   * cite44†Redis Iris context engine L54:   * cite45†Redis Radar L55:   * cite46†Redis Feature Form L56:   * cite47†Redis Insight L57:   * cite48†Redis Data Integration (RDI) L58: cite49†Commands L59: 
+L60: Download documentation
+L61: ## Download documentation
+L62: 
+L63: Choose the products and versions you want. Everything arrives as one `.tar.gz`, with a directory per product.
+L64: 
+L65: Format [Select]
+L66: 
+L67: This page  |
+L68: --- | ---
+L69:  | [Button: Download ]
+L70: [Input]  | Products  | Version
+L71: --- | --- | ---
+L72: [Input]  | Develop with Redis Clients, data types, programmability, and Redis for AI. RedisVL is listed separately.  |
+L73: [Input]  | Libraries and tools Client libraries, observability, and cloud integrations. Redis Data Integration is listed separately.  |
+L74: [Input]  | RedisVL  | [Select]
+L75: [Input]  | Redis Software  | [Select]
+L76: [Input]  | Redis Cloud  |
+L77: [Input]  | Redis for Kubernetes  | [Select]
+L78: [Input]  | Redis Open Source  |
+L79: [Input]  | Redis Iris context engine  |
+L80: [Input]  | Redis Feature Form  |
+L81: [Input]  | Redis Insight  |
+L82: [Input]  | Redis Data Integration  | [Select]
+L83: [Input]  | Glossary  |
+L84: [Input]  | Command reference  |
+L85: [Button: Cancel ] [Button: Download ]
+L86: 
+L87:   1. cite50†Docs Docs L88:   2. → cite51†Redis products L89:   3. → cite5†Redis Open Source L90:   4. → cite26†Manage Redis L91:   5. → cite34†Optimizing Redis L92:   6. → cite35†Redis benchmark L93: # Redis benchmark
+L94: 
+L95: Use the redis-benchmark utility on a Redis server
+L96: 
+L97: Redis Open Source
+L98: ---
+L99: ## How fast is Redis?
+L100: 
+L101: Redis includes the `redis-benchmark` utility that simulates running commands done by N clients at the same time sending M total queries (it is similar to the Apache's `ab` utility). Below you'll find the full output of a benchmark executed against a Linux box.
+L102: 
+L103: The following options are supported:
+L104: 
+L105:     `Usage: redis-benchmark [-h <host>] [-p <port>] [-c <clients>] [-n <requests]> [-k <boolean>]
+L106:     `
+L107: 
+L108: Options:
+L109:   * `-h <hostname>`: Server hostname (default 127.0.0.1)
+L110:   * `-p <port>`: Server port (default 6379)
+L111:   * `-s <socket>`: Server socket (overrides host and port)
+L112:   * `-a <password>`: Password for Redis Auth
+L113:   * `--user <username>`: Used to send ACL style 'AUTH username pass'. Needs -a.
+L114:   * `-c <clients>`: Number of parallel connections (default 50)
+L115:   * `-n <requests>`: Total number of requests (default 100000)
+L116:   * `-d <size>`: Data size of SET/GET value in bytes (default 3)
+L117:   * `--dbnum <db>`: SELECT the specified db number (default 0)
+L118:   * `--threads <num>`: Enable multi-thread mode.
+L119:   * `--cluster`: Enable cluster mode.
+L120:   * `--enable-tracking`: Send CLIENT TRACKING on before starting benchmark.
+L121:   * `-k <boolean>`: 1=keep alive 0=reconnect (default 1)
+L122:   * `-r <keyspacelen>`: Use random keys for SET/GET/INCR, random values for SADD, random members and scores for ZADD. Using this option the benchmark will expand the string rand_int inside an argument with a 12 digits number in the specified range from 0 to keyspacelen-1. The substitution changes every time a command is executed. Default tests use this to hit random keys in the specified range.
+L123:   * `-P <numreq>`: Pipeline `<numreq>` requests. Default 1 (no pipeline).
+L124:   * `-e`: If server replies with errors, show them on stdout. (No more than 1 error per second is displayed.)
+L125:   * `-q`: Quiet. Just show query/sec values
+L126:   * `--precision`: Number of decimal places to display in latency output (default 0)
+L127:   * `--csv`: Output in CSV format
+L128:   * `-l`: Loop. Run the tests forever
+L129:   * `-t <tests>`: Only run the comma separated list of tests. The test names are the same as the ones produced as output.
+L130:   * `-I`: Idle mode. Just open N idle connections and wait.
+L131:   * `--help`: Output this help and exit.
+L132:   * `--version`: Output version and exit.
+L133: You need to have a running Redis instance before launching the benchmark. A typical example would be:
+L134: 
+L135:     `redis-benchmark -q -n 100000
+L136:     `
+L137: 
+L138: Using this tool is quite easy, and you can also write your own benchmark, but as with any benchmarking activity, there are some pitfalls to avoid.
+L139: ## Running only a subset of the tests
+L140: 
+L141: You don't need to run all the default tests every time you execute redis-benchmark. The simplest thing to select only a subset of tests is to use the `-t` option like in the following example:
+L142: 
+L143:     `$ redis-benchmark -t set,lpush -n 100000 -q
+L144:     SET: 180180.17 requests per second, p50=0.143 msec
+L145:     LPUSH: 188323.91 requests per second, p50=0.135 msec
+L146:     `
+L147: In the above example we asked to just run test the SET and LPUSH commands, in quiet mode (see the `-q` switch).
+L148: 
+L149: It is also possible to specify the command to benchmark directly like in the following example:
+L150: 
+L151:     `$ redis-benchmark -n 100000 -q script load "redis.call('set','foo','bar')"
+L152:     script load redis.call('set','foo','bar'): 69881.20 requests per second
+L153:     `
+L154: ## Selecting the size of the key space
+L155: 
+L156: By default the benchmark runs against a single key. In Redis the difference between such a synthetic benchmark and a real one is not huge since it is an in-memory system, however it is possible to stress cache misses and in general to simulate a more real-world work load by using a large key space.
+L157: This is obtained by using the `-r` switch. For instance if I want to run one million SET operations, using a random key for every operation out of 100k possible keys, I'll use the following command line:
+L158: 
+L159:     `$ redis-cli flushall
+L160:     OK
+L161: 
+L162:     $ redis-benchmark -t set -r 100000 -n 1000000
+L163:     ====== SET ======
+L164:       1000000 requests completed in 13.86 seconds
+L165:       50 parallel clients
+L166:       3 bytes payload
+L167:       keep alive: 1
+L168: 
+L169:     99.76% `<=` 1 milliseconds
+L170:     99.98% `<=` 2 milliseconds
+L171:     100.00% `<=` 3 milliseconds
+L172:     100.00% `<=` 3 milliseconds
+L173:     72144.87 requests per second
+L174: 
+L175:     $ redis-cli dbsize
+L176:     (integer) 99993
+L177:     `
+L178: ## Using pipelining
+L179: 
+L180: By default every client (the benchmark simulates 50 clients if not otherwise specified with `-c`) sends the next command only when the reply of the previous command is received, this means that the server will likely need a read call in order to read each command from every client. Also RTT is paid as well.
+L181: Redis supports cite52†pipelining , so it is possible to send multiple commands at once, a feature often exploited by real world applications. Redis pipelining is able to dramatically improve the number of operations per second a server is able to deliver.
+L182: This is an example of running the benchmark in a MacBook Air 11" using a pipelining of 16 commands:
+L183: 
+L184:     `$ redis-benchmark -n 1000000 -t set,get -P 16 -q
+L185:     SET: 1536098.25 requests per second, p50=0.479 msec
+L186:     GET: 1811594.25 requests per second, p50=0.391 msec
+L187:     `
+L188: 
+L189: Using pipelining results in a significant increase in performance.
+L190: ## Pitfalls and misconceptions
+L191: 
+L192: The first point is obvious: the golden rule of a useful benchmark is to only compare apples and apples. Different versions of Redis can be compared on the same workload for instance. Or the same version of Redis, but with different options. If you plan to compare Redis to something else, then it is important to evaluate the functional and technical differences, and take them in account.
+L193:   * Redis is a server, hence, all commands involve network round trips. Embedded data stores do not involve network and protocol management. When comparing such products to Redis, command execution times should be used instead of end-to-end times.
+L194:   * Redis commands return an acknowledgment for all usual commands. Some other data stores do not. Comparing Redis to stores involving one-way queries is only mildly useful.
+L195:   * Naively iterating on synchronous Redis commands does not benchmark Redis itself, but rather measure your network (or IPC) latency and the client library intrinsic latency. To really test Redis, you need multiple connections (like redis-benchmark) and/or to use pipelining to aggregate several commands and/or multiple threads or processes.
+L196:   * Redis is an in-memory data store with some optional persistence options. If you plan to compare it to transactional servers (MySQL, PostgreSQL, etc ...), then you should consider activating AOF and decide on a suitable fsync policy.
+L197:   * Redis is, mostly, a single-threaded server from the POV of commands execution (actually modern versions of Redis use threads for different things). It is not designed to benefit from multiple CPU cores. People are supposed to launch several Redis instances to scale out on several cores if needed. It is not really fair to compare one single Redis instance to a multi-threaded data store.
+L198: A common misconception is that redis-benchmark is designed to make Redis performances look stellar, the throughput achieved by redis-benchmark being somewhat artificial, and not achievable by a real application. This is actually not true.
+L199: The `redis-benchmark` program is a quick and useful way to get some figures and evaluate the performance of a Redis instance on a given hardware. However, by default, it does not represent the maximum throughput a Redis instance can sustain. Actually, by using pipelining and a fast client (hiredis), it is fairly easy to write a program generating more throughput than redis-benchmark. The default behavior of redis-benchmark is to achieve throughput by exploiting concurrency only (i.e.
+L200: it creates several connections to the server). It does not use pipelining or any parallelism at all (one pending query per connection at most, and no multi-threading), if not explicitly enabled via the `-P` parameter. So in some way using `redis-benchmark` and, triggering, for example, a `BGSAVE` operation in the background at the same time, will provide the user with numbers more near to the worst case than to the best case.
+L201: To run a benchmark using pipelining mode (and achieve higher throughput), you need to explicitly use the -P option. Please note that it is still a realistic behavior since a lot of Redis based applications actively use pipelining to improve performance. However you should use a pipeline size that is more or less the average pipeline length you'll be able to use in your application in order to get realistic numbers.
+L202: Finally, the benchmark should apply the same operations, and work in the same way with the multiple data stores you want to compare. It is absolutely pointless to compare the result of redis-benchmark to the result of another benchmark program and extrapolate.
+L203: For instance, Redis and memcached in single-threaded mode can be compared on GET/SET operations. Both are in-memory data stores, working mostly in the same way at the protocol level. Provided their respective benchmark application is aggregating queries in the same way (pipelining) and use a similar number of connections, the comparison is actually meaningful.
+L204: 
+L205: This perfect example is illustrated by the dialog between Redis (antirez) and memcached (dormando) developers.
+L206: cite53†antirez 1 - On Redis, Memcached, Speed, Benchmarks and The Toilet†antirez.com L207: 
+L208: cite54†dormando - Redis VS Memcached (slightly better bench)†dormando.livejournal.com L209: 
+L210: cite55†antirez 2 - An update on the Memcached/Redis benchmark†antirez.com L211: 
+L212: You can see that in the end, the difference between the two solutions is not so staggering, once all technical aspects are considered. Please note both Redis and memcached have been optimized further after these benchmarks.
+L213: Finally, when very efficient servers are benchmarked (and stores like Redis or memcached definitely fall in this category), it may be difficult to saturate the server. Sometimes, the performance bottleneck is on client side, and not server-side. In that case, the client (i.e. the benchmark program itself) must be fixed, or perhaps scaled out, in order to reach the maximum throughput.
+L214: ## Factors impacting Redis performance
+L215: 
+L216: There are multiple factors having direct consequences on Redis performance. We mention them here, since they can alter the result of any benchmarks. Please note however, that a typical Redis instance running on a low end, untuned box usually provides good enough performance for most applications.
+L217:   * Network bandwidth and latency usually have a direct impact on the performance. It is a good practice to use the ping program to quickly check the latency between the client and server hosts is normal before launching the benchmark. Regarding the bandwidth, it is generally useful to estimate the throughput in Gbit/s and compare it to the theoretical bandwidth of the network.
+L218: For instance a benchmark setting 4 KB strings in Redis at 100000 q/s, would actually consume 3.2 Gbit/s of bandwidth and probably fit within a 10 Gbit/s link, but not a 1 Gbit/s one. In many real world scenarios, Redis throughput is limited by the network well before being limited by the CPU. To consolidate several high-throughput Redis instances on a single server, it worth considering putting a 10 Gbit/s NIC or multiple 1 Gbit/s NICs with TCP/IP bonding.
+L219:   * CPU is another very important factor. Being single-threaded, Redis favors fast CPUs with large caches and not many cores. At this game, Intel CPUs are currently the winners. It is not uncommon to get only half the performance on an AMD Opteron CPU compared to similar Nehalem EP/Westmere EP/Sandy Bridge Intel CPUs with Redis. When client and server run on the same box, the CPU is the limiting factor with redis-benchmark.
+L220:   * Speed of RAM and memory bandwidth seem less critical for global performance especially for small objects. For large objects (>10 KB), it may become noticeable though. Usually, it is not really cost-effective to buy expensive fast memory modules to optimize Redis.
+L221:   * Redis runs slower on a VM compared to running without virtualization using the same hardware. If you have the chance to run Redis on a physical machine this is preferred.
+L222: However this does not mean that Redis is slow in virtualized environments, the delivered performances are still very good and most of the serious performance issues you may incur in virtualized environments are due to over-provisioning, non-local disks with high latency, or old hypervisor software that have slow `fork` syscall implementation.
+L223:   * When the server and client benchmark programs run on the same box, both the TCP/IP loopback and unix domain sockets can be used. Depending on the platform, unix domain sockets can achieve around 50% more throughput than the TCP/IP loopback (on Linux for instance). The default behavior of redis-benchmark is to use the TCP/IP loopback.
+L224:   * The performance benefit of unix domain sockets compared to TCP/IP loopback tends to decrease when pipelining is heavily used (i.e. long pipelines).
+L225:   * When an ethernet network is used to access Redis, aggregating commands using pipelining is especially efficient when the size of the data is kept under the ethernet packet size (about 1500 bytes). Actually, processing 10 bytes, 100 bytes, or 1000 bytes queries almost result in the same throughput. See the graph below.
+L226: cite56†Image: Data size impact†github.com L227:   * On multi CPU sockets servers, Redis performance becomes dependent on the NUMA configuration and process location. The most visible effect is that redis-benchmark results seem non-deterministic because client and server processes are distributed randomly on the cores. To get deterministic results, it is required to use process placement tools (on Linux: taskset or numactl).
+L228: The most efficient combination is always to put the client and server on two different cores of the same CPU to benefit from the L3 cache. Here are some results of 4 KB SET benchmark for 3 server CPUs (AMD Istanbul, Intel Nehalem EX, and Intel Westmere) with different relative placements. Please note this benchmark is not meant to compare CPU models between themselves (CPUs exact model and frequency are therefore not disclosed).
+L229: cite57†Image: NUMA chart†github.com L230:   * With high-end configurations, the number of client connections is also an important factor. Being based on epoll/kqueue, the Redis event loop is quite scalable. Redis has already been benchmarked at more than 60000 connections, and was still able to sustain 50000 q/s in these conditions. As a rule of thumb, an instance with 30000 connections can only process half the throughput achievable with 100 connections. Here is an example showing the throughput of a Redis instance per number of connections:
+L231: cite58†Image: connections chart†github.com L232:   * With high-end configurations, it is possible to achieve higher throughput by tuning the NIC(s) configuration and associated interruptions. Best throughput is achieved by setting an affinity between Rx/Tx NIC queues and CPU cores, and activating RPS (Receive Packet Steering) support. More information in this cite59†thread†groups.google.com . Jumbo frames may also provide a performance boost when large objects are used.
+L233:   * Depending on the platform, Redis can be compiled against different memory allocators (libc malloc, jemalloc, tcmalloc), which may have different behaviors in term of raw speed, internal and external fragmentation. If you did not compile Redis yourself, you can use the INFO command to check the `mem_allocator` field. Please note most benchmarks do not run long enough to generate significant external fragmentation (contrary to production Redis instances).
+L234: ## Other things to consider
+L235: 
+L236: One important goal of any benchmark is to get reproducible results, so they can be compared to the results of other tests.
+L237:   * A good practice is to try to run tests on isolated hardware as much as possible. If it is not possible, then the system must be monitored to check the benchmark is not impacted by some external activity.
+L238:   * Some configurations (desktops and laptops for sure, some servers as well) have a variable CPU core frequency mechanism. The policy controlling this mechanism can be set at the OS level. Some CPU models are more aggressive than others at adapting the frequency of the CPU cores to the workload. To get reproducible results, it is better to set the highest possible fixed frequency for all the CPU cores involved in the benchmark.
+L239:   * An important point is to size the system accordingly to the benchmark. The system must have enough RAM and must not swap. On Linux, do not forget to set the `overcommit_memory` parameter correctly. Please note 32 and 64 bit Redis instances do not have the same memory footprint.
+L240:   * If you plan to use RDB or AOF for your benchmark, please check there is no other I/O activity in the system. Avoid putting RDB or AOF files on NAS or NFS shares, or on any other devices impacting your network bandwidth and/or latency (for instance, EBS on Amazon EC2).
+L241:   * Set Redis logging level (loglevel parameter) to warning or notice. Avoid putting the generated log file on a remote filesystem.
+L242:   * Avoid using monitoring tools which can alter the result of the benchmark. For instance using INFO at regular interval to gather statistics is probably fine, but MONITOR will impact the measured performance significantly.
+L243: ## Benchmark results on bare-metal servers across different Redis versions
+L244: 
+L245: It is critically important that Redis performance is retained or improved seamlessly on every released version.
+L246: 
+L247: To assess it, we've conducted benchmarks on the released versions of Redis (starting on v2.6.0) using `redis-benchmark` on a series of command types over a standalone redis-server, repeating the same benchmark multiple times, ensuring its statistical significance, and measuring the run-to-run variance.
+L248: The used hardware platform was a stable bare-metal HPE ProLiant DL380 Gen10 Server, with one Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz, disabling Intel HT Technology, disabling CPU Frequency scaling, with all configurable BIOS and CPU system settings set to performance.
+L249: The box was running Ubuntu 18.04 Linux release 4.15.0-123, and Redis was compiled with gcc 7.5.0. The used benchmark client (`redis-benchmark`) was kept stable across all tests, with version `redis-benchmark 6.2.0 (git:445aa844)`. Both the redis-server and redis-benchmark processes were pinned to specific physical cores.
+L250: 
+L251: The following benchmark options were used across tests:
+L252:   * The tests were done with 50 simultaneous clients performing 5 million requests.
+L253:   * Tests were executed using the loopback interface.
+L254:   * Tests were executed without pipelining.
+L255:   * The used payload size was 256 Bytes.
+L256:   * For each redis-benchmark process, 2 threads were used to ensure that the benchmark client was not the bottleneck.
+L257:   * Strings, Hashes, Sets, and Sorted Sets data types were benchmarked.
+L258: 
+L259: Below we present the obtained results, broken by data type.
+L260: cite60†Image: Strings performance over versions cite61†Image: Hashes performance over versions cite62†Image: Sets performance over versions cite63†Image: Sorted sets performance over versions L261: ## Other Redis benchmarking tools
+L262: 
+L263: There are several third-party tools that can be used for benchmarking Redis. Refer to each tool's documentation for more information about its goals and capabilities.
+L264:   * cite64†memtier_benchmark†github.com from cite65†Redis Labs†twitter.com is a NoSQL Redis and Memcache traffic generation and benchmarking tool.
+L265:   * cite66†rpc-perf†github.com from cite67†Twitter†twitter.com is a tool for benchmarking RPC services that supports Redis and Memcache.
+L266:   * cite68†YCSB†github.com from cite69†Yahoo @Yahoo†twitter.com is a benchmarking framework with clients to many databases, including Redis.
+L267: 
+L268: RATE THIS PAGE
+L269: 
+L270: [Input] ★ [Input] ★ [Input] ★ [Input] ★ [Input] ★
+L271: 
+L272: cite70†Back to top ↑ L273: cite71†Edit this page†github.com cite72†Create an issue†github.com Download documentation cite73†Ask AI to explain this page L274: ## On this page
+L275: 
+L276:   * cite74†How fast is Redis? L277:   * cite75†Running only a subset of the tests L278:   * cite76†Selecting the size of the key space L279:   * cite77†Using pipelining L280:   * cite78†Pitfalls and misconceptions L281:   * cite79†Factors impacting Redis performance L282:   * cite80†Other things to consider L283:   * cite81†Benchmark results on bare-metal servers across different Redis versions L284:   * cite82†Other Redis benchmarking tools L285: ### Compare
+L286: 
+L287: cite83†Redis vs Elasticache cite84†Redis vs Memcached cite85†Redis vs Memory Store cite86†Redis vs. Open Source L288: 
+L289: ### Company
+L290: 
+L291: cite87†Mission & values cite88†Leadership cite89†Careers L292: 
+L293: ### Partners
+L294: 
+L295: cite90†Amazon Web Services cite91†Google Cloud cite92†Microsoft Azure cite93†All partners L296: 
+L297: ### Support
+L298: 
+L299: cite94†Professional services cite95†Support L300: 
+L301: cite96†Trust†trust.redis.io cite97†Privacy cite98†Terms of use cite99†Legal notices L302: 
+L303: [Input: Search…] [Select]
+L304: 
+L305: [Button: ESC ]
+

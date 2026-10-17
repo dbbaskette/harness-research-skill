@@ -68,7 +68,7 @@ Research organized for understanding, with the audit trail close at hand.
 | File | Use it for |
 | --- | --- |
 | `research/report.md` | The main answer, themes, findings, explanations and comparisons |
-| `research/brief.md` | A concise starting point for the next writing or content task |
+| `research/brief.md` | A prioritized handoff shaped to your task, with useful evidence and qualifications to retain |
 | `research/evidence.md` | Source passages and the factual support behind the report |
 | `research/facts.json` | Structured evidence and synthesis for compatible tools (schema 2) |
 | `research/output.json` | The saved revision, review status and artifact hashes |
@@ -78,14 +78,25 @@ Questions guide the investigation. They do not force every report into Q&A.
 A short factual check can stay short; a broad topic can become a coherent
 explanation. A comparison uses named criteria rather than unrelated fact lists.
 
-Read the [Valkey/Redis replacement report](docs/verification/1.0.0-alpha.1/valkey-redis/research/report.md):
-a fresh trial with 14 primary sources, 28 facts and five synthesized findings,
-independently checked against the original sources. The
-[acceptance record](docs/verification/1.0.0-alpha.1/README.md) documents the results and limits.
+Read the [Valkey/Redis replacement report](docs/verification/1.0.0-alpha.1/valkey-redis-editorial/research/report.md):
+a revised example with 21 primary sources, 38 facts and five synthesized findings,
+independently checked against dated source captures and saved original contexts.
+Its [prioritized presentation brief](docs/verification/1.0.0-alpha.1/valkey-redis-editorial/research/brief.md)
+shows the task-shaped handoff. The
+[editorial refinement record](docs/verification/1.0.0-alpha.1/editorial-refinement/README.md)
+documents review, tests and current studio integration limits; the
+[initial acceptance record](docs/verification/1.0.0-alpha.1/README.md) preserves history.
 Earlier [0.9 examples](docs/verification/0.9.0/README.md) document the previous
 implementation and are not examples of this output contract.
 
 ## Start with your purpose
+
+Add the purpose in your own words: “help us choose,” “background for a blog,” or
+“teach engineers new to the topic.” It shapes the depth, explanations and format
+of the report and brief. If you leave it out, the default is **general-purpose
+topic research**: a balanced explanation of the topic and a concise overview.
+No intake form is required. You can name more than one use and say which matters
+most. A studio can pass its actual content task as the purpose.
 
 **Understand a topic**
 
@@ -119,16 +130,19 @@ For this development preview, use the explicit checkout path above.
 
 ## Useful input for the work that comes next
 
-- **Presentations:** prioritized findings, aligned comparisons and the caveats
-  that belong with each message.
-- **Blogs:** explanations, mechanisms, supporting evidence and counterarguments.
-- **Training:** concepts, distinctions, limitations and material that can inform
-  examples and exercises.
+The brief leads with what matters for the task and selects the strongest useful
+support. Its shape can change with the intended use:
 
+- **Presentations:** key messages, a possible storyline and evidence worth visualizing.
+- **Blogs:** a central argument, mechanisms and the strongest counterarguments.
+- **Training:** a concept sequence, misconceptions and grounded examples.
+- **Decisions:** consequential tradeoffs and conditions that change the choice.
+
+These are useful emphases, not fixed templates or a bundle of separate deliverables.
 The next skill still owns the slides, prose or lesson design. A research report
 is a derived artifact, not a new independent primary source. Structured consumers
 must support schema 2 explicitly; [migration notes](docs/migration-v1.md) explain
-what changes and what remains available.
+what changes and what remains available. [Passing a studio task →](docs/using-harness-research.md#feed-presentations-blogs-and-training)
 
 ## How it works
 
@@ -165,32 +179,33 @@ representative guidance-start response. Stage-only rows count their own referenc
 | --- | ---: |
 | Discovery metadata | 36 |
 | Installed bootstrap | 574 |
-| Bootstrap + current guidance entry | 1,225 |
-| Investigator stage | 822 |
-| Synthesis writer stage | 939 |
-| Independent reviewer stage | 1,051 |
-| New synthesis: coordinator entry and workflow | 3,375 |
-| New synthesis: all stages in one context | 6,187 |
-| Synthesis resume, verify or refresh | 1,953 |
-| Legacy 0.9 queued coordinator | 4,956 |
-| Legacy 0.9 reuse or refresh | 2,008 |
-| Legacy explicit chat-only answer | 2,185 |
-| Legacy manual saved research | 3,376 |
-| Legacy manual status or resume | 1,786 |
-| Legacy comparative routing only | 1,938 |
-| Legacy Codex comparative outline | 2,898 |
-| Legacy Codex add items | 2,103 |
-| Legacy Codex add fields | 2,123 |
-| Legacy Codex deep results | 2,786 |
-| Legacy Codex deep results + saved evidence | 3,977 |
-| Legacy Claude comparative outline | 2,915 |
-| Legacy Claude deep results | 2,808 |
-| Investigation + general web strategy | 4,694 |
-| Investigation + academic strategy | 4,786 |
-| Investigation + GitHub strategy | 4,581 |
-| Investigation + technical Q&A strategy | 4,486 |
-| Investigation + Chinese sources strategy | 4,711 |
-| Legacy migration | 1,580 |
+| Bootstrap + current guidance entry | 1,242 |
+| Investigator stage | 1,017 |
+| Synthesis writer stage | 1,547 |
+| Independent reviewer stage | 1,330 |
+| New synthesis: coordinator entry and workflow | 3,773 |
+| New synthesis: all stages in one context | 7,667 |
+| Synthesis resume, verify or refresh | 2,132 |
+| Optional studio task handoff | 4,474 |
+| Legacy 0.9 queued coordinator | 4,973 |
+| Legacy 0.9 reuse or refresh | 2,025 |
+| Legacy explicit chat-only answer | 2,202 |
+| Legacy manual saved research | 3,393 |
+| Legacy manual status or resume | 1,803 |
+| Legacy comparative routing only | 1,955 |
+| Legacy Codex comparative outline | 2,915 |
+| Legacy Codex add items | 2,120 |
+| Legacy Codex add fields | 2,140 |
+| Legacy Codex deep results | 2,803 |
+| Legacy Codex deep results + saved evidence | 3,994 |
+| Legacy Claude comparative outline | 2,932 |
+| Legacy Claude deep results | 2,825 |
+| Investigation + general web strategy | 5,287 |
+| Investigation + academic strategy | 5,379 |
+| Investigation + GitHub strategy | 5,174 |
+| Investigation + technical Q&A strategy | 5,079 |
+| Investigation + Chinese sources strategy | 5,304 |
+| Legacy migration | 1,597 |
 
 The new default starts with the entry and synthesis workflow. Investigation, writing
 and independent review each load their own reference when needed. The all-stages

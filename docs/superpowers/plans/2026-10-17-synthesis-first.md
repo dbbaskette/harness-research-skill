@@ -25,3 +25,47 @@ The source must support the assertion, and the assertions must support the synth
 - Fresh Valkey/Redis research completed with 14 primary sources, 28 facts and five findings. A different invocation read all originals and accepted 18 prose blocks plus facts/findings.
 - Preserved bundle verifies complete with matching source/artifact hashes. [Acceptance record](../../verification/1.0.0-alpha.1/README.md).
 - This is a local development preview; publication and active installation were not performed.
+
+## Authorized refinement
+
+1. Update stage guidance and first-use purpose examples using existing schema-2 fields.
+2. Expose readable evidence and counterfacts in brief output; test traceability,
+   qualification preservation and purpose-sensitive review invalidation.
+3. Revise the Valkey/Redis example in a separate acceptance case; retain original
+   captures and history, correct scoped claims and add useful purpose-led detail.
+4. Independently check the revised dossier and a small semantic-review exercise;
+   resolve supported objections before claiming completion.
+5. Refresh generated context measurements, run the integrated local suite, and
+   copy the reviewed report/evidence into the user's project. No publication or
+   active installation is requested.
+
+Refinement completed: purpose guidance and readable evidence briefs implemented;
+149-test macOS gate passed after tightening the entrypoint. Independent semantic
+probe rejected the scoped-claim regression; purpose variants changed explanatory
+content. Revised 38-fact Valkey/Redis case independently accepted and copied with
+verified evidence to the user's project. See the
+[refinement record](../../verification/1.0.0-alpha.1/purpose-refinement/README.md).
+
+## Editorial follow-up
+
+1. Inspect current studio call sites and document a purpose/task handoff using the
+   existing request fields and actual schema boundaries.
+2. Add optional authored brief sections, complete reference/review validation and
+   a legacy fallback; smooth reader rendering while retaining audit types.
+3. Update stage guidance and user docs; exercise purpose-specific handoffs using
+   the same saved Valkey/Redis evidence, with independent review of the new bundle.
+4. Run focused runtime tests, refresh context outputs and the full native gate;
+   update the user-visible report/brief only after review.
+
+Editorial follow-up completed on the development tree. The full native gate passed
+155 tests; authored brief references, review coverage, digest invalidation and old
+finding-view fallback are covered. Independent review accepted the presentation
+case's 22 report and eight brief blocks alongside source/fact/finding checks.
+Blog/training probes show different organization from the same evidence. Caller
+adapters remain legacy; [integration findings and verification](../../verification/1.0.0-alpha.1/editorial-refinement/README.md)
+record that boundary. User-visible report/brief copies were verified after update.
+
+General-purpose default follow-up: made purpose optional in the dossier contract,
+normalized missing/null/blank values before persistence and digesting, and aligned
+entry/stage/user guidance. Regression tests cover normalized equivalence, saved
+output propagation, explicit-task preservation and invalid-type rejection.

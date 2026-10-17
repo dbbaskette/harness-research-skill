@@ -1,0 +1,44 @@
+{
+  "version": "1.0.0-alpha.1",
+  "base_commit": "16582ce46e52036f51133ad057a5cc7ab8ddc0f2",
+  "tested_tree": "Working tree pinned by native/source-files.sha256; runtime/tests/guidance match; subsequent edits are documentation/acceptance artifacts",
+  "native": {
+    "passed": 149,
+    "failed": 0,
+    "skipped": 0,
+    "os": "macOS 27.0",
+    "node": "22.23.2",
+    "python": "3.9.6",
+    "result": "PASS",
+    "cleanup": "Both task-owned VM directories independently confirmed absent; base remains"
+  },
+  "scope_probe": {
+    "expected": "needs-revision",
+    "actual": "needs-revision",
+    "unsupported": [
+      "transfer-method",
+      "migration-path",
+      "decision:0"
+    ]
+  },
+  "purpose_probe": {
+    "type": "Independent writing exercise using same two supplied sources",
+    "decision": "Pilot funding and evidence to obtain",
+    "training": "Snapshots, synchronization/backlogs, illustrative loss sequence",
+    "limitation": "Prose drafts, not independent factual acceptance"
+  },
+  "revised_report": {
+    "digest": "a581995344103ace82f05066bd22de1457d4645df35480d8ed3cb2cacaed6ef1",
+    "status": "complete",
+    "sources": 21,
+    "facts": 38,
+    "findings": 5,
+    "prose_blocks": 22,
+    "reviewer": "revised-report-checker",
+    "artifact_integrity": "verified",
+    "live_refresh": false
+  },
+  "published": false,
+  "active_installation_updated": false,
+  "recorded_at": "2026-10-17T16:16:03.283915+00:00"
+}

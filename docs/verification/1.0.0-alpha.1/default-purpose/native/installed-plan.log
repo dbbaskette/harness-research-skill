@@ -1,0 +1,18 @@
+{
+  "run": "66d6dd8496ddbaf0b06fe973",
+  "scope": "supplied-only",
+  "sourceMode": "Uploaded sources only",
+  "sourceGaps": [],
+  "status": "in-progress",
+  "pending": [
+    "availability"
+  ],
+  "unresolved": [],
+  "staleItems": [],
+  "completed": 0,
+  "total": 1,
+  "file": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/content/.harness-research/research.json",
+  "report": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/content/.harness-research/research-report.md",
+  "assessment": "Research coverage; does not certify a factual or downstream review.",
+  "carried": []
+}

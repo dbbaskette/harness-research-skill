@@ -1,0 +1,37 @@
+{
+  "version": "1.0.0-alpha.1",
+  "base_commit": "16582ce46e52036f51133ad057a5cc7ab8ddc0f2",
+  "tested_tree": "Working tree pinned by native/source-files.sha256; runtime/tests/guidance match tested bytes; later changes documentation/acceptance only",
+  "native": {
+    "passed": 155,
+    "failed": 0,
+    "skipped": 0,
+    "result": "PASS",
+    "os": "macOS 27.0",
+    "node": "22.23.2",
+    "python": "3.9.6",
+    "vm": "harness-research-test-20261017174525-35822-7d8049eb",
+    "cleanup": "Runner exit0; task-owned directory absent; base remains"
+  },
+  "example": {
+    "status": "complete",
+    "artifact_integrity": "verified",
+    "digest": "8daa8a079f9ce343ab3e1b1a164ec5eb2f95272ce2480ce2d858c9095c39c794",
+    "source_contexts": 21,
+    "facts": 38,
+    "findings": 5,
+    "report_blocks": 22,
+    "brief_blocks": 8,
+    "reviewer": "editorial-checker",
+    "review_objections": 0,
+    "live_refresh": false
+  },
+  "purpose_probes": {
+    "blog": "unreviewed draft handoff",
+    "introductory_training": "unreviewed draft handoff"
+  },
+  "studio_callers_migrated": false,
+  "active_installation_updated": false,
+  "published": false,
+  "recorded_at": "2026-10-17T17:49:19.661581+00:00"
+}

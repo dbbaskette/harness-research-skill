@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { readText, identifier, text, stable, hash, localFile, exists } from './run-storage.mjs';
 
 export const OWNER = 'harness-research-synthesis';
+export const DEFAULT_PURPOSE = 'General-purpose topic research';
 export const digestSource = s => ({ id: s.id, file: s.file, sha256: s.sha256, ...(s.original_file ? { original_file: s.original_file, original_sha256: s.original_sha256 } : {}) });
 export const KINDS = ['summary', 'inference', 'recommendation', 'gap'];
 const list = (v, label) => { if (!Array.isArray(v)) throw new Error(`${label} must be an array.`); return v; };
@@ -19,20 +20,27 @@ function block(value, allowed, label) {
   refs(value.refs, allowed, `${label} refs`, value.kind !== 'gap');
 }
 export function proseItems(dossier) {
-  const items = dossier.sections.flatMap(s => s.blocks.map((b, i) => ({ id: `${s.id}:${i}`, ...b })));
-  for (const [ci, c] of (dossier.comparisons || []).entries()) for (const [ri, r] of c.rows.entries()) for (const [si, cell] of r.cells.entries()) items.push({ id: `comparison:${ci}:${ri}:${si}`, ...cell });
+  const items = dossier.sections.flatMap(s => s.blocks.map((b, i) => ({ ...b, id: `${s.id}:${i}` })));
+  for (const section of dossier.brief || []) for (const [index, value] of section.blocks.entries()) items.push({ ...value, id: `brief:${section.id}:${index}` });
+  for (const [ci, c] of (dossier.comparisons || []).entries()) for (const [ri, r] of c.rows.entries()) for (const [si, cell] of r.cells.entries()) items.push({ ...cell, id: `comparison:${ci}:${ri}:${si}` });
   return items;
 }
 export async function validateDossier(root, input, author) {
   identifier(author, 'Worker');
   if (!input || input.schema !== 2) throw new Error('Dossier schema must be 2.');
   const d = structuredClone(input);
+  if (d.purpose == null || (typeof d.purpose === 'string' && !d.purpose.trim())) d.purpose = DEFAULT_PURPOSE;
   for (const key of ['topic','audience','purpose','scope']) text(d[key], key, 20000);
   choice(d.source_mode, ['public','selected','mixed'], 'source_mode');
   list(d.sources, 'sources'); list(d.facts, 'facts'); list(d.findings, 'findings'); list(d.sections, 'sections');
   if (!d.sections.length) throw new Error('At least one report section is required.');
   const sourceIds = unique(d.sources, 'source ID'), factIds = unique(d.facts, 'fact ID'), findingIds = unique(d.findings, 'finding ID');
   unique(d.sections, 'section ID');
+  if (Object.hasOwn(d, 'brief')) {
+    list(d.brief, 'brief');
+    if (!d.brief.length) throw new Error('Authored brief needs at least one section.');
+    unique(d.brief, 'brief section ID');
+  }
   const allIds = [...sourceIds, ...factIds, ...findingIds];
   if (new Set(allIds).size !== allIds.length) throw new Error(`Source, fact and finding IDs must be globally distinct. Collisions: ${[...new Set(allIds.filter((id, index) => allIds.indexOf(id) !== index))].join(', ')}.`);
   const captures = [];
@@ -91,7 +99,13 @@ export async function validateDossier(root, input, author) {
     for (const group of ['implications','conditions','gaps']) for (const value of list(finding[group], `Finding ${group}`)) block(value, factIds, `Finding ${group}`);
   }
   const evidenceIds = new Set([...factIds, ...findingIds]);
-  for (const section of d.sections) { text(section.title, 'Section title'); list(section.blocks, 'Section blocks'); if (!section.blocks.length) throw new Error('Report sections need blocks.'); for (const value of section.blocks) block(value, evidenceIds, 'Report block'); }
+  for (const [label, sections] of [['Report', d.sections], ['Brief', d.brief || []]]) {
+    for (const section of sections) {
+      text(section.title, `${label} section title`); list(section.blocks, `${label} section blocks`);
+      if (!section.blocks.length) throw new Error(`${label} sections need blocks.`);
+      for (const value of section.blocks) block(value, evidenceIds, `${label} block`);
+    }
+  }
   for (const comparison of list(d.comparisons || [], 'comparisons')) {
     text(comparison.title, 'Comparison title'); list(comparison.subjects, 'Comparison subjects');
     if (comparison.subjects.length < 2 || new Set(comparison.subjects).size !== comparison.subjects.length) throw new Error('Comparison requires at least two distinct subjects.');

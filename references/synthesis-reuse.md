@@ -28,10 +28,20 @@ alter a pinned task’s instructions or evidence.
 ## Use the report as source material
 
 Start with the report and brief; inspect `facts.json` schema 2 and `evidence.md`
-when traceability matters. Findings preserve supporting facts, counterevidence,
+when traceability matters. An authored brief prioritizes material for its recorded
+purpose; it is a selected view, not the complete evidence inventory. An older
+dossier without authored brief sections retains the automatic findings view. Findings preserve supporting facts, counterevidence,
 implications, conditions and gaps. Carry these qualifications into downstream
-presentations, blogs and training. A downstream author’s new interpretation is
-not covered by the research report’s old review.
+presentations, blogs and training. Keep each takeaway attached to its strongest
+support, the explanation of material counterevidence, and qualifications that
+must survive compression. Do not reduce a precise constraint to generic advice
+to check compatibility or hide an exception to fit a shorter format. A changed
+purpose may require more explanation or a labeled illustrative example; new
+factual premises need evidence. A downstream author’s new interpretation is not
+covered by the research report’s old review. When adapting the report or brief
+for a new task, update `purpose` and the authored sections, then save and review
+the changed dossier. Reuse sound evidence within its limits; a different output
+shape alone does not require repeating source collection.
 
 Preserve IDs when meaning is unchanged and reference the dossier digest when
 recording an external handoff. A source hash proves saved bytes are unchanged;

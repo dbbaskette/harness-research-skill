@@ -7,8 +7,14 @@ quota or required report structure.
 ## Scope and effort
 
 Record the topic, reader, purpose, permitted source mode and important exclusions.
-A short comparison can proceed directly. For a broad ambiguous topic, offer a
-compact scope before expensive work; honor an already approved scope without
+Use the stated purpose to choose evidence: decisions need consequential constraints
+and alternatives; explanation and training need mechanisms and misconceptions.
+When no intended use or studio task is supplied, default to general-purpose topic
+research: understand the topic, its key concepts, evidence, perspectives and
+practical implications. Do not assume a presentation, blog or course or ask for
+a use merely to begin. A short comparison
+can proceed directly. For a broad ambiguous topic, offer a compact scope before
+expensive work; honor an already approved scope without
 another gate. Keep a brief `research/plan.md` with the actual focus, unresolved
 leads and stopping decision. It is a working note, not a checked artifact.
 
@@ -49,7 +55,10 @@ numbers, versions, conditions and provenance; split compound assertions when the
 support differs. Each fact identifies its actual author invocation and cites an
 exact quotation from a saved source. Do not truncate an assertion to satisfy an
 arbitrary word count. The helper pins source bytes and exact quotes; the checker
-still has to assess whether the whole claim follows.
+still has to assess whether the whole claim follows. Track which subject, edition
+and condition each clause refers to: a neighboring sentence about a different
+product does not extend the first sentence's claim. Keep a necessary inference
+separate from what the source explicitly says.
 
 Seek counterevidence deliberately. Distinguish incompatible claims about the same
 thing from differences in versions, workloads, products or measurement methods.
@@ -58,8 +67,13 @@ a newer page or higher-ranked publisher win.
 
 ## Comparisons and transitions
 
-Compare equivalent editions, versions, capabilities and conditions. Build rows by
-named criterion; an absent cell means evidence is missing, not capability absent.
+Compare equivalent editions, versions, capabilities and conditions on the criteria
+that could change the reader's conclusion. Investigate the strongest credible case
+for each relevant alternative, including the status quo. Prefer comparable evidence
+for consequential claims; if only one side has measurements or documentation,
+state the asymmetry and its effect on the conclusion. Balance does not require
+equal source counts or equal weight for unsupported positions. Tables are optional;
+when useful, align rows by criterion and distinguish missing evidence from absence.
 For a migration/replacement request, test suitability by workload and dependencies:
 API/command use, clients, modules, persistence, topology, operational integration,
 cutover/rollback and validation. Treat a preferred destination as a hypothesis;

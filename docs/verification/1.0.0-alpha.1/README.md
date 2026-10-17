@@ -1,7 +1,29 @@
 # 1.0.0-alpha.1 development acceptance
 
-**Local acceptance passed.** This is an unpublished development preview, not a
-release tag or an active installation update.
+## Latest verified state
+
+The final integration candidate passes **156 tests, zero failures and zero skips**
+in the disposable native gate. [Default-purpose verification](default-purpose/README.md)
+pins the tested source tree and confirms the general-purpose fallback. The
+[editorial refinement record](editorial-refinement/README.md) covers authored briefs,
+readable public prose, independent review and the studio adapter boundary.
+
+Use the [latest Valkey/Redis report](valkey-redis-editorial/research/report.md),
+[brief](valkey-redis-editorial/research/brief.md) and
+[evidence](valkey-redis-editorial/research/evidence.md) for the corrected example.
+The earlier results below are preserved as historical acceptance records.
+This remains a prerelease development version; merging does not install it or
+create a release tag.
+
+## Initial implementation record
+
+**Initial local acceptance passed.** This is an unpublished development preview,
+not a release tag or an active installation update. A later comparative review
+found an overbroad fact in the original live case despite its recorded approval:
+`newer-data-boundary` joined neighboring sentences with different edition scope.
+The [purpose/evidence refinement record](purpose-refinement/README.md) tracks the
+correction, stronger handoff behavior and subsequent verification. Original
+artifacts below remain a historical record, not evidence that the objection was absent.
 
 [Read the Valkey/Redis report](valkey-redis/research/report.md) ·
 [Reusable findings](valkey-redis/research/brief.md) ·

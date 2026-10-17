@@ -1,0 +1,1184 @@
+OS: 27.0
+Node: v22.23.2
+Python: Python 3.9.6
+Source: 16582ce46e52036f51133ad057a5cc7ab8ddc0f2
+
+added 2 packages, and audited 3 packages in 1s
+
+1 package is looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+npm notice
+npm notice New major version of npm available! 10.9.8 -> 12.2.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.0
+npm notice To update run: npm install -g npm@12.2.0
+npm notice
+found 0 vulnerabilities
+Collecting PyYAML==6.0.3
+  Downloading pyyaml-6.0.3-cp39-cp39-macosx_11_0_arm64.whl (174 kB)
+Installing collected packages: PyYAML
+Successfully installed PyYAML-6.0.3
+WARNING: You are using pip version 21.2.4; however, version 26.0.1 is available.
+You should consider upgrading via the '/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/validator/bin/python3 -m pip install --upgrade pip' command.
+
+> harness-research-skill@1.0.0-alpha.1 test
+> node --test tests/*.test.mjs
+
+TAP version 13
+# Subtest: routed instruction links and sections resolve
+ok 1 - routed instruction links and sections resolve
+  ---
+  duration_ms: 26.306
+  type: 'test'
+  ...
+# Subtest: reported paths count each input once and README reflects the tested instructions
+ok 2 - reported paths count each input once and README reflects the tested instructions
+  ---
+  duration_ms: 532.626625
+  type: 'test'
+  ...
+# Subtest: the README shows the progressive disclosure map, generated from the same measurements
+ok 3 - the README shows the progressive disclosure map, generated from the same measurements
+  ---
+  duration_ms: 559.559417
+  type: 'test'
+  ...
+# Subtest: shared shell installation is repeatable, isolated and usable in three harnesses without npm dependencies
+ok 4 - shared shell installation is repeatable, isolated and usable in three harnesses without npm dependencies
+  ---
+  duration_ms: 1276.001458
+  type: 'test'
+  ...
+# Subtest: installer migrates exact Brand-owned aliases and agents while preserving independent skills
+ok 5 - installer migrates exact Brand-owned aliases and agents while preserving independent skills
+  ---
+  duration_ms: 724.629667
+  type: 'test'
+  ...
+# Subtest: installer rejects unsafe parents and unrelated destinations before writes
+ok 6 - installer rejects unsafe parents and unrelated destinations before writes
+  ---
+  duration_ms: 63.562625
+  type: 'test'
+  ...
+# Subtest: legacy migration preserves originals, scope, run IDs, evidence and history; stale inputs stay stale
+ok 7 - legacy migration preserves originals, scope, run IDs, evidence and history; stale inputs stay stale
+  ---
+  duration_ms: 166.942083
+  type: 'test'
+  ...
+# Subtest: legacy migration refuses active locks, unowned state and hostile history without changing old files
+ok 8 - legacy migration refuses active locks, unowned state and hostile history without changing old files
+  ---
+  duration_ms: 325.454417
+  type: 'test'
+  ...
+# Subtest: generic entrypoint routes valid local resources and CLI refuses irrelevant flags
+ok 9 - generic entrypoint routes valid local resources and CLI refuses irrelevant flags
+  ---
+  duration_ms: 426.969792
+  type: 'test'
+  ...
+# Subtest: preserved comparative validator detects missing fields without requiring system Python changes
+ok 10 - preserved comparative validator detects missing fields without requiring system Python changes
+  ---
+  duration_ms: 323.448417
+  type: 'test'
+  ...
+# Subtest: macOS system aliases normalize without allowing user directory symlinks
+ok 11 - macOS system aliases normalize without allowing user directory symlinks
+  ---
+  duration_ms: 376.337292
+  type: 'test'
+  ...
+# Subtest: new work sees main advancement; resumed work retains guidance and installed runtime without network
+ok 12 - new work sees main advancement; resumed work retains guidance and installed runtime without network
+  ---
+  duration_ms: 2435.123042
+  type: 'test'
+  ...
+# Subtest: guidance snapshots retain attribution and upstream licenses without executable code
+ok 13 - guidance snapshots retain attribution and upstream licenses without executable code
+  ---
+  duration_ms: 1420.846292
+  type: 'test'
+  ...
+# Subtest: older guidance and task pins report unknown release without inventing a version
+ok 14 - older guidance and task pins report unknown release without inventing a version
+  ---
+  duration_ms: 1574.786667
+  type: 'test'
+  ...
+# Subtest: malformed guidance release cannot create a task
+ok 15 - malformed guidance release cannot create a task
+  ---
+  duration_ms: 716.96925
+  type: 'test'
+  ...
+# Subtest: guidance and executable changes are detected when resuming saved work
+ok 16 - guidance and executable changes are detected when resuming saved work
+  ---
+  duration_ms: 932.078209
+  type: 'test'
+  ...
+# Subtest: incompatible guidance does not create a task and releases the refresh lock
+ok 17 - incompatible guidance does not create a task and releases the refresh lock
+  ---
+  duration_ms: 562.45975
+  type: 'test'
+  ...
+# Subtest: synthesis guidance requires its prerelease runtime and retains its pin on resume
+ok 18 - synthesis guidance requires its prerelease runtime and retains its pin on resume
+  ---
+  duration_ms: 1686.686709
+  type: 'test'
+  ...
+# Subtest: automatic refresh stays on stable releases even for a preview runtime
+ok 19 - automatic refresh stays on stable releases even for a preview runtime
+  ---
+  duration_ms: 965.72475
+  type: 'test'
+  ...
+# Subtest: fetch failures preserve existing tasks and never claim current guidance
+ok 20 - fetch failures preserve existing tasks and never claim current guidance
+  ---
+  duration_ms: 407.719625
+  type: 'test'
+  ...
+# Subtest: DNS failures identify the network restriction without leaking Git URLs and allow a retry
+ok 21 - DNS failures identify the network restriction without leaking Git URLs and allow a retry
+  ---
+  duration_ms: 1384.427958
+  type: 'test'
+  ...
+# Subtest: missing Git reports the actual local operation instead of a fetch failure
+ok 22 - missing Git reports the actual local operation instead of a fetch failure
+  ---
+  duration_ms: 568.465833
+  type: 'test'
+  ...
+# Subtest: rejects symlink or executable guidance and unsafe caches
+ok 23 - rejects symlink or executable guidance and unsafe caches
+  ---
+  duration_ms: 1117.715583
+  type: 'test'
+  ...
+# Subtest: pins an approved ancestor explicitly and rejects other commits or malformed task IDs
+ok 24 - pins an approved ancestor explicitly and rejects other commits or malformed task IDs
+  ---
+  duration_ms: 943.001042
+  type: 'test'
+  ...
+# Subtest: refresh lock refuses concurrent updates without deleting another owner’s lock
+ok 25 - refresh lock refuses concurrent updates without deleting another owner’s lock
+  ---
+  duration_ms: 1419.149625
+  type: 'test'
+  ...
+# Subtest: installed discovery entry is the small bootstrap while executable helpers stay local
+ok 26 - installed discovery entry is the small bootstrap while executable helpers stay local
+  ---
+  duration_ms: 4266.24075
+  type: 'test'
+  ...
+# Subtest: new work takes the newest release its runtime supports, so unreleased guidance on main is not served
+ok 27 - new work takes the newest release its runtime supports, so unreleased guidance on main is not served
+  ---
+  duration_ms: 3498.948541
+  type: 'test'
+  ...
+# Subtest: light depth keeps facts and answers short: at most 8 facts per question and 10 answer sentences
+ok 28 - light depth keeps facts and answers short: at most 8 facts per question and 10 answer sentences
+  ---
+  duration_ms: 1126.488917
+  type: 'test'
+  ...
+# Subtest: a light writer gets its sentence limit in the task and more is refused
+ok 29 - a light writer gets its sentence limit in the task and more is refused
+  ---
+  duration_ms: 1235.017625
+  type: 'test'
+  ...
+# Subtest: standard depth keeps its larger limits
+ok 30 - standard depth keeps its larger limits
+  ---
+  duration_ms: 1417.708291
+  type: 'test'
+  ...
+# Subtest: each task names the guidance sections its worker needs, from the runtime when guidance is local
+ok 31 - each task names the guidance sections its worker needs, from the runtime when guidance is local
+  ---
+  duration_ms: 983.850083
+  type: 'test'
+  ...
+# Subtest: a pinned guidance task points workers at its own snapshot, falling back to older guidance files
+ok 32 - a pinned guidance task points workers at its own snapshot, falling back to older guidance files
+  ---
+  duration_ms: 2279.920292
+  type: 'test'
+  ...
+# Subtest: verify reports a checked fact as confirmed without changing the saved output
+ok 33 - verify reports a checked fact as confirmed without changing the saved output
+  ---
+  duration_ms: 2017.548042
+  type: 'test'
+  ...
+# Subtest: verify follows narrowing, merging and supersession without calling an old assertion confirmed
+ok 34 - verify follows narrowing, merging and supersession without calling an old assertion confirmed
+  ---
+  duration_ms: 1259.139166
+  type: 'test'
+  ...
+# Subtest: verify reports rejected, unchecked, stale and gone keys, including keys from an earlier run
+ok 35 - verify reports rejected, unchecked, stale and gone keys, including keys from an earlier run
+  ---
+  duration_ms: 1784.059709
+  type: 'test'
+  ...
+# Subtest: verify reads cited keys from any file and needs no run ID on the command line
+ok 36 - verify reads cited keys from any file and needs no run ID on the command line
+  ---
+  duration_ms: 486.381792
+  type: 'test'
+  ...
+# Subtest: reassess --again researches, checks and rewrites only the chosen question and keeps its checked facts
+ok 37 - reassess --again researches, checks and rewrites only the chosen question and keeps its checked facts
+  ---
+  duration_ms: 806.888417
+  type: 'test'
+  ...
+# Subtest: reassess --again refuses unknown or unassessed questions, a round in progress and a reason alone
+ok 38 - reassess --again refuses unknown or unassessed questions, a round in progress and a reason alone
+  ---
+  duration_ms: 417.272208
+  type: 'test'
+  ...
+# Subtest: approve records who approved which content, and a later change says it no longer applies
+ok 39 - approve records who approved which content, and a later change says it no longer applies
+  ---
+  duration_ms: 401.252417
+  type: 'test'
+  ...
+# Subtest: start --from reuses finished research at once, with the same keys and the origin approval kept as history
+ok 40 - start --from reuses finished research at once, with the same keys and the origin approval kept as history
+  ---
+  duration_ms: 1029.538
+  type: 'test'
+  ...
+# Subtest: start --from researches again what it cannot carry: unsaved text, unchecked candidates, or found sources in a supplied-only run
+ok 41 - start --from researches again what it cannot carry: unsaved text, unchecked candidates, or found sources in a supplied-only run
+  ---
+  duration_ms: 409.327291
+  type: 'test'
+  ...
+# Subtest: start --from refuses edited research, claims, a different depth and a replacement plan
+ok 42 - start --from refuses edited research, claims, a different depth and a replacement plan
+  ---
+  duration_ms: 384.455125
+  type: 'test'
+  ...
+# Subtest: a new topic extends the reused plan; only new questions are researched, checked, cross-checked and written
+ok 43 - a new topic extends the reused plan; only new questions are researched, checked, cross-checked and written
+  ---
+  duration_ms: 1338.865959
+  type: 'test'
+  ...
+# Subtest: two origins with colliding IDs are renamed, and a shared question is assessed again by one checker
+ok 44 - two origins with colliding IDs are renamed, and a shared question is assessed again by one checker
+  ---
+  duration_ms: 9442.719917
+  type: 'test'
+  ...
+# Subtest: find lists research folders under a directory with their status, size, approval and source age
+ok 45 - find lists research folders under a directory with their status, size, approval and source age
+  ---
+  duration_ms: 352.274667
+  type: 'test'
+  ...
+# Subtest: refresh re-reads web sources; unchanged text keeps every fact current
+ok 46 - refresh re-reads web sources; unchanged text keeps every fact current
+  ---
+  duration_ms: 279.883291
+  type: 'test'
+  ...
+# Subtest: refresh makes a fact stale when its passage is gone, and researches, checks and rewrites just its question
+ok 47 - refresh makes a fact stale when its passage is gone, and researches, checks and rewrites just its question
+  ---
+  duration_ms: 195.396417
+  type: 'test'
+  ...
+# Subtest: refresh keeps facts whose passages remain, records unreadable originals, and needs a finished run
+ok 48 - refresh keeps facts whose passages remain, records unreadable originals, and needs a finished run
+  ---
+  duration_ms: 354.642167
+  type: 'test'
+  ...
+# Subtest: verify follows a narrowed assertion that was later superseded to the one standing now
+ok 49 - verify follows a narrowed assertion that was later superseded to the one standing now
+  ---
+  duration_ms: 99.168375
+  type: 'test'
+  ...
+# Subtest: a round that finishes before the first pass writes a section leaves that section to be written in full
+ok 50 - a round that finishes before the first pass writes a section leaves that section to be written in full
+  ---
+  duration_ms: 148.5685
+  type: 'test'
+  ...
+# Subtest: refresh follows a page through several revisions, including back to earlier text
+ok 51 - refresh follows a page through several revisions, including back to earlier text
+  ---
+  duration_ms: 277.939167
+  type: 'test'
+  ...
+# Subtest: import does not carry a confirmed fact whose saved text is gone, even from an older revision, and refuses an altered pin
+ok 52 - import does not carry a confirmed fact whose saved text is gone, even from an older revision, and refuses an altered pin
+  ---
+  duration_ms: 283.871166
+  type: 'test'
+  ...
+# Subtest: import rewrites and reviews answers that were never reviewed at standard depth
+ok 53 - import rewrites and reviews answers that were never reviewed at standard depth
+  ---
+  duration_ms: 313.361167
+  type: 'test'
+  ...
+# Subtest: a question two origins answer differently is assessed again, and a stale or edited selected original is read again
+ok 54 - a question two origins answer differently is assessed again, and a stale or edited selected original is read again
+  ---
+  duration_ms: 543.626584
+  type: 'test'
+  ...
+# Subtest: a research folder copied under another name keeps its saved text
+ok 55 - a research folder copied under another name keeps its saved text
+  ---
+  duration_ms: 129.937209
+  type: 'test'
+  ...
+# Subtest: reuse with a new selected source reads it before the planner extends the plan
+ok 56 - reuse with a new selected source reads it before the planner extends the plan
+  ---
+  duration_ms: 276.558167
+  type: 'test'
+  ...
+# Subtest: claim questions come across only when their exact target is in the new project
+ok 57 - claim questions come across only when their exact target is in the new project
+  ---
+  duration_ms: 242.381625
+  type: 'test'
+  ...
+# Subtest: a file selected again, or already carried over by reuse, is one selected source and never stalls the run
+ok 58 - a file selected again, or already carried over by reuse, is one selected source and never stalls the run
+  ---
+  duration_ms: 858.431458
+  type: 'test'
+  ...
+# Subtest: a relative --from that finds nothing says it was read against --project
+ok 59 - a relative --from that finds nothing says it was read against --project
+  ---
+  duration_ms: 234.135958
+  type: 'test'
+  ...
+# Subtest: each answer keeps its evidence in a collapsed block after the cited prose
+ok 60 - each answer keeps its evidence in a collapsed block after the cited prose
+  ---
+  duration_ms: 81.801542
+  type: 'test'
+  ...
+# Subtest: an extension for a new topic can restate the scope and title, and otherwise keeps the origin scope
+ok 61 - an extension for a new topic can restate the scope and title, and otherwise keeps the origin scope
+  ---
+  duration_ms: 194.889042
+  type: 'test'
+  ...
+# Subtest: queued research completes with a checked cited answer, matching exports and a legacy projection
+ok 62 - queued research completes with a checked cited answer, matching exports and a legacy projection
+  ---
+  duration_ms: 615.626334
+  type: 'test'
+  ...
+# Subtest: honest zero-fact and all-rejected questions complete with gaps and no invented citation
+ok 63 - honest zero-fact and all-rejected questions complete with gaps and no invented citation
+  ---
+  duration_ms: 1035.469583
+  type: 'test'
+  ...
+# Subtest: an inaccessible original can be rejected honestly, but cannot confirm or narrow a fact
+ok 64 - an inaccessible original can be rejected honestly, but cannot confirm or narrow a fact
+  ---
+  duration_ms: 292.848917
+  type: 'test'
+  ...
+# Subtest: a mixed-source check retains accessible support and records the inaccessible original as a gap
+ok 65 - a mixed-source check retains accessible support and records the inaccessible original as a gap
+  ---
+  duration_ms: 353.330417
+  type: 'test'
+  ...
+# Subtest: lease expiry fences old workers, renews live work and accepted replay cannot rewrite results
+ok 66 - lease expiry fences old workers, renews live work and accepted replay cannot rewrite results
+  ---
+  duration_ms: 165.504583
+  type: 'test'
+  ...
+# Subtest: a lapsed lease still submits while nobody else has taken the task
+ok 67 - a lapsed lease still submits while nobody else has taken the task
+  ---
+  duration_ms: 90.905792
+  type: 'test'
+  ...
+# Subtest: a refused submission keeps its lease for correction, and ten refusals end the attempt
+ok 68 - a refused submission keeps its lease for correction, and ten refusals end the attempt
+  ---
+  duration_ms: 922.89125
+  type: 'test'
+  ...
+# Subtest: three failed attempts block instead of fabricating unavailable, explicit retry retains history
+ok 69 - three failed attempts block instead of fabricating unavailable, explicit retry retains history
+  ---
+  duration_ms: 283.09575
+  type: 'test'
+  ...
+# Subtest: plan-only hold supports validated edits and cannot accidentally run research early
+ok 70 - plan-only hold supports validated edits and cannot accidentally run research early
+  ---
+  duration_ms: 159.350125
+  type: 'test'
+  ...
+# Subtest: unavailable independent checker is a visible execution block with partial artifacts
+ok 71 - unavailable independent checker is a visible execution block with partial artifacts
+  ---
+  duration_ms: 212.526083
+  type: 'test'
+  ...
+# Subtest: number/quote validation and failure rollback retain no partially accepted facts
+ok 72 - number/quote validation and failure rollback retain no partially accepted facts
+  ---
+  duration_ms: 157.39025
+  type: 'test'
+  ...
+# Subtest: normalized quotes preserve exact original wording and Unicode offsets; numeric boundaries remain distinct
+ok 73 - normalized quotes preserve exact original wording and Unicode offsets; numeric boundaries remain distinct
+  ---
+  duration_ms: 0.777542
+  type: 'test'
+  ...
+# Subtest: abbreviations stay one sentence, and spelled-out or scaled numbers meet the number rule
+ok 74 - abbreviations stay one sentence, and spelled-out or scaled numbers meet the number rule
+  ---
+  duration_ms: 0.713042
+  type: 'test'
+  ...
+# Subtest: digits inside identifiers are part of a name, not numbers the evidence must contain
+ok 75 - digits inside identifiers are part of a name, not numbers the evidence must contain
+  ---
+  duration_ms: 0.229958
+  type: 'test'
+  ...
+# Subtest: unowned output and escaping sources are preserved
+ok 76 - unowned output and escaping sources are preserved
+  ---
+  duration_ms: 5.311125
+  type: 'test'
+  ...
+# Subtest: narrowing creates a new assertion key and retains the rejected wording in history
+ok 77 - narrowing creates a new assertion key and retains the rejected wording in history
+  ---
+  duration_ms: 775.338917
+  type: 'test'
+  ...
+# Subtest: cross-check merges checked duplicates, preserves aliases, and rejects supersession cycles
+ok 78 - cross-check merges checked duplicates, preserves aliases, and rejects supersession cycles
+  ---
+  duration_ms: 586.658416
+  type: 'test'
+  ...
+# Subtest: one light gap round is capped, skips the gap cross-check, and unresearched angles remain explicit gaps
+ok 79 - one light gap round is capped, skips the gap cross-check, and unresearched angles remain explicit gaps
+  ---
+  duration_ms: 4100.422541
+  type: 'test'
+  ...
+# Subtest: standard depth requires a different writing reviewer and rejects unsupported headlines
+ok 80 - standard depth requires a different writing reviewer and rejects unsupported headlines
+  ---
+  duration_ms: 5063.549291
+  type: 'test'
+  ...
+# Subtest: source original and extraction revisions are pinned separately; changed originals invalidate current use
+ok 81 - source original and extraction revisions are pinned separately; changed originals invalidate current use
+  ---
+  duration_ms: 193.518416
+  type: 'test'
+  ...
+# Subtest: UTF-8 BOM hashes use original bytes, and unreadable selected originals become assessed gaps
+ok 82 - UTF-8 BOM hashes use original bytes, and unreadable selected originals become assessed gaps
+  ---
+  duration_ms: 245.830083
+  type: 'test'
+  ...
+# Subtest: public-source permissions and exact Unicode claim targets cannot be bypassed by self-citation
+ok 83 - public-source permissions and exact Unicode claim targets cannot be bypassed by self-citation
+  ---
+  duration_ms: 104.387125
+  type: 'test'
+  ...
+# Subtest: status repairs interrupted derived writes without changing revision and refuses stale run writes
+ok 84 - status repairs interrupted derived writes without changing revision and refuses stale run writes
+  ---
+  duration_ms: 150.023208
+  type: 'test'
+  ...
+# Subtest: concurrent task claims wait for the shared lock and never return the same lease
+ok 85 - concurrent task claims wait for the shared lock and never return the same lease
+  ---
+  duration_ms: 397.372625
+  type: 'test'
+  ...
+# Subtest: a lock left by an exited process is recovered; a live one is waited for, then reported
+ok 86 - a lock left by an exited process is recovered; a live one is waited for, then reported
+  ---
+  duration_ms: 318.685291
+  type: 'test'
+  ...
+# Subtest: CLI JSON and source paths resolve against project; help and malformed payload errors are actionable
+ok 87 - CLI JSON and source paths resolve against project; help and malformed payload errors are actionable
+  ---
+  duration_ms: 37.570042
+  type: 'test'
+  ...
+# Subtest: published schema validates the complete design fixture and rejects malformed external exports
+ok 88 - published schema validates the complete design fixture and rejects malformed external exports
+  ---
+  duration_ms: 1.251917
+  type: 'test'
+  ...
+# Subtest: isolated installation includes queued CLI, schema and skill guidance with no runtime dependencies
+ok 89 - isolated installation includes queued CLI, schema and skill guidance with no runtime dependencies
+  ---
+  duration_ms: 263.370833
+  type: 'test'
+  ...
+# Subtest: legacy status repairs an interrupted projection and manual commands cannot replace canonical work
+ok 90 - legacy status repairs an interrupted projection and manual commands cannot replace canonical work
+  ---
+  duration_ms: 105.999334
+  type: 'test'
+  ...
+# Subtest: new research records and verifies the saved bootstrap guidance identity offline
+ok 91 - new research records and verifies the saved bootstrap guidance identity offline
+  ---
+  duration_ms: 209.993792
+  type: 'test'
+  ...
+# Subtest: programmatic research imports work from stdin without treating it as a guidance executable
+ok 92 - programmatic research imports work from stdin without treating it as a guidance executable
+  ---
+  duration_ms: 69.496083
+  type: 'test'
+  ...
+# Subtest: preserved live skill examples keep valid exports, exact evidence and independent check identities
+ok 93 - preserved live skill examples keep valid exports, exact evidence and independent check identities
+  ---
+  duration_ms: 7.727042
+  type: 'test'
+  ...
+# Subtest: the preserved Claude Code trial export verifies against its manifest and keeps researcher and checker apart
+ok 94 - the preserved Claude Code trial export verifies against its manifest and keeps researcher and checker apart
+  ---
+  duration_ms: 6.877375
+  type: 'test'
+  ...
+# Subtest: a failed section holds up only what depends on it; other sections are checked as soon as they are researched
+ok 95 - a failed section holds up only what depends on it; other sections are checked as soon as they are researched
+  ---
+  duration_ms: 269.888
+  type: 'test'
+  ...
+# Subtest: peek shows the next task without taking it, and release gives it back without a failed attempt
+ok 96 - peek shows the next task without taking it, and release gives it back without a failed attempt
+  ---
+  duration_ms: 111.0375
+  type: 'test'
+  ...
+# Subtest: releasing research preserves checker exclusion, including after a refused finding
+ok 97 - releasing research preserves checker exclusion, including after a refused finding
+  ---
+  duration_ms: 375.833125
+  type: 'test'
+  ...
+# Subtest: saved source text must carry its surroundings unless registered as a partial capture
+ok 98 - saved source text must carry its surroundings unless registered as a partial capture
+  ---
+  duration_ms: 312.039375
+  type: 'test'
+  ...
+# Subtest: reports take a short title, compare subjects side by side, and export no worker bookkeeping
+ok 99 - reports take a short title, compare subjects side by side, and export no worker bookkeeping
+  ---
+  duration_ms: 85.245667
+  type: 'test'
+  ...
+# Subtest: comparison tables keep merged facts in every linked question section
+ok 100 - comparison tables keep merged facts in every linked question section
+  ---
+  duration_ms: 260.341417
+  type: 'test'
+  ...
+# Subtest: the sources list reads one path or link per line, and peek and release work from the command line
+ok 101 - the sources list reads one path or link per line, and peek and release work from the command line
+  ---
+  duration_ms: 73.540333
+  type: 'test'
+  ...
+# Subtest: current guidance requires the synthesis runtime and explicitly retains legacy resume routes
+ok 102 - current guidance requires the synthesis runtime and explicitly retains legacy resume routes
+  ---
+  duration_ms: 3.575958
+  type: 'test'
+  ...
+# Subtest: registered text is pinned: editing the working file changes nothing, and the pinned copy is what quotes check against
+ok 103 - registered text is pinned: editing the working file changes nothing, and the pinned copy is what quotes check against
+  ---
+  duration_ms: 262.4635
+  type: 'test'
+  ...
+# Subtest: a changed original makes only the work resting on it stale, and reassess redoes just that
+ok 104 - a changed original makes only the work resting on it stale, and reassess redoes just that
+  ---
+  duration_ms: 358.335334
+  type: 'test'
+  ...
+# Subtest: plans outside the depth size or uneven across subjects are accepted with warnings shown in the plan and report
+ok 105 - plans outside the depth size or uneven across subjects are accepted with warnings shown in the plan and report
+  ---
+  duration_ms: 27.1315
+  type: 'test'
+  ...
+# Subtest: the command line writes the full task to a file and answers compactly unless asked for everything
+ok 106 - the command line writes the full task to a file and answers compactly unless asked for everything
+  ---
+  duration_ms: 14.929417
+  type: 'test'
+  ...
+# Subtest: trial fixes: gaps name inline files, "partial" coverage is accepted, and sentences may state a fact's date
+ok 107 - trial fixes: gaps name inline files, "partial" coverage is accepted, and sentences may state a fact's date
+  ---
+  duration_ms: 98.995125
+  type: 'test'
+  ...
+# Subtest: start names a missing project folder plainly, and peek accepts the --harness that next takes
+ok 108 - start names a missing project folder plainly, and peek accepts the --harness that next takes
+  ---
+  duration_ms: 6.359166
+  type: 'test'
+  ...
+# Subtest: plan and every recorded finding automatically produce a cited report including unresolved questions
+ok 109 - plan and every recorded finding automatically produce a cited report including unresolved questions
+  ---
+  duration_ms: 19.947667
+  type: 'test'
+  ...
+# Subtest: matching plans resume findings and changes retain history with a new run
+ok 110 - matching plans resume findings and changes retain history with a new run
+  ---
+  duration_ms: 42.982542
+  type: 'test'
+  ...
+# Subtest: a changed plan keeps the findings of questions that did not change
+ok 111 - a changed plan keeps the findings of questions that did not change
+  ---
+  duration_ms: 14.283375
+  type: 'test'
+  ...
+# Subtest: a reworded or removed question loses its finding and the rest keep theirs
+ok 112 - a reworded or removed question loses its finding and the rest keep theirs
+  ---
+  duration_ms: 17.870916
+  type: 'test'
+  ...
+# Subtest: a changed topic, purpose, scope, selected sources or input keeps no finding
+ok 113 - a changed topic, purpose, scope, selected sources or input keeps no finding
+  ---
+  duration_ms: 86.111291
+  type: 'test'
+  ...
+# Subtest: unchanged selected sources keep a finding when a question is added
+ok 114 - unchanged selected sources keep a finding when a question is added
+  ---
+  duration_ms: 10.166541
+  type: 'test'
+  ...
+# Subtest: a kept finding whose snapshot changed is reported stale
+ok 115 - a kept finding whose snapshot changed is reported stale
+  ---
+  duration_ms: 10.13925
+  type: 'test'
+  ...
+# Subtest: a finding may carry a one-line headline, shown as its answer
+ok 116 - a finding may carry a one-line headline, shown as its answer
+  ---
+  duration_ms: 17.467125
+  type: 'test'
+  ...
+# Subtest: changed content or evidence is stale and cannot silently be counted as current
+ok 117 - changed content or evidence is stale and cannot silently be counted as current
+  ---
+  duration_ms: 12.965667
+  type: 'test'
+  ...
+# Subtest: verdicts require actual exact passages and unknown questions or bad quotations preserve the record
+ok 118 - verdicts require actual exact passages and unknown questions or bad quotations preserve the record
+  ---
+  duration_ms: 6.636333
+  type: 'test'
+  ...
+# Subtest: supplied-only and private-query protections persist across replanning
+ok 119 - supplied-only and private-query protections persist across replanning
+  ---
+  duration_ms: 7.015208
+  type: 'test'
+  ...
+# Subtest: fact-checks bind exact Unicode claims to a content snapshot and keep contradictory findings
+ok 120 - fact-checks bind exact Unicode claims to a content snapshot and keep contradictory findings
+  ---
+  duration_ms: 8.274042
+  type: 'test'
+  ...
+# Subtest: source traversal, symlinks and unowned storage cannot overwrite external or user files
+ok 121 - source traversal, symlinks and unowned storage cannot overwrite external or user files
+  ---
+  duration_ms: 52.790042
+  type: 'test'
+  ...
+# Subtest: concurrent findings cannot lose a save and stale locks are surfaced
+ok 122 - concurrent findings cannot lose a save and stale locks are surfaced
+  ---
+  duration_ms: 379.929959
+  type: 'test'
+  ...
+# Subtest: question IDs matching object properties start pending and the packaged CLI writes the automatic report
+ok 123 - question IDs matching object properties start pending and the packaged CLI writes the automatic report
+  ---
+  duration_ms: 149.280875
+  type: 'test'
+  ...
+# Subtest: uploaded-only research pins the original and extraction, binds citations and excludes unselected documents
+ok 124 - uploaded-only research pins the original and extraction, binds citations and excludes unselected documents
+  ---
+  duration_ms: 14.157583
+  type: 'test'
+  ...
+# Subtest: combined research retains uploaded and contrary public evidence in the same report
+ok 125 - combined research retains uploaded and contrary public evidence in the same report
+  ---
+  duration_ms: 15.69975
+  type: 'test'
+  ...
+# Subtest: uncited uploads and changed extractions invalidate research and retain earlier revisions
+ok 126 - uncited uploads and changed extractions invalidate research and retain earlier revisions
+  ---
+  duration_ms: 14.940917
+  type: 'test'
+  ...
+# Subtest: unreadable and partial uploads remain explicit coverage gaps without preventing an uploaded-only report
+ok 127 - unreadable and partial uploads remain explicit coverage gaps without preventing an uploaded-only report
+  ---
+  duration_ms: 10.425666
+  type: 'test'
+  ...
+# Subtest: binary uploads cannot be cited as text and selected documents obey project path boundaries
+ok 128 - binary uploads cannot be cited as text and selected documents obey project path boundaries
+  ---
+  duration_ms: 38.558875
+  type: 'test'
+  ...
+# Subtest: manual planning, recording and migration cannot poison a synthesis project
+ok 129 - manual planning, recording and migration cannot poison a synthesis project
+  ---
+  duration_ms: 13.954792
+  type: 'test'
+  ...
+# Subtest: concurrent old and new starts select one project owner without mixed state
+ok 130 - concurrent old and new starts select one project owner without mixed state
+  ---
+  duration_ms: 30.728667
+  type: 'test'
+  ...
+# Subtest: draft -> independent checked report; hashes and criterion-aligned output; derived repair
+ok 131 - draft -> independent checked report; hashes and criterion-aligned output; derived repair
+  ---
+  duration_ms: 46.859667
+  type: 'test'
+  ...
+# Subtest: reusable brief carries readable evidence, authored counterargument, qualifications and purpose
+ok 132 - reusable brief carries readable evidence, authored counterargument, qualifications and purpose
+  ---
+  duration_ms: 21.00275
+  type: 'test'
+  ...
+# Subtest: reject unsupported references and source quotes before state persists
+ok 133 - reject unsupported references and source quotes before state persists
+  ---
+  duration_ms: 3.42675
+  type: 'test'
+  ...
+# Subtest: review requires independent identity, full original reads, semantic checks and current digest
+ok 134 - review requires independent identity, full original reads, semantic checks and current digest
+  ---
+  duration_ms: 24.453958
+  type: 'test'
+  ...
+# Subtest: changed working sources and immutable captures invalidate completed reports
+ok 135 - changed working sources and immutable captures invalidate completed reports
+  ---
+  duration_ms: 25.969416
+  type: 'test'
+  ...
+# Subtest: source permissions, partial context and comparison alignment are explicit
+ok 136 - source permissions, partial context and comparison alignment are explicit
+  ---
+  duration_ms: 12.009208
+  type: 'test'
+  ...
+# Subtest: protect unowned outputs, legacy runs, traversal and symlink destinations
+ok 137 - protect unowned outputs, legacy runs, traversal and symlink destinations
+  ---
+  duration_ms: 11.189708
+  type: 'test'
+  ...
+# Subtest: authored markdown and HTML cannot inject links, tables or HTML
+ok 138 - authored markdown and HTML cannot inject links, tables or HTML
+  ---
+  duration_ms: 6.317792
+  type: 'test'
+  ...
+# Subtest: forged accepted/worker fields cannot override semantic rejection or reviewer identity
+ok 139 - forged accepted/worker fields cannot override semantic rejection or reviewer identity
+  ---
+  duration_ms: 12.318291
+  type: 'test'
+  ...
+# Subtest: minimal scope draft has no manufactured evidence and cannot retain review after save
+ok 140 - minimal scope draft has no manufactured evidence and cannot retain review after save
+  ---
+  duration_ms: 9.143083
+  type: 'test'
+  ...
+# Subtest: inaccessible originals persist an honest failed review and locator survives export
+ok 141 - inaccessible originals persist an honest failed review and locator survives export
+  ---
+  duration_ms: 12.623666
+  type: 'test'
+  ...
+# Subtest: portable research folder retains exact snapshots and old reviewed revisions are preserved
+ok 142 - portable research folder retains exact snapshots and old reviewed revisions are preserved
+  ---
+  duration_ms: 22.824792
+  type: 'test'
+  ...
+# Subtest: portable snapshot directories cannot redirect writes through symlinks
+ok 143 - portable snapshot directories cannot redirect writes through symlinks
+  ---
+  duration_ms: 3.157708
+  type: 'test'
+  ...
+# Subtest: repeated verify never calls missing or modified portable source artifacts verified
+ok 144 - repeated verify never calls missing or modified portable source artifacts verified
+  ---
+  duration_ms: 19.472292
+  type: 'test'
+  ...
+# Subtest: selected binary originals are explicitly pinned, portable, reviewed, and tracked separately from extraction
+ok 145 - selected binary originals are explicitly pinned, portable, reviewed, and tracked separately from extraction
+  ---
+  duration_ms: 39.483041
+  type: 'test'
+  ...
+# Subtest: original_file rejects traversal and symlinks while file URI origin requires the real local original
+ok 146 - original_file rejects traversal and symlinks while file URI origin requires the real local original
+  ---
+  duration_ms: 6.060875
+  type: 'test'
+  ...
+# Subtest: synthesis waits on the shared research lock used by legacy mutations
+ok 147 - synthesis waits on the shared research lock used by legacy mutations
+  ---
+  duration_ms: 28.767583
+  type: 'test'
+  ...
+# Subtest: authored brief preserves priority, all sections, fact/finding refs and typed audit without procedural reader labels
+ok 148 - authored brief preserves priority, all sections, fact/finding refs and typed audit without procedural reader labels
+  ---
+  duration_ms: 13.735042
+  type: 'test'
+  ...
+# Subtest: authored brief requires complete independent review and unsupported prose prevents completion
+ok 149 - authored brief requires complete independent review and unsupported prose prevents completion
+  ---
+  duration_ms: 27.333333
+  type: 'test'
+  ...
+# Subtest: brief draft and stale status stay explicit without technical integrity banners
+ok 150 - brief draft and stale status stay explicit without technical integrity banners
+  ---
+  duration_ms: 16.785583
+  type: 'test'
+  ...
+# Subtest: omitted authored brief retains every finding and explicitly exports its absence
+ok 151 - omitted authored brief retains every finding and explicitly exports its absence
+  ---
+  duration_ms: 6.401416
+  type: 'test'
+  ...
+# Subtest: malformed authored briefs fail before writing state
+ok 152 - malformed authored briefs fail before writing state
+  ---
+  duration_ms: 14.904375
+  type: 'test'
+  ...
+# Subtest: authored extras cannot override collision-safe review identities
+ok 153 - authored extras cannot override collision-safe review identities
+  ---
+  duration_ms: 43.277417
+  type: 'test'
+  ...
+# Subtest: missing purpose defaults to general topic research and explicit studio tasks remain intact
+ok 154 - missing purpose defaults to general topic research and explicit studio tasks remain intact
+  ---
+  duration_ms: 28.953375
+  type: 'test'
+  ...
+# Subtest: runtime compatibility follows prerelease precedence without treating alpha as stable
+ok 155 - runtime compatibility follows prerelease precedence without treating alpha as stable
+  ---
+  duration_ms: 0.8855
+  type: 'test'
+  ...
+# Subtest: malformed versions cannot bypass the runtime compatibility boundary
+ok 156 - malformed versions cannot bypass the runtime compatibility boundary
+  ---
+  duration_ms: 0.224292
+  type: 'test'
+  ...
+1..156
+# tests 156
+# suites 0
+# pass 156
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 29026.686167
+
+> harness-research-skill@1.0.0-alpha.1 context:check
+> node tools/context-usage.mjs --check
+
+{
+  "routes": {
+    "Discovery metadata": 36,
+    "Installed bootstrap": 574,
+    "Bootstrap + current guidance entry": 1242,
+    "Investigator stage": 1017,
+    "Synthesis writer stage": 1547,
+    "Independent reviewer stage": 1330,
+    "New synthesis: coordinator entry and workflow": 3773,
+    "New synthesis: all stages in one context": 7667,
+    "Synthesis resume, verify or refresh": 2132,
+    "Optional studio task handoff": 4474,
+    "Legacy 0.9 queued coordinator": 4973,
+    "Legacy 0.9 reuse or refresh": 2025,
+    "Legacy explicit chat-only answer": 2202,
+    "Legacy manual saved research": 3393,
+    "Legacy manual status or resume": 1803,
+    "Legacy comparative routing only": 1955,
+    "Legacy Codex comparative outline": 2915,
+    "Legacy Codex add items": 2120,
+    "Legacy Codex add fields": 2140,
+    "Legacy Codex deep results": 2803,
+    "Legacy Codex deep results + saved evidence": 3994,
+    "Legacy Claude comparative outline": 2932,
+    "Legacy Claude deep results": 2825,
+    "Investigation + general web strategy": 5287,
+    "Investigation + academic strategy": 5379,
+    "Investigation + GitHub strategy": 5174,
+    "Investigation + technical Q&A strategy": 5079,
+    "Investigation + Chinese sources strategy": 5304,
+    "Legacy migration": 1597
+  },
+  "inputDigest": "13dc8cbb2aeae3993ad91c7117c6af4f0ce7f07358f02b1911941d48b0d5f17a"
+}
+{
+  "status": "installed",
+  "runtimeVersion": "1.0.0-alpha.1",
+  "shared": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/shared",
+  "runtime": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/shared/versions/1.0.0-alpha.1-66bdb33bea65f5c03aa9",
+  "targets": [
+    "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.agents/skills/harness-research",
+    "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.claude/skills/harness-research",
+    "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.cursor/skills/harness-research"
+  ],
+  "legacy": [
+    {
+      "path": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.agents/skills/research",
+      "old": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.agents/skills/tanzu-brand/scripts/research/codex/skills/research",
+      "source": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/shared/current/upstream/codex/skills/research",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.agents/skills/research-add-items",
+      "old": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.agents/skills/tanzu-brand/scripts/research/codex/skills/research-add-items",
+      "source": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/shared/current/upstream/codex/skills/research-add-items",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.agents/skills/research-add-fields",
+      "old": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.agents/skills/tanzu-brand/scripts/research/codex/skills/research-add-fields",
+      "source": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/shared/current/upstream/codex/skills/research-add-fields",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.agents/skills/research-deep",
+      "old": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.agents/skills/tanzu-brand/scripts/research/codex/skills/research-deep",
+      "source": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/shared/current/upstream/codex/skills/research-deep",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.agents/skills/research-report",
+      "old": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.agents/skills/tanzu-brand/scripts/research/codex/skills/research-report",
+      "source": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/shared/current/upstream/codex/skills/research-report",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.codex/agents/web-researcher.toml",
+      "old": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.agents/skills/tanzu-brand/scripts/research/codex/agents/web-researcher.toml",
+      "source": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/shared/current/upstream/codex/agents/web-researcher.toml",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.codex/agents/web-search-modules",
+      "old": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.agents/skills/tanzu-brand/scripts/research/codex/agents/web-search-modules",
+      "source": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/shared/current/upstream/codex/agents/web-search-modules",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.codex/skills/research",
+      "old": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.codex/skills/tanzu-brand/scripts/research/codex/skills/research",
+      "source": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/shared/current/upstream/codex/skills/research",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.codex/skills/research-add-items",
+      "old": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.codex/skills/tanzu-brand/scripts/research/codex/skills/research-add-items",
+      "source": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/shared/current/upstream/codex/skills/research-add-items",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.codex/skills/research-add-fields",
+      "old": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.codex/skills/tanzu-brand/scripts/research/codex/skills/research-add-fields",
+      "source": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/shared/current/upstream/codex/skills/research-add-fields",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.codex/skills/research-deep",
+      "old": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.codex/skills/tanzu-brand/scripts/research/codex/skills/research-deep",
+      "source": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/shared/current/upstream/codex/skills/research-deep",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.codex/skills/research-report",
+      "old": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.codex/skills/tanzu-brand/scripts/research/codex/skills/research-report",
+      "source": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/shared/current/upstream/codex/skills/research-report",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.claude/skills/research",
+      "old": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.claude/skills/tanzu-brand/scripts/research/claude/skills/research",
+      "source": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/shared/current/upstream/claude/skills/research",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.claude/skills/research-add-items",
+      "old": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.claude/skills/tanzu-brand/scripts/research/claude/skills/research-add-items",
+      "source": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/shared/current/upstream/claude/skills/research-add-items",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.claude/skills/research-add-fields",
+      "old": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.claude/skills/tanzu-brand/scripts/research/claude/skills/research-add-fields",
+      "source": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/shared/current/upstream/claude/skills/research-add-fields",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.claude/skills/research-deep",
+      "old": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.claude/skills/tanzu-brand/scripts/research/claude/skills/research-deep",
+      "source": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/shared/current/upstream/claude/skills/research-deep",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.claude/skills/research-report",
+      "old": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.claude/skills/tanzu-brand/scripts/research/claude/skills/research-report",
+      "source": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/shared/current/upstream/claude/skills/research-report",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.claude/agents/web-search-agent.md",
+      "old": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.claude/skills/tanzu-brand/scripts/research/claude/agents/web-search-agent.md",
+      "source": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/shared/current/upstream/claude/agents/web-search-agent.md",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.claude/agents/web-search-modules",
+      "old": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/home/.claude/skills/tanzu-brand/scripts/research/claude/agents/web-search-modules",
+      "source": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/shared/current/upstream/claude/agents/web-search-modules",
+      "status": "preserved",
+      "previous": null
+    }
+  ],
+  "contentDigest": "66bdb33bea65f5c03aa9d5daefbadd1bee49c66a5215b65424ec297de776c0c4"
+}
+Usage: node scripts/harness-research.mjs synthesis save|review|status|verify --project DIR [options]
+       node scripts/harness-research.mjs research ACTION --project DIR [options]
+       node scripts/harness-research.mjs plan|record|status|migrate --project DIR [--file JSON] [--run ID --item ID] [--allow-web]
+       node scripts/harness-research.mjs --version
+harness-research 1.0.0-alpha.1
+{
+  "run": "66d6dd8496ddbaf0b06fe973",
+  "scope": "supplied-only",
+  "sourceMode": "Uploaded sources only",
+  "sourceGaps": [],
+  "status": "in-progress",
+  "pending": [
+    "availability"
+  ],
+  "unresolved": [],
+  "staleItems": [],
+  "completed": 0,
+  "total": 1,
+  "file": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/content/.harness-research/research.json",
+  "report": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.CPHVgj/content/.harness-research/research-report.md",
+  "assessment": "Research coverage; does not certify a factual or downstream review.",
+  "carried": []
+}
+{"usage":"synthesis save --project DIR --file dossier.json --worker ID | review --project DIR --file review.json --worker ID | status --project DIR | verify --project DIR. File paths are project-relative. Status includes an independent review template. Save writes draft artifacts; review binds to exact content and source hashes. The helper never fetches sources or makes semantic judgments."}
+{"schema":2,"status":"draft","problems":[],"digest":"b636f31dee6717696c44f7feaa66ebfebb41455ec4c9ac71c5bd5f597fd7e3d3","author":"installer-smoke","reviewer":null,"sources":[],"outputs":["research/report.md","research/brief.md","research/evidence.md","research/facts.json","research/output.json"],"review_template":{"schema":2,"digest":"b636f31dee6717696c44f7feaa66ebfebb41455ec4c9ac71c5bd5f597fd7e3d3","originals":[],"facts":[],"findings":[],"prose":[{"id":"pending:0","verdict":"pending","note":""}],"assessment":{"coverage":"pending","usefulness":"pending","note":""}},"caveat":"Worker identities and original-read attestations are supplied by the harness. Hashes and structural validation do not prove truth or process independence.","artifact_integrity":"repaired","artifact_problems":[],"regenerated_files":["research/report.md","research/brief.md","research/evidence.md","research/facts.json","research/output.json"]}
+{"schema":2,"status":"draft","problems":[],"digest":"b636f31dee6717696c44f7feaa66ebfebb41455ec4c9ac71c5bd5f597fd7e3d3","author":"installer-smoke","reviewer":null,"sources":[],"outputs":["research/report.md","research/brief.md","research/evidence.md","research/facts.json","research/output.json"],"review_template":{"schema":2,"digest":"b636f31dee6717696c44f7feaa66ebfebb41455ec4c9ac71c5bd5f597fd7e3d3","originals":[],"facts":[],"findings":[],"prose":[{"id":"pending:0","verdict":"pending","note":""}],"assessment":{"coverage":"pending","usefulness":"pending","note":""}},"caveat":"Worker identities and original-read attestations are supplied by the harness. Hashes and structural validation do not prove truth or process independence.","artifact_integrity":"verified","artifact_problems":[],"regenerated_files":[]}

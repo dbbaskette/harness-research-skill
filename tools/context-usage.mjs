@@ -43,6 +43,7 @@ export async function measureContext() {
     synthesisFull: path([...entry, 'references/synthesis-workflow.md', 'references/investigate.md', 'references/synthesize.md', 'references/review-synthesis.md']),
     investigator: path(['references/investigate.md']), synthesisWriter: path(['references/synthesize.md']), synthesisReviewer: path(['references/review-synthesis.md']),
     synthesisReuse: path([...entry, 'references/synthesis-reuse.md']),
+    studioHandoff: path([...entry, 'references/synthesis-workflow.md', 'references/studio-handoff.md']),
     queued: path(queued), researchWorker: path(['references/task-research.md']), checkWorker: path(['references/task-check.md']), writeWorker: path(['references/task-write.md']), refreshWorker: path(['references/reuse.md']), focused: path(focused), quick: path([...entry, 'references/workflow.md']),
     resume: path([...entry, 'references/resume.md']),
     reuse: path([...entry, 'references/reuse.md']),
@@ -63,7 +64,7 @@ export async function measureContext() {
   const activation = files['bootstrap/SKILL.md'] + files['SKILL.md'];
   const routes = { 'Discovery metadata': count(description), 'Installed bootstrap': files['bootstrap/SKILL.md'], 'Bootstrap + current guidance entry': activation,
     'Investigator stage': readingPaths.investigator.total, 'Synthesis writer stage': readingPaths.synthesisWriter.total, 'Independent reviewer stage': readingPaths.synthesisReviewer.total,
-    ...Object.fromEntries(Object.entries({ synthesisCoordinator: 'New synthesis: coordinator entry and workflow', synthesisFull: 'New synthesis: all stages in one context', synthesisReuse: 'Synthesis resume, verify or refresh',
+    ...Object.fromEntries(Object.entries({ synthesisCoordinator: 'New synthesis: coordinator entry and workflow', synthesisFull: 'New synthesis: all stages in one context', synthesisReuse: 'Synthesis resume, verify or refresh', studioHandoff: 'Optional studio task handoff',
       queued: 'Legacy 0.9 queued coordinator', reuse: 'Legacy 0.9 reuse or refresh', quick: 'Legacy explicit chat-only answer', focused: 'Legacy manual saved research', resume: 'Legacy manual status or resume', comparative: 'Legacy comparative routing only', codexoutline: 'Legacy Codex comparative outline', codexitems: 'Legacy Codex add items', codexfields: 'Legacy Codex add fields', codexdeep: 'Legacy Codex deep results', codexdeepSaved: 'Legacy Codex deep results + saved evidence', claudeoutline: 'Legacy Claude comparative outline', claudedeep: 'Legacy Claude deep results', general: 'Investigation + general web strategy', academic: 'Investigation + academic strategy', github: 'Investigation + GitHub strategy', technical: 'Investigation + technical Q&A strategy', chinese: 'Investigation + Chinese sources strategy', migration: 'Legacy migration' }).map(([name, label]) => [label, standalone[name].total])) };
   const hashes = Object.fromEntries(paths.map(path => [path, createHash('sha256').update(contents[path]).digest('hex')]));
   const inputDigest = createHash('sha256').update(JSON.stringify({ hashes, outputs, readingPaths, routes })).digest('hex');

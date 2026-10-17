@@ -22,14 +22,18 @@ flowchart LR
 
 ## The unit of work is a dossier
 
-The schema-2 dossier has sources, facts, findings and ordered report sections.
+The schema-2 dossier has sources, facts, findings, ordered report sections and
+optional authored brief sections.
 Questions can help the investigator discover missing information; they are not
 required public headings or executable tasks. Explicit comparison criteria relate
 subject cells instead of pairing facts by array position.
 
 Facts cite exact source quotations and their author identities. Findings connect
 facts, identify contrary evidence, and distinguish direct summaries, inferences
-and conditional recommendations. The same findings feed the concise brief.
+and conditional recommendations. Authors use them to shape a prioritized brief
+for the actual studio task or research purpose. The helper preserves authored
+order and references; it does not choose a format by matching purpose keywords.
+Old dossiers without authored brief sections retain the full finding view.
 Source limitations and unresolved questions remain explicit, including unknown
 workload details that more web searching cannot resolve.
 
@@ -42,7 +46,7 @@ actual meaning and usefulness.
 
 Saving computes a digest over the dossier, its author and source hashes. The
 independent review names that digest and the inspected sources. It assesses
-facts, findings, prose, comparison cells, coverage and usefulness. An author
+facts, findings, report and brief prose, comparison cells, coverage and usefulness. An author
 cannot review their own dossier or their own facts under the same identity.
 
 The host supplies identities and reading attestations. The helper can reject a

@@ -8,7 +8,6 @@
     "schema",
     "topic",
     "audience",
-    "purpose",
     "scope",
     "source_mode",
     "sources",
@@ -29,8 +28,12 @@
       "minLength": 1
     },
     "purpose": {
-      "type": "string",
-      "minLength": 1
+      "type": [
+        "string",
+        "null"
+      ],
+      "default": "General-purpose topic research",
+      "description": "Optional intended use or studio task. Omitted, null or blank values normalize to General-purpose topic research; explicit nonempty purpose is preserved."
     },
     "scope": {
       "type": "string",
@@ -73,6 +76,14 @@
       "items": {
         "$ref": "#/$defs/comparison"
       }
+    },
+    "brief": {
+      "description": "Optional purpose-shaped brief, authored in priority order. When omitted, the helper renders all findings. Every supplied block requires independent prose review.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/section"
+      },
+      "minItems": 1
     }
   },
   "$defs": {

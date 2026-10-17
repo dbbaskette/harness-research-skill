@@ -32,8 +32,11 @@ verdicts. Do not manufacture a passing review.
 For every fact, check that exact quotations exist and the assertion follows from
 the surrounding source, including numbers, releases, editions, dates and conditions.
 Identify circular support, marketing presented as demonstrated behavior, omitted
-qualifiers and conflated products. Search for contradictions when a material claim
-requires it, within the authorized source scope. A fresh relevant source may
+qualifiers and conflated products. Resolve the subject and scope of each supporting
+clause: an exact quote in an adjacent sentence may concern another edition or
+condition. Do not join them into a broader claim. Distinguish explicit statements
+from reasonable but additional inferences. Search for contradictions when a
+material claim requires it, within the authorized source scope. A fresh relevant source may
 require a revised dossier and new digest before it can support completion.
 
 Use `supported` only when the full claim is supported. Use `narrow` when support
@@ -45,9 +48,9 @@ silently rewrite the report while asserting you reviewed the old digest.
 
 For each finding and prose block, inspect its entire reference chain. Is the text
 a fair synthesis rather than a larger claim than its facts support? Are causal
-claims established, interpretations labeled and recommendations conditional? Are
-contradictions and consequential unknowns visible beside the conclusions they
-limit? Are repeated sources mistaken for independent confirmations?
+claims established, interpretations distinguishable in natural language and
+recommendations conditional? Are contradictions and consequential unknowns
+visible beside the conclusions they limit? Are repeated sources mistaken for independent confirmations?
 
 Review every comparison cell against its named criterion, compatible versions and
 matching units/conditions. Verify that “no evidence” has not become “no capability.”
@@ -55,6 +58,20 @@ Read the report as a whole as well: does it answer the user’s actual request, 
 what matters and support downstream authors? Is its coverage honest? Repetition,
 question-by-question dumping, a missing central explanation or a misleading
 headline can justify `needs-revision` even when each isolated fact is accurate.
+
+Check the saved brief as well as the report. Does its ordering make the most
+consequential takeaway easy to find, and does its shape serve the actual task?
+Can a downstream author understand the supporting evidence, why a counterargument
+matters and which qualifications must survive shortening? Has synthesis discarded a consequential detail already
+present in the evidence in favor of generic advice to verify it? Does the depth
+serve the recorded purpose, with illustrative examples clearly separated from
+observations? Are procedural labels and repeated evidence inventories obscuring
+the explanation? A brief should prioritize without removing qualifications or
+forcing an arbitrary number of takeaways. Assess the strongest supported case for
+relevant alternatives and the status quo where applicable; one-sided evidence needs an explicit limit, not
+an artificial balance of sources or prose. Record overall handoff shortcomings in
+`assessment.usefulness`, and objections to specific content against its finding
+or prose ID.
 
 Support checks and usefulness are separate. Do not claim a benchmark, exhaustive
 coverage or successful migration because a report recommends one. A factual
@@ -78,9 +95,12 @@ The review object is:
 
 This illustrates fields, not a passing default. Populate every entry returned by
 `review_template`; finding/prose verdicts also allow `narrow` and `unsupported`.
-Assessment alternatives are `needs-revision`. Comparison prose IDs are
-`comparison:COMPARISON_INDEX:ROW_INDEX:CELL_INDEX`, all zero-based. Use the runtime’s
-IDs and source hashes exactly.
+Assessment alternatives are `needs-revision`. Authored brief prose IDs are
+`brief:SECTION_ID:BLOCK_INDEX`. Comparison prose IDs are
+`comparison:COMPARISON_INDEX:ROW_INDEX:CELL_INDEX`; all indexes are zero-based.
+Review each brief block's references and qualifications just as report prose;
+a review that omits authored brief blocks is incomplete. Use the runtime’s IDs
+and source hashes exactly.
 
 Save `research/review.json`, then run:
 
