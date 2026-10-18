@@ -5,8 +5,8 @@ description: Investigate topics, compare options and check claims using public o
 
 # Harness Research
 
-Guidance release: **1.0.0-alpha.1**. On start/resume, report the installed runtime,
-guidance revision and freshness. This workflow requires runtime **1.0.0-alpha.1 or newer**; older saved runs retain
+Guidance release: **1.0.0**. On start/resume, report the installed runtime,
+guidance revision and freshness. This workflow requires runtime **1.0.0 or newer**; older saved runs retain
 their original workflow.
 
 Modified from Anthropic’s Knowledge Synthesis: investigation, independent review,

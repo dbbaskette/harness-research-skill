@@ -2,9 +2,9 @@
 
 [README](../README.md) · [Setup](setup.md) · [Architecture](architecture.md)
 
-The 1.0 preview changes the default workflow and structured output. It does not
+The 1.0 release changes the default workflow and structured output. It does not
 silently upgrade existing projects or rewrite installed skills. Keep 0.9 projects
-and their pinned runtime/guidance intact while evaluating the preview in a fresh
+and their pinned runtime/guidance intact while starting 1.0 research in a fresh
 content folder.
 
 | Concern | 0.9 queue | 1.0 synthesis |

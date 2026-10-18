@@ -2,9 +2,9 @@
 
 [README](../README.md) · [Setup](setup.md) · [Architecture](architecture.md)
 
-This guide covers the **1.0 development preview**. For a published 0.9 installation,
-use the [legacy guide](legacy-using-harness-research.md). A preview checkout must
-be selected explicitly; the installed bootstrap continues to select stable releases.
+This guide covers **Harness Research 1.0**. For an existing 0.9 run,
+use the [legacy guide](legacy-using-harness-research.md) and its pinned runtime.
+New tasks on the installed 1.0 runtime select stable synthesis guidance.
 
 ## Begin with what you need to understand
 

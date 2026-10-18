@@ -1,0 +1,12 @@
+"image info --plist /Users/dbbaskette/.tart/vms/harness-research-test-20261018143033-40529-00a4cb63/disk.img" failed with exit code 1: Error: Failed to retrieve info for disk image: The operation couldn’t be completed. Resource temporarily unavailable
+<anonymous_script>:1
+
+
+SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at Socket.<anonymous> ([eval]:5:21)
+    at Socket.emit (node:events:526:24)
+    at endReadableNT (node:internal/streams/readable:2147:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+
+Node.js v26.11.1

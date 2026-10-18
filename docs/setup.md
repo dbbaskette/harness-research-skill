@@ -2,46 +2,37 @@
 
 [README](../README.md) · [User guide](using-harness-research.md)
 
-## Try the new implementation
+## Install or update to 1.0.0
 
-This checkout is **1.0.0-alpha.1**, an unpublished development preview. Use an
-agent with source-reading tools and Node.js 20 or later. No runtime npm install
-is required. Start a new content folder and tell the agent to read this checkout's
-absolute `SKILL.md` path and use its local runtime.
-
-```text
-Use /absolute/path/to/harness-research-skill/SKILL.md and the local runtime
-in that checkout. Research <topic> for <audience> using <source boundary>.
-```
-
-This is the supported preview path. Installing an alpha helper does not cause
-stable-tag guidance refresh to select unreleased instructions. Do not confuse a
-new executable version with the guidance actually loaded for a task.
-
-Check the checkout version:
+Requirements: Node.js 20+, Git, Bash and a configured agent with source-reading
+and search tools. No runtime npm install is required.
 
 ```sh
-node scripts/harness-research.mjs --version
-```
-
-The agent should name the runtime version and local guidance on first use. After
-publication, the normal skill installation and stable-tag refresh path will apply.
-Do not run a clone command for a future tag that does not yet exist.
-
-## Install the published 0.9.5 release
-
-This installs the previous question-oriented workflow, useful for existing runs.
-Requirements are Node.js 20+, Git, Bash and a configured agent.
-
-```sh
-git clone --branch v0.9.5 https://github.com/dbbaskette/harness-research-skill.git
+git clone --branch v1.0.0 https://github.com/dbbaskette/harness-research-skill.git
 cd harness-research-skill
 bash scripts/Install-Harness-Research.sh
 ```
 
+Use a fresh checkout directory when updating, then run that release's installer.
+It retains old immutable runtimes and switches the discovery links to 1.0.0.
+Existing projects retain their pinned runtime and guidance; do not convert an
+in-progress 0.9 project by starting a new synthesis task over its files.
+
 Start a new agent session and invoke `$harness-research` in Codex,
-`/harness-research` in Claude Code, or ask Cursor to use the skill. See the
-[0.9 user guide](legacy-using-harness-research.md) for that version's behavior.
+`/harness-research` in Claude Code, or ask Cursor to use the skill. New tasks select
+stable 1.0.0 guidance automatically. The agent reports runtime version, guidance
+revision and freshness on start/resume.
+
+Check the installed version on macOS:
+
+```sh
+node "$HOME/.agents/skills/harness-research/scripts/harness-research.mjs" --version
+```
+
+The [0.9.5 release](https://github.com/dbbaskette/harness-research-skill/releases/tag/v0.9.5)
+and [legacy guide](legacy-using-harness-research.md) remain available for older runs.
+For development work, an explicit checkout's `SKILL.md` and runtime may still be
+used together; automatic refresh selects stable release tags.
 
 ## Installation locations
 
@@ -79,7 +70,7 @@ is local and does not prove live website access.
 
 | Symptom | Next step |
 | --- | --- |
-| Preview still writes the old Q&A format | Check the selected guidance path, not only `--version`; use the checkout entry explicitly |
+| New task still writes the old Q&A format | Check runtime and guidance versions; install 1.0.0 and start a new task in a fresh content folder |
 | New helper refuses existing `research/` files | Preserve the old project; use a fresh folder or resume its legacy runtime |
 | Independent review unavailable | Keep the saved draft; enable a permitted separate invocation before claiming completion |
 | Source changed or review no longer matches | Re-read affected evidence, save a revised dossier and obtain a new review |

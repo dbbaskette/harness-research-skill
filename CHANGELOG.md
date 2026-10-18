@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.0-alpha.1 — unreleased
+## 1.0.0 — 2026-10-18
 
 - Default absent, null or blank research purpose to general-purpose topic research; preserve explicit studio tasks and intended uses.
 
@@ -15,7 +15,7 @@
 - Align comparisons by explicit criterion; preserve source snapshots, draft/revision/stale states and output ownership.
 - Keep the 0.9 queue/manual commands as legacy compatibility paths; introduce an explicit schema-2 consumer boundary.
 - Rewrite first-use docs and architecture; add a colorful README illustration and upstream attribution.
-- Acceptance and live Valkey/Redis results are recorded separately under docs/verification/1.0.0-alpha.1.
+- Promote to stable 1.0.0 with automatic stable guidance selection for new tasks on the updated runtime. Development acceptance remains in docs/verification/1.0.0-alpha.1; release verification is in docs/verification/1.0.0.
 
 ## 0.9.5 — 2026-10-16
 

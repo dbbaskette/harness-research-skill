@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1080" height="700" viewBox="0 0 1080 700" role="img" aria-labelledby="title description">
   <title id="title">Harness Research: progressive context loading</title>
-  <desc id="description">Discovery metadata: 36 tokens. Installed bootstrap: 574 tokens. Bootstrap + current guidance entry: ~1.2k. Investigator stage: ~1.0k. Synthesis writer stage: ~1.5k. Independent reviewer stage: ~1.3k. New synthesis: coordinator entry and workflow: ~3.8k. New synthesis: all stages in one context: ~7.7k. Synthesis resume, verify or refresh: ~2.1k. Optional studio task handoff: ~4.5k. Each stage loads when needed. Branches are not added together; all-stages total is shown explicitly.</desc>
-  <!-- Input digest: 13dc8cbb2aeae3993ad91c7117c6af4f0ce7f07358f02b1911941d48b0d5f17a -->
+  <desc id="description">Discovery metadata: 36 tokens. Installed bootstrap: 521 tokens. Bootstrap + current guidance entry: ~1.2k. Investigator stage: ~1.0k. Synthesis writer stage: ~1.5k. Independent reviewer stage: ~1.3k. New synthesis: coordinator entry and workflow: ~3.7k. New synthesis: all stages in one context: ~7.6k. Synthesis resume, verify or refresh: ~2.1k. Optional studio task handoff: ~4.4k. Each stage loads when needed. Branches are not added together; all-stages total is shown explicitly.</desc>
+  <!-- Input digest: ef6127200ad42a00861b7f163f718b1ad44c4493adc02c26523950aa2f25ac61 -->
   <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#005C8A"/></marker></defs>
   <rect width="1080" height="700" rx="16" fill="#F5F7F9"/>
   <g font-family="Arial, Helvetica, sans-serif" fill="#1B1D36">
@@ -22,7 +22,7 @@
   <g transform="translate(376 80)">
     <rect width="328" height="96" rx="12" fill="white" stroke="#005C8A" stroke-width="2"/>
     <text x="16" y="26" font-size="17" font-weight="700" fill="#005C8A">Installed bootstrap</text>
-    <text x="16" y="56" font-size="26" font-weight="700">574 tokens</text>
+    <text x="16" y="56" font-size="26" font-weight="700">521 tokens</text>
     <text x="16" y="80" font-size="13">Pins compatible stable guidance</text>
   </g>
   <g transform="translate(728 80)">
@@ -34,7 +34,7 @@
   <g transform="translate(24 230)">
     <rect width="328" height="96" rx="12" fill="white" stroke="#005C8A" stroke-width="2"/>
     <text x="16" y="26" font-size="17" font-weight="700" fill="#005C8A">Synthesis coordinator</text>
-    <text x="16" y="56" font-size="26" font-weight="700">~3.8k</text>
+    <text x="16" y="56" font-size="26" font-weight="700">~3.7k</text>
     <text x="16" y="80" font-size="13">Entry + synthesis-workflow.md</text>
   </g>
   <g transform="translate(376 230)">
@@ -46,7 +46,7 @@
   <g transform="translate(728 230)">
     <rect width="328" height="96" rx="12" fill="white" stroke="#005C8A" stroke-width="2"/>
     <text x="16" y="26" font-size="17" font-weight="700" fill="#005C8A">All stages in one context</text>
-    <text x="16" y="56" font-size="26" font-weight="700">~7.7k</text>
+    <text x="16" y="56" font-size="26" font-weight="700">~7.6k</text>
     <text x="16" y="80" font-size="13">Cumulative, if one agent reads all stages</text>
   </g>
   <g transform="translate(24 400)">
@@ -70,19 +70,19 @@
   <g transform="translate(24 570)">
     <rect width="328" height="96" rx="12" fill="white" stroke="#6B7280" stroke-width="2" stroke-dasharray="6 4"/>
     <text x="16" y="26" font-size="17" font-weight="700" fill="#6B7280">Legacy queue</text>
-    <text x="16" y="56" font-size="26" font-weight="700">~5.0k</text>
+    <text x="16" y="56" font-size="26" font-weight="700">~4.9k</text>
     <text x="16" y="80" font-size="13">Existing 0.9 callers only</text>
   </g>
   <g transform="translate(376 570)">
     <rect width="328" height="96" rx="12" fill="white" stroke="#6B7280" stroke-width="2" stroke-dasharray="6 4"/>
     <text x="16" y="26" font-size="17" font-weight="700" fill="#6B7280">Legacy manual research</text>
-    <text x="16" y="56" font-size="26" font-weight="700">~3.4k</text>
+    <text x="16" y="56" font-size="26" font-weight="700">~3.3k</text>
     <text x="16" y="80" font-size="13">Older plan and record callers</text>
   </g>
   <g transform="translate(728 570)">
     <rect width="328" height="96" rx="12" fill="white" stroke="#6B7280" stroke-width="2" stroke-dasharray="6 4"/>
     <text x="16" y="26" font-size="17" font-weight="700" fill="#6B7280">Legacy comparative route</text>
-    <text x="16" y="56" font-size="26" font-weight="700">~2.0k</text>
+    <text x="16" y="56" font-size="26" font-weight="700">~1.9k</text>
     <text x="16" y="80" font-size="13">One upstream resource when selected</text>
   </g>
   </g>

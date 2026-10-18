@@ -1,10 +1,18 @@
 # Versioned releases
 
-The working tree is **1.0.0-alpha.1**, an unpublished synthesis-first preview. The most recent published stable version at the start of this work is **0.9.5**. Do not describe an unpushed branch, successful local test or preview install as a release.
+**1.0.0** promotes the synthesis-first implementation to stable, following the
+owner's explicit stable-release approval on 2026-10-18. New 1.0 tasks select stable
+synthesis guidance automatically; the guidance floor is runtime 1.0.0. Existing
+0.9 runs retain their own pinned runtime and instructions.
 
-The new guidance requires runtime 1.0.0-alpha.1 or newer. Published automatic refresh selects compatible stable tags; a development checkout is selected explicitly. The 0.9 runtime and pinned guidance remain the correct resume path for existing question-queue runs.
-
-The new [specification](superpowers/specs/2026-10-17-synthesis-first.md) and [acceptance record](verification/1.0.0-alpha.1/README.md) govern this redesign. Before any authorized release, require the integrated native suite, isolated installation/context checks, source/license verification and the requested live research with independent review. Record exact scope and untested environments. Existing remote release gates remain required. Publishing, tagging and merging require separate authorization; this implementation request does not provide it.
+The [specification](superpowers/specs/2026-10-17-synthesis-first.md),
+[development acceptance](verification/1.0.0-alpha.1/README.md) and
+[stable release record](verification/1.0.0/README.md) record the tested scope.
+Native checks, isolated installation/context checks, source/license verification
+and the requested Valkey/Redis research with independent review are required.
+Live acceptance is scoped to the available Codex host; it does not establish
+cross-model or cross-harness quality. Structured studio adapters still need
+schema-2 integration. Markdown report and brief handoffs are available now.
 
 ## Historical releases
 

@@ -1,0 +1,16 @@
+{
+  "version": "1.0.0",
+  "base_commit": "fb14ea1cb6c517f8a3c25c7270cd52dea74f1402",
+  "tested_tree": "native/source-files.sha256",
+  "matched_implementation_files": 55,
+  "native": {
+    "result": "PASS",
+    "passed": 156,
+    "failed": 0,
+    "skipped": 0,
+    "vm": "harness-research-test-20261018143033-40529-00a4cb63",
+    "removed": true
+  },
+  "live_evidence": "../1.0.0-alpha.1/editorial-refinement/README.md",
+  "scope": "Stable promotion, no new live trial; structured studio adapters remain legacy"
+}
