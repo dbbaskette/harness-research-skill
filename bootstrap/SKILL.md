@@ -43,8 +43,5 @@ refresh never installs or executes repository scripts.
 
 Honor the user’s scope, sources, editing freedom, and completion boundary.
 Research output requirements live in the selected guidance. New synthesis guidance
-requires runtime 1.0.0-alpha.1 or newer; guidance refresh cannot upgrade helpers.
-During prerelease development, use the trusted checkout’s guidance and runtime
-together, or explicitly pin an approved main-branch commit with `sync-guidance.mjs
-pin --project "<content-project>" --revision <commit>`. Automatic refresh continues
-to select stable releases; installing an alpha does not opt into alpha guidance.
+requires runtime 1.0.0 or newer; guidance refresh cannot upgrade helpers.
+Install the stable 1.0 runtime to use synthesis guidance for new tasks.

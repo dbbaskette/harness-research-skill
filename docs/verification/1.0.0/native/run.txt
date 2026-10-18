@@ -1,0 +1,20 @@
+Project: /private/tmp/harness-research-synthesis
+Test suite: harness-research
+Base VM: tanzu-brand-golden-gate-base
+Test VM: harness-research-test-20261018143033-40529-00a4cb63
+Source commit: fb14ea1cb6c517f8a3c25c7270cd52dea74f1402
+ M CHANGELOG.md
+ M README.md
+ M SKILL.md
+ M bootstrap/SKILL.md
+ M docs/development.md
+ M docs/images/context-loading.svg
+ M docs/migration-v1.md
+ M docs/releases.md
+ M docs/setup.md
+ M docs/using-harness-research.md
+ M guidance/manifest.json
+ M package-lock.json
+ M package.json
+ M tests/research-run.test.mjs
+?? docs/verification/1.0.0/

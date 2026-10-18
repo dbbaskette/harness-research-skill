@@ -12,11 +12,10 @@ a blog, training, or a decision.
 **[Start here](#your-first-research-report)** · **[What you get](#what-you-get)** ·
 **[User guide](docs/using-harness-research.md)** · **[Setup](docs/setup.md)**
 
-> **1.0 development preview.** This checkout contains the new synthesis-first
-> implementation (`1.0.0-alpha.1`). It has not been published as a release.
-> The published [0.9.5 release](https://github.com/dbbaskette/harness-research-skill/releases/tag/v0.9.5)
-> uses the earlier question-oriented workflow. Use the preview instructions below
-> to try this code; installing 0.9.5 will not give you the new behavior.
+> **Harness Research 1.0.** The synthesis-first workflow is available in
+> [v1.0.0](https://github.com/dbbaskette/harness-research-skill/releases/tag/v1.0.0).
+> Upgrade the installed runtime to use it for new research. Existing 0.9 projects
+> keep their pinned runtime and guidance. [Migration details →](docs/migration-v1.md)
 
 ## Your first research report
 
@@ -28,20 +27,25 @@ also needs a separate agent invocation to review the evidence and synthesis.
 ### 1. Open a project for the output
 
 Choose the content or code project where you want `research/report.md` saved.
-For a first preview, use a new folder so existing research stays intact.
+For your first run, use a new folder so existing research stays intact.
 
-### 2. Point your agent at this checkout's skill
+### 2. Install the skill and ask your agent
 
-In Codex or Claude Code, use a prompt like this, replacing the first path with
-your checkout's absolute path:
+Install once, or run the installer from the new release to upgrade:
+
+```sh
+git clone --branch v1.0.0 https://github.com/dbbaskette/harness-research-skill.git
+cd harness-research-skill
+bash scripts/Install-Harness-Research.sh
+```
+
+Start a new agent session. Invoke **`$harness-research`** in Codex,
+**`/harness-research`** in Claude Code, or ask Cursor to use Harness Research:
 
 ```text
-Use the skill at /absolute/path/to/harness-research-skill/SKILL.md.
-Use that checkout's local runtime and guidance for this preview.
-
-Compare Valkey and Redis for an application engineering team considering
-replacing Redis. Use public primary sources. Explain where replacement is
-practical, where it is risky, and what we should verify before a migration.
+Use Harness Research to compare Valkey and Redis for an application engineering
+team considering replacing Redis. Use public primary sources. Explain where
+replacement is practical, where it is risky, and what to verify before migration.
 ```
 
 The agent handles source collection, helper commands, writing and saving. You do
@@ -49,8 +53,7 @@ not need to prepare JSON, run npm commands, request citations, or ask it to writ
 the report afterward. If your host requests permission for an independent review,
 allow it to complete the checked workflow.
 
-**Already have a published installation?** Keep it for existing work. The preview
-uses its explicit local path. [Install, update and version details →](docs/setup.md)
+[Install, update and version details →](docs/setup.md)
 
 ### 3. Open the result
 
@@ -124,7 +127,7 @@ what remains unknown. The audience is our technical enablement team.
 
 After installing a published version, invoke **`$harness-research`** in Codex,
 **`/harness-research`** in Claude Code, or ask your agent to use the named skill.
-For this development preview, use the explicit checkout path above.
+New tasks select compatible stable guidance automatically; existing tasks keep their pins.
 
 [More on scope, source choices and follow-ups →](docs/using-harness-research.md)
 
@@ -178,34 +181,34 @@ representative guidance-start response. Stage-only rows count their own referenc
 | Reading path | Tokens |
 | --- | ---: |
 | Discovery metadata | 36 |
-| Installed bootstrap | 574 |
-| Bootstrap + current guidance entry | 1,242 |
+| Installed bootstrap | 521 |
+| Bootstrap + current guidance entry | 1,183 |
 | Investigator stage | 1,017 |
 | Synthesis writer stage | 1,547 |
 | Independent reviewer stage | 1,330 |
-| New synthesis: coordinator entry and workflow | 3,773 |
-| New synthesis: all stages in one context | 7,667 |
-| Synthesis resume, verify or refresh | 2,132 |
-| Optional studio task handoff | 4,474 |
-| Legacy 0.9 queued coordinator | 4,973 |
-| Legacy 0.9 reuse or refresh | 2,025 |
-| Legacy explicit chat-only answer | 2,202 |
-| Legacy manual saved research | 3,393 |
-| Legacy manual status or resume | 1,803 |
-| Legacy comparative routing only | 1,955 |
-| Legacy Codex comparative outline | 2,915 |
-| Legacy Codex add items | 2,120 |
-| Legacy Codex add fields | 2,140 |
-| Legacy Codex deep results | 2,803 |
-| Legacy Codex deep results + saved evidence | 3,994 |
-| Legacy Claude comparative outline | 2,932 |
-| Legacy Claude deep results | 2,825 |
-| Investigation + general web strategy | 5,287 |
-| Investigation + academic strategy | 5,379 |
-| Investigation + GitHub strategy | 5,174 |
-| Investigation + technical Q&A strategy | 5,079 |
-| Investigation + Chinese sources strategy | 5,304 |
-| Legacy migration | 1,597 |
+| New synthesis: coordinator entry and workflow | 3,708 |
+| New synthesis: all stages in one context | 7,602 |
+| Synthesis resume, verify or refresh | 2,067 |
+| Optional studio task handoff | 4,409 |
+| Legacy 0.9 queued coordinator | 4,908 |
+| Legacy 0.9 reuse or refresh | 1,960 |
+| Legacy explicit chat-only answer | 2,137 |
+| Legacy manual saved research | 3,328 |
+| Legacy manual status or resume | 1,738 |
+| Legacy comparative routing only | 1,890 |
+| Legacy Codex comparative outline | 2,850 |
+| Legacy Codex add items | 2,055 |
+| Legacy Codex add fields | 2,075 |
+| Legacy Codex deep results | 2,738 |
+| Legacy Codex deep results + saved evidence | 3,929 |
+| Legacy Claude comparative outline | 2,867 |
+| Legacy Claude deep results | 2,760 |
+| Investigation + general web strategy | 5,222 |
+| Investigation + academic strategy | 5,314 |
+| Investigation + GitHub strategy | 5,109 |
+| Investigation + technical Q&A strategy | 5,014 |
+| Investigation + Chinese sources strategy | 5,239 |
+| Legacy migration | 1,532 |
 
 The new default starts with the entry and synthesis workflow. Investigation, writing
 and independent review each load their own reference when needed. The all-stages

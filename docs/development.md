@@ -50,12 +50,12 @@ needed; their results identify repaired files. Neither browses or revalidates
 current websites. Saving revised content clears the old review. Preserve source
 and dossier history and obtain a new review after material changes.
 
-## Preview and installation
+## Development and installation
 
-The version is `1.0.0-alpha.1`. Use the checkout's `SKILL.md` and local runtime for
-preview work. The installed bootstrap chooses compatible stable releases; it will
-not automatically choose this unpushed development branch. The new guidance floor
-prevents old helpers from loading an unsupported workflow.
+The stable version is `1.0.0`. New installed tasks choose compatible stable
+release guidance. For unpublished development, select the checkout's `SKILL.md`
+and runtime explicitly. The guidance floor prevents older helpers from loading
+an unsupported workflow.
 
 Test an installation only in disposable destinations:
 
