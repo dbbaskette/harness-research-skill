@@ -10,15 +10,17 @@ different contracts. Do not silently reinterpret one as the other.
 Resume the bootstrap task to recover its pinned runtime/guidance, then run:
 
 ```sh
-node "<runtime>/scripts/harness-research.mjs" synthesis status --project DIR
-node "<runtime>/scripts/harness-research.mjs" synthesis verify --project DIR
+node "<runtime>/scripts/harness-research.mjs" synthesis status --project DIR --compact
+node "<runtime>/scripts/harness-research.mjs" synthesis verify --project DIR --compact
 ```
 
 Read `research/report.md`, the dossier input and the returned status. Draft work
 continues from its actual open evidence/review tasks. A verified bundle has matching
 files; only its recorded independent review establishes its reviewed state.
-Missing or modified artifacts need repair from the authoritative dossier and a
-new save/review where the digest changes. Never edit a generated report and keep
+Missing or modified artifacts are regenerated from the authoritative dossier;
+changed files are first preserved under `.harness-research/output-backups/`, with
+paths in `preserved_files`. Recover useful edits into the dossier, then save and
+review the new digest. Source/snapshot damage cannot be repaired by regeneration. Never edit a generated report and keep
 claiming the previous bundle is verified.
 
 If new guidance is explicitly adopted, disclose the change and recheck conclusions

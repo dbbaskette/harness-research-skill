@@ -18,6 +18,9 @@ It retains old immutable runtimes and switches the discovery links to 1.0.0.
 Existing projects retain their pinned runtime and guidance; do not convert an
 in-progress 0.9 project by starting a new synthesis task over its files.
 
+After installation, return to the **content project** where `research/` should be
+saved; the shell commands above leave you in the skill checkout.
+
 Start a new agent session and invoke `$harness-research` in Codex,
 `/harness-research` in Claude Code, or ask Cursor to use the skill. New tasks select
 stable 1.0.0 guidance automatically. The agent reports runtime version, guidance
@@ -65,6 +68,29 @@ A failed DNS/network lookup is a source-access failure, not a second runtime.
 Use the host's permitted network-retry mechanism, or report the limitation.
 Changing entrypoints cannot repair unavailable network access. A source/hash check
 is local and does not prove live website access.
+
+## Development runtime and recovery
+
+The repository's `1.0.1-alpha.1` runtime is unreleased. Its new compact, template,
+and validate commands require that runtime or newer. To test it, use the checkout's
+`SKILL.md` and local helper together; automatic guidance selection continues to use
+compatible published stable releases. The install instructions above target 1.0.0.
+
+Development status/verify preserves overwritten outputs in
+`.harness-research/output-backups/` and reports `preserved_files`. Recover useful
+edits into the dossier before saving and obtaining a new review. Generated files
+remain projections of the saved dossier.
+
+Installer and guidance refresh locks contain the owning process ID. Retry after an
+interruption: a lock at least 60 seconds old is recovered only when its recorded
+process has exited. An old live owner remains protected. Unknown/malformed locks
+are preserved for inspection; do not delete a lock while another operation runs.
+
+New guidance selection searches up to 100 stable releases. A search-budget error
+means older compatible guidance may exist; it differs from checking every listed
+release and finding none compatible. Resume an existing pinned task, explicitly
+pin an approved compatible revision, or update the runtime using the trusted
+installer. No failed lookup silently switches guidance.
 
 ## Troubleshooting
 

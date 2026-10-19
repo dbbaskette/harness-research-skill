@@ -9,7 +9,7 @@ export const digestSource = s => ({ id: s.id, file: s.file, sha256: s.sha256, ..
 export const KINDS = ['summary', 'inference', 'recommendation', 'gap'];
 const list = (v, label) => { if (!Array.isArray(v)) throw new Error(`${label} must be an array.`); return v; };
 const choice = (v, options, label) => { if (!options.includes(v)) throw new Error(`${label} must be one of ${options.join(', ')}.`); return v; };
-const unique = (items, label) => { const ids = new Set(); for (const item of items) { identifier(item.id, label); if (ids.has(item.id)) throw new Error(`Duplicate ${label}: ${item.id}`); ids.add(item.id); } return ids; };
+const unique = (items, label) => { const ids = new Set(); for (const [index, item] of items.entries()) { identifier(item?.id, `${label} [${index}].id`); if (ids.has(item.id)) throw new Error(`Duplicate ${label}: ${item.id}`); ids.add(item.id); } return ids; };
 function refs(value, allowed, label, required = true) {
   list(value, label); if (required && !value.length) throw new Error(`${label} needs supporting references.`);
   if (new Set(value).size !== value.length || value.some(id => !allowed.has(id))) throw new Error(`${label} contains duplicate or unknown references.`);
@@ -45,65 +45,77 @@ export async function validateDossier(root, input, author) {
   if (new Set(allIds).size !== allIds.length) throw new Error(`Source, fact and finding IDs must be globally distinct. Collisions: ${[...new Set(allIds.filter((id, index) => allIds.indexOf(id) !== index))].join(', ')}.`);
   const captures = [];
   for (const source of d.sources) {
-    for (const key of ['origin','title','publisher']) text(source[key], `Source ${key}`);
-    choice(source.permission, ['public','selected'], 'Source permission');
-    if (d.source_mode !== 'mixed' && source.permission !== d.source_mode) throw new Error('Source permission falls outside source_mode.');
-    if (source.permission === 'public') { try { const url = new URL(source.origin); if (!['https:','http:'].includes(url.protocol) || url.username || url.password) throw new Error(); } catch { throw new Error('Public source origin must be an HTTP(S) URL without credentials.'); } }
-    choice(source.context, ['full','partial'], 'Source context');
-    if (source.context === 'partial') text(source.context_note, 'Partial source context_note');
-    for (const key of ['source_date','accessed_at','version']) if (source[key] !== undefined) text(source[key], key);
-    text(source.file, 'Source file');
-    if (source.file.startsWith('.harness-research/') || /^research\/(report\.md|brief\.md|evidence\.md|facts\.json|output\.json)$/.test(source.file)) throw new Error('Source file cannot be a managed synthesis artifact.');
-    const captured = await readText(root, source.file, { withHash: true });
-    if (!captured.content.trim()) throw new Error('Source capture must contain readable context.');
-    // A local original and its extraction are different evidence objects. Do not silently
-    // treat unchanged extracted text as proof the selected original is unchanged.
-    let originPath = null;
-    if (source.origin.startsWith('file:')) { try { originPath = fileURLToPath(source.origin); } catch { throw new Error('Invalid local source origin.'); } }
-    else if (!/^[a-z][a-z0-9+.-]*:/i.test(source.origin)) originPath = resolve(root, source.origin);
-    if (originPath && await exists(originPath)) {
-      const canonical = await realpath(originPath);
-      if (canonical.startsWith(root + sep) && (await lstat(originPath)).isSymbolicLink()) throw new Error('Local source origin must not be a symlink.');
-      originPath = canonical;
-    }
-    if (originPath?.startsWith(root + sep) && await exists(originPath)) {
-      const originFile = relative(root, originPath);
-      await localFile(root, originFile);
-      if (originFile !== source.file && source.original_file !== originFile) throw new Error(`Local source origin requires original_file: ${originFile}`);
-    }
-    const capture = { id: source.id, file: source.file, sha256: captured.sha256, content: captured.content };
-    if (source.original_file !== undefined) {
-      text(source.original_file, 'original_file');
-      if (source.original_file.startsWith('.harness-research/') || /^research\/(report\.md|brief\.md|evidence\.md|facts\.json|output\.json)$/.test(source.original_file)) throw new Error('Original file cannot be a managed synthesis artifact.');
-      const original = await localFile(root, source.original_file);
-      if ((await lstat(original)).size > 64 * 1024 * 1024) throw new Error('Original source exceeds 64 MiB. Use a separately identified smaller source.');
-      capture.original_file = source.original_file;
-      capture.original_sha256 = hash(await readFile(original));
-    }
-    captures.push(capture);
+    try {
+      for (const key of ['origin','title','publisher']) text(source[key], `Source ${key}`);
+      choice(source.permission, ['public','selected'], 'Source permission');
+      if (d.source_mode !== 'mixed' && source.permission !== d.source_mode) throw new Error('Source permission falls outside source_mode.');
+      if (source.permission === 'public') { try { const url = new URL(source.origin); if (!['https:','http:'].includes(url.protocol) || url.username || url.password) throw new Error(); } catch { throw new Error('Public source origin must be an HTTP(S) URL without credentials.'); } }
+      choice(source.context, ['full','partial'], 'Source context');
+      if (source.context === 'partial') text(source.context_note, 'Partial source context_note');
+      for (const key of ['source_date','accessed_at','version']) if (source[key] !== undefined) text(source[key], key);
+      text(source.file, 'Source file');
+      if (source.file.startsWith('.harness-research/') || /^research\/(report\.md|brief\.md|evidence\.md|facts\.json|output\.json)$/.test(source.file)) throw new Error('Source file cannot be a managed synthesis artifact.');
+      const captured = await readText(root, source.file, { withHash: true });
+      if (!captured.content.trim()) throw new Error('Source capture must contain readable context.');
+      // A local original and its extraction are different evidence objects. Do not silently
+      // treat unchanged extracted text as proof the selected original is unchanged.
+      let originPath = null;
+      if (source.origin.startsWith('file:')) { try { originPath = fileURLToPath(source.origin); } catch { throw new Error('Invalid local source origin.'); } }
+      else if (!/^[a-z][a-z0-9+.-]*:/i.test(source.origin)) originPath = resolve(root, source.origin);
+      if (originPath && await exists(originPath)) {
+        const canonical = await realpath(originPath);
+        if (canonical.startsWith(root + sep) && (await lstat(originPath)).isSymbolicLink()) throw new Error('Local source origin must not be a symlink.');
+        originPath = canonical;
+      }
+      if (originPath?.startsWith(root + sep) && await exists(originPath)) {
+        const originFile = relative(root, originPath);
+        await localFile(root, originFile);
+        if (originFile !== source.file && source.original_file !== originFile) throw new Error(`Local source origin requires original_file: ${originFile}`);
+      }
+      const externalOriginal = originPath && !originPath.startsWith(root + sep);
+      if (externalOriginal && !source.original_file) throw new Error(`Source ${source.id}.original_file is required for an external local origin. Copy the original into the project and set original_file to that project-relative copy; retain origin unchanged.`);
+      const capture = { id: source.id, file: source.file, sha256: captured.sha256, content: captured.content };
+      if (source.original_file !== undefined) {
+        text(source.original_file, 'original_file');
+        if (source.original_file.startsWith('.harness-research/') || /^research\/(report\.md|brief\.md|evidence\.md|facts\.json|output\.json)$/.test(source.original_file)) throw new Error('Original file cannot be a managed synthesis artifact.');
+        const original = await localFile(root, source.original_file);
+        if ((await lstat(original)).size > 64 * 1024 * 1024) throw new Error('Original source exceeds 64 MiB. Use a separately identified smaller source.');
+        capture.original_file = source.original_file;
+        capture.original_sha256 = hash(await readFile(original));
+        if (externalOriginal && await exists(originPath)) {
+          if (!(await lstat(originPath)).isFile() || (await lstat(originPath)).size > 64 * 1024 * 1024) throw new Error(`Source ${source.id}.origin must identify a regular original of at most 64 MiB.`);
+          if (hash(await readFile(originPath)) !== capture.original_sha256) throw new Error(`Source ${source.id}.original_file does not match the external original. Copy its exact bytes into the project.`);
+        }
+      }
+      captures.push(capture);
+    } catch (error) { throw new Error(`sources[${JSON.stringify(source.id)}]: ${error.message}`); }
   }
   for (const fact of d.facts) {
-    text(fact.statement, 'Fact statement', 10000); identifier(fact.author, 'Fact author');
-    list(fact.citations, 'Fact citations'); if (!fact.citations.length) throw new Error('Facts need exact source quotations.');
-    for (const citation of fact.citations) {
-      if (!sourceIds.has(citation.source)) throw new Error('Citation references an unknown source.');
-      text(citation.quote, 'Exact quote', 30000);
-      if (citation.locator !== undefined) text(citation.locator, 'Citation locator');
-      if (!captures.find(c => c.id === citation.source).content.includes(citation.quote)) throw new Error(`Exact quote not found in source ${citation.source}.`);
-    }
+    try {
+      text(fact.statement, 'Fact statement', 10000); identifier(fact.author, 'Fact author');
+      list(fact.citations, 'Fact citations'); if (!fact.citations.length) throw new Error('Facts need exact source quotations.');
+      for (const citation of fact.citations) {
+        if (!sourceIds.has(citation.source)) throw new Error('Citation references an unknown source.');
+        text(citation.quote, 'Exact quote', 30000);
+        if (citation.locator !== undefined) text(citation.locator, 'Citation locator');
+        if (!captures.find(c => c.id === citation.source).content.includes(citation.quote)) throw new Error(`Exact quote not found in source ${citation.source}.`);
+      }
+    } catch (error) { throw new Error(`facts[${JSON.stringify(fact.id)}]: ${error.message}`); }
   }
   for (const finding of d.findings) {
-    text(finding.title, 'Finding title'); block(finding.summary, factIds, 'Finding summary');
-    if (finding.summary.kind === 'gap') throw new Error('Finding summaries require evidence; place unknowns in gaps.');
-    refs(finding.support, factIds, 'Finding support'); refs(finding.counter, factIds, 'Finding counter', false);
-    for (const group of ['implications','conditions','gaps']) for (const value of list(finding[group], `Finding ${group}`)) block(value, factIds, `Finding ${group}`);
+    try {
+      text(finding.title, 'Finding title'); block(finding.summary, factIds, 'Finding summary');
+      if (finding.summary.kind === 'gap') throw new Error('Finding summaries require evidence; place unknowns in gaps.');
+      refs(finding.support, factIds, 'Finding support'); refs(finding.counter, factIds, 'Finding counter', false);
+      for (const group of ['implications','conditions','gaps']) for (const value of list(finding[group], `Finding ${group}`)) block(value, factIds, `Finding ${group}`);
+    } catch (error) { throw new Error(`findings[${JSON.stringify(finding.id)}]: ${error.message}`); }
   }
   const evidenceIds = new Set([...factIds, ...findingIds]);
   for (const [label, sections] of [['Report', d.sections], ['Brief', d.brief || []]]) {
     for (const section of sections) {
-      text(section.title, `${label} section title`); list(section.blocks, `${label} section blocks`);
+      text(section.title, `${label} section ${section.id}.title`); list(section.blocks, `${label} section ${section.id}.blocks`);
       if (!section.blocks.length) throw new Error(`${label} sections need blocks.`);
-      for (const value of section.blocks) block(value, evidenceIds, `${label} block`);
+      for (const value of section.blocks) block(value, evidenceIds, `${label} block ${section.id}[${section.blocks.indexOf(value)}]`);
     }
   }
   for (const comparison of list(d.comparisons || [], 'comparisons')) {

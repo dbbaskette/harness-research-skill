@@ -65,7 +65,9 @@ mechanical validation is never described as fact certification.
 The helper owns its generated output files after a valid first save. It refuses
 unowned files, nonregular output paths and a project already owned by the old
 research engine. Status/verify can regenerate derived artifacts and report that
-repair. Source changes require a new save and review, not a repaired approval.
+repair, preserving prior bytes in `.harness-research/output-backups/` and
+returning backup paths. Full finding qualifications remain in the evidence
+appendix even when the brief selects a smaller view. Source changes require a new save and review, not a repaired approval.
 
 Source snapshots and generated files remain with the research. Working dossiers,
 review input and planning notes are agent-managed inputs; only manifest-listed

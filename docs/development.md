@@ -28,12 +28,23 @@ Paths passed through `--file` are relative to `--project`.
 ```sh
 node scripts/harness-research.mjs synthesis help
 node scripts/harness-research.mjs synthesis save --project /absolute/content-project --file research/dossier.json --worker researcher
-node scripts/harness-research.mjs synthesis status --project /absolute/content-project
+node scripts/harness-research.mjs synthesis status --project /absolute/content-project --compact
 ```
 
-Status returns the exact digest, source hashes and review template. A different
-invocation reads the actual source context and saved report, fills the template,
-and submits its real judgments:
+Validate a dossier without writing or clearing an existing review:
+
+```sh
+node scripts/harness-research.mjs synthesis validate --project /absolute/content-project --file research/dossier.json --worker researcher
+node scripts/harness-research.mjs synthesis template --project /absolute/content-project --out research/review.json
+```
+
+`--compact` returns status, digest, counts, integrity checks, problems and repair
+paths. Full responses remain the default for existing consumers and include
+source records and `review_template`; `--verbose` pretty-prints the full result.
+`template` prints only pending review JSON, or creates a new project-relative
+`--out` file under an existing directory. It refuses overwrites and managed paths.
+A different invocation reads the source context and saved report, fills the
+template, and submits its real judgments:
 
 ```sh
 node scripts/harness-research.mjs synthesis review --project /absolute/content-project --file research/review.json --worker reviewer
@@ -46,13 +57,36 @@ cannot approve a different digest. Invalid references, source changes and missin
 review items are actionable errors, not reasons to weaken the contract.
 
 `status` and `verify` inspect local integrity and repair derived exports when
-needed; their results identify repaired files. Neither browses or revalidates
+needed; their results identify repaired files and `preserved_files` backup paths.
+Every overwritten output, including normal status transitions, is preserved
+byte-for-byte under `.harness-research/output-backups/`, deduplicated by content.
+Backups are working history outside the portable artifact manifest. Bring useful
+edits back into the dossier and save/review them. Integrity checks deduplicate
+source paths within each command and report `integrity_checks` with files checked
+and bytes hashed; the next command reads the bytes again. Neither browses or revalidates
 current websites. Saving revised content clears the old review. Preserve source
 and dossier history and obtain a new review after material changes.
 
+CLI exits are intentionally separate from completion:
+
+| Result | Exit |
+| --- | ---: |
+| Intact draft or intact needs-revision on status/verify | 0 |
+| Completed output or accepted review | 0 |
+| Stale evidence or failed artifact integrity | 1 |
+| Submitted review with objections | 1 (objections are saved) |
+| Invalid command/input or storage failure | 1 |
+
+For completion gates, check `status === "complete"` as well as the exit code.
+See the [executable schema-2 example](../examples/synthesis/README.md) for a small
+source, dossier, authored brief and unfilled review template. It uses no network
+or automatic passing review.
+
 ## Development and installation
 
-The stable version is `1.0.0`. New installed tasks choose compatible stable
+The published stable version is `1.0.0`; this checkout is the unreleased
+`1.0.1-alpha.1` development runtime. Its guidance requires that runtime or newer
+because it uses the new template and compact interfaces. New installed tasks choose compatible stable
 release guidance. For unpublished development, select the checkout's `SKILL.md`
 and runtime explicitly. The guidance floor prevents older helpers from loading
 an unsupported workflow.

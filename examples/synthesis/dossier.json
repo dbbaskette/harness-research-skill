@@ -1,0 +1,50 @@
+{
+  "schema": 2,
+  "topic": "Retention in a fictional queue service",
+  "audience": "Service operators",
+  "purpose": "Illustrate a source-backed operational brief",
+  "scope": "The supplied synthetic reference only; no real product claims",
+  "source_mode": "selected",
+  "sources": [{
+    "id": "src-reference",
+    "file": "source.md",
+    "origin": "source.md",
+    "title": "Synthetic queue service reference",
+    "publisher": "Example fixture",
+    "permission": "selected",
+    "context": "full"
+  }],
+  "facts": [{
+    "id": "fact-retention",
+    "statement": "The fictional service defaults to 24-hour retention and permits 1 to 72 hours.",
+    "author": "example-author",
+    "citations": [{
+      "source": "src-reference",
+      "quote": "The queue retains messages for 24 hours by default. Operators can configure\nretention from 1 to 72 hours.",
+      "locator": "Retention paragraph"
+    }]
+  }],
+  "findings": [{
+    "id": "finding-retention",
+    "title": "Choose retention within the documented range",
+    "summary": {"text": "Retention is configurable rather than fixed at the default.", "kind": "summary", "refs": ["fact-retention"]},
+    "support": ["fact-retention"],
+    "counter": [],
+    "implications": [{"text": "For this fictional service, choose retention to match the required recovery window within the documented range.", "kind": "recommendation", "refs": ["fact-retention"]}],
+    "conditions": [{"text": "The documented maximum is 72 hours.", "kind": "summary", "refs": ["fact-retention"]}],
+    "gaps": [{"text": "Throughput and the effect of retention on resource use remain unmeasured.", "kind": "gap", "refs": []}]
+  }],
+  "sections": [{
+    "id": "answer",
+    "title": "A bounded retention choice",
+    "blocks": [{"text": "The fictional queue defaults to 24 hours of retention, with a configurable range of 1 to 72 hours.", "kind": "summary", "refs": ["finding-retention"]}]
+  }],
+  "brief": [{
+    "id": "handoff",
+    "title": "What an operator should retain",
+    "blocks": [
+      {"text": "Select a recovery window within the supported range, retaining the 72-hour upper limit when summarizing this example.", "kind": "recommendation", "refs": ["finding-retention"]},
+      {"text": "This synthetic reference supports no throughput or resource-efficiency claim.", "kind": "gap", "refs": []}
+    ]
+  }]
+}

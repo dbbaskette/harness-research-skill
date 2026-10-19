@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, mkdir, readFile, writeFile, readdir, rm, symlink, realpath, chmod } from 'node:fs/promises';
+import { mkdtemp, mkdir, readFile, writeFile, readdir, rm, symlink, realpath, chmod, utimes } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { execFile } from 'node:child_process';
@@ -195,4 +195,37 @@ test('new work takes the newest release its runtime supports, so unreleased guid
   assert.equal(newest.freshness, 'current-at-start'); assert.equal(newest.newerRelease, undefined); assert.equal(newest.notice, undefined);
   await exec('git', ['-C', f.source, 'tag', '-d', 'v0.3.0']);
   await assert.rejects(start(f), /newer installed runtime/);
+});
+
+test('guidance lock recovers an abandoned process but retains an old live owner', async t => {
+  const f = await fixture(t), cache = join(f.project, '.' + skill, 'guidance'); await mkdir(cache,{recursive:true});
+  const lock = join(cache,'.sync-lock'), old = new Date(Date.now()-120000);
+  await writeFile(lock,String(process.pid)); await utimes(lock,old,old);
+  await assert.rejects(start(f), /Another guidance refresh/);
+  assert.equal(await readFile(lock,'utf8'),String(process.pid));
+  await writeFile(lock,'2147483647'); await utimes(lock,old,old);
+  assert.equal((await start(f)).revision,f.first);
+  await assert.rejects(readFile(lock),{code:'ENOENT'});
+});
+
+test('guidance searches beyond ten incompatible releases and distinguishes its search budget', async t => {
+  const f = await fixture(t);
+  await exec('git',['-C',f.source,'tag','v0.3.0',f.first]);
+  await writeFile(join(f.source,'guidance/manifest.json'),JSON.stringify({schema:1,skill,version:'9.0.0',entry:'SKILL.md',minimumRuntime:'9.0.0'}));
+  const incompatible = await f.commit();
+  for (let i=0;i<12;i++) await exec('git',['-C',f.source,'tag',`v9.0.${i}`,incompatible]);
+  await assert.rejects(start({...f,releaseLimit:10}),/search limit reached.*older compatible guidance may exist/);
+  const started = await start(f); assert.equal(started.revision,f.first);
+  assert.equal(started.ref,'refs/tags/v0.3.0'); assert.equal(started.freshness,'older-compatible-release');
+  await exec('git',['-C',f.source,'tag','-d','v0.3.0']);
+  await assert.rejects(start(f),/No guidance release supports/);
+});
+
+test('new command guidance cannot load on the older 1.0.0 runtime', async t => {
+  const f = await fixture(t), manifest = JSON.parse(await readFile(new URL('../guidance/manifest.json',import.meta.url),'utf8'));
+  await writeFile(join(f.source,'guidance/manifest.json'),JSON.stringify(manifest)); await f.commit();
+  await writeFile(join(f.runtime,'package.json'),JSON.stringify({name:pkg.name,version:'1.0.0'}));
+  await assert.rejects(start(f),/newer installed runtime/);
+  await writeFile(join(f.runtime,'package.json'),JSON.stringify({name:pkg.name,version:pkg.version}));
+  assert.equal((await start(f)).guidanceVersion,manifest.version);
 });

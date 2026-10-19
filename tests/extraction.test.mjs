@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, mkdir, readFile, writeFile, readlink, symlink, realpath, rm, access, cp, readdir } from 'node:fs/promises';
+import { mkdtemp, mkdir, readFile, writeFile, readlink, symlink, realpath, rm, access, cp, readdir, utimes } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -141,4 +141,15 @@ test('macOS system aliases normalize without allowing user directory symlinks', 
   const result = await install({ ...options, home: join(alias, 'home'), shared: join(alias, 'shared') });
   assert.equal(result.shared, options.shared);
   for (const target of result.targets) await access(join(target, 'SKILL.md'));
+});
+
+test('installer recovers abandoned locks while preserving an old live installation lock', async t => {
+  const f = await fixture(t); await mkdir(f.shared,{mode:0o700});
+  const lock = join(f.shared,'.install-lock'), old = new Date(Date.now()-120000);
+  await writeFile(lock,String(process.pid)); await utimes(lock,old,old);
+  await assert.rejects(install(f),/Another skill installation/);
+  assert.equal(await readFile(lock,'utf8'),String(process.pid));
+  await writeFile(lock,'2147483647'); await utimes(lock,old,old);
+  assert.equal((await install(f)).status,'installed');
+  await assert.rejects(readFile(lock),{code:'ENOENT'});
 });

@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { planResearch, recordResearch, researchStatus, migrateResearch } from './lib/research.mjs';
 import { runCli } from './lib/run-cli.mjs';
 if (process.argv[2] === 'synthesis') {
-  try { const { runSynthesisCli } = await import('./lib/synthesis-cli.mjs'); const result = await runSynthesisCli(process.argv.slice(3)); if (result !== undefined) console.log(JSON.stringify(result, null, process.argv.includes('--verbose') ? 2 : 0)); if (result?.accepted === false) process.exitCode = 1; }
+  try { const { runSynthesisCli, synthesisExitCode } = await import('./lib/synthesis-cli.mjs'); const result = await runSynthesisCli(process.argv.slice(3)); if (result !== undefined) console.log(JSON.stringify(result, null, process.argv.includes('--verbose') ? 2 : 0)); process.exitCode = synthesisExitCode(process.argv[3], result); }
   catch (error) { console.error(error.message); process.exitCode = 1; }
 } else if (process.argv[2] === 'research') {
   try { const result = await runCli(process.argv.slice(3)); console.log(JSON.stringify(result, null, process.argv.includes('--verbose') ? 2 : 0)); if (result.accepted === false) process.exitCode = 1; }

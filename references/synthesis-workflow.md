@@ -28,8 +28,8 @@ contract; ordinary standalone research does not need that reference.
 
 Use the installed runtime returned by bootstrap. Report its actual version and
 guidance revision/freshness, including when using a local development build. Do not
-execute downloaded guidance as a substitute runtime. This workflow requires the
-1.0 runtime; continue old runs with their saved guidance rather than changing
+execute downloaded guidance as a substitute runtime. This development workflow requires runtime
+1.0.1-alpha.1 or newer; continue old runs with their saved guidance rather than changing
 formats silently. Keep one active output bundle per project; use a separate case
 directory for a comparison experiment or when preserving another report.
 
@@ -38,9 +38,10 @@ checking the saved revision. These commands use files relative to `--project`:
 
 ```sh
 node "<runtime>/scripts/harness-research.mjs" synthesis save --project DIR --file research/dossier.json --worker AUTHOR
-node "<runtime>/scripts/harness-research.mjs" synthesis status --project DIR
+node "<runtime>/scripts/harness-research.mjs" synthesis status --project DIR --compact
+node "<runtime>/scripts/harness-research.mjs" synthesis template --project DIR --out research/review.json
 node "<runtime>/scripts/harness-research.mjs" synthesis review --project DIR --file research/review.json --worker CHECKER
-node "<runtime>/scripts/harness-research.mjs" synthesis verify --project DIR
+node "<runtime>/scripts/harness-research.mjs" synthesis verify --project DIR --compact
 ```
 
 `AUTHOR` and `CHECKER` identify actual invocations. Use a stable lowercase label
@@ -58,7 +59,7 @@ that review is incomplete.
 2. Read [synthesize](synthesize.md), or give it to the author. Produce findings and
    connected prose for the reader; internal questions need not appear in output.
 3. Save the dossier. Its report is a draft until reviewed. Ask a separate invocation
-   to read [review synthesis](review-synthesis.md), the status review template,
+   to read [review synthesis](review-synthesis.md), the generated review template,
    source captures, facts, findings and actual report. One independent invocation
    can perform both factual and semantic review; they remain distinct judgments.
 4. Address objections by revising evidence or prose and saving again. Saving a
@@ -72,7 +73,7 @@ The report leads with the answer; metadata and evidence remain accessible.
 `brief.md` presents an authored, prioritized handoff shaped to the intended use,
 with useful evidence, counterarguments and must-retain qualifications. Dossiers
 without authored brief sections retain the automatic findings view;
-`evidence.md` exposes facts, quotes, sources and review. `facts.json` is schema 2;
+`evidence.md` exposes facts, quotes, sources, full finding implications/conditions/gaps and review. `facts.json` is schema 2;
 `output.json` pins generated files to the saved digest. A matching manifest proves
 file integrity, not factual truth. `plan.md`, input JSON and ancillary notes are
 working material, not automatically checked bundle members.
@@ -85,9 +86,12 @@ Source files must remain inside the project. IDs are unique,
 lowercase identifiers with hyphens. Preserve IDs across revisions when meaning is
 unchanged; change an ID when it would otherwise point to a different assertion.
 Source, fact and finding IDs share one namespace; prefixes such as `src-`, `fact-`
-and `finding-` avoid collisions. Status contains the full review template: redirect
-it to a working JSON file when needed, then read only its status or the review
-fields for the current stage instead of repeatedly printing the entire response.
+and `finding-` avoid collisions. `status --compact` returns state, counts, digest and integrity problems without
+repeating source records or the full template. `template` prints the pending
+review object; `template --out research/review.json` creates it without overwriting
+an existing file. Omit `--compact` for the compatible full response. Use
+`validate --project DIR --file research/dossier.json --worker AUTHOR` to check
+fields, references and quotes without creating state or changing a saved review.
 
 Top-level fields:
 
@@ -114,6 +118,10 @@ For an extraction of a supplied PDF, Office document or other local original,
 include `original_file` with its project-relative path. The helper pins its bytes
 separately and invalidates review if either original or readable capture changes.
 An existing local `origin` distinct from `file` requires that explicit original pin.
+For an original outside the project, copy its exact bytes into the project and
+set `original_file` to that copy, preserving `origin`. When the external original
+is available, save/validate checks that the copy matches; subsequent integrity
+checks monitor the project-local original and snapshot, not the external path.
 
 A fact: `{id, statement, author, citations: [{source, quote}]}`. `source` references
 a source ID; `quote` is exact captured text. `author` is the actual investigator
@@ -186,8 +194,19 @@ reviewer’s honesty or the truth of a source.
 `verify` also reports artifact integrity separately. `failed` means a pinned
 capture or original is missing/altered; regenerating Markdown cannot fix it.
 `repaired` identifies regenerated derived files; `verified` means the saved files
-match, not that websites were fetched again. Previous dossier and review states
-remain in `.harness-research/synthesis-history/`.
+match, not that websites were fetched again. Every replaced output's previous bytes are preserved under
+`.harness-research/output-backups/`; `preserved_files` maps outputs to backups.
+This also preserves normal render transitions. Recover editorial changes into the
+dossier and save/review them; copying a backup over a generated report does not
+make those changes reviewed. Previous dossier and review states remain in
+`.harness-research/synthesis-history/`.
+
+CLI exit 0 means the command succeeded, not that independent review is complete.
+An intact draft and an intact `needs-revision` result exit 0 on status/verify.
+Stale evidence or failed artifact integrity exits 1. Submitting a rejected review
+also exits 1 while saving its objections. Accepted review and completed verified
+output exit 0. Invalid input/command failures exit 1. Read JSON `status` alongside
+the exit code when completion is required.
 
 When network access, source access or review is blocked, save what is known with
 explicit limits. Do not claim live currency from a cached source hash. For later

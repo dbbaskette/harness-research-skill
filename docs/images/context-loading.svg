@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1080" height="700" viewBox="0 0 1080 700" role="img" aria-labelledby="title description">
   <title id="title">Harness Research: progressive context loading</title>
-  <desc id="description">Discovery metadata: 36 tokens. Installed bootstrap: 521 tokens. Bootstrap + current guidance entry: ~1.2k. Investigator stage: ~1.0k. Synthesis writer stage: ~1.5k. Independent reviewer stage: ~1.3k. New synthesis: coordinator entry and workflow: ~3.7k. New synthesis: all stages in one context: ~7.6k. Synthesis resume, verify or refresh: ~2.1k. Optional studio task handoff: ~4.4k. Each stage loads when needed. Branches are not added together; all-stages total is shown explicitly.</desc>
-  <!-- Input digest: ef6127200ad42a00861b7f163f718b1ad44c4493adc02c26523950aa2f25ac61 -->
+  <desc id="description">Discovery metadata: 36 tokens. Installed bootstrap: 521 tokens. Bootstrap + current guidance entry: ~1.2k. Investigator stage: ~1.0k. Synthesis writer stage: ~1.5k. Independent reviewer stage: ~1.4k. New synthesis: coordinator entry and workflow: ~4.0k. New synthesis: all stages in one context: ~8.0k. Synthesis resume, verify or refresh: ~2.1k. Optional studio task handoff: ~4.8k. Each stage loads when needed. Branches are not added together; all-stages total is shown explicitly.</desc>
+  <!-- Input digest: 72f6f03e7384638b65b4059a242a96f496749daf89e89ef801c4a9f2e2980c37 -->
   <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#005C8A"/></marker></defs>
   <rect width="1080" height="700" rx="16" fill="#F5F7F9"/>
   <g font-family="Arial, Helvetica, sans-serif" fill="#1B1D36">
@@ -34,7 +34,7 @@
   <g transform="translate(24 230)">
     <rect width="328" height="96" rx="12" fill="white" stroke="#005C8A" stroke-width="2"/>
     <text x="16" y="26" font-size="17" font-weight="700" fill="#005C8A">Synthesis coordinator</text>
-    <text x="16" y="56" font-size="26" font-weight="700">~3.7k</text>
+    <text x="16" y="56" font-size="26" font-weight="700">~4.0k</text>
     <text x="16" y="80" font-size="13">Entry + synthesis-workflow.md</text>
   </g>
   <g transform="translate(376 230)">
@@ -46,7 +46,7 @@
   <g transform="translate(728 230)">
     <rect width="328" height="96" rx="12" fill="white" stroke="#005C8A" stroke-width="2"/>
     <text x="16" y="26" font-size="17" font-weight="700" fill="#005C8A">All stages in one context</text>
-    <text x="16" y="56" font-size="26" font-weight="700">~7.6k</text>
+    <text x="16" y="56" font-size="26" font-weight="700">~8.0k</text>
     <text x="16" y="80" font-size="13">Cumulative, if one agent reads all stages</text>
   </g>
   <g transform="translate(24 400)">
@@ -64,7 +64,7 @@
   <g transform="translate(728 400)">
     <rect width="328" height="96" rx="12" fill="white" stroke="#6C4B94" stroke-width="2"/>
     <text x="16" y="26" font-size="17" font-weight="700" fill="#6C4B94">Independent review</text>
-    <text x="16" y="56" font-size="26" font-weight="700">~1.3k</text>
+    <text x="16" y="56" font-size="26" font-weight="700">~1.4k</text>
     <text x="16" y="80" font-size="13">review-synthesis.md, in a separate review</text>
   </g>
   <g transform="translate(24 570)">

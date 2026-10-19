@@ -1,18 +1,34 @@
 import { readFile, writeFile, realpath } from 'node:fs/promises';
-import { join, resolve, extname } from 'node:path';
+import { join, resolve, extname, isAbsolute, relative, basename, sep } from 'node:path';
 import { exists, directory, localFile, readText, atomic, hash, stable, parseJson, acquireLock, releaseLock } from './run-storage.mjs';
 import { OWNER, digestSource, validateDossier, validateReview, reviewTemplate } from './synthesis-model.mjs';
 import { renderOutputs } from './synthesis-output.mjs';
 
 const OUTPUTS = ['report.md','brief.md','evidence.md','facts.json','output.json'];
-const HELP = 'synthesis save --project DIR --file dossier.json --worker ID | review --project DIR --file review.json --worker ID | status --project DIR | verify --project DIR. File paths are project-relative. Status includes an independent review template. Save writes draft artifacts; review binds to exact content and source hashes. The helper never fetches sources or makes semantic judgments.';
+const HELP = 'synthesis save|review|validate --project DIR --file INPUT.json --worker ID [--compact|--verbose] | status|verify --project DIR [--compact|--verbose] | template --project DIR [--out NEW.json]. Paths are project-relative. Full responses remain the default; --compact omits sources and review_template. Validate does not write. Template prints pending review JSON or creates --out without overwriting. Save writes drafts; review binds to exact content. Verify exits 1 for stale/failed integrity; review exits 1 for rejected work. Intact drafts and completed outputs exit 0. The helper never fetches sources or makes semantic judgments.';
+export function synthesisExitCode(action, result) {
+  return result?.artifact_integrity === 'failed' || result?.status === 'stale' ||
+    (action === 'review' && result?.status === 'needs-revision') ? 1 : 0;
+}
 function args(argv) {
   const action = argv[0] || 'help', result = { action };
-  if (!['save','review','status','verify','help'].includes(action)) throw new Error(`Unknown synthesis action. ${HELP}`);
-  for (let i = 1; i < argv.length; i += 2) { const name = argv[i]; if (!['--project','--file','--worker'].includes(name) || !argv[i + 1] || argv[i + 1].startsWith('--') || result[name.slice(2)]) throw new Error(`Invalid synthesis arguments. ${HELP}`); result[name.slice(2)] = argv[i + 1]; }
+  if (!['save','review','validate','template','status','verify','help'].includes(action)) throw new Error(`Unknown synthesis action. ${HELP}`);
+  for (let i = 1; i < argv.length; i++) {
+    const name = argv[i], key = name.slice(2);
+    if (['--compact','--verbose'].includes(name)) {
+      if (result[key]) throw new Error(`Duplicate ${name}.`);
+      result[key] = true;
+    } else {
+      if (!['--project','--file','--worker','--out'].includes(name) || !argv[i + 1] || argv[i + 1].startsWith('--') || result[key]) throw new Error(`Invalid synthesis arguments. ${HELP}`);
+      result[key] = argv[++i];
+    }
+  }
+  if (result.compact && result.verbose) throw new Error('Choose --compact or --verbose.');
   if (action !== 'help' && !result.project) throw new Error('--project is required.');
-  if (['save','review'].includes(action) && (!result.file || !result.worker)) throw new Error('--file and --worker are required.');
-  if (['status','verify'].includes(action) && (result.file || result.worker)) throw new Error('status/verify accept only --project.');
+  if (['save','review','validate'].includes(action) && (!result.file || !result.worker)) throw new Error('--file and --worker are required.');
+  if (['status','verify','template'].includes(action) && (result.file || result.worker)) throw new Error('status/verify/template do not accept --file or --worker.');
+  if (result.out && action !== 'template') throw new Error('--out is only valid for template.');
+  if (action === 'template' && (result.compact || result.verbose)) throw new Error('template does not accept output-format flags.');
   return result;
 }
 async function readState(path) {
@@ -40,37 +56,75 @@ async function protectOutputs(output, state) {
   }
 }
 async function stateStatus(root, state) {
-  const problems = [];
+  const problems = [], artifactProblems = [], checked = new Map();
+  let bytesHashed = 0;
   const recomputed = hash(stable({ dossier: state.dossier, author: state.author, sources: state.sources.map(digestSource) }));
   if (recomputed !== state.digest) problems.push('Saved content digest does not match the dossier.');
-  for (const source of state.sources) for (const [name, path, expected] of [['working source',source.file,source.sha256],['immutable snapshot',source.snapshot,source.sha256], ...(source.original_file ? [['working original',source.original_file,source.original_sha256],['immutable original snapshot',source.original_snapshot,source.original_sha256]] : [])]) {
-    try { if (hash(await readFile(await localFile(root, path))) !== expected) problems.push(`${source.id}: ${name} changed.`); }
-    catch { problems.push(`${source.id}: ${name} is unavailable.`); }
+  async function inspect(path) {
+    if (!checked.has(path)) {
+      try {
+        const bytes = await readFile(await localFile(root, path)); bytesHashed += bytes.length;
+        checked.set(path, hash(bytes));
+      } catch { checked.set(path, null); }
+    }
+    return checked.get(path);
+  }
+  for (const source of state.sources) {
+    const files = [['working source',source.file,source.sha256,false],['immutable snapshot',source.snapshot,source.sha256,true], ...(source.original_file ? [['working original',source.original_file,source.original_sha256,false],['immutable original snapshot',source.original_snapshot,source.original_sha256,true]] : [])];
+    for (const [name, path, expected, artifact] of files) {
+      const actual = await inspect(path);
+      if (actual !== expected) {
+        problems.push(`${source.id}: ${name} ${actual === null ? 'is unavailable' : 'changed'}.`);
+        if (artifact) artifactProblems.push(`${path}: ${actual === null ? 'unavailable' : 'content changed'}.`);
+      }
+    }
   }
   let accepted = false;
   if (state.review) { try { accepted = validateReview(state, state.review, state.review.worker).accepted; } catch (e) { problems.push(`Review invalid: ${e.message}`); } }
-  return { status: problems.length ? 'stale' : !state.review ? 'draft' : accepted ? 'complete' : 'needs-revision', problems };
+  return { status: problems.length ? 'stale' : !state.review ? 'draft' : accepted ? 'complete' : 'needs-revision', problems, artifact_problems: [...new Set(artifactProblems)], integrity_checks: { files_checked: checked.size, bytes_hashed: bytesHashed } };
 }
-async function materialize(root, state, status) {
+async function materialize(root, state, current) {
   const output = join(root, 'research'); await protectOutputs(output, state); await directory(output);
-  const regenerated = [];
-  for (const [name, content] of Object.entries(renderOutputs(state, status))) {
-    let previous = null; try { previous = await readFile(join(output, name), 'utf8'); } catch (e) { if (e.code !== 'ENOENT') throw e; }
-    if (previous !== content) { regenerated.push(`research/${name}`); await atomic(join(output, name), content); }
+  const regenerated = [], preserved = [];
+  for (const [name, content] of Object.entries(renderOutputs(state, current.status))) {
+    let previous = null; try { previous = await readFile(join(output, name)); } catch (e) { if (e.code !== 'ENOENT') throw e; }
+    if (!previous?.equals(Buffer.from(content))) {
+      if (previous !== null) {
+        const backupDir = join(root, '.harness-research', 'output-backups'); await directory(backupDir);
+        const backup = `${hash(previous)}-${name}`, path = join(backupDir, backup), info = await exists(path);
+        if (info) {
+          if (!info.isFile() || info.isSymbolicLink() || !(await readFile(path)).equals(previous)) throw new Error('Output backup changed; preserve and inspect it.');
+        } else await writeFile(path, previous, { flag: 'wx', mode: 0o600 });
+        preserved.push({ file: `research/${name}`, backup: `.harness-research/output-backups/${backup}` });
+      }
+      regenerated.push(`research/${name}`); await atomic(join(output, name), content);
+    }
   }
-  const artifactProblems = [];
-  for (const source of state.sources) for (const [file, expected] of [[source.snapshot, source.sha256], ...(source.original_file ? [[source.original_snapshot, source.original_sha256]] : [])]) {
-    try { if (hash(await readFile(await localFile(root, file))) !== expected) artifactProblems.push(`${file}: content changed.`); }
-    catch { artifactProblems.push(`${file}: unavailable.`); }
-  }
-  return { artifact_integrity: artifactProblems.length ? 'failed' : regenerated.length ? 'repaired' : 'verified', artifact_problems: artifactProblems, regenerated_files: regenerated };
+  return { artifact_integrity: current.artifact_problems.length ? 'failed' : regenerated.length ? 'repaired' : 'verified', regenerated_files: regenerated, preserved_files: preserved };
 }
-function result(state, current) {
-  return { schema: 2, ...current, digest: state.digest, author: state.author, reviewer: state.review?.worker || null, sources: state.sources, outputs: OUTPUTS.map(f => `research/${f}`), review_template: reviewTemplate(state), caveat: 'Worker identities and original-read attestations are supplied by the harness. Hashes and structural validation do not prove truth or process independence.' };
+function result(state, current, compact) {
+  const base = { schema: 2, ...current, digest: state.digest, author: state.author, reviewer: state.review?.worker || null, outputs: OUTPUTS.map(f => `research/${f}`) };
+  if (compact) return { ...base, counts: { sources: state.sources.length, facts: state.dossier.facts.length, findings: state.dossier.findings.length }, template_command: 'synthesis template --project DIR' };
+  return { ...base, sources: state.sources, review_template: reviewTemplate(state), caveat: 'Worker identities and original-read attestations are supplied by the harness. Hashes and structural validation do not prove truth or process independence.' };
+}
+async function writeTemplate(root, name, template) {
+  // Require an existing project-local parent and create without overwriting.
+  if (!name || isAbsolute(name) || name.split(/[\\/]/).some(p => !p || p === '.' || p === '..')) throw new Error('--out must be a project-relative path without traversal.');
+  const managed = p => p === '.harness-research' || p.startsWith('.harness-research/') || OUTPUTS.some(f => p === `research/${f}`) || p === 'research/sources' || p.startsWith('research/sources/');
+  if (managed(name)) throw new Error('--out cannot replace managed research files.');
+  const path = join(root, name), parent = await realpath(resolve(path, '..'));
+  if (parent !== root && !parent.startsWith(root + sep)) throw new Error('--out escapes the project.');
+  if (managed(relative(root, join(parent, basename(path))).split(sep).join('/'))) throw new Error('--out cannot write through an alias to managed research files.');
+  await writeFile(path, JSON.stringify(template, null, 2) + '\n', { flag: 'wx', mode: 0o600 });
 }
 export async function runSynthesisCli(argv) {
   const options = args(argv); if (options.action === 'help') return { usage: HELP };
   const root = await realpath(resolve(options.project)), derived = join(root, '.harness-research'), statePath = join(derived, 'synthesis.json');
+  if (options.action === 'validate') {
+    const input = parseJson(await readText(root, options.file));
+    const checked = await validateDossier(root, input, options.worker);
+    return { schema: 2, valid: true, digest: checked.digest, counts: { sources: checked.sources.length, facts: checked.dossier.facts.length, findings: checked.dossier.findings.length } };
+  }
   await directory(derived);
   const lock = join(derived, 'research.lock'), owned = await acquireLock(lock);
   try {
@@ -102,8 +156,15 @@ export async function runSynthesisCli(argv) {
       state = { owner: OWNER, schema: 2, dossier: validated.dossier, author: validated.author, digest: validated.digest, sources: validated.sources, review: null };
       await atomic(statePath, JSON.stringify(state, null, 2) + '\n');
     } else if (!state) throw new Error('No synthesis dossier saved in this project.');
+    if (options.action === 'template') {
+      const template = reviewTemplate(state);
+      if (!options.out) return template;
+      await writeTemplate(root, options.out, template);
+      return { schema: 2, digest: state.digest, template_file: options.out };
+    }
+    let current;
     if (options.action === 'review') {
-      const current = await stateStatus(root, state); if (current.status === 'stale') throw new Error(`Evidence is stale. Save revised content before review. ${current.problems.join(' ')}`);
+      current = await stateStatus(root, state); if (current.status === 'stale') throw new Error(`Evidence is stale. Save revised content before review. ${current.problems.join(' ')}`);
       const review = parseJson(await readText(root, options.file));
       const checked = validateReview(state, review, options.worker);
       await protectOutputs(join(root, 'research'), state);
@@ -111,8 +172,10 @@ export async function runSynthesisCli(argv) {
       state.review = checked;
       await atomic(statePath, JSON.stringify(state, null, 2) + '\n');
     }
-    const current = await stateStatus(root, state);
-    const artifacts = await materialize(root, state, current.status);
-    return { ...result(state, current), ...artifacts };
+    // Review changes no source bytes; reuse its inspection, but recompute acceptance.
+    if (current) current.status = state.review.accepted ? 'complete' : 'needs-revision';
+    else current = await stateStatus(root, state);
+    const artifacts = await materialize(root, state, current);
+    return { ...result(state, current, options.compact), ...artifacts };
   } finally { await releaseLock(lock, owned); }
 }
