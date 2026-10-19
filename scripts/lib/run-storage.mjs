@@ -85,9 +85,9 @@ export async function acquireLock(lock, { wait = lockWait(), now = Date.now, bus
       const owner = Number((await readFile(lock, 'utf8').catch(() => '')).trim());
       const again = await exists(lock);
       // Remove only the same abandoned lock file we inspected, never a newer owner's.
-      if (!alive(owner) && again && again.ino === held.ino && again.dev === held.dev) { await unlink(lock).catch(() => {}); continue; }
+      if (Number.isInteger(owner) && owner > 0 && !alive(owner) && again && again.ino === held.ino && again.dev === held.dev) { await unlink(lock).catch(() => {}); continue; }
     }
-    if (now() >= deadline) throw new Error(`${busy} after waiting ${Math.round(wait / 1000)}s; retry. If no other research command is running, the lock's process has exited and it will be recovered automatically after ${STALE_LOCK_MS / 1000}s.`);
+    if (now() >= deadline) throw new Error(`${busy} after waiting ${Math.round(wait / 1000)}s; retry. Locks at least ${STALE_LOCK_MS / 1000}s old are recovered only when their recorded process has exited. Unknown locks are preserved for inspection.`);
     await pause(delay / 2 + Math.random() * delay);
   }
 }

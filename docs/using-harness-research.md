@@ -162,4 +162,7 @@ conflicting output ownership rather than silently converting it.
 For a new-format project, ask the agent to inspect synthesis status, correct any
 reported source or review problems, and continue from the saved dossier. An
 interrupted export can be regenerated from saved state; a changed source needs
-reassessment. [Developer commands and contract](development.md)
+reassessment. In the development runtime, repair preserves replaced files under
+`.harness-research/output-backups/` and returns their paths. Ask the agent to bring
+useful editorial changes into the dossier and save/review them; directly editing
+a generated report does not update its reviewed source of truth. [Developer commands and contract](development.md)

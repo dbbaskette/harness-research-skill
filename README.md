@@ -39,7 +39,8 @@ cd harness-research-skill
 bash scripts/Install-Harness-Research.sh
 ```
 
-Start a new agent session. Invoke **`$harness-research`** in Codex,
+Return to the **content project** where you want the report saved; the commands
+above leave you inside the skill checkout. Start a new agent session. Invoke **`$harness-research`** in Codex,
 **`/harness-research`** in Claude Code, or ask Cursor to use Harness Research:
 
 ```text
@@ -169,7 +170,7 @@ are loaded only to resume old work.
 ![Progressive disclosure: load the entry and the relevant stage, not the entire instruction library.](docs/images/context-loading.svg)
 
 [Architecture](docs/architecture.md) · [Evidence and limitations](docs/using-harness-research.md#evidence-and-review) ·
-[Developer guide](docs/development.md) · [Release history](docs/releases.md)
+[Developer guide](docs/development.md) · [Runnable schema-2 example](examples/synthesis/README.md) · [Release history](docs/releases.md)
 
 <details>
 <summary>For maintainers: measured instruction context</summary>
@@ -182,33 +183,33 @@ representative guidance-start response. Stage-only rows count their own referenc
 | --- | ---: |
 | Discovery metadata | 36 |
 | Installed bootstrap | 521 |
-| Bootstrap + current guidance entry | 1,183 |
+| Bootstrap + current guidance entry | 1,191 |
 | Investigator stage | 1,017 |
 | Synthesis writer stage | 1,547 |
-| Independent reviewer stage | 1,330 |
-| New synthesis: coordinator entry and workflow | 3,708 |
-| New synthesis: all stages in one context | 7,602 |
-| Synthesis resume, verify or refresh | 2,067 |
-| Optional studio task handoff | 4,409 |
-| Legacy 0.9 queued coordinator | 4,908 |
-| Legacy 0.9 reuse or refresh | 1,960 |
-| Legacy explicit chat-only answer | 2,137 |
-| Legacy manual saved research | 3,328 |
-| Legacy manual status or resume | 1,738 |
-| Legacy comparative routing only | 1,890 |
-| Legacy Codex comparative outline | 2,850 |
-| Legacy Codex add items | 2,055 |
-| Legacy Codex add fields | 2,075 |
-| Legacy Codex deep results | 2,738 |
-| Legacy Codex deep results + saved evidence | 3,929 |
-| Legacy Claude comparative outline | 2,867 |
-| Legacy Claude deep results | 2,760 |
-| Investigation + general web strategy | 5,222 |
-| Investigation + academic strategy | 5,314 |
-| Investigation + GitHub strategy | 5,109 |
-| Investigation + technical Q&A strategy | 5,014 |
-| Investigation + Chinese sources strategy | 5,239 |
-| Legacy migration | 1,532 |
+| Independent reviewer stage | 1,390 |
+| New synthesis: coordinator entry and workflow | 4,050 |
+| New synthesis: all stages in one context | 8,004 |
+| Synthesis resume, verify or refresh | 2,125 |
+| Optional studio task handoff | 4,751 |
+| Legacy 0.9 queued coordinator | 4,922 |
+| Legacy 0.9 reuse or refresh | 1,974 |
+| Legacy explicit chat-only answer | 2,151 |
+| Legacy manual saved research | 3,342 |
+| Legacy manual status or resume | 1,752 |
+| Legacy comparative routing only | 1,904 |
+| Legacy Codex comparative outline | 2,864 |
+| Legacy Codex add items | 2,069 |
+| Legacy Codex add fields | 2,089 |
+| Legacy Codex deep results | 2,752 |
+| Legacy Codex deep results + saved evidence | 3,943 |
+| Legacy Claude comparative outline | 2,881 |
+| Legacy Claude deep results | 2,774 |
+| Investigation + general web strategy | 5,564 |
+| Investigation + academic strategy | 5,656 |
+| Investigation + GitHub strategy | 5,451 |
+| Investigation + technical Q&A strategy | 5,356 |
+| Investigation + Chinese sources strategy | 5,581 |
+| Legacy migration | 1,546 |
 
 The new default starts with the entry and synthesis workflow. Investigation, writing
 and independent review each load their own reference when needed. The all-stages

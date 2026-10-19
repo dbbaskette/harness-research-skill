@@ -4,6 +4,10 @@ import { mkdtemp, writeFile, readFile, mkdir, symlink, rm, readdir, cp } from 'n
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { runSynthesisCli } from '../scripts/lib/synthesis-cli.mjs';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
+import { fileURLToPath } from 'node:url';
+const exec = promisify(execFile);
 
 async function fixture(t) {
   const project = await mkdtemp(join(tmpdir(), 'synthesis-test-')); t.after(() => rm(project, { recursive:true, force:true }));
@@ -246,4 +250,144 @@ test('missing purpose defaults to general topic research and explicit studio tas
   const exported=JSON.parse(await readFile(join(f.project,'research/facts.json'),'utf8'));
   assert.equal(exported.purpose,f.dossier.purpose);
   f.dossier.purpose=42; await assert.rejects(f.save(),/purpose/);
+});
+
+test('external selected originals require faithful local pins and preserve origin metadata', async t => {
+  const f = await fixture(t), outside = await mkdtemp(join(tmpdir(), 'synthesis-original-'));
+  t.after(() => rm(outside, { recursive: true, force: true }));
+  const external = join(outside, 'original.pdf'), bytes = Buffer.from('%PDF-1.7\nSelected original');
+  await writeFile(external, bytes);
+  f.dossier.source_mode = 'selected'; Object.assign(f.dossier.sources[0], { permission: 'selected', origin: external });
+  for (const origin of [external, new URL(`file://${external}`).href]) {
+    f.dossier.sources[0].origin = origin;
+    await assert.rejects(f.save(), /original_file.*external local origin.*Copy/);
+  }
+  f.dossier.sources[0].origin = '../missing-original.pdf';
+  await assert.rejects(f.save(), /original_file.*external local origin.*Copy/);
+  f.dossier.sources[0].origin = external;
+  f.dossier.sources[0].original_file = 'original.pdf';
+  await writeFile(join(f.project, 'original.pdf'), 'Wrong copy');
+  await assert.rejects(f.save(), /does not match the external original/);
+  await writeFile(join(f.project, 'original.pdf'), bytes);
+  const draft = await f.save(); assert.ok(draft.sources[0].original_sha256);
+  const facts = JSON.parse(await readFile(join(f.project, 'research/facts.json'), 'utf8'));
+  assert.equal(facts.sources[0].origin, f.dossier.sources[0].origin);
+  await f.review(draft);
+  await writeFile(join(f.project, 'original.pdf'), 'Changed local original');
+  assert.equal((await f.status()).status, 'stale');
+});
+
+test('evidence appendix preserves full finding meaning when an authored brief selects only the lead', async t => {
+  const f = await fixture(t), finding = f.dossier.findings[0];
+  finding.conditions = [{text:'Only use this recommendation for the documented workload.', kind:'inference', refs:['fact-a']}];
+  finding.gaps = [{text:'Production behavior remains unmeasured.', kind:'gap', refs:[]}];
+  f.dossier.brief = [{id:'lead',title:'Lead',blocks:[finding.summary]}];
+  await f.save();
+  const evidence = await readFile(join(f.project,'research/evidence.md'),'utf8');
+  for (const b of [...finding.implications, ...finding.conditions, ...finding.gaps]) assert.ok(evidence.includes(b.text));
+  assert.match(evidence, /\*\*Interpretation:\*\* Only use.*evidence.md#fact-a/);
+});
+
+test('repair preserves exact previous bytes and does not clobber backups', async t => {
+  const f = await fixture(t); await f.save();
+  const edited = Buffer.from([0xff, 0x00, 0x41]);
+  await writeFile(join(f.project,'research/report.md'), edited);
+  const repaired = await f.status(), preserved = repaired.preserved_files.find(p => p.file === 'research/report.md');
+  assert.ok(preserved); assert.deepEqual(await readFile(join(f.project,preserved.backup)), edited);
+  assert.match(await readFile(join(f.project,'research/report.md'),'utf8'), /Draft/);
+  assert.deepEqual((await f.status()).preserved_files, []);
+  await writeFile(join(f.project,'research/report.md'), edited);
+  assert.equal((await f.status()).preserved_files[0].backup, preserved.backup);
+  await writeFile(join(f.project,preserved.backup), 'Backup was edited');
+  await writeFile(join(f.project,'research/report.md'), edited);
+  await assert.rejects(f.status(), /Output backup changed/);
+  assert.deepEqual(await readFile(join(f.project,'research/report.md')), edited);
+});
+
+test('compact responses retain integrity and review state while template remains pending and complete', async t => {
+  const f = await fixture(t), saved = await f.save();
+  const compact = await runSynthesisCli(['status','--project',f.project,'--compact']);
+  assert.equal(compact.digest,saved.digest); assert.equal(compact.status,'draft');
+  assert.deepEqual(compact.counts,{sources:1,facts:1,findings:1});
+  assert.equal(compact.sources,undefined); assert.equal(compact.review_template,undefined);
+  assert.ok(JSON.stringify(compact).length < JSON.stringify(saved).length);
+  assert.deepEqual(await runSynthesisCli(['template','--project',f.project]),saved.review_template);
+  await runSynthesisCli(['template','--project',f.project,'--out','research/review.json']);
+  const template = JSON.parse(await readFile(join(f.project,'research/review.json'),'utf8'));
+  assert.deepEqual(template,saved.review_template); assert.equal(template.facts[0].verdict,'pending');
+  await assert.rejects(runSynthesisCli(['template','--project',f.project,'--out','research/review.json']), /EEXIST/);
+  for (const out of ['../review.json','research/report.md','.harness-research/synthesis.json','research/sources/source.txt']) await assert.rejects(runSynthesisCli(['template','--project',f.project,'--out',out]));
+  await assert.rejects(runSynthesisCli(['status','--project',f.project,'--compact','--verbose']),/Choose/);
+});
+
+test('validate diagnoses fields without creating state or changing an existing review', async t => {
+  const f = await fixture(t);
+  await writeFile(join(f.project,'dossier.json'), JSON.stringify(f.dossier));
+  const before = (await readdir(f.project)).sort();
+  const valid = await runSynthesisCli(['validate','--project',f.project,'--file','dossier.json','--worker','writer']);
+  assert.equal(valid.valid,true); assert.deepEqual((await readdir(f.project)).sort(),before);
+  f.dossier.sections[0].blocks[0].refs = ['unknown'];
+  await writeFile(join(f.project,'dossier.json'), JSON.stringify(f.dossier));
+  await assert.rejects(runSynthesisCli(['validate','--project',f.project,'--file','dossier.json','--worker','writer']), /Report block decision\[0\] refs.*unknown/);
+  f.dossier.sections[0].blocks[0].refs = ['fact-a'];
+  const saved = await f.save(); await f.review(saved);
+  const state = await readFile(join(f.project,'.harness-research/synthesis.json'));
+  await runSynthesisCli(['validate','--project',f.project,'--file','dossier.json','--worker','writer']);
+  assert.deepEqual(await readFile(join(f.project,'.harness-research/synthesis.json')),state);
+});
+
+test('integrity reads are deduplicated per command but source changes are rechecked on the next command', async t => {
+  const f = await fixture(t);
+  f.dossier.sources.push({...f.dossier.sources[0], id:'source-b'});
+  const draft = await f.save();
+  const checked = await f.status();
+  assert.equal(checked.integrity_checks.files_checked, 2);
+  assert.equal(checked.integrity_checks.bytes_hashed, 2 * Buffer.byteLength('Complete context. The default is 10. Exceptions depend on workload.'));
+  assert.equal((await f.review(draft)).integrity_checks.bytes_hashed, checked.integrity_checks.bytes_hashed);
+  await writeFile(join(f.project,'source.txt'),'Changed');
+  const stale = await f.status(); assert.equal(stale.status,'stale');
+  assert.ok(stale.problems.some(p => p.startsWith('source-a:'))); assert.ok(stale.problems.some(p => p.startsWith('source-b:')));
+});
+
+test('CLI exit semantics distinguish integrity failure and rejected review from intact drafts', async t => {
+  const f = await fixture(t), draft = await f.save();
+  const cli = fileURLToPath(new URL('../scripts/harness-research.mjs',import.meta.url));
+  const call = (...args) => exec(process.execPath,[cli,'synthesis',...args,'--project',f.project]);
+  assert.equal(JSON.parse((await call('verify')).stdout).status,'draft');
+  await f.review(draft,'checker',r => r.facts[0].verdict = 'unsupported');
+  await assert.rejects(call('review','--file','review.json','--worker','checker'), e => e.code === 1 && JSON.parse(e.stdout).status === 'needs-revision');
+  assert.equal(JSON.parse((await call('verify')).stdout).status,'needs-revision');
+  await f.review(draft);
+  assert.equal(JSON.parse((await call('verify','--compact')).stdout).status,'complete');
+  await writeFile(join(f.project,'source.txt'),'Changed working source');
+  await assert.rejects(call('verify'), e => e.code === 1 && JSON.parse(e.stdout).status === 'stale');
+  await rm(join(f.project,draft.sources[0].snapshot));
+  await assert.rejects(call('verify','--compact'), e => e.code === 1 && JSON.parse(e.stdout).artifact_integrity === 'failed');
+});
+
+test('documented synthesis example validates and saves with an unfilled reproducible review template', async t => {
+  const project = await mkdtemp(join(tmpdir(),'synthesis-example-')); t.after(()=>rm(project,{recursive:true,force:true}));
+  for (const name of ['source.md','dossier.json']) await cp(new URL(`../examples/synthesis/${name}`,import.meta.url),join(project,name));
+  const cli = fileURLToPath(new URL('../scripts/harness-research.mjs',import.meta.url));
+  const call = (...args) => exec(process.execPath,[cli,'synthesis',...args,'--project',project]);
+  const valid = JSON.parse((await call('validate','--file','dossier.json','--worker','example-author')).stdout);
+  await assert.rejects(readFile(join(project,'.harness-research/synthesis.json')),{code:'ENOENT'});
+  const saved = JSON.parse((await call('save','--file','dossier.json','--worker','example-author','--compact')).stdout);
+  assert.equal(valid.digest,saved.digest);
+  await call('template','--out','review.json');
+  const expected = JSON.parse(await readFile(new URL('../examples/synthesis/review-template.json',import.meta.url),'utf8'));
+  assert.deepEqual(JSON.parse(await readFile(join(project,'review.json'),'utf8')),expected);
+  await assert.rejects(call('review','--file','review.json','--worker','example-checker'));
+  assert.equal(JSON.parse((await call('verify','--compact')).stdout).status,'draft');
+});
+
+test('template output cannot escape through directory links or create state through an alias', async t => {
+  const f = await fixture(t); await f.save();
+  const outside = await mkdtemp(join(tmpdir(),'template-outside-')); t.after(()=>rm(outside,{recursive:true,force:true}));
+  await symlink(outside,join(f.project,'outside'));
+  await symlink(join(f.project,'.harness-research'),join(f.project,'state-alias'));
+  for (const out of ['outside/review.json','state-alias/research-run.json']) await assert.rejects(runSynthesisCli(['template','--project',f.project,'--out',out]),/escapes|managed/);
+  assert.deepEqual(await readdir(outside),[]);
+  await assert.rejects(readFile(join(f.project,'.harness-research/research-run.json')),{code:'ENOENT'});
+  assert.equal((await f.status()).status,'draft');
 });

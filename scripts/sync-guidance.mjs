@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 // Refresh instructions only. All executable operations use the installed runtime.
-import { readFile, writeFile, mkdir, rename, rm, lstat, readdir, realpath, open } from 'node:fs/promises';
+import { readFile, writeFile, mkdir, rename, rm, lstat, readdir, realpath } from 'node:fs/promises';
 import { resolve, join, dirname, relative, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { execFile } from 'node:child_process';
 import { promisify, parseArgs } from 'node:util';
 import { createHash, randomUUID } from 'node:crypto';
 import { parseVersion, compareVersions } from './lib/version.mjs';
+import { acquireLock, releaseLock } from './lib/run-storage.mjs';
 const exec = promisify(execFile), root = fileURLToPath(new URL('../', import.meta.url));
 const sources = {
   'harness-slides': { skill: 'harness-slides', repository: 'https://github.com/dbbaskette/harness-slides-skill.git' },
@@ -119,9 +120,11 @@ async function inspectCommit(repository, commit, config) {
   } else { if (manifest.name !== config.packageName) throw new Error('Unrecognized guidance package.'); compatible(manifest.version, config.version); }
   return { listing, guidanceVersion };
 }
-export async function start({ project, runtime = root, source, revision } = {}) {
+export async function start({ project, runtime = root, source, revision, releaseLimit = 100 } = {}) {
+  if (!Number.isSafeInteger(releaseLimit) || releaseLimit < 1 || releaseLimit > 1000) throw new Error('releaseLimit must be between 1 and 1000.');
   const config = await settings(runtime), cache = await cacheFor(project, config, true);
-  const lock = await open(join(cache, '.sync-lock'), 'wx', 0o600).catch(error => { if (error.code === 'EEXIST') throw new Error('Another guidance refresh is running; retry after it finishes.'); throw error; });
+  const lockPath = join(cache, '.sync-lock');
+  const lock = await acquireLock(lockPath, { wait: 0, busy: 'Another guidance refresh is running' });
   let stage;
   try {
     const repository = join(cache, 'repository.git');
@@ -141,12 +144,13 @@ export async function start({ project, runtime = root, source, revision } = {}) 
       // New work uses the newest release the installed runtime supports, so unreleased guidance on
       // main never reaches installed users. A repository with no release tags is served from main.
       const releases = await releaseTags(repository, trustedSource);
-      for (const release of releases.slice(0, 10)) {
+      for (const release of releases.slice(0, releaseLimit)) {
         await git(repository, 'fetch', '--quiet', '--no-tags', '--depth=1', trustedSource, release.ref);
         const candidate = await head();
         try { inspected = await inspectCommit(repository, candidate, config); commit = candidate; channel = 'release'; ref = release.ref; break; }
         catch (error) { if (!/newer installed runtime/.test(error.message)) throw error; skipped.push({ ref: release.ref, minimumRuntime: error.minimumRuntime }); }
       }
+      if (!commit && releases.length > releaseLimit) throw new Error(`Guidance compatibility search limit reached after ${releaseLimit} releases; older compatible guidance may exist. Resume a saved task, pin an approved revision, or update with the trusted installer.`);
       if (!commit && releases.length) throw new Error('No guidance release supports this installed runtime; it needs a newer installed runtime. Update with this skill’s trusted installer.');
       if (!commit) { await git(repository, 'fetch', '--quiet', '--no-tags', '--depth=1', trustedSource, ref); commit = await head(); }
     }
@@ -172,7 +176,7 @@ export async function start({ project, runtime = root, source, revision } = {}) 
     const tag = name => name.slice('refs/tags/'.length), newer = skipped[0];
     const disclosure = newer ? { freshness: 'older-compatible-release', newerRelease: newer, notice: `Guidance ${tag(newer.ref)} needs runtime ${newer.minimumRuntime}; this task uses ${tag(ref)}, the newest release runtime ${config.version} supports. Update with this skill’s trusted installer to use the newer guidance.` } : { freshness: 'current-at-start' };
     return { ...disclosure, channel, ref, runtimeVersion: config.version, guidanceVersion, revision: commit, task, guidance: join(snapshot, 'SKILL.md'), runtime: config.runtime };
-  } finally { if (stage) await rm(stage, { recursive: true, force: true }); await lock.close(); await rm(join(cache, '.sync-lock')); }
+  } finally { try { if (stage) await rm(stage, { recursive: true, force: true }); } finally { await releaseLock(lockPath, lock); } }
 }
 export async function resume({ project, task, runtime = root, cached = false } = {}) {
   const config = await settings(runtime);

@@ -180,7 +180,7 @@
         "original_file": {
           "type": "string",
           "minLength": 1,
-          "description": "Project-relative selected original file when different from readable capture; binary formats accepted. Required when origin identifies an existing local file distinct from file."
+          "description": "Project-relative selected original file when different from readable capture; binary formats accepted. Required when origin identifies an existing local file distinct from file, or an external absolute/file-URI origin. For external originals, copy exact bytes into the project and retain origin unchanged."
         }
       },
       "allOf": [

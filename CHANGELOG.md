@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.1-alpha.1 — unreleased
+
+- Fail CLI integrity verification for stale evidence or damaged snapshots; explicitly track supplied originals outside the project.
+- Retain full finding qualifications in the evidence appendix and preserve overwritten output bytes in reported backups.
+- Recover abandoned installation/guidance locks and search up to 100 releases for compatible guidance with a distinct search-limit error.
+- Add opt-in compact replies, pending review-template output, nonmutating dossier validation, and per-command deduplicated integrity reads.
+- Add a runnable schema-2 example and update workflow, recovery, and CLI documentation. Existing full response shapes remain available by default.
+
 ## 1.0.0 — 2026-10-18
 
 - Default absent, null or blank research purpose to general-purpose topic research; preserve explicit studio tasks and intended uses.

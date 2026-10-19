@@ -8,9 +8,12 @@ the same context does not qualify.
 
 ## Establish what you reviewed
 
-Run `synthesis status --project DIR`. It returns the digest, source hashes and
-`review_template` with every required fact, finding and prose ID. Use that template
-rather than guessing review IDs. Source records provide both the pinned capture
+Run `synthesis status --project DIR --compact` for the state and digest, then
+`synthesis template --project DIR --out research/review.json` to create the pending
+review object with every required fact, finding and prose ID. Without `--out`,
+template prints that object. Never overwrite an existing review input. The full
+status response (without `--compact`) remains available with source hashes and
+`review_template`. Use the generated template rather than guessing review IDs. The full status source records provide both the pinned capture
 and its original working file. Read the actual source material, surrounding
 qualifications, facts and report; inspect originals for supplied documents where
 extraction could lose meaning. A saved web capture establishes what was read at

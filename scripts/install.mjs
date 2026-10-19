@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { readdir, readFile, mkdir, writeFile, symlink, readlink, lstat, rename, rm, open, realpath } from 'node:fs/promises';
+import { readdir, readFile, mkdir, writeFile, symlink, readlink, lstat, rename, rm, realpath } from 'node:fs/promises';
 import { join, resolve, dirname } from 'node:path';
 import { homedir } from 'node:os';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -7,6 +7,7 @@ import { parseArgs } from 'node:util';
 import { randomUUID } from 'node:crypto';
 import { hash, digest } from './lib/common.mjs';
 import { parseVersion } from './lib/version.mjs';
+import { acquireLock, releaseLock } from './lib/run-storage.mjs';
 
 const packageRoot = fileURLToPath(new URL('../', import.meta.url));
 const roots = ['SKILL.md', 'LICENSE', 'NOTICE.md', 'package.json', 'package-lock.json', 'bootstrap', 'guidance', 'references', 'scripts', 'upstream', 'examples'];
@@ -97,7 +98,8 @@ export async function install({ source = packageRoot, home = homedir(), claudeCo
   for (const entry of legacy.filter(entry => entry.status === 'would-migrate')) await checkParents(dirname(entry.path));
   if (dryRun) return { status: 'dry-run', runtimeVersion: pkg.version, shared, runtime, targets, legacy, contentDigest };
   await safeParent(shared);
-  const lock = await open(join(shared, '.install-lock'), 'wx', 0o600), created = [], migrated = [];
+  const lockPath = join(shared, '.install-lock');
+  const lock = await acquireLock(lockPath, { wait: 0, busy: 'Another skill installation is running' }), created = [], migrated = [];
   try {
     await safeParent(join(shared, 'versions'));
     const existing = await state(runtime);
@@ -141,7 +143,7 @@ export async function install({ source = packageRoot, home = homedir(), claudeCo
     for (const target of created) try { if ((await state(target))?.link === current) await rm(target); } catch (failure) { failures.push(failure); }
     if (failures.length) throw new AggregateError([error, ...failures], 'Installation failed; some links require recovery.');
     throw error;
-  } finally { await lock.close(); await rm(join(shared, '.install-lock')); }
+  } finally { await releaseLock(lockPath, lock); }
 }
 
 async function main() {

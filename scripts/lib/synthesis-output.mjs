@@ -44,7 +44,10 @@ export function renderOutputs(state, status) {
     evidence += `<a id="${f.id}"></a>\n## ${md(f.id)}\n\n${md(f.statement)}\n\nAuthor: ${md(f.author)}\n\n`;
     for (const c of f.citations) evidence += `> ${md(c.quote)}\n\nSource: [${c.source}](#${c.source})${c.locator ? `, ${md(c.locator)}` : ''}.\n\n`;
   }
-  for (const f of d.findings) evidence += `<a id="${f.id}"></a>\n## ${md(f.title)}\n\n${typedStatement(f.summary)}\n\nSupporting facts: ${references(f.support)}. Counterevidence: ${f.counter.length ? references(f.counter) : 'none recorded'}.\n\n`;
+  for (const f of d.findings) {
+    evidence += `<a id="${f.id}"></a>\n## ${md(f.title)}\n\n${typedStatement(f.summary)}\n\nSupporting facts: ${references(f.support)}. Counterevidence: ${f.counter.length ? references(f.counter) : 'none recorded'}.\n\n`;
+    for (const [key, label] of [['implications','Implications'],['conditions','Qualifications to preserve'],['gaps','Gaps']]) if (f[key].length) evidence += `### ${label}\n\n${f[key].map(b => `- ${typedStatement(b)}`).join('\n')}\n\n`;
+  }
   for (const [label, sections] of [['Report prose', d.sections], ['Authored brief prose', d.brief || []]]) {
     if (!sections.length) continue;
     evidence += `## ${label}\n\n`;

@@ -1,0 +1,47 @@
+{
+  "schema": 2,
+  "digest": "1badf88ed6864b2d2e54f30faf9bb9ef809e706ba0bbf6204bcbbea10f77f300",
+  "originals": [
+    {
+      "source": "src-reference",
+      "sha256": "6cc44022314556f85933d47418c66c70091421b00f955120e2f3a810bee18571",
+      "read_original": false
+    }
+  ],
+  "facts": [
+    {
+      "id": "fact-retention",
+      "verdict": "pending",
+      "note": ""
+    }
+  ],
+  "findings": [
+    {
+      "id": "finding-retention",
+      "verdict": "pending",
+      "note": ""
+    }
+  ],
+  "prose": [
+    {
+      "id": "answer:0",
+      "verdict": "pending",
+      "note": ""
+    },
+    {
+      "id": "brief:handoff:0",
+      "verdict": "pending",
+      "note": ""
+    },
+    {
+      "id": "brief:handoff:1",
+      "verdict": "pending",
+      "note": ""
+    }
+  ],
+  "assessment": {
+    "coverage": "pending",
+    "usefulness": "pending",
+    "note": ""
+  }
+}
