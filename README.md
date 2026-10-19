@@ -1,37 +1,21 @@
-![Colorful source notes become a clear, connected research report.](docs/assets/harness-research-synthesis-banner.png)
+![Source notes become a clear, connected research report.](docs/assets/harness-research-synthesis-banner.png)
 
 # Harness Research
 
-### Find the evidence. Connect the ideas. Keep the understanding.
+**Turn a topic or a set of documents into a clear, cited research report.**
 
-A research **skill for your coding agent**. Ask about a topic, compare options, or
-bring documents to examine. Get a saved, cited report that explains what matters,
-why it matters, and where the evidence stops—ready to inform a presentation,
-a blog, training, or a decision.
+Harness Research is a skill for Codex, Claude Code, and Cursor. Your agent gathers
+evidence, explains what matters, and saves a report you can use for a decision,
+presentation, blog, or training.
 
-**[Start here](#your-first-research-report)** · **[What you get](#what-you-get)** ·
-**[User guide](docs/using-harness-research.md)** · **[Setup](docs/setup.md)**
+## Get started
 
-> **Harness Research 1.0.** The synthesis-first workflow is available in
-> [v1.0.0](https://github.com/dbbaskette/harness-research-skill/releases/tag/v1.0.0).
-> Upgrade the installed runtime to use it for new research. Existing 0.9 projects
-> keep their pinned runtime and guidance. [Migration details →](docs/migration-v1.md)
+You need **Node.js 20+**, Git, Bash, and an agent with tools to search and read
+sources. The skill uses your agent’s existing model and tools.
 
-## Your first research report
+### 1. Install the skill
 
-You need **Node.js 20+** and an agent with source-reading/search tools, such as
-Codex or Claude Code. The agent uses its existing tools and model access; there
-is no separate research service or API subscription to configure. A checked report
-also needs a separate agent invocation to review the evidence and synthesis.
-
-### 1. Open a project for the output
-
-Choose the content or code project where you want `research/report.md` saved.
-For your first run, use a new folder so existing research stays intact.
-
-### 2. Install the skill and ask your agent
-
-Install once, or run the installer from the new release to upgrade:
+Run these commands in a terminal to install the stable release:
 
 ```sh
 git clone --branch v1.0.0 https://github.com/dbbaskette/harness-research-skill.git
@@ -39,189 +23,69 @@ cd harness-research-skill
 bash scripts/Install-Harness-Research.sh
 ```
 
-Return to the **content project** where you want the report saved; the commands
-above leave you inside the skill checkout. Start a new agent session. Invoke **`$harness-research`** in Codex,
-**`/harness-research`** in Claude Code, or ask Cursor to use Harness Research:
+The installer makes the skill available to Codex, Claude Code, and Cursor.
+[Setup and update instructions →](docs/setup.md)
+
+### 2. Open your project and ask
+
+Return to the project where you want the research saved, then start a new agent
+session. Use **`$harness-research`** in Codex, **`/harness-research`** in Claude
+Code, or ask Cursor to use Harness Research.
+
+Describe what you want to learn:
 
 ```text
-Use Harness Research to compare Valkey and Redis for an application engineering
-team considering replacing Redis. Use public primary sources. Explain where
-replacement is practical, where it is risky, and what to verify before migration.
+Use Harness Research to compare PostgreSQL and SQLite for a small internal app.
+The audience is our engineering team. Use public primary sources and explain
+which requirements would change the choice.
 ```
 
-The agent handles source collection, helper commands, writing and saving. You do
-not need to prepare JSON, run npm commands, request citations, or ask it to write
-the report afterward. If your host requests permission for an independent review,
-allow it to complete the checked workflow.
+If you have a purpose, add it: “help us choose,” “background for a blog,” or
+“teach engineers new to the topic.” Otherwise, the agent prepares a general
+overview. It handles source collection, citations, writing, and saving.
 
-[Install, update and version details →](docs/setup.md)
+To work only from your own documents:
+
+```text
+Use Harness Research to check the launch claims in sources/product-brief.pdf
+and sources/release-notes.md. Use only these files. Explain what they support,
+where they disagree, and what remains unknown.
+```
 
 ### 3. Open the result
 
-The agent links **`research/report.md`**. Read the central answer, findings,
-explanation, comparisons and limitations. Follow the evidence links when you want
-to inspect the underlying source passages.
+The agent links the saved files in your project:
 
-If source access or independent checking is incomplete, the saved output says so.
-A draft is useful progress; it is not presented as a completed checked report.
-
-## What you get
-
-Research organized for understanding, with the audit trail close at hand.
-
-| File | Use it for |
+| File | What it contains |
 | --- | --- |
-| `research/report.md` | The main answer, themes, findings, explanations and comparisons |
-| `research/brief.md` | A prioritized handoff shaped to your task, with useful evidence and qualifications to retain |
-| `research/evidence.md` | Source passages and the factual support behind the report |
-| `research/facts.json` | Structured evidence and synthesis for compatible tools (schema 2) |
-| `research/output.json` | The saved revision, review status and artifact hashes |
-| `research/sources/` | Pinned source text used for this result |
+| **`research/report.md`** | The main answer, supporting explanation, and limitations |
+| **`research/brief.md`** | Key takeaways and evidence for the work you plan to do next |
+| **`research/evidence.md`** | Source passages, qualifications, and review details |
 
-Questions guide the investigation. They do not force every report into Q&A.
-A short factual check can stay short; a broad topic can become a coherent
-explanation. A comparison uses named criteria rather than unrelated fact lists.
+Source snapshots and JSON exports are saved alongside them for traceability and
+reuse. You can ask follow-ups such as “explain this for beginners” or “refresh the
+evidence before we use it.”
 
-Read the [Valkey/Redis replacement report](docs/verification/1.0.0-alpha.1/valkey-redis-editorial/research/report.md):
-a revised example with 21 primary sources, 38 facts and five synthesized findings,
-independently checked against dated source captures and saved original contexts.
-Its [prioritized presentation brief](docs/verification/1.0.0-alpha.1/valkey-redis-editorial/research/brief.md)
-shows the task-shaped handoff. The
-[editorial refinement record](docs/verification/1.0.0-alpha.1/editorial-refinement/README.md)
-documents review, tests and current studio integration limits; the
-[initial acceptance record](docs/verification/1.0.0-alpha.1/README.md) preserves history.
-Earlier [0.9 examples](docs/verification/0.9.0/README.md) document the previous
-implementation and are not examples of this output contract.
+[See a Valkey/Redis report](docs/verification/1.0.0-alpha.1/valkey-redis-editorial/research/report.md)
+and its [presentation brief](docs/verification/1.0.0-alpha.1/valkey-redis-editorial/research/brief.md).
 
-## Start with your purpose
+## How review works
 
-Add the purpose in your own words: “help us choose,” “background for a blog,” or
-“teach engineers new to the topic.” It shapes the depth, explanations and format
-of the report and brief. If you leave it out, the default is **general-purpose
-topic research**: a balanced explanation of the topic and a concise overview.
-No intake form is required. You can name more than one use and say which matters
-most. A studio can pass its actual content task as the purpose.
+A separate agent run checks the sources and conclusions. If independent
+review or source access is incomplete, the report clearly shows its draft status
+or limitations. A reviewed report can still have open questions, and changing
+information may need a refresh.
 
-**Understand a topic**
+The report and brief can feed another writing or presentation skill. Research
+produces the evidence and explanation; the next skill creates the final content.
 
-```text
-Research how retrieval-augmented generation works for software architects.
-Explain the mechanisms, trade-offs, failure modes and evaluation choices.
-Use public primary sources. This will inform a technical blog and training.
-```
+## Learn more
 
-**Compare alternatives**
+- [User guide](docs/using-harness-research.md) — scope, sources, follow-ups, and reuse.
+- [Setup and troubleshooting](docs/setup.md) — installation, updates, and older projects.
+- [Developer guide](docs/development.md) — CLI commands, testing, and instruction context.
+- [Runnable example](examples/synthesis/README.md) — try the development workflow locally.
+- [Architecture](docs/architecture.md) and [release history](docs/releases.md).
 
-```text
-Compare PostgreSQL and SQLite for a small internal application.
-Cover deployment, concurrency and maintenance. Explain which constraints
-change the decision, and leave unknown workload requirements visible.
-```
-
-**Work only from your documents**
-
-```text
-Use sources/product-brief.pdf and sources/release-notes.md only.
-Check which launch claims they support, explain contradictions, and identify
-what remains unknown. The audience is our technical enablement team.
-```
-
-After installing a published version, invoke **`$harness-research`** in Codex,
-**`/harness-research`** in Claude Code, or ask your agent to use the named skill.
-New tasks select compatible stable guidance automatically; existing tasks keep their pins.
-
-[More on scope, source choices and follow-ups →](docs/using-harness-research.md)
-
-## Useful input for the work that comes next
-
-The brief leads with what matters for the task and selects the strongest useful
-support. Its shape can change with the intended use:
-
-- **Presentations:** key messages, a possible storyline and evidence worth visualizing.
-- **Blogs:** a central argument, mechanisms and the strongest counterarguments.
-- **Training:** a concept sequence, misconceptions and grounded examples.
-- **Decisions:** consequential tradeoffs and conditions that change the choice.
-
-These are useful emphases, not fixed templates or a bundle of separate deliverables.
-The next skill still owns the slides, prose or lesson design. A research report
-is a derived artifact, not a new independent primary source. Structured consumers
-must support schema 2 explicitly; [migration notes](docs/migration-v1.md) explain
-what changes and what remains available. [Passing a studio task →](docs/using-harness-research.md#feed-presentations-blogs-and-training)
-
-## How it works
-
-**Investigate → connect the evidence → write → independently review → save.**
-
-The synthesis approach adapts Anthropic's
-[Knowledge Synthesis](https://github.com/anthropics/knowledge-work-plugins/tree/33eeda1e8fd856455b05479d13a0f85b5f803744/enterprise-search/skills/knowledge-synthesis):
-group related evidence, prioritize what the reader needs, preserve disagreement,
-and lead with a useful answer. Harness adds scoped investigation, saved evidence,
-independent review and durable output. [Attribution and licenses →](NOTICE.md)
-
-The agent does the thinking. A local helper checks quotations and references,
-pins source text, and ties review to the exact saved evidence. A different
-invocation checks both the factual support and the conclusions drawn from it.
-Source support is not a guarantee of truth or live currency.
-
-The skill loads guidance **only when that stage needs it**. Investigation,
-synthesis, checking and reuse have focused references; old queue instructions
-are loaded only to resume old work.
-
-![Progressive disclosure: load the entry and the relevant stage, not the entire instruction library.](docs/images/context-loading.svg)
-
-[Architecture](docs/architecture.md) · [Evidence and limitations](docs/using-harness-research.md#evidence-and-review) ·
-[Developer guide](docs/development.md) · [Runnable schema-2 example](examples/synthesis/README.md) · [Release history](docs/releases.md)
-
-<details>
-<summary>For maintainers: measured instruction context</summary>
-
-<!-- CONTEXT-USAGE:START -->
-Measured with `cl100k_base`; cumulative instruction counts include a normalized
-representative guidance-start response. Stage-only rows count their own reference.
-
-| Reading path | Tokens |
-| --- | ---: |
-| Discovery metadata | 36 |
-| Installed bootstrap | 521 |
-| Bootstrap + current guidance entry | 1,191 |
-| Investigator stage | 1,017 |
-| Synthesis writer stage | 1,547 |
-| Independent reviewer stage | 1,390 |
-| New synthesis: coordinator entry and workflow | 4,050 |
-| New synthesis: all stages in one context | 8,004 |
-| Synthesis resume, verify or refresh | 2,125 |
-| Optional studio task handoff | 4,751 |
-| Legacy 0.9 queued coordinator | 4,922 |
-| Legacy 0.9 reuse or refresh | 1,974 |
-| Legacy explicit chat-only answer | 2,151 |
-| Legacy manual saved research | 3,342 |
-| Legacy manual status or resume | 1,752 |
-| Legacy comparative routing only | 1,904 |
-| Legacy Codex comparative outline | 2,864 |
-| Legacy Codex add items | 2,069 |
-| Legacy Codex add fields | 2,089 |
-| Legacy Codex deep results | 2,752 |
-| Legacy Codex deep results + saved evidence | 3,943 |
-| Legacy Claude comparative outline | 2,881 |
-| Legacy Claude deep results | 2,774 |
-| Investigation + general web strategy | 5,564 |
-| Investigation + academic strategy | 5,656 |
-| Investigation + GitHub strategy | 5,451 |
-| Investigation + technical Q&A strategy | 5,356 |
-| Investigation + Chinese sources strategy | 5,581 |
-| Legacy migration | 1,546 |
-
-The new default starts with the entry and synthesis workflow. Investigation, writing
-and independent review each load their own reference when needed. The all-stages
-row shows their cumulative cost if read in one context; delegated stage rows are
-separate contexts. Synthesis reuse does not load investigation or writing contracts
-until new work is needed. Strategy rows add exactly one source strategy. Legacy
-queue, manual and comparative paths remain available only for existing callers.
-Source documents, evidence payloads, tool responses and conversation add separately.
-The JSON output also exposes direct-checkout paths without bootstrap/start overhead.
-<!-- CONTEXT-USAGE:END -->
-
-Measurements describe instruction loading, not total model usage or cost.
-Run `npm run context:update` after guidance changes and `npm run context:check`
-to verify the generated table and map.
-</details>
+The synthesis approach adapts Anthropic’s Knowledge Synthesis.
+See [attribution and licenses](NOTICE.md).

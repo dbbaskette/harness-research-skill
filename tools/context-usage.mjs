@@ -126,14 +126,14 @@ export async function main() {
   if (args.some(x => !['--write', '--check', '--json'].includes(x)) || args.length > 1) throw new Error('Choose --write, --check or --json');
   const data = await measureContext();
   if (args.includes('--json')) { console.log(JSON.stringify(data, null, 2)); return; }
-  const url = new URL('README.md', root), readme = await readFile(url, 'utf8');
+  const url = new URL('docs/development.md', root), document = await readFile(url, 'utf8');
   const pattern = /<!-- CONTEXT-USAGE:START -->[\s\S]*?<!-- CONTEXT-USAGE:END -->/;
-  if (!pattern.test(readme) || (readme.match(/<!-- CONTEXT-USAGE:START -->/g) ?? []).length !== 1) throw new Error('Expected one context report marker pair');
-  const next = readme.replace(pattern, `<!-- CONTEXT-USAGE:START -->\n${renderReport(data)}<!-- CONTEXT-USAGE:END -->`);
+  if (!pattern.test(document) || (document.match(/<!-- CONTEXT-USAGE:START -->/g) ?? []).length !== 1) throw new Error('Expected one context report marker pair');
+  const next = document.replace(pattern, `<!-- CONTEXT-USAGE:START -->\n${renderReport(data)}<!-- CONTEXT-USAGE:END -->`);
   const mapUrl = new URL('docs/images/context-loading.svg', root), map = renderMap(data);
   const savedMap = await readFile(mapUrl, 'utf8').catch(() => null);
   if (args.includes('--write')) { await mkdir(new URL('docs/images/', root), { recursive: true }); await writeFile(url, next); await writeFile(mapUrl, map); }
-  else if (readme !== next || savedMap !== map) throw new Error('Context counts changed; run npm run context:update');
+  else if (document !== next || savedMap !== map) throw new Error('Context counts changed; run npm run context:update');
   console.log(JSON.stringify({ routes: data.routes, inputDigest: data.inputDigest }, null, 2));
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) main().catch(error => { console.error(error.message); process.exitCode = 1; });

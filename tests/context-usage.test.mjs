@@ -21,9 +21,9 @@ test('routed instruction links and sections resolve', async () => {
   }
 });
 
-test('reported paths count each input once and README reflects the tested instructions', async () => {
-  const data = await measureContext(), readme = await readFile(new URL('README.md', root), 'utf8');
-  assert.ok(readme.includes(renderReport(data)));
+test('reported paths count each input once and the developer guide reflects the tested instructions', async () => {
+  const data = await measureContext(), guide = await readFile(new URL('docs/development.md', root), 'utf8');
+  assert.ok(guide.includes(renderReport(data)));
   for (const route of [...Object.values(data.readingPaths), ...Object.values(data.standalone)]) {
     assert.equal(new Set(route.files.map(x => x.path)).size, route.files.length);
     assert.equal(new Set(route.helpers.map(x => x.name)).size, route.helpers.length);
@@ -56,10 +56,10 @@ test('reported paths count each input once and README reflects the tested instru
     assert.equal(data.readingPaths[name].files.filter(x => x.path.includes('web-search-modules')).length, 1);
 });
 
-test('the README shows the progressive disclosure map, generated from the same measurements', async () => {
+test('the developer guide shows the progressive disclosure map, generated from the same measurements', async () => {
   const data = await measureContext(), map = await readFile(new URL('docs/images/context-loading.svg', root), 'utf8');
   assert.equal(map, renderMap(data), 'docs/images/context-loading.svg is stale; run npm run context:update');
-  assert.match(await readFile(new URL('README.md', root), 'utf8'), /!\[Progressive disclosure[^\]]*\]\(docs\/images\/context-loading\.svg\)/);
+  assert.match(await readFile(new URL('docs/development.md', root), 'utf8'), /!\[Progressive disclosure[^\]]*\]\(images\/context-loading\.svg\)/);
   assert.ok(map.includes(data.inputDigest));
   // Every path the map draws shows its measured total, and nothing is left unescaped.
   for (const label of ['Discovery metadata', 'Installed bootstrap', 'Investigator stage', 'Synthesis writer stage', 'Independent reviewer stage']) {
