@@ -1,7 +1,22 @@
 # Versioned releases
 
-**1.0.0** promotes the synthesis-first implementation to stable, following the
-owner's explicit stable-release approval on 2026-10-18. New 1.0 tasks select stable
+**1.0.1** (2026-10-23) is a patch release of the 1.0 synthesis workflow. It
+fixes synthesis integrity exits, external-original pinning and evidence
+qualifications; preserves overwritten outputs; recovers abandoned locks; and adds
+opt-in compact, template and validate commands. Its guidance floor is runtime
+1.0.1, so 1.0.0 installations keep 1.0.0 guidance until updated. The owner asked
+for new releases of the studios and harness skills and then explicitly approved
+publishing "Harness Research 1.0.1" as an immutable public tag and release.
+
+The [1.0.1 release record](verification/1.0.1/README.md) pins the tested tree.
+Its checks are the native gate (full suite, audit, generated context and isolated
+installation) and an isolated install of the downloaded release archive. No new
+live research trial was run; the record explains why and what remains unmeasured.
+
+## Historical releases
+
+**1.0.0 (2026-10-18)** promotes the synthesis-first implementation to stable,
+following the owner's explicit stable-release approval. New 1.0 tasks select stable
 synthesis guidance automatically; the guidance floor is runtime 1.0.0. Existing
 0.9 runs retain their own pinned runtime and instructions.
 
@@ -13,8 +28,6 @@ and the requested Valkey/Redis research with independent review are required.
 Live acceptance is scoped to the available Codex host; it does not establish
 cross-model or cross-harness quality. Structured studio adapters still need
 schema-2 integration. Markdown report and brief handoffs are available now.
-
-## Historical releases
 
 **0.9.5 acceptance scope (2026-10-16).** 0.9.5 adds the README's progressive
 disclosure map and documentation updates, with no runtime behaviour change. The

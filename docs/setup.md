@@ -2,19 +2,19 @@
 
 [README](../README.md) · [User guide](using-harness-research.md)
 
-## Install or update to 1.0.0
+## Install or update to 1.0.1
 
 Requirements: Node.js 20+, Git, Bash and a configured agent with source-reading
 and search tools. No runtime npm install is required.
 
 ```sh
-git clone --branch v1.0.0 https://github.com/dbbaskette/harness-research-skill.git
+git clone --branch v1.0.1 https://github.com/dbbaskette/harness-research-skill.git
 cd harness-research-skill
 bash scripts/Install-Harness-Research.sh
 ```
 
 Use a fresh checkout directory when updating, then run that release's installer.
-It retains old immutable runtimes and switches the discovery links to 1.0.0.
+It retains old immutable runtimes and switches the discovery links to 1.0.1.
 Existing projects retain their pinned runtime and guidance; do not convert an
 in-progress 0.9 project by starting a new synthesis task over its files.
 
@@ -23,7 +23,7 @@ saved; the shell commands above leave you in the skill checkout.
 
 Start a new agent session and invoke `$harness-research` in Codex,
 `/harness-research` in Claude Code, or ask Cursor to use the skill. New tasks select
-stable 1.0.0 guidance automatically. The agent reports runtime version, guidance
+stable 1.0.1 guidance automatically. The agent reports runtime version, guidance
 revision and freshness on start/resume.
 
 Check the installed version on macOS:
@@ -69,14 +69,14 @@ Use the host's permitted network-retry mechanism, or report the limitation.
 Changing entrypoints cannot repair unavailable network access. A source/hash check
 is local and does not prove live website access.
 
-## Development runtime and recovery
+## Runtime 1.0.1 and recovery
 
-The repository's `1.0.1-alpha.1` runtime is unreleased. Its new compact, template,
-and validate commands require that runtime or newer. To test it, use the checkout's
-`SKILL.md` and local helper together; automatic guidance selection continues to use
-compatible published stable releases. The install instructions above target 1.0.0.
+The 1.0.1 compact, template and validate commands require runtime 1.0.1 or newer,
+and 1.0.1 guidance declares that floor. A 1.0.0 installation keeps selecting
+compatible 1.0.0 guidance and reports `older-compatible-release` until you install
+1.0.1 with the instructions above.
 
-Development status/verify preserves overwritten outputs in
+Status/verify preserves overwritten outputs in
 `.harness-research/output-backups/` and reports `preserved_files`. Recover useful
 edits into the dossier before saving and obtaining a new review. Generated files
 remain projections of the saved dossier.
@@ -96,7 +96,7 @@ installer. No failed lookup silently switches guidance.
 
 | Symptom | Next step |
 | --- | --- |
-| New task still writes the old Q&A format | Check runtime and guidance versions; install 1.0.0 and start a new task in a fresh content folder |
+| New task still writes the old Q&A format | Check runtime and guidance versions; install 1.0.1 and start a new task in a fresh content folder |
 | New helper refuses existing `research/` files | Preserve the old project; use a fresh folder or resume its legacy runtime |
 | Independent review unavailable | Keep the saved draft; enable a permitted separate invocation before claiming completion |
 | Source changed or review no longer matches | Re-read affected evidence, save a revised dossier and obtain a new review |

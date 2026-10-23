@@ -2,7 +2,7 @@
 
 This fictional queue reference demonstrates the schema and helper commands. It
 is not live research or an independently checked report. Run it in a disposable
-project using the development runtime (`1.0.1-alpha.1` or newer). From the repository:
+project using runtime `1.0.1` or newer. From the repository:
 
 ```sh
 example_project=$(mktemp -d)

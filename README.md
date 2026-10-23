@@ -18,7 +18,7 @@ sources. The skill uses your agent’s existing model and tools.
 Run these commands in a terminal to install the stable release:
 
 ```sh
-git clone --branch v1.0.0 https://github.com/dbbaskette/harness-research-skill.git
+git clone --branch v1.0.1 https://github.com/dbbaskette/harness-research-skill.git
 cd harness-research-skill
 bash scripts/Install-Harness-Research.sh
 ```
