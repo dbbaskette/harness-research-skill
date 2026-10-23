@@ -1,0 +1,25 @@
+{
+  "version": "1.0.1",
+  "tested_commit": "63542837ea9e1f4b686f59e14971d1276699112f",
+  "tested_tree": "native/source-files.sha256",
+  "tested_files": 622,
+  "authorization": "Owner explicitly approved publishing Harness Research 1.0.1 as an immutable public tag and release on 2026-10-23",
+  "native": {
+    "result": "PASS",
+    "passed": 169,
+    "failed": 0,
+    "skipped": 0,
+    "audit_vulnerabilities": 0,
+    "context_check": "PASS",
+    "installed_version": "harness-research 1.0.1",
+    "vm": "harness-research-test-20261023153714-70111-5b1d9e7b",
+    "removed": true
+  },
+  "host": {
+    "suite": { "passed": 168, "failed": 0, "skipped": 1 },
+    "isolated_archive_install": "PASS"
+  },
+  "live_research_trial": false,
+  "live_evidence": "../1.0.0-alpha.1/README.md",
+  "scope": "Patch release on mechanical checks; agent use of the 1.0.1 guidance is not yet observed live"
+}

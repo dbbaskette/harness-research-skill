@@ -1,12 +1,14 @@
 # Changelog
 
-## 1.0.1-alpha.1 — unreleased
+## 1.0.1 — 2026-10-23
 
 - Fail CLI integrity verification for stale evidence or damaged snapshots; explicitly track supplied originals outside the project.
 - Retain full finding qualifications in the evidence appendix and preserve overwritten output bytes in reported backups.
 - Recover abandoned installation/guidance locks and search up to 100 releases for compatible guidance with a distinct search-limit error.
 - Add opt-in compact replies, pending review-template output, nonmutating dossier validation, and per-command deduplicated integrity reads.
 - Add a runnable schema-2 example and update workflow, recovery, and CLI documentation. Existing full response shapes remain available by default.
+- Simplify the README and move maintainer context measurements to the developer guide.
+- Publish 1.0.1 guidance with a runtime 1.0.1 floor; 1.0.0 installations keep 1.0.0 guidance until updated. Release verification is in docs/verification/1.0.1.
 
 ## 1.0.0 — 2026-10-18
 

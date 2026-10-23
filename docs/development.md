@@ -84,9 +84,9 @@ or automatic passing review.
 
 ## Development and installation
 
-The published stable version is `1.0.0`; this checkout is the unreleased
-`1.0.1-alpha.1` development runtime. Its guidance requires that runtime or newer
-because it uses the new template and compact interfaces. New installed tasks choose compatible stable
+The published stable version is `1.0.1`. Its guidance requires runtime 1.0.1 or
+newer because it uses the template, validate and compact interfaces; 1.0.0
+runtimes keep selecting 1.0.0 guidance. New installed tasks choose compatible stable
 release guidance. For unpublished development, select the checkout's `SKILL.md`
 and runtime explicitly. The guidance floor prevents older helpers from loading
 an unsupported workflow.
@@ -131,7 +131,8 @@ It reports per-stage and cumulative context, not model cost. After guidance chan
 regenerate the table below and its context map, then check them.
 
 The [1.0 acceptance record](verification/1.0.0-alpha.1/README.md) distinguishes code
-checks, live research, independent evidence review and limitations. A synthetic
+checks, live research, independent evidence review and limitations. Each release's
+record under [verification](verification/) pins its tested tree and scope. A synthetic
 fixture is not a live research test, and local acceptance is not a release.
 
 ## Documentation and attribution
@@ -163,33 +164,33 @@ representative guidance-start response. Stage-only rows count their own referenc
 | --- | ---: |
 | Discovery metadata | 36 |
 | Installed bootstrap | 521 |
-| Bootstrap + current guidance entry | 1,191 |
+| Bootstrap + current guidance entry | 1,183 |
 | Investigator stage | 1,017 |
 | Synthesis writer stage | 1,547 |
 | Independent reviewer stage | 1,390 |
-| New synthesis: coordinator entry and workflow | 4,050 |
-| New synthesis: all stages in one context | 8,004 |
-| Synthesis resume, verify or refresh | 2,125 |
-| Optional studio task handoff | 4,751 |
-| Legacy 0.9 queued coordinator | 4,922 |
-| Legacy 0.9 reuse or refresh | 1,974 |
-| Legacy explicit chat-only answer | 2,151 |
-| Legacy manual saved research | 3,342 |
-| Legacy manual status or resume | 1,752 |
-| Legacy comparative routing only | 1,904 |
-| Legacy Codex comparative outline | 2,864 |
-| Legacy Codex add items | 2,069 |
-| Legacy Codex add fields | 2,089 |
-| Legacy Codex deep results | 2,752 |
-| Legacy Codex deep results + saved evidence | 3,943 |
-| Legacy Claude comparative outline | 2,881 |
-| Legacy Claude deep results | 2,774 |
-| Investigation + general web strategy | 5,564 |
-| Investigation + academic strategy | 5,656 |
-| Investigation + GitHub strategy | 5,451 |
-| Investigation + technical Q&A strategy | 5,356 |
-| Investigation + Chinese sources strategy | 5,581 |
-| Legacy migration | 1,546 |
+| New synthesis: coordinator entry and workflow | 4,032 |
+| New synthesis: all stages in one context | 7,986 |
+| Synthesis resume, verify or refresh | 2,111 |
+| Optional studio task handoff | 4,733 |
+| Legacy 0.9 queued coordinator | 4,908 |
+| Legacy 0.9 reuse or refresh | 1,960 |
+| Legacy explicit chat-only answer | 2,137 |
+| Legacy manual saved research | 3,328 |
+| Legacy manual status or resume | 1,738 |
+| Legacy comparative routing only | 1,890 |
+| Legacy Codex comparative outline | 2,850 |
+| Legacy Codex add items | 2,055 |
+| Legacy Codex add fields | 2,075 |
+| Legacy Codex deep results | 2,738 |
+| Legacy Codex deep results + saved evidence | 3,929 |
+| Legacy Claude comparative outline | 2,867 |
+| Legacy Claude deep results | 2,760 |
+| Investigation + general web strategy | 5,546 |
+| Investigation + academic strategy | 5,638 |
+| Investigation + GitHub strategy | 5,433 |
+| Investigation + technical Q&A strategy | 5,338 |
+| Investigation + Chinese sources strategy | 5,563 |
+| Legacy migration | 1,532 |
 
 The new default starts with the entry and synthesis workflow. Investigation, writing
 and independent review each load their own reference when needed. The all-stages

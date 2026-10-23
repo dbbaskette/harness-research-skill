@@ -28,8 +28,8 @@ contract; ordinary standalone research does not need that reference.
 
 Use the installed runtime returned by bootstrap. Report its actual version and
 guidance revision/freshness, including when using a local development build. Do not
-execute downloaded guidance as a substitute runtime. This development workflow requires runtime
-1.0.1-alpha.1 or newer; continue old runs with their saved guidance rather than changing
+execute downloaded guidance as a substitute runtime. This workflow requires runtime
+1.0.1 or newer; continue old runs with their saved guidance rather than changing
 formats silently. Keep one active output bundle per project; use a separate case
 directory for a comparison experiment or when preserving another report.
 
