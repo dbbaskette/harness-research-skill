@@ -3,7 +3,14 @@ import { parseArgs } from 'node:util';
 import { readFile } from 'node:fs/promises';
 import { planResearch, recordResearch, researchStatus, migrateResearch } from './lib/research.mjs';
 import { runCli } from './lib/run-cli.mjs';
-if (process.argv[2] === 'synthesis') {
+if (process.argv[2] === 'asset' || process.argv[2] === 'collection') {
+  try {
+    const module = await import(process.argv[2] === 'asset' ? './lib/topic-assets.mjs' : './lib/collection.mjs');
+    const run = process.argv[2] === 'asset' ? module.runAssetCli : module.runCollectionCli;
+    const result = await run(process.argv.slice(3));
+    if (result !== undefined) console.log(JSON.stringify(result, null, process.argv.includes('--verbose') ? 2 : 0));
+  } catch (error) { console.error(error.message); process.exitCode = 1; }
+} else if (process.argv[2] === 'synthesis') {
   try { const { runSynthesisCli, synthesisExitCode } = await import('./lib/synthesis-cli.mjs'); const result = await runSynthesisCli(process.argv.slice(3)); if (result !== undefined) console.log(JSON.stringify(result, null, process.argv.includes('--verbose') ? 2 : 0)); process.exitCode = synthesisExitCode(process.argv[3], result); }
   catch (error) { console.error(error.message); process.exitCode = 1; }
 } else if (process.argv[2] === 'research') {
@@ -18,7 +25,7 @@ try {
     const pkg = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'));
     console.log(`harness-research ${pkg.version}`);
   }
-  else if (values.help || action === 'help') console.log('Usage: node scripts/harness-research.mjs synthesis save|review|status|verify --project DIR [options]\n       node scripts/harness-research.mjs research ACTION --project DIR [options]\n       node scripts/harness-research.mjs plan|record|status|migrate --project DIR [--file JSON] [--run ID --item ID] [--allow-web]\n       node scripts/harness-research.mjs --version');
+  else if (values.help || action === 'help') console.log('Usage: node scripts/harness-research.mjs asset init|intake|metadata|source|status [options]\n       node scripts/harness-research.mjs collection init|register|capture|accept|assemble|retry|pause|resume|stop|invalidate|status --project DIR [options]\n       node scripts/harness-research.mjs synthesis save|review|status|verify --project DIR [options]\n       node scripts/harness-research.mjs research ACTION --project DIR [options]\n       node scripts/harness-research.mjs plan|record|status|migrate --project DIR [--file JSON] [--run ID --item ID] [--allow-web]\n       node scripts/harness-research.mjs --version');
   else {
     if (!values.project || positionals.length !== 1 || !['plan', 'record', 'status', 'migrate'].includes(action)) throw new Error('Choose plan, record, status or migrate and supply --project.');
     const allowed = { plan: ['project', 'file', 'allow-web'], record: ['project', 'file', 'run', 'item'], status: ['project'], migrate: ['project'] }[action];

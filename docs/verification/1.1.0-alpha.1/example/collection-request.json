@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "topic": "Meridian vs Boreal for an internal inventory application",
+  "audience": "Application engineers",
+  "purpose": "Help select an operating approach for a small internal app; explain what would change the choice",
+  "source_mode": "selected",
+  "scope": "Deployment, concurrency, maintenance and evidence limits in the supplied synthetic materials only",
+  "workstreams": [
+    {
+      "id": "deployment-concurrency",
+      "questions": [
+        "Explain deployment and concurrency differences and their practical boundaries."
+      ]
+    },
+    {
+      "id": "maintenance-evidence",
+      "questions": [
+        "Explain backup, security, maintenance and what the supplied material cannot establish."
+      ]
+    }
+  ],
+  "max_investigators": 3
+}

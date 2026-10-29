@@ -2,6 +2,7 @@ import { readFile, lstat, realpath } from 'node:fs/promises';
 import { resolve, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readText, identifier, text, stable, hash, localFile, exists } from './run-storage.mjs';
+import { managedSource, digestContent } from './synthesis-layout.mjs';
 
 export const OWNER = 'harness-research-synthesis';
 export const DEFAULT_PURPOSE = 'General-purpose topic research';
@@ -25,7 +26,8 @@ export function proseItems(dossier) {
   for (const [ci, c] of (dossier.comparisons || []).entries()) for (const [ri, r] of c.rows.entries()) for (const [si, cell] of r.cells.entries()) items.push({ ...cell, id: `comparison:${ci}:${ri}:${si}` });
   return items;
 }
-export async function validateDossier(root, input, author) {
+export async function validateDossier(root, input, author, { outputPrefix = 'research' } = {}) {
+  if (!['', 'research'].includes(outputPrefix)) throw new Error('Unrecognized synthesis output layout.');
   identifier(author, 'Worker');
   if (!input || input.schema !== 2) throw new Error('Dossier schema must be 2.');
   const d = structuredClone(input);
@@ -54,7 +56,7 @@ export async function validateDossier(root, input, author) {
       if (source.context === 'partial') text(source.context_note, 'Partial source context_note');
       for (const key of ['source_date','accessed_at','version']) if (source[key] !== undefined) text(source[key], key);
       text(source.file, 'Source file');
-      if (source.file.startsWith('.harness-research/') || /^research\/(report\.md|brief\.md|evidence\.md|facts\.json|output\.json)$/.test(source.file)) throw new Error('Source file cannot be a managed synthesis artifact.');
+      if (managedSource(source.file, outputPrefix)) throw new Error('Source file cannot be a managed synthesis artifact.');
       const captured = await readText(root, source.file, { withHash: true });
       if (!captured.content.trim()) throw new Error('Source capture must contain readable context.');
       // A local original and its extraction are different evidence objects. Do not silently
@@ -77,7 +79,7 @@ export async function validateDossier(root, input, author) {
       const capture = { id: source.id, file: source.file, sha256: captured.sha256, content: captured.content };
       if (source.original_file !== undefined) {
         text(source.original_file, 'original_file');
-        if (source.original_file.startsWith('.harness-research/') || /^research\/(report\.md|brief\.md|evidence\.md|facts\.json|output\.json)$/.test(source.original_file)) throw new Error('Original file cannot be a managed synthesis artifact.');
+        if (managedSource(source.original_file, outputPrefix)) throw new Error('Original file cannot be a managed synthesis artifact.');
         const original = await localFile(root, source.original_file);
         if ((await lstat(original)).size > 64 * 1024 * 1024) throw new Error('Original source exceeds 64 MiB. Use a separately identified smaller source.');
         capture.original_file = source.original_file;
@@ -131,7 +133,7 @@ export async function validateDossier(root, input, author) {
     }
   }
   const pins = captures.map(digestSource);
-  const digest = hash(stable({ dossier: d, author, sources: pins }));
+  const digest = hash(stable(digestContent(d, author, pins, outputPrefix)));
   return { dossier: d, author, sources: pins, digest, captures };
 }
 export function reviewTemplate(state) {

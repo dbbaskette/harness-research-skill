@@ -12,6 +12,8 @@ and agents; first-time users do not need to drive them.
 | Discovery and stage routing | [SKILL.md](../SKILL.md) |
 | Coordinator and dossier contract | [synthesis-workflow.md](../references/synthesis-workflow.md) |
 | Investigation / writing / review | [investigate.md](../references/investigate.md), [synthesize.md](../references/synthesize.md), [review-synthesis.md](../references/review-synthesis.md) |
+| Local assets and input inventory | [topic-assets.md](../references/topic-assets.md), `scripts/lib/topic-assets.mjs` |
+| Bounded collection and worker packets | [parallel-research.md](../references/parallel-research.md), [investigation-packet.md](../references/investigation-packet.md) |
 | CLI, state, snapshots and repairs | [synthesis-cli.mjs](../scripts/lib/synthesis-cli.mjs) |
 | Validation and review binding | [synthesis-model.mjs](../scripts/lib/synthesis-model.mjs) |
 | Report, brief, evidence and exports | [synthesis-output.mjs](../scripts/lib/synthesis-output.mjs) |
@@ -19,7 +21,49 @@ and agents; first-time users do not need to drive them.
 | Packaging and compatibility | [install.mjs](../scripts/install.mjs), [sync-guidance.mjs](../scripts/sync-guidance.mjs) |
 | Prior queue and manual interface | [legacy developer guide](legacy-development.md) |
 
-## Work with a dossier
+## Local asset and collection development
+
+The checkout is `1.1.0-alpha.1`; published stable installation remains `1.0.1`.
+Use the checkout’s `SKILL.md` and executable together for these additive features.
+Normal stable guidance refresh does not select an unpublished prerelease.
+
+Create a topic asset from a directory/URL-list intake:
+
+```sh
+node scripts/harness-research.mjs asset init --project /absolute/workspace --topic "Example topic" --directory /absolute/inputs --source-mode selected
+```
+
+The returned root defaults to `/absolute/workspace/research/example-topic`.
+`--destination` selects a local output root; no Git operation or studio is required.
+Use that root as `--project` for normal synthesis commands, with `dossier.json`
+and `review.json` relative to it. Its owned marker writes generated artifacts at
+the root. Existing unmarked cases retain `<project>/research/` paths.
+`asset help` describes metadata, intake, source-outcome and status operations.
+After synthesis verification, the asset handoff manifest hashes metadata, source
+inventory, retained originals/captures and reviewed bundle artifacts. It excludes
+private helper state. Metadata updates change the handoff manifest without
+claiming a new semantic review or changing the dossier's reviewed digest.
+
+For bounded investigation, author the request and use:
+
+```sh
+node scripts/harness-research.mjs collection init --project /absolute/asset --file request.json
+node scripts/harness-research.mjs collection register --project /absolute/asset --file invocation.json
+node scripts/harness-research.mjs collection capture --project /absolute/asset --file capture.json
+node scripts/harness-research.mjs collection accept --project /absolute/asset --file packet.json
+node scripts/harness-research.mjs collection assemble --project /absolute/asset
+```
+
+See [coordination](../references/parallel-research.md) for host-controlled identities,
+receipt fields and attempt/generation transitions. The helper performs local
+validation and persistence only. Native host calls run investigators and control
+budget/cancellation. Register asset source outcomes before collection capture.
+The host records actual invocation termination through `collection finish`; a
+stop/retry request alone is not evidence that a process stopped. Use returned registry records unchanged as dossier sources
+and facts; findings, report and brief remain authored synthesis. The standard
+saved-digest independent review is still the final boundary.
+
+## Work with an existing project dossier
 
 Use a fresh content project. Copy/read source material into it through the host's
 authorized tools, then author a dossier using the [contract](../references/synthesis-workflow.md).
@@ -163,34 +207,38 @@ representative guidance-start response. Stage-only rows count their own referenc
 | Reading path | Tokens |
 | --- | ---: |
 | Discovery metadata | 36 |
-| Installed bootstrap | 521 |
-| Bootstrap + current guidance entry | 1,183 |
-| Investigator stage | 1,017 |
-| Synthesis writer stage | 1,547 |
-| Independent reviewer stage | 1,390 |
-| New synthesis: coordinator entry and workflow | 4,032 |
-| New synthesis: all stages in one context | 7,986 |
-| Synthesis resume, verify or refresh | 2,111 |
-| Optional studio task handoff | 4,733 |
-| Legacy 0.9 queued coordinator | 4,908 |
-| Legacy 0.9 reuse or refresh | 1,960 |
-| Legacy explicit chat-only answer | 2,137 |
-| Legacy manual saved research | 3,328 |
-| Legacy manual status or resume | 1,738 |
-| Legacy comparative routing only | 1,890 |
-| Legacy Codex comparative outline | 2,850 |
-| Legacy Codex add items | 2,055 |
-| Legacy Codex add fields | 2,075 |
-| Legacy Codex deep results | 2,738 |
-| Legacy Codex deep results + saved evidence | 3,929 |
-| Legacy Claude comparative outline | 2,867 |
-| Legacy Claude deep results | 2,760 |
-| Investigation + general web strategy | 5,546 |
-| Investigation + academic strategy | 5,638 |
-| Investigation + GitHub strategy | 5,433 |
-| Investigation + technical Q&A strategy | 5,338 |
-| Investigation + Chinese sources strategy | 5,563 |
-| Legacy migration | 1,532 |
+| Installed bootstrap | 543 |
+| Bootstrap + current guidance entry | 1,220 |
+| Investigator stage | 1,143 |
+| Synthesis writer stage | 1,614 |
+| Independent reviewer stage | 1,528 |
+| New synthesis: coordinator entry and workflow | 4,341 |
+| New synthesis: all stages in one context | 8,626 |
+| Synthesis resume, verify or refresh | 2,420 |
+| Optional studio task handoff | 5,474 |
+| Optional local topic asset intake | 5,737 |
+| Parallel coordinator with Codex adapter | 5,907 |
+| Parallel coordinator with Claude Code adapter | 5,891 |
+| Delegated investigator with packet contract | 2,227 |
+| Legacy 0.9 queued coordinator | 4,951 |
+| Legacy 0.9 reuse or refresh | 2,003 |
+| Legacy explicit chat-only answer | 2,180 |
+| Legacy manual saved research | 3,371 |
+| Legacy manual status or resume | 1,781 |
+| Legacy comparative routing only | 1,933 |
+| Legacy Codex comparative outline | 2,893 |
+| Legacy Codex add items | 2,098 |
+| Legacy Codex add fields | 2,118 |
+| Legacy Codex deep results | 2,781 |
+| Legacy Codex deep results + saved evidence | 3,972 |
+| Legacy Claude comparative outline | 2,910 |
+| Legacy Claude deep results | 2,803 |
+| Investigation + general web strategy | 5,981 |
+| Investigation + academic strategy | 6,073 |
+| Investigation + GitHub strategy | 5,868 |
+| Investigation + technical Q&A strategy | 5,773 |
+| Investigation + Chinese sources strategy | 5,998 |
+| Legacy migration | 1,575 |
 
 The new default starts with the entry and synthesis workflow. Investigation, writing
 and independent review each load their own reference when needed. The all-stages

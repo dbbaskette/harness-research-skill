@@ -20,6 +20,36 @@ flowchart LR
     F -->|Objections| E
 ```
 
+## Local assets, portable execution
+
+New work can create one local topic asset under `research/<topic>/`, or at a caller’s
+explicit local destination. `topic.json` is discovery metadata, `sources.json`
+retains supplied/discovered input outcomes, `documents/` holds originals and
+`sources/` holds readable captures. The schema-2 report, brief and evidence bundle
+lives directly at that root. Existing cases retain their `research/` output layout.
+An owned asset marker selects the layout; unrelated folders are not adopted.
+`asset-manifest.json` separately covers the portable metadata/input/output files.
+It excludes private helper logs/state and does not change the schema-2 reviewed
+digest in `output.json`. This separates handoff integrity from evidence review.
+
+The skill also works without a studio, Git or sync service. Studios pass the
+content task, source boundary and local destination, then own synchronization.
+A successful local review is distinct from a successful repository sync.
+
+Independent workstreams may run through native host subagents. The helper records
+actual invocation registration, permission-bound capture receipts and immutable
+accepted packets. One coordinator assembles stable namespaced IDs and gives the
+registry to synthesis; model text cannot register a new investigator or broaden
+access. Different captures of the same URL remain distinct logical sources.
+The final author preserves investigator facts and writes findings/prose; a separate
+invocation reviews the saved final digest. Packet acceptance is not semantic review.
+
+Host execution adapters retain capacity, budget reservation and cancellation.
+The Node helper does not start models, launch provider CLIs or bridge harnesses.
+A serial fallback is honest investigation, while unavailable separate review
+leaves a draft. Generation/attempt guards reject stale or stopped completions;
+valid packet checkpoints avoid recollecting unchanged work.
+
 ## The unit of work is a dossier
 
 The schema-2 dossier has sources, facts, findings, ordered report sections and
@@ -80,7 +110,9 @@ but continuing it requires the saved project state and compatible runtime.
 | --- | --- |
 | Discovery | Skill name and description |
 | Activation | Short entrypoint and the selected workflow |
-| Gathering evidence | Investigation reference |
+| Creating/intaking a topic asset | Local asset reference |
+| Coordinating independent workstreams | Parallel reference and one native host adapter |
+| Gathering evidence | Investigation reference; packet contract only for a delegated workstream |
 | Organizing and writing | Synthesis reference |
 | Independent checking | Review reference and exact review template |
 | Revisiting saved work | Reuse reference |

@@ -78,3 +78,28 @@ saved integrity, not live currency.
 Narrowing an assertion requires a new assertion identity in the authored dossier;
 a stable key must not silently change meaning. The new workflow's digest identifies
 the whole reviewed result. Consumers should pin that digest as well as the IDs.
+
+## Local asset and collection development
+
+The 1.1.0-alpha.1 checkout adds local topic assets and optional bounded collection.
+These are additive contracts. Existing 1.0 dossiers keep their original project
+root, output paths and saved runtime; do not move files to imitate the new layout.
+New topic assets default to `research/<topic>/` and carry their own owned state.
+They write `report.md`, `brief.md`, `evidence.md`, `facts.json` and `output.json`
+directly at that root. Relative artifact paths resolve from the actual manifest.
+The final structured evidence/synthesis export remains schema 2. New
+`asset-manifest.json` covers portable metadata and intake files as well as the
+reviewed bundle. It is a transport-integrity contract, not a new evidence review
+or a replacement for `output.json`.
+
+A source directory plus `urls.txt` is input convenience, not permission to search
+outside the selected material. Metadata tags and full input inventory do not
+claim independent evidence review. Standalone use requires no studio or Git;
+a studio passes a local destination and owns repository sync separately.
+
+A studio enabling collection must adopt registered multi-investigator identities,
+capture receipts, immutable assembly and protocol/generation guards. It must not
+merely remove the single-author check or copy the merger into its own runtime.
+Retain old serial execution protocols for existing runs and do not restart active
+work. Native execution, process cancellation and supported budget reservation stay
+with that host. The research helper never upgrades installed companions.

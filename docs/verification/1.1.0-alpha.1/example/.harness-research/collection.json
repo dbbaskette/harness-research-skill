@@ -1,0 +1,190 @@
+{
+  "owner": "harness-research-collection",
+  "schema": 1,
+  "protocol": "parallel-v1",
+  "request": {
+    "schema": 1,
+    "topic": "Meridian vs Boreal for an internal inventory application",
+    "audience": "Application engineers",
+    "purpose": "Help select an operating approach for a small internal app; explain what would change the choice",
+    "source_mode": "selected",
+    "scope": "Deployment, concurrency, maintenance and evidence limits in the supplied synthetic materials only",
+    "workstreams": [
+      {
+        "id": "deployment-concurrency",
+        "questions": [
+          "Explain deployment and concurrency differences and their practical boundaries."
+        ]
+      },
+      {
+        "id": "maintenance-evidence",
+        "questions": [
+          "Explain backup, security, maintenance and what the supplied material cannot establish."
+        ]
+      }
+    ],
+    "max_investigators": 3,
+    "execution_mode": "parallel",
+    "supplied_sources": [
+      {
+        "origin": "/private/tmp/harness-local-acceptance-110/inputs/documents/boreal.md",
+        "file": "documents/dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259.md",
+        "sha256": "dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259"
+      },
+      {
+        "origin": "/private/tmp/harness-local-acceptance-110/inputs/documents/meridian.md",
+        "file": "documents/b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06.md",
+        "sha256": "b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06"
+      },
+      {
+        "origin": "https://example.invalid/optional-reference"
+      }
+    ],
+    "allowed_domains": [],
+    "input_fingerprint": "4773023cb85b35c72b702125700910ed1081a436de2ed920f2f623f1ed838d08"
+  },
+  "request_digest": "91ea1febc96aabe79e2a147a96f94bc3e17138cc60532b6deb2b95f116bdf039",
+  "generation": 1,
+  "status": "active",
+  "asset_id": "topic-4bae330bebfc42718da890ae81e7b847",
+  "created_at": "2026-10-29T20:38:55.311Z",
+  "updated_at": "2026-10-29T20:44:11.475Z",
+  "workstreams": [
+    {
+      "id": "deployment-concurrency",
+      "attempts": [
+        {
+          "number": 1,
+          "investigator": "asset-investigator",
+          "invocation": "collaboration:/root/topic_assets",
+          "status": "accepted",
+          "started_at": "2026-10-29T20:38:55.557Z",
+          "receipts": [
+            {
+              "source": {
+                "id": "source-meridian",
+                "origin": "/private/tmp/harness-local-acceptance-110/inputs/documents/meridian.md",
+                "title": "Meridian DB — synthetic supplied fixture",
+                "publisher": "Supplied synthetic test fixture",
+                "permission": "selected",
+                "context": "full",
+                "file": "sources/b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06.txt",
+                "original_file": "documents/b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06.md",
+                "accessed_at": "2026-10-29"
+              },
+              "id": "source-meridian",
+              "file": "sources/b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06.txt",
+              "sha256": "b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06",
+              "original_file": "documents/b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06.md",
+              "original_sha256": "b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06",
+              "snapshot": ".harness-research/collection-data/capture-b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06.bin",
+              "original_snapshot": ".harness-research/collection-data/original-b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06.bin"
+            },
+            {
+              "source": {
+                "id": "source-boreal",
+                "origin": "/private/tmp/harness-local-acceptance-110/inputs/documents/boreal.md",
+                "title": "Boreal DB — synthetic supplied fixture",
+                "publisher": "Supplied synthetic test fixture",
+                "permission": "selected",
+                "context": "full",
+                "file": "sources/dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259.txt",
+                "original_file": "documents/dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259.md",
+                "accessed_at": "2026-10-29"
+              },
+              "id": "source-boreal",
+              "file": "sources/dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259.txt",
+              "sha256": "dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259",
+              "original_file": "documents/dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259.md",
+              "original_sha256": "dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259",
+              "snapshot": ".harness-research/collection-data/capture-dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259.bin",
+              "original_snapshot": ".harness-research/collection-data/original-dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259.bin"
+            }
+          ],
+          "packet": {
+            "file": ".harness-research/collection-data/packet-1-deployment-concurrency-1-e4b67a9ab640a17eba569c982e24da0fba32f0c51b30d594303b35cfe52bf37c.json",
+            "sha256": "e4b67a9ab640a17eba569c982e24da0fba32f0c51b30d594303b35cfe52bf37c"
+          },
+          "ended_at": "2026-10-29T20:41:16.609Z",
+          "outcome": "completed"
+        }
+      ]
+    },
+    {
+      "id": "maintenance-evidence",
+      "attempts": [
+        {
+          "number": 1,
+          "investigator": "packet-investigator",
+          "invocation": "collaboration:/root/parallel_packets",
+          "status": "accepted",
+          "started_at": "2026-10-29T20:38:55.698Z",
+          "receipts": [
+            {
+              "source": {
+                "id": "meridian-guide",
+                "origin": "/private/tmp/harness-local-acceptance-110/inputs/documents/meridian.md",
+                "title": "Meridian DB — synthetic supplied fixture",
+                "publisher": "Synthetic supplied fixture; author unspecified",
+                "file": "sources/b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06.txt",
+                "original_file": "documents/b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06.md",
+                "permission": "selected",
+                "context": "full",
+                "accessed_at": "2026-10-29"
+              },
+              "id": "meridian-guide",
+              "file": "sources/b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06.txt",
+              "sha256": "b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06",
+              "original_file": "documents/b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06.md",
+              "original_sha256": "b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06",
+              "snapshot": ".harness-research/collection-data/capture-b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06.bin",
+              "original_snapshot": ".harness-research/collection-data/original-b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06.bin"
+            },
+            {
+              "source": {
+                "id": "boreal-guide",
+                "origin": "/private/tmp/harness-local-acceptance-110/inputs/documents/boreal.md",
+                "title": "Boreal DB — synthetic supplied fixture",
+                "publisher": "Synthetic supplied fixture; author unspecified",
+                "file": "sources/dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259.txt",
+                "original_file": "documents/dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259.md",
+                "permission": "selected",
+                "context": "full",
+                "accessed_at": "2026-10-29"
+              },
+              "id": "boreal-guide",
+              "file": "sources/dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259.txt",
+              "sha256": "dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259",
+              "original_file": "documents/dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259.md",
+              "original_sha256": "dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259",
+              "snapshot": ".harness-research/collection-data/capture-dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259.bin",
+              "original_snapshot": ".harness-research/collection-data/original-dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259.bin"
+            }
+          ],
+          "packet": {
+            "file": ".harness-research/collection-data/packet-1-maintenance-evidence-1-c303df5a12599ff8bc0f68fab6850117a96087c450b19132bf276ab2bd8d428c.json",
+            "sha256": "c303df5a12599ff8bc0f68fab6850117a96087c450b19132bf276ab2bd8d428c"
+          },
+          "ended_at": "2026-10-29T20:41:16.622Z",
+          "outcome": "completed"
+        }
+      ]
+    }
+  ],
+  "identities": [
+    {
+      "investigator": "asset-investigator",
+      "invocation": "collaboration:/root/topic_assets"
+    },
+    {
+      "investigator": "packet-investigator",
+      "invocation": "collaboration:/root/parallel_packets"
+    }
+  ],
+  "registry": {
+    "digest": "fce1224d525791ac3d80ceeb1a23c63e3f9dcc7a10f3a335d34206e04ddf039e",
+    "file": ".harness-research/collection-data/registry-fce1224d525791ac3d80ceeb1a23c63e3f9dcc7a10f3a335d34206e04ddf039e.json",
+    "sha256": "2541549d61834e650c789bd7dbe98726e615012fe6fca9c2cfc5e69f7d82c89a"
+  },
+  "final_digest": "8813e2092de19b1d3371ce08c6d94f3ea0ccbeec8f3fce487ba5036585da26c0"
+}

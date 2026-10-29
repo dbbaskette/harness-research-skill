@@ -14,7 +14,8 @@ node "<runtime>/scripts/harness-research.mjs" synthesis status --project DIR --c
 node "<runtime>/scripts/harness-research.mjs" synthesis verify --project DIR --compact
 ```
 
-Read `research/report.md`, the dossier input and the returned status. Draft work
+Read the returned report path, the dossier input and the returned status. Topic
+assets hold `report.md` directly; existing cases keep `research/report.md`. Draft work
 continues from its actual open evidence/review tasks. A verified bundle has matching
 files; only its recorded independent review establishes its reviewed state.
 Missing or modified artifacts are regenerated from the authoritative dossier;
@@ -41,8 +42,11 @@ to check compatibility or hide an exception to fit a shorter format. A changed
 purpose may require more explanation or a labeled illustrative example; new
 factual premises need evidence. A downstream author’s new interpretation is not
 covered by the research report’s old review. When adapting the report or brief
-for a new task, update `purpose` and the authored sections, then save and review
-the changed dossier. Reuse sound evidence within its limits; a different output
+for a new task in an existing unmarked case, update `purpose` and the authored
+sections, then save and review the changed dossier. Topic assets preserve their
+recorded request: initialize an explicitly named variant for a different topic,
+audience, purpose or source permission, selecting reusable evidence as inputs.
+Do not reinterpret a metadata title/tag edit as request revision. Reuse sound evidence within its limits; a different output
 shape alone does not require repeating source collection.
 
 Preserve IDs when meaning is unchanged and reference the dossier digest when
@@ -68,3 +72,20 @@ carry-forward of semantic approvals.
 A report marked `stale` must not be handed off as current reviewed research.
 When refresh is blocked, retain the older artifact with its date and explicit
 limitation. Do not infer currency from an unchanged local file or cached manifest.
+
+## Reuse a topic asset or collection checkpoint
+
+Use the local asset ID/path and reviewed digest for downstream handoffs. Tags can
+help find a topic, but matching tags do not select it or establish fit. Preserve
+its scope, source permissions and purpose. A changed shared revision does not
+silently update an existing consumer's digest pin. Studios own synchronization;
+a failed sync does not invalidate a completed local report or require new research.
+
+For interrupted collection, load [parallel coordination](parallel-research.md),
+inspect `collection status`, and reuse only accepted packets with matching request,
+generation, receipts and bytes. Retry the affected workstream; do not dispatch a
+complete new wave merely because one source failed. Changed supplied files,
+URL-list bytes, scope or permissions require new intake and explicit invalidation.
+A copied report bundle without collection state remains readable but cannot resume
+its workers. Existing serial runs continue serially unless explicitly restarted
+under a new protocol at a safe boundary.

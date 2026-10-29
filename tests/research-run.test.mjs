@@ -620,7 +620,7 @@ test('the sources list reads one path or link per line, and peek and release wor
 });
 test('current guidance requires the synthesis runtime and explicitly retains legacy resume routes', async () => {
   const manifest = JSON.parse(await readFile(new URL('../guidance/manifest.json', import.meta.url), 'utf8'));
-  assert.equal(manifest.minimumRuntime, '1.0.1');
+  assert.equal(manifest.minimumRuntime, JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8')).version);
   const skill = await readFile(new URL('../SKILL.md', import.meta.url), 'utf8');
   assert.match(skill, /\*\*New research:\*\*.*synthesis workflow/);
   assert.match(skill, /references\/synthesis-workflow\.md/);

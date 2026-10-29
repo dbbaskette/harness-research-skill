@@ -1,0 +1,564 @@
+{
+  "schema": 2,
+  "topic": "Meridian vs Boreal for an internal inventory application",
+  "audience": "Application engineers",
+  "purpose": "Help select an operating approach for a small internal app; explain what would change the choice",
+  "scope": "Deployment, concurrency, maintenance and evidence limits in the supplied synthetic materials only",
+  "source_mode": "selected",
+  "sources": [
+    {
+      "id": "s-91b01fbd77a5cd94a00b1a24198ff36757cbff4f5e03ed53",
+      "origin": "/private/tmp/harness-local-acceptance-110/inputs/documents/meridian.md",
+      "title": "Meridian DB \u2014 synthetic supplied fixture",
+      "publisher": "Supplied synthetic test fixture",
+      "permission": "selected",
+      "context": "full",
+      "file": "sources/b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06.txt",
+      "original_file": "documents/b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06.md",
+      "accessed_at": "2026-10-29"
+    },
+    {
+      "id": "s-1b40d381dc355411602ce8a2ff1e50a358541881a8ba3191",
+      "origin": "/private/tmp/harness-local-acceptance-110/inputs/documents/boreal.md",
+      "title": "Boreal DB \u2014 synthetic supplied fixture",
+      "publisher": "Supplied synthetic test fixture",
+      "permission": "selected",
+      "context": "full",
+      "file": "sources/dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259.txt",
+      "original_file": "documents/dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259.md",
+      "accessed_at": "2026-10-29"
+    },
+    {
+      "id": "s-8c0bf633d48d3bacf5e472ea1c0ad8c99b3d16d69202a0f3",
+      "origin": "/private/tmp/harness-local-acceptance-110/inputs/documents/meridian.md",
+      "title": "Meridian DB \u2014 synthetic supplied fixture",
+      "publisher": "Synthetic supplied fixture; author unspecified",
+      "file": "sources/b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06.txt",
+      "original_file": "documents/b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06.md",
+      "permission": "selected",
+      "context": "full",
+      "accessed_at": "2026-10-29"
+    },
+    {
+      "id": "s-cad497a627f8037787cd642aaea6f4c7e730a8841438ba25",
+      "origin": "/private/tmp/harness-local-acceptance-110/inputs/documents/boreal.md",
+      "title": "Boreal DB \u2014 synthetic supplied fixture",
+      "publisher": "Synthetic supplied fixture; author unspecified",
+      "file": "sources/dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259.txt",
+      "original_file": "documents/dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259.md",
+      "permission": "selected",
+      "context": "full",
+      "accessed_at": "2026-10-29"
+    }
+  ],
+  "facts": [
+    {
+      "id": "f-1bac23d9aac4a8ca1c1934ce8b9a8eae3694b29a495ec074",
+      "statement": "Meridian embeds in the application process and stores its data in one local file.",
+      "author": "asset-investigator",
+      "citations": [
+        {
+          "source": "s-91b01fbd77a5cd94a00b1a24198ff36757cbff4f5e03ed53",
+          "quote": "Meridian embeds in the application's process and stores data in one local file."
+        }
+      ]
+    },
+    {
+      "id": "f-2b671e92b1f9c12e72ed23d5055c416159a1f3417e4a4e8b",
+      "statement": "Meridian permits one writer at a time per database.",
+      "author": "asset-investigator",
+      "citations": [
+        {
+          "source": "s-91b01fbd77a5cd94a00b1a24198ff36757cbff4f5e03ed53",
+          "quote": "It permits one writer at a time per database."
+        }
+      ]
+    },
+    {
+      "id": "f-609c7f001d477435a02859d84d669eaa3b7da07e2349cf9b",
+      "statement": "Meridian readers can continue during a write transaction when journal mode is enabled.",
+      "author": "asset-investigator",
+      "citations": [
+        {
+          "source": "s-91b01fbd77a5cd94a00b1a24198ff36757cbff4f5e03ed53",
+          "quote": "Readers can continue during a write transaction when journal mode is enabled."
+        }
+      ]
+    },
+    {
+      "id": "f-1e08dc0b3a70a953840b93c441f067844c282a92abc1d62b",
+      "statement": "Meridian requires validation of filesystem locking before use on a shared filesystem.",
+      "author": "asset-investigator",
+      "citations": [
+        {
+          "source": "s-91b01fbd77a5cd94a00b1a24198ff36757cbff4f5e03ed53",
+          "quote": "The operator must validate filesystem locking before using a shared filesystem."
+        }
+      ]
+    },
+    {
+      "id": "f-212228958e6e8643b8199cbcb0c6d84aa89c183c753f922a",
+      "statement": "The Meridian fixture describes suitability for a single application instance with modest write traffic.",
+      "author": "asset-investigator",
+      "citations": [
+        {
+          "source": "s-91b01fbd77a5cd94a00b1a24198ff36757cbff4f5e03ed53",
+          "quote": "Meridian is suitable for a single application instance with modest write traffic."
+        }
+      ]
+    },
+    {
+      "id": "f-877913d109b7b64c747c0165764dbb3327d781c7a11817ca",
+      "statement": "Boreal runs as a separate database service.",
+      "author": "asset-investigator",
+      "citations": [
+        {
+          "source": "s-1b40d381dc355411602ce8a2ff1e50a358541881a8ba3191",
+          "quote": "Boreal runs as a separate database service."
+        }
+      ]
+    },
+    {
+      "id": "f-b78fe11312529141fc9bb01de42aa6ec7c6efde2c991cafe",
+      "statement": "Boreal supports multiple concurrent writers, but conflicting updates can wait or retry.",
+      "author": "asset-investigator",
+      "citations": [
+        {
+          "source": "s-1b40d381dc355411602ce8a2ff1e50a358541881a8ba3191",
+          "quote": "It supports multiple concurrent writers, but conflicting updates can wait or retry."
+        }
+      ]
+    },
+    {
+      "id": "f-a120e72417922aee2093261e703aa38c5cffef1ad69eb927",
+      "statement": "Boreal connection limits and transaction behavior require workload-specific tuning.",
+      "author": "asset-investigator",
+      "citations": [
+        {
+          "source": "s-1b40d381dc355411602ce8a2ff1e50a358541881a8ba3191",
+          "quote": "Its connection limit and transaction behavior require workload-specific tuning."
+        }
+      ]
+    },
+    {
+      "id": "f-f5accb58347e9c81b3fe6f31134798b5404ca644c8970723",
+      "statement": "Boreal can serve several application instances over the network.",
+      "author": "asset-investigator",
+      "citations": [
+        {
+          "source": "s-1b40d381dc355411602ce8a2ff1e50a358541881a8ba3191",
+          "quote": "Boreal can serve several application instances over the network."
+        }
+      ]
+    },
+    {
+      "id": "f-02dde3dbb82c3cd28e38115587480c8d124d309ab422e313",
+      "statement": "Copying an open Meridian database file can yield an incomplete backup; the fixture directs the operator to use the backup interface or stop writes first.",
+      "author": "packet-investigator",
+      "citations": [
+        {
+          "source": "s-8c0bf633d48d3bacf5e472ea1c0ad8c99b3d16d69202a0f3",
+          "quote": "A backup taken by copying the open database file can be incomplete; use the backup interface or stop writes first.",
+          "locator": "Backup/security paragraph"
+        }
+      ]
+    },
+    {
+      "id": "f-03485d1e334bd2ead354ef53cf32afe2d4fe8401091ad66b",
+      "statement": "Meridian has no built-in network authentication because it exposes no database server; the application and operating system must restrict file access.",
+      "author": "packet-investigator",
+      "citations": [
+        {
+          "source": "s-8c0bf633d48d3bacf5e472ea1c0ad8c99b3d16d69202a0f3",
+          "quote": "There is no built-in network authentication because Meridian exposes no database server. The application and operating system must restrict file access.",
+          "locator": "Backup/security paragraph"
+        }
+      ]
+    },
+    {
+      "id": "f-4f07a22ea780bb44c1aa6d87d2aa9773bf1149b4decaa618",
+      "statement": "The Boreal operator must configure access control and install supported updates.",
+      "author": "packet-investigator",
+      "citations": [
+        {
+          "source": "s-cad497a627f8037787cd642aaea6f4c7e730a8841438ba25",
+          "quote": "The operator must configure access control, install supported updates, schedule backups and test restores.",
+          "locator": "Operations paragraph"
+        }
+      ]
+    },
+    {
+      "id": "f-d3e66b5ebd86176707efb16b3f772fec81f23f4351239997",
+      "statement": "The Boreal operator must schedule backups and test restores, and the fixture provides a logical export.",
+      "author": "packet-investigator",
+      "citations": [
+        {
+          "source": "s-cad497a627f8037787cd642aaea6f4c7e730a8841438ba25",
+          "quote": "The operator must configure access control, install supported updates, schedule backups and test restores. A logical export is available; high-availability operation requires additional service configuration.",
+          "locator": "Operations paragraph"
+        }
+      ]
+    },
+    {
+      "id": "f-af55ed278fd8bc17e9cbfff6f95bf7429bb0ffd63045b107",
+      "statement": "Boreal high availability requires additional service configuration; the fixture does not promise uninterrupted failover.",
+      "author": "packet-investigator",
+      "citations": [
+        {
+          "source": "s-cad497a627f8037787cd642aaea6f4c7e730a8841438ba25",
+          "quote": "A logical export is available; high-availability operation requires additional service configuration. This fixture does not promise uninterrupted failover.",
+          "locator": "Operations paragraph"
+        }
+      ]
+    },
+    {
+      "id": "f-db5459e93dd8f6d73cfcb7b3b70099d4bfd5f2d6a934ebbf",
+      "statement": "Boreal requires service monitoring and someone responsible for recovery.",
+      "author": "packet-investigator",
+      "citations": [
+        {
+          "source": "s-cad497a627f8037787cd642aaea6f4c7e730a8841438ba25",
+          "quote": "It requires service monitoring and someone responsible for recovery.",
+          "locator": "Final paragraph"
+        }
+      ]
+    },
+    {
+      "id": "f-763534c5b1514b6d1e947ed7dc0c0d402c30fa6790b40f2e",
+      "statement": "The Boreal fixture supplies no comparative throughput measurements or operating cost figures.",
+      "author": "packet-investigator",
+      "citations": [
+        {
+          "source": "s-cad497a627f8037787cd642aaea6f4c7e730a8841438ba25",
+          "quote": "No comparative throughput measurements or operating cost figures are supplied by this fixture.",
+          "locator": "Final paragraph"
+        }
+      ]
+    },
+    {
+      "id": "f-7d4911a64fa83bc899ad32e470d240ac6e077492ecfe8d9f",
+      "statement": "The Meridian fixture supplies no comparative throughput measurements.",
+      "author": "packet-investigator",
+      "citations": [
+        {
+          "source": "s-8c0bf633d48d3bacf5e472ea1c0ad8c99b3d16d69202a0f3",
+          "quote": "No comparative throughput measurements are provided by this fixture.",
+          "locator": "Final paragraph"
+        }
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "topology",
+      "title": "Let instance topology and write contention drive the choice",
+      "summary": {
+        "text": "For a single application instance with modest writes, Meridian is a candidate. When several application instances need shared data or concurrent writers, Boreal is a candidate, subject to contention and tuning checks.",
+        "kind": "recommendation",
+        "refs": [
+          "f-1bac23d9aac4a8ca1c1934ce8b9a8eae3694b29a495ec074",
+          "f-2b671e92b1f9c12e72ed23d5055c416159a1f3417e4a4e8b",
+          "f-212228958e6e8643b8199cbcb0c6d84aa89c183c753f922a",
+          "f-877913d109b7b64c747c0165764dbb3327d781c7a11817ca",
+          "f-b78fe11312529141fc9bb01de42aa6ec7c6efde2c991cafe",
+          "f-a120e72417922aee2093261e703aa38c5cffef1ad69eb927",
+          "f-f5accb58347e9c81b3fe6f31134798b5404ca644c8970723"
+        ]
+      },
+      "support": [
+        "f-1bac23d9aac4a8ca1c1934ce8b9a8eae3694b29a495ec074",
+        "f-2b671e92b1f9c12e72ed23d5055c416159a1f3417e4a4e8b",
+        "f-212228958e6e8643b8199cbcb0c6d84aa89c183c753f922a",
+        "f-877913d109b7b64c747c0165764dbb3327d781c7a11817ca",
+        "f-b78fe11312529141fc9bb01de42aa6ec7c6efde2c991cafe",
+        "f-f5accb58347e9c81b3fe6f31134798b5404ca644c8970723"
+      ],
+      "counter": [
+        "f-1e08dc0b3a70a953840b93c441f067844c282a92abc1d62b",
+        "f-a120e72417922aee2093261e703aa38c5cffef1ad69eb927"
+      ],
+      "implications": [
+        {
+          "text": "Check how many application instances must write shared data before choosing an embedded file or a network service.",
+          "kind": "recommendation",
+          "refs": [
+            "f-1bac23d9aac4a8ca1c1934ce8b9a8eae3694b29a495ec074",
+            "f-2b671e92b1f9c12e72ed23d5055c416159a1f3417e4a4e8b",
+            "f-f5accb58347e9c81b3fe6f31134798b5404ca644c8970723"
+          ]
+        }
+      ],
+      "conditions": [
+        {
+          "text": "Meridian shared-filesystem locking requires validation; Boreal concurrent writers can still wait or retry, and its connection and transaction settings need workload-specific tuning.",
+          "kind": "summary",
+          "refs": [
+            "f-1e08dc0b3a70a953840b93c441f067844c282a92abc1d62b",
+            "f-b78fe11312529141fc9bb01de42aa6ec7c6efde2c991cafe",
+            "f-a120e72417922aee2093261e703aa38c5cffef1ad69eb927"
+          ]
+        }
+      ],
+      "gaps": [
+        {
+          "text": "The application topology, write rate and update-contention pattern were not supplied.",
+          "kind": "gap",
+          "refs": []
+        }
+      ]
+    },
+    {
+      "id": "operations",
+      "title": "Both approaches need explicit recovery and access ownership",
+      "summary": {
+        "text": "An embedded database removes the separate service in this comparison, but it does not remove backup or access responsibilities. A separate service adds explicit update, monitoring, access-control and recovery duties.",
+        "kind": "inference",
+        "refs": [
+          "f-1bac23d9aac4a8ca1c1934ce8b9a8eae3694b29a495ec074",
+          "f-877913d109b7b64c747c0165764dbb3327d781c7a11817ca",
+          "f-02dde3dbb82c3cd28e38115587480c8d124d309ab422e313",
+          "f-03485d1e334bd2ead354ef53cf32afe2d4fe8401091ad66b",
+          "f-4f07a22ea780bb44c1aa6d87d2aa9773bf1149b4decaa618",
+          "f-d3e66b5ebd86176707efb16b3f772fec81f23f4351239997",
+          "f-db5459e93dd8f6d73cfcb7b3b70099d4bfd5f2d6a934ebbf"
+        ]
+      },
+      "support": [
+        "f-02dde3dbb82c3cd28e38115587480c8d124d309ab422e313",
+        "f-03485d1e334bd2ead354ef53cf32afe2d4fe8401091ad66b",
+        "f-4f07a22ea780bb44c1aa6d87d2aa9773bf1149b4decaa618",
+        "f-d3e66b5ebd86176707efb16b3f772fec81f23f4351239997",
+        "f-db5459e93dd8f6d73cfcb7b3b70099d4bfd5f2d6a934ebbf"
+      ],
+      "counter": [
+        "f-af55ed278fd8bc17e9cbfff6f95bf7429bb0ffd63045b107"
+      ],
+      "implications": [
+        {
+          "text": "Assign an operator and test a recovery procedure for either option before relying on it.",
+          "kind": "recommendation",
+          "refs": [
+            "f-02dde3dbb82c3cd28e38115587480c8d124d309ab422e313",
+            "f-d3e66b5ebd86176707efb16b3f772fec81f23f4351239997",
+            "f-db5459e93dd8f6d73cfcb7b3b70099d4bfd5f2d6a934ebbf"
+          ]
+        }
+      ],
+      "conditions": [
+        {
+          "text": "Meridian open-file copies can be incomplete. Boreal high availability needs additional configuration and the fixture does not promise uninterrupted failover.",
+          "kind": "summary",
+          "refs": [
+            "f-02dde3dbb82c3cd28e38115587480c8d124d309ab422e313",
+            "f-af55ed278fd8bc17e9cbfff6f95bf7429bb0ffd63045b107"
+          ]
+        }
+      ],
+      "gaps": [
+        {
+          "text": "Recovery objectives, restore-drill results and maintenance ownership are unknown.",
+          "kind": "gap",
+          "refs": []
+        }
+      ]
+    },
+    {
+      "id": "limits",
+      "title": "The supplied documents establish no throughput or cost winner",
+      "summary": {
+        "text": "Neither fixture supplies comparative throughput measurements, and Boreal supplies no operating-cost figures. These materials do not establish a measured performance or cost winner.",
+        "kind": "inference",
+        "refs": [
+          "f-763534c5b1514b6d1e947ed7dc0c0d402c30fa6790b40f2e",
+          "f-7d4911a64fa83bc899ad32e470d240ac6e077492ecfe8d9f"
+        ]
+      },
+      "support": [
+        "f-763534c5b1514b6d1e947ed7dc0c0d402c30fa6790b40f2e",
+        "f-7d4911a64fa83bc899ad32e470d240ac6e077492ecfe8d9f"
+      ],
+      "counter": [],
+      "implications": [
+        {
+          "text": "Validate representative workload behavior before converting concurrency capability into a performance recommendation.",
+          "kind": "recommendation",
+          "refs": [
+            "f-2b671e92b1f9c12e72ed23d5055c416159a1f3417e4a4e8b",
+            "f-b78fe11312529141fc9bb01de42aa6ec7c6efde2c991cafe",
+            "f-763534c5b1514b6d1e947ed7dc0c0d402c30fa6790b40f2e",
+            "f-7d4911a64fa83bc899ad32e470d240ac6e077492ecfe8d9f"
+          ]
+        }
+      ],
+      "conditions": [],
+      "gaps": [
+        {
+          "text": "No runtime benchmark, migration, cost study or production validation was performed.",
+          "kind": "gap",
+          "refs": []
+        }
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "id": "answer",
+      "title": "Choose around deployment and contention",
+      "blocks": [
+        {
+          "text": "This is a controlled exercise using supplied fictional documentation; it is not guidance for a real database deployment. No network source or workload was tested.",
+          "kind": "gap",
+          "refs": []
+        },
+        {
+          "text": "For a single application instance with modest writes, Meridian is a candidate. When several application instances need shared data or concurrent writers, Boreal is a candidate, subject to contention and tuning checks.",
+          "kind": "recommendation",
+          "refs": [
+            "f-1bac23d9aac4a8ca1c1934ce8b9a8eae3694b29a495ec074",
+            "f-2b671e92b1f9c12e72ed23d5055c416159a1f3417e4a4e8b",
+            "f-212228958e6e8643b8199cbcb0c6d84aa89c183c753f922a",
+            "f-877913d109b7b64c747c0165764dbb3327d781c7a11817ca",
+            "f-b78fe11312529141fc9bb01de42aa6ec7c6efde2c991cafe",
+            "f-a120e72417922aee2093261e703aa38c5cffef1ad69eb927",
+            "f-f5accb58347e9c81b3fe6f31134798b5404ca644c8970723"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "concurrency",
+      "title": "What the concurrency statements actually allow",
+      "blocks": [
+        {
+          "text": "Meridian permits one writer per database; readers can continue during a write when journal mode is enabled. Its documented candidate workload is one application instance with modest writes, and a shared filesystem requires locking validation.",
+          "kind": "summary",
+          "refs": [
+            "f-2b671e92b1f9c12e72ed23d5055c416159a1f3417e4a4e8b",
+            "f-609c7f001d477435a02859d84d669eaa3b7da07e2349cf9b",
+            "f-1e08dc0b3a70a953840b93c441f067844c282a92abc1d62b",
+            "f-212228958e6e8643b8199cbcb0c6d84aa89c183c753f922a"
+          ]
+        },
+        {
+          "text": "Boreal serves several application instances over the network and supports concurrent writers. Conflicting updates may wait or retry, so this is a capability difference rather than evidence of better throughput for the inventory app. Connection limits and transaction behavior require workload-specific tuning.",
+          "kind": "inference",
+          "refs": [
+            "f-b78fe11312529141fc9bb01de42aa6ec7c6efde2c991cafe",
+            "f-a120e72417922aee2093261e703aa38c5cffef1ad69eb927",
+            "f-f5accb58347e9c81b3fe6f31134798b5404ca644c8970723",
+            "f-763534c5b1514b6d1e947ed7dc0c0d402c30fa6790b40f2e",
+            "f-7d4911a64fa83bc899ad32e470d240ac6e077492ecfe8d9f"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "maintenance",
+      "title": "Recovery and access still need an owner",
+      "blocks": [
+        {
+          "text": "For Meridian, use its backup interface or stop writes before copying: an open-file copy may be incomplete. Access protection belongs to the application and operating system because no database server is exposed.",
+          "kind": "summary",
+          "refs": [
+            "f-02dde3dbb82c3cd28e38115587480c8d124d309ab422e313",
+            "f-03485d1e334bd2ead354ef53cf32afe2d4fe8401091ad66b"
+          ]
+        },
+        {
+          "text": "For Boreal, configure access control, install supported updates, schedule backups, test restores and monitor the service. Someone must own recovery. A logical export is available; high availability requires extra configuration and does not promise uninterrupted failover in the supplied fixture.",
+          "kind": "summary",
+          "refs": [
+            "f-4f07a22ea780bb44c1aa6d87d2aa9773bf1149b4decaa618",
+            "f-d3e66b5ebd86176707efb16b3f772fec81f23f4351239997",
+            "f-af55ed278fd8bc17e9cbfff6f95bf7429bb0ffd63045b107",
+            "f-db5459e93dd8f6d73cfcb7b3b70099d4bfd5f2d6a934ebbf"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "validation",
+      "title": "What would change the decision",
+      "blocks": [
+        {
+          "text": "Neither fixture supplies comparative throughput measurements, and Boreal supplies no operating-cost figures. These materials do not establish a measured performance or cost winner.",
+          "kind": "inference",
+          "refs": [
+            "f-763534c5b1514b6d1e947ed7dc0c0d402c30fa6790b40f2e",
+            "f-7d4911a64fa83bc899ad32e470d240ac6e077492ecfe8d9f"
+          ]
+        },
+        {
+          "text": "The missing inputs are actual instance count, conflicting-write behavior, filesystem topology, recovery objectives, restore evidence and operating ownership. Resolve these before making an unconditional recommendation.",
+          "kind": "gap",
+          "refs": []
+        }
+      ]
+    }
+  ],
+  "brief": [
+    {
+      "id": "decision",
+      "title": "Start with the deployment shape",
+      "blocks": [
+        {
+          "text": "For a single application instance with modest writes, Meridian is a candidate. When several application instances need shared data or concurrent writers, Boreal is a candidate, subject to contention and tuning checks.",
+          "kind": "recommendation",
+          "refs": [
+            "f-1bac23d9aac4a8ca1c1934ce8b9a8eae3694b29a495ec074",
+            "f-2b671e92b1f9c12e72ed23d5055c416159a1f3417e4a4e8b",
+            "f-212228958e6e8643b8199cbcb0c6d84aa89c183c753f922a",
+            "f-877913d109b7b64c747c0165764dbb3327d781c7a11817ca",
+            "f-b78fe11312529141fc9bb01de42aa6ec7c6efde2c991cafe",
+            "f-a120e72417922aee2093261e703aa38c5cffef1ad69eb927",
+            "f-f5accb58347e9c81b3fe6f31134798b5404ca644c8970723"
+          ]
+        },
+        {
+          "text": "Meridian shared-filesystem locking requires validation; Boreal concurrent writers can still wait or retry, and its connection and transaction settings need workload-specific tuning.",
+          "kind": "summary",
+          "refs": [
+            "f-1e08dc0b3a70a953840b93c441f067844c282a92abc1d62b",
+            "f-b78fe11312529141fc9bb01de42aa6ec7c6efde2c991cafe",
+            "f-a120e72417922aee2093261e703aa38c5cffef1ad69eb927"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "retain",
+      "title": "Keep these qualifications",
+      "blocks": [
+        {
+          "text": "An embedded database removes the separate service in this comparison, but it does not remove backup or access responsibilities. A separate service adds explicit update, monitoring, access-control and recovery duties.",
+          "kind": "inference",
+          "refs": [
+            "f-1bac23d9aac4a8ca1c1934ce8b9a8eae3694b29a495ec074",
+            "f-877913d109b7b64c747c0165764dbb3327d781c7a11817ca",
+            "f-02dde3dbb82c3cd28e38115587480c8d124d309ab422e313",
+            "f-03485d1e334bd2ead354ef53cf32afe2d4fe8401091ad66b",
+            "f-4f07a22ea780bb44c1aa6d87d2aa9773bf1149b4decaa618",
+            "f-d3e66b5ebd86176707efb16b3f772fec81f23f4351239997",
+            "f-db5459e93dd8f6d73cfcb7b3b70099d4bfd5f2d6a934ebbf"
+          ]
+        },
+        {
+          "text": "Meridian open-file copies can be incomplete. Boreal high availability needs additional configuration and the fixture does not promise uninterrupted failover.",
+          "kind": "summary",
+          "refs": [
+            "f-02dde3dbb82c3cd28e38115587480c8d124d309ab422e313",
+            "f-af55ed278fd8bc17e9cbfff6f95bf7429bb0ffd63045b107"
+          ]
+        },
+        {
+          "text": "Neither fixture supplies comparative throughput measurements, and Boreal supplies no operating-cost figures. These materials do not establish a measured performance or cost winner.",
+          "kind": "inference",
+          "refs": [
+            "f-763534c5b1514b6d1e947ed7dc0c0d402c30fa6790b40f2e",
+            "f-7d4911a64fa83bc899ad32e470d240ac6e077492ecfe8d9f"
+          ]
+        }
+      ]
+    }
+  ]
+}

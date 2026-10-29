@@ -1,0 +1,206 @@
+{
+  "schema": 2,
+  "digest": "8813e2092de19b1d3371ce08c6d94f3ea0ccbeec8f3fce487ba5036585da26c0",
+  "originals": [
+    {
+      "source": "s-91b01fbd77a5cd94a00b1a24198ff36757cbff4f5e03ed53",
+      "sha256": "b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06",
+      "original_sha256": "b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06",
+      "read_original": true
+    },
+    {
+      "source": "s-1b40d381dc355411602ce8a2ff1e50a358541881a8ba3191",
+      "sha256": "dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259",
+      "original_sha256": "dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259",
+      "read_original": true
+    },
+    {
+      "source": "s-8c0bf633d48d3bacf5e472ea1c0ad8c99b3d16d69202a0f3",
+      "sha256": "b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06",
+      "original_sha256": "b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06",
+      "read_original": true
+    },
+    {
+      "source": "s-cad497a627f8037787cd642aaea6f4c7e730a8841438ba25",
+      "sha256": "dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259",
+      "original_sha256": "dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259",
+      "read_original": true
+    }
+  ],
+  "facts": [
+    {
+      "id": "f-1bac23d9aac4a8ca1c1934ce8b9a8eae3694b29a495ec074",
+      "verdict": "supported",
+      "note": "Re-read for this new saved digest. The complete Meridian original explicitly states embedded execution and one local file; the exact quotation preserves both clauses."
+    },
+    {
+      "id": "f-2b671e92b1f9c12e72ed23d5055c416159a1f3417e4a4e8b",
+      "verdict": "supported",
+      "note": "Re-read for this new saved digest. The Meridian original states one writer at a time per database. The fact retains the per-database boundary."
+    },
+    {
+      "id": "f-609c7f001d477435a02859d84d669eaa3b7da07e2349cf9b",
+      "verdict": "supported",
+      "note": "Re-read for this new saved digest. The Meridian original permits continuing readers when journal mode is enabled. The fact preserves that stated condition without claiming it is the only possible mode."
+    },
+    {
+      "id": "f-1e08dc0b3a70a953840b93c441f067844c282a92abc1d62b",
+      "verdict": "supported",
+      "note": "Re-read for this new saved digest. The original explicitly places filesystem-locking validation before shared-filesystem use."
+    },
+    {
+      "id": "f-212228958e6e8643b8199cbcb0c6d84aa89c183c753f922a",
+      "verdict": "supported",
+      "note": "Re-read for this new saved digest. The original limits its suitability statement to one application instance and modest write traffic; the fact correctly attributes that statement to this fictional fixture."
+    },
+    {
+      "id": "f-877913d109b7b64c747c0165764dbb3327d781c7a11817ca",
+      "verdict": "supported",
+      "note": "Re-read for this new saved digest. The Boreal original explicitly describes a separate database service."
+    },
+    {
+      "id": "f-b78fe11312529141fc9bb01de42aa6ec7c6efde2c991cafe",
+      "verdict": "supported",
+      "note": "Re-read for this new saved digest. The concurrent-writer statement includes conflicting updates waiting or retrying. Both the capability and qualification survive."
+    },
+    {
+      "id": "f-a120e72417922aee2093261e703aa38c5cffef1ad69eb927",
+      "verdict": "supported",
+      "note": "Re-read for this new saved digest. The original expressly requires workload-specific tuning for connection limit and transaction behavior."
+    },
+    {
+      "id": "f-f5accb58347e9c81b3fe6f31134798b5404ca644c8970723",
+      "verdict": "supported",
+      "note": "Re-read for this new saved digest. The original explicitly permits several application instances over the network; no numerical capacity is inferred."
+    },
+    {
+      "id": "f-02dde3dbb82c3cd28e38115587480c8d124d309ab422e313",
+      "verdict": "supported",
+      "note": "Re-read for this new saved digest. The Meridian original warns an open-file copy can be incomplete and prescribes backup interface or stopped writes. The fact preserves the alternatives and qualification."
+    },
+    {
+      "id": "f-03485d1e334bd2ead354ef53cf32afe2d4fe8401091ad66b",
+      "verdict": "supported",
+      "note": "Re-read for this new saved digest. Both adjacent Meridian clauses concern this same embedded product: no server/network authentication and application/OS file-access responsibility. The conjunction is supported in context."
+    },
+    {
+      "id": "f-4f07a22ea780bb44c1aa6d87d2aa9773bf1149b4decaa618",
+      "verdict": "supported",
+      "note": "Re-read for this new saved digest. The Boreal original names access control and supported updates as operator responsibilities; the narrower fact is accurate."
+    },
+    {
+      "id": "f-d3e66b5ebd86176707efb16b3f772fec81f23f4351239997",
+      "verdict": "supported",
+      "note": "Re-read for this new saved digest. The complete Boreal original requires scheduled backups and tested restores and states logical export availability; the fact does not infer failover from the export."
+    },
+    {
+      "id": "f-af55ed278fd8bc17e9cbfff6f95bf7429bb0ffd63045b107",
+      "verdict": "supported",
+      "note": "Re-read for this new saved digest. The original requires additional high-availability configuration and explicitly disclaims uninterrupted failover; the fact preserves that boundary."
+    },
+    {
+      "id": "f-db5459e93dd8f6d73cfcb7b3b70099d4bfd5f2d6a934ebbf",
+      "verdict": "supported",
+      "note": "Re-read for this new saved digest. The final Boreal paragraph expressly requires service monitoring and recovery ownership."
+    },
+    {
+      "id": "f-763534c5b1514b6d1e947ed7dc0c0d402c30fa6790b40f2e",
+      "verdict": "supported",
+      "note": "Re-read for this new saved digest. The Boreal source explicitly says no comparative throughput measurements or operating cost figures are supplied."
+    },
+    {
+      "id": "f-7d4911a64fa83bc899ad32e470d240ac6e077492ecfe8d9f",
+      "verdict": "supported",
+      "note": "Re-read for this new saved digest. The Meridian source explicitly supplies no comparative throughput measurements. This is a fixture evidence limit, not a real product claim."
+    }
+  ],
+  "findings": [
+    {
+      "id": "topology",
+      "verdict": "supported",
+      "note": "Re-read for this new saved digest. The recommendation is conditional, grounded in single-instance/modest-write Meridian suitability and networked/multiwriter Boreal capability, with contention, tuning and shared-filesystem caveats preserved. The implication asks for the missing topology rather than declaring a winner."
+    },
+    {
+      "id": "operations",
+      "verdict": "supported",
+      "note": "Re-read for this new saved digest. The inference correctly separates removal of the separate service from backup/file-access duties. The Boreal duties, recovery recommendation and high-availability qualification are supported by the two complete fictional originals; actual recovery objectives remain unknown."
+    },
+    {
+      "id": "limits",
+      "verdict": "supported",
+      "note": "Re-read for this new saved digest. The complete sources supply no comparative throughput data and Boreal supplies no cost figures. They cannot establish a measured comparative winner. The workload-validation recommendation and no-benchmark/no-migration limitations are proportionate."
+    }
+  ],
+  "prose": [
+    {
+      "id": "answer:0",
+      "verdict": "supported",
+      "note": "Re-read for this new saved digest. Both originals explicitly identify invented products for a controlled test. The no-network/no-workload-test boundary is correctly presented as a limitation rather than evidence of capability."
+    },
+    {
+      "id": "answer:1",
+      "verdict": "supported",
+      "note": "Re-read for this new saved digest. Candidate recommendations retain the relevant topology, modest-write and contention/tuning conditions, without an unconditional product or performance winner."
+    },
+    {
+      "id": "concurrency:0",
+      "verdict": "supported",
+      "note": "Re-read complete Meridian original/capture, current fact and report paragraph. The revised wording says readers can continue during a write WHEN journal mode is enabled, matching the source without asserting exclusivity. One-writer/per-database, single-instance/modest-write and shared-filesystem validation clauses are also supported."
+    },
+    {
+      "id": "concurrency:1",
+      "verdict": "supported",
+      "note": "Re-read for this new saved digest. The networked/multiwriter capability, potential waits/retries and tuning requirement are documented. Calling this a capability difference rather than measured throughput superiority is a sound inference given absent benchmarks."
+    },
+    {
+      "id": "maintenance:0",
+      "verdict": "supported",
+      "note": "Re-read for this new saved digest. The backup alternatives, incomplete open-copy risk, lack of exposed server and application/OS access responsibility all follow from Meridian\u2019s complete original."
+    },
+    {
+      "id": "maintenance:1",
+      "verdict": "supported",
+      "note": "Re-read for this new saved digest. Boreal\u2019s update/access/backup/restore/monitoring/recovery duties, logical export, extra HA configuration and no uninterrupted-failover promise remain within the supplied fixture."
+    },
+    {
+      "id": "validation:0",
+      "verdict": "supported",
+      "note": "Re-read for this new saved digest. No measured performance/cost winner is supported by these fictional materials; the text accurately states the missing comparative data."
+    },
+    {
+      "id": "validation:1",
+      "verdict": "supported",
+      "note": "Re-read for this new saved digest. The full supplied documents provide no application-specific instance count, workload conflicts, filesystem topology, recovery targets or restore results. The conditional information request is useful and not a fabricated fact."
+    },
+    {
+      "id": "brief:decision:0",
+      "verdict": "supported",
+      "note": "Re-read for this new saved digest. The brief retains the report\u2019s conditional candidate split, rather than an unsupported blanket recommendation."
+    },
+    {
+      "id": "brief:decision:1",
+      "verdict": "supported",
+      "note": "Re-read for this new saved digest. The shared-filesystem, conflict/retry and workload-tuning qualifications are explicit in the original sources and correctly preserved."
+    },
+    {
+      "id": "brief:retain:0",
+      "verdict": "supported",
+      "note": "Re-read for this new saved digest. The brief keeps the important inference: embedded does not eliminate backup/access work, while separate-service operational duties are specifically documented."
+    },
+    {
+      "id": "brief:retain:1",
+      "verdict": "supported",
+      "note": "Re-read for this new saved digest. The open-file backup and HA/failover qualifications remain exact in meaning and useful to a downstream author."
+    },
+    {
+      "id": "brief:retain:2",
+      "verdict": "supported",
+      "note": "Re-read for this new saved digest. The evidence-data limitation and resulting lack of a measured comparative winner are supported and preserved during shortening."
+    }
+  ],
+  "assessment": {
+    "coverage": "accurate",
+    "usefulness": "adequate",
+    "note": "I re-read the full current dossier, all 17 assertions and their full original/capture context, all 3 findings including conditions/implications/gaps, and all 13 report/brief blocks. The necessity overclaim in concurrency:0 is corrected. The report gives conditional deployment/operating candidates, preserves contention, locking, backup and failover qualifications, and states missing workload/performance/cost evidence. The brief prioritizes those consequences without discarding caveats. Four logical source records remain two fictional originals, not independent corroborations. No further blocking objection. This is controlled supplied-fictional-material research only; no network source, real product, workload, migration, cost or cross-harness validation was performed."
+  }
+}

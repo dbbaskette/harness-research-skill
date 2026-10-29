@@ -1,0 +1,143 @@
+{
+  "schema": 1,
+  "request_digest": "91ea1febc96aabe79e2a147a96f94bc3e17138cc60532b6deb2b95f116bdf039",
+  "generation": 1,
+  "workstream": "deployment-concurrency",
+  "attempt": 1,
+  "investigator": "asset-investigator",
+  "sources": [
+    {
+      "id": "source-meridian",
+      "origin": "/private/tmp/harness-local-acceptance-110/inputs/documents/meridian.md",
+      "title": "Meridian DB \u2014 synthetic supplied fixture",
+      "publisher": "Supplied synthetic test fixture",
+      "permission": "selected",
+      "context": "full",
+      "file": "sources/b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06.txt",
+      "original_file": "documents/b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06.md",
+      "accessed_at": "2026-10-29"
+    },
+    {
+      "id": "source-boreal",
+      "origin": "/private/tmp/harness-local-acceptance-110/inputs/documents/boreal.md",
+      "title": "Boreal DB \u2014 synthetic supplied fixture",
+      "publisher": "Supplied synthetic test fixture",
+      "permission": "selected",
+      "context": "full",
+      "file": "sources/dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259.txt",
+      "original_file": "documents/dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259.md",
+      "accessed_at": "2026-10-29"
+    }
+  ],
+  "facts": [
+    {
+      "id": "meridian-deployment",
+      "statement": "Meridian embeds in the application process and stores its data in one local file.",
+      "author": "asset-investigator",
+      "citations": [
+        {
+          "source": "source-meridian",
+          "quote": "Meridian embeds in the application's process and stores data in one local file."
+        }
+      ]
+    },
+    {
+      "id": "meridian-write-limit",
+      "statement": "Meridian permits one writer at a time per database.",
+      "author": "asset-investigator",
+      "citations": [
+        {
+          "source": "source-meridian",
+          "quote": "It permits one writer at a time per database."
+        }
+      ]
+    },
+    {
+      "id": "meridian-readers",
+      "statement": "Meridian readers can continue during a write transaction when journal mode is enabled.",
+      "author": "asset-investigator",
+      "citations": [
+        {
+          "source": "source-meridian",
+          "quote": "Readers can continue during a write transaction when journal mode is enabled."
+        }
+      ]
+    },
+    {
+      "id": "meridian-shared-filesystem",
+      "statement": "Meridian requires validation of filesystem locking before use on a shared filesystem.",
+      "author": "asset-investigator",
+      "citations": [
+        {
+          "source": "source-meridian",
+          "quote": "The operator must validate filesystem locking before using a shared filesystem."
+        }
+      ]
+    },
+    {
+      "id": "meridian-instance-fit",
+      "statement": "The Meridian fixture describes suitability for a single application instance with modest write traffic.",
+      "author": "asset-investigator",
+      "citations": [
+        {
+          "source": "source-meridian",
+          "quote": "Meridian is suitable for a single application instance with modest write traffic."
+        }
+      ]
+    },
+    {
+      "id": "boreal-deployment",
+      "statement": "Boreal runs as a separate database service.",
+      "author": "asset-investigator",
+      "citations": [
+        {
+          "source": "source-boreal",
+          "quote": "Boreal runs as a separate database service."
+        }
+      ]
+    },
+    {
+      "id": "boreal-writers",
+      "statement": "Boreal supports multiple concurrent writers, but conflicting updates can wait or retry.",
+      "author": "asset-investigator",
+      "citations": [
+        {
+          "source": "source-boreal",
+          "quote": "It supports multiple concurrent writers, but conflicting updates can wait or retry."
+        }
+      ]
+    },
+    {
+      "id": "boreal-tuning",
+      "statement": "Boreal connection limits and transaction behavior require workload-specific tuning.",
+      "author": "asset-investigator",
+      "citations": [
+        {
+          "source": "source-boreal",
+          "quote": "Its connection limit and transaction behavior require workload-specific tuning."
+        }
+      ]
+    },
+    {
+      "id": "boreal-application-instances",
+      "statement": "Boreal can serve several application instances over the network.",
+      "author": "asset-investigator",
+      "citations": [
+        {
+          "source": "source-boreal",
+          "quote": "Boreal can serve several application instances over the network."
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Both sources explicitly describe invented products for a controlled skill test; findings are not real product guidance.",
+    "Only the supplied document bytes were inspected. No network requests, external searches, benchmarks or workload experiments were performed.",
+    "The optional supplied URL was not accessed under this invocation's no-network constraint; malformed URL input remains rejected in the shared inventory."
+  ],
+  "gaps": [
+    "The application's actual instance count, write rate, conflicting-update pattern and filesystem topology are not supplied.",
+    "Neither source provides comparative throughput measurements; concurrency capabilities alone do not establish application throughput or response time.",
+    "The sources do not quantify where modest write traffic stops being appropriate or provide concrete Boreal connection/transaction tuning settings."
+  ]
+}

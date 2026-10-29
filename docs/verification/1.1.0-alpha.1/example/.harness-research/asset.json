@@ -1,0 +1,151 @@
+{
+  "owner": "harness-research-asset",
+  "schema": 1,
+  "id": "topic-4bae330bebfc42718da890ae81e7b847",
+  "layout": "topic",
+  "created_at": "2026-10-29T20:38:39.602Z",
+  "updated_at": "2026-10-29T20:45:31.840Z",
+  "request": {
+    "topic": "Meridian vs Boreal for an internal inventory application",
+    "audience": "Application engineers",
+    "purpose": "Help select an operating approach for a small internal app; explain what would change the choice",
+    "source_mode": "selected"
+  },
+  "metadata": {
+    "title": "Meridian vs Boreal for an internal inventory application",
+    "description": "Controlled supplied-document example of a local reusable research asset.",
+    "tags": [
+      "database-selection",
+      "concurrency",
+      "operations",
+      "synthetic-example"
+    ]
+  },
+  "intake": {
+    "files": [
+      {
+        "file": "documents/dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259.md",
+        "sha256": "dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259"
+      },
+      {
+        "file": "sources/dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259.txt",
+        "sha256": "dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259"
+      },
+      {
+        "file": "documents/b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06.md",
+        "sha256": "b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06"
+      },
+      {
+        "file": "sources/b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06.txt",
+        "sha256": "b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06"
+      },
+      {
+        "file": ".harness-research/intake/c83d6d7a02d6914e01c7f5d168a01076838ea521439a5bb58232e9ca49cce8b3.urls.txt",
+        "sha256": "c83d6d7a02d6914e01c7f5d168a01076838ea521439a5bb58232e9ca49cce8b3"
+      }
+    ],
+    "inventory": [
+      {
+        "path": "documents/boreal.md",
+        "sha256": "dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259"
+      },
+      {
+        "path": "documents/meridian.md",
+        "sha256": "b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06"
+      },
+      {
+        "kind": "url-list",
+        "sha256": "c83d6d7a02d6914e01c7f5d168a01076838ea521439a5bb58232e9ca49cce8b3"
+      }
+    ]
+  },
+  "inputFingerprint": "4773023cb85b35c72b702125700910ed1081a436de2ed920f2f623f1ed838d08",
+  "inventory": [
+    {
+      "id": "input-906f369b43ad3e825660ded15c496527",
+      "role": "supplied",
+      "type": "document",
+      "origin": "/private/tmp/harness-local-acceptance-110/inputs/documents/boreal.md",
+      "filename": "documents/boreal.md",
+      "permission": "selected",
+      "original_file": "documents/dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259.md",
+      "original_sha256": "dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259",
+      "capture_file": "sources/dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259.txt",
+      "capture_sha256": "dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259",
+      "outcome": "ready",
+      "evidence_ids": [
+        "s-1b40d381dc355411602ce8a2ff1e50a358541881a8ba3191",
+        "s-cad497a627f8037787cd642aaea6f4c7e730a8841438ba25"
+      ],
+      "used_in_digest": "8813e2092de19b1d3371ce08c6d94f3ea0ccbeec8f3fce487ba5036585da26c0"
+    },
+    {
+      "id": "input-ad09f5a9005c1b118e9c47c065cdbb7f",
+      "role": "supplied",
+      "type": "document",
+      "origin": "/private/tmp/harness-local-acceptance-110/inputs/documents/meridian.md",
+      "filename": "documents/meridian.md",
+      "permission": "selected",
+      "original_file": "documents/b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06.md",
+      "original_sha256": "b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06",
+      "capture_file": "sources/b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06.txt",
+      "capture_sha256": "b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06",
+      "outcome": "ready",
+      "evidence_ids": [
+        "s-91b01fbd77a5cd94a00b1a24198ff36757cbff4f5e03ed53",
+        "s-8c0bf633d48d3bacf5e472ea1c0ad8c99b3d16d69202a0f3"
+      ],
+      "used_in_digest": "8813e2092de19b1d3371ce08c6d94f3ea0ccbeec8f3fce487ba5036585da26c0"
+    },
+    {
+      "id": "input-ddacaa46fee1029ab4b1460a3cb36fa9",
+      "role": "supplied",
+      "type": "url",
+      "origin": "https://example.invalid/optional-reference",
+      "permission": "selected",
+      "line": 2,
+      "list_file": ".harness-research/intake/c83d6d7a02d6914e01c7f5d168a01076838ea521439a5bb58232e9ca49cce8b3.urls.txt",
+      "outcome": "unused",
+      "evidence_ids": [],
+      "note": "Retained supplied URL; intentionally not fetched because this controlled exercise uses documents only and forbids network access."
+    },
+    {
+      "id": "input-f756e2c6adcd5bb21016d7591f60dd2a",
+      "role": "supplied",
+      "type": "url",
+      "origin": "malformed-url",
+      "permission": "selected",
+      "line": 3,
+      "list_file": ".harness-research/intake/c83d6d7a02d6914e01c7f5d168a01076838ea521439a5bb58232e9ca49cce8b3.urls.txt",
+      "outcome": "rejected",
+      "note": "Malformed URL.",
+      "evidence_ids": []
+    }
+  ],
+  "revisions": [
+    {
+      "digest": "7e1355d5d3722240ea6eb0b46278f6f79cc8f88cf9282bbf6bcd7a99e75abad3",
+      "status": "needs-revision",
+      "inputFingerprint": "4773023cb85b35c72b702125700910ed1081a436de2ed920f2f623f1ed838d08",
+      "author": "root-synthesis",
+      "reviewer": "guidance-checker",
+      "updated_at": "2026-10-29T20:43:50.738Z"
+    },
+    {
+      "digest": "8813e2092de19b1d3371ce08c6d94f3ea0ccbeec8f3fce487ba5036585da26c0",
+      "status": "complete",
+      "inputFingerprint": "4773023cb85b35c72b702125700910ed1081a436de2ed920f2f623f1ed838d08",
+      "author": "root-synthesis",
+      "reviewer": "guidance-checker",
+      "updated_at": "2026-10-29T20:44:46.487Z"
+    }
+  ],
+  "current": {
+    "digest": "8813e2092de19b1d3371ce08c6d94f3ea0ccbeec8f3fce487ba5036585da26c0",
+    "status": "complete",
+    "inputFingerprint": "4773023cb85b35c72b702125700910ed1081a436de2ed920f2f623f1ed838d08",
+    "author": "root-synthesis",
+    "reviewer": "guidance-checker",
+    "updated_at": "2026-10-29T20:44:46.487Z"
+  }
+}

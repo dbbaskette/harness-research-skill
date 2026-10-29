@@ -1,0 +1,41 @@
+{
+  "owner": "harness-research-asset",
+  "schema": 1,
+  "id": "topic-4bae330bebfc42718da890ae81e7b847",
+  "title": "Meridian vs Boreal for an internal inventory application",
+  "description": "Controlled supplied-document example of a local reusable research asset.",
+  "tags": [
+    "database-selection",
+    "concurrency",
+    "operations",
+    "synthetic-example"
+  ],
+  "created_at": "2026-10-29T20:38:39.602Z",
+  "updated_at": "2026-10-29T20:45:31.840Z",
+  "current": {
+    "digest": "8813e2092de19b1d3371ce08c6d94f3ea0ccbeec8f3fce487ba5036585da26c0",
+    "status": "complete",
+    "inputFingerprint": "4773023cb85b35c72b702125700910ed1081a436de2ed920f2f623f1ed838d08",
+    "author": "root-synthesis",
+    "reviewer": "guidance-checker",
+    "updated_at": "2026-10-29T20:44:46.487Z"
+  },
+  "revisions": [
+    {
+      "digest": "7e1355d5d3722240ea6eb0b46278f6f79cc8f88cf9282bbf6bcd7a99e75abad3",
+      "status": "needs-revision",
+      "inputFingerprint": "4773023cb85b35c72b702125700910ed1081a436de2ed920f2f623f1ed838d08",
+      "author": "root-synthesis",
+      "reviewer": "guidance-checker",
+      "updated_at": "2026-10-29T20:43:50.738Z"
+    },
+    {
+      "digest": "8813e2092de19b1d3371ce08c6d94f3ea0ccbeec8f3fce487ba5036585da26c0",
+      "status": "complete",
+      "inputFingerprint": "4773023cb85b35c72b702125700910ed1081a436de2ed920f2f623f1ed838d08",
+      "author": "root-synthesis",
+      "reviewer": "guidance-checker",
+      "updated_at": "2026-10-29T20:44:46.487Z"
+    }
+  ]
+}

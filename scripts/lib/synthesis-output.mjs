@@ -1,5 +1,6 @@
 import { hash } from './run-storage.mjs';
 import { OWNER } from './synthesis-model.mjs';
+import { outputPrefix } from './synthesis-layout.mjs';
 
 // Authored text is data: escape markup, HTML and newlines before putting it in generated Markdown.
 export const md = value => String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/([\\`*_{}\[\]()#+!|~])/g, '\\$1').replace(/[\r\n]+/g, ' ');
@@ -13,6 +14,8 @@ function banner(status) {
 }
 export function renderOutputs(state, status) {
   const d = state.dossier;
+  const prefix = outputPrefix(state);
+  const fromOutput = path => prefix ? (path.startsWith(prefix + '/') ? path.slice(prefix.length + 1) : '../' + path) : path;
   const heading = `# ${md(d.topic)}\n\n` + banner(status);
   let report = heading;
   for (const section of d.sections) { report += `## ${md(section.title)}\n\n`; for (const b of section.blocks) report += statement(b) + '\n\n'; }
@@ -62,8 +65,8 @@ export function renderOutputs(state, status) {
     evidence += `<a id="${s.id}"></a>\n## ${md(s.title)}\n\n${origin} · ${md(s.publisher)} · ${md(s.permission)} · ${md(s.context)} context\n\n`;
     if (s.context_note) evidence += md(s.context_note) + '\n\n';
     for (const key of ['source_date','accessed_at','version']) if (s[key]) evidence += `${key}: ${md(s[key])}\n\n`;
-    if (pin.original_snapshot) evidence += `Original: [saved original](${pin.original_snapshot.slice('research/'.length)}); SHA-256: \`${pin.original_sha256}\`.\n\n`;
-    evidence += `Capture: [saved context](${pin.snapshot.startsWith('research/') ? pin.snapshot.slice('research/'.length) : '../' + pin.snapshot}); SHA-256: \`${pin.sha256}\`.\n\n`;
+    if (pin.original_snapshot) evidence += `Original: [saved original](${fromOutput(pin.original_snapshot)}); SHA-256: \`${pin.original_sha256}\`.\n\n`;
+    evidence += `Capture: [saved context](${fromOutput(pin.snapshot)}); SHA-256: \`${pin.sha256}\`.\n\n`;
   }
   if (state.review) {
     evidence += `## Independent review\n\nReviewer: ${md(state.review.worker)}. ${md(state.review.assessment.note)}\n\n`;
@@ -72,6 +75,6 @@ export function renderOutputs(state, status) {
   } else evidence += '## Independent review\n\nPending. Exact quote matching and source hashes are mechanical checks, not semantic evidence review.\n';
   const facts = { owner: OWNER, schema: 2, digest: state.digest, status, topic: d.topic, audience: d.audience, purpose: d.purpose, scope: d.scope, source_mode: d.source_mode, sources: d.sources.map(s => ({ ...s, ...state.sources.find(p => p.id === s.id) })), facts: d.facts, findings: d.findings, sections: d.sections, brief: d.brief || null, comparisons: d.comparisons || [], review: state.review || null };
   const files = { 'report.md': report, 'brief.md': brief, 'evidence.md': evidence, 'facts.json': json(facts) };
-  files['output.json'] = json({ owner: OWNER, schema: 2, digest: state.digest, status, artifacts: [...Object.entries(files).map(([file, bytes]) => ({ file, sha256: hash(bytes) })), ...[...new Map(state.sources.flatMap(s => [[s.snapshot, s.sha256], ...(s.original_snapshot ? [[s.original_snapshot, s.original_sha256]] : [])]).filter(([file]) => file.startsWith('research/')).map(([file, sha256]) => [file, { file: file.slice('research/'.length), sha256 }])).values()]] });
+  files['output.json'] = json({ owner: OWNER, schema: 2, digest: state.digest, status, ...(state.collection ? { collection: state.collection } : {}), artifacts: [...Object.entries(files).map(([file, bytes]) => ({ file, sha256: hash(bytes) })), ...[...new Map(state.sources.flatMap(s => [[s.snapshot, s.sha256], ...(s.original_snapshot ? [[s.original_snapshot, s.original_sha256]] : [])]).filter(([file]) => prefix ? file.startsWith(prefix + '/') : !file.startsWith('.harness-research/')).map(([file, sha256]) => [file, { file: fromOutput(file), sha256 }])).values()]] });
   return files;
 }
