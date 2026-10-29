@@ -16,10 +16,10 @@ evidence, writing, checking, and keeping the result.
 **[Start here](#your-first-report)** · **[Bring your sources](#bring-your-own-sources)** ·
 **[Explore the options](#make-the-research-fit-your-task)** · **[User guide](docs/using-harness-research.md)**
 
-> **This checkout: `1.1.0-alpha.1`, a local development preview.** This README
-> covers the new topic folders, directory/URL-list intake, and parallel investigation.
-> They are not included in the published `1.0.1` release. Follow the checkout
-> instructions below to try them, or [install the stable release](#install-the-published-release).
+> **Harness Research 1.1.0.** Local topic assets, directory/URL-list intake, and
+> bounded parallel investigation are included in this release.
+> [Release and downloads](https://github.com/dbbaskette/harness-research-skill/releases/tag/v1.1.0) ·
+> [Install and update](docs/setup.md)
 
 ## Your first report
 
@@ -28,23 +28,30 @@ sources. A fully reviewed result also needs a separate agent invocation to check
 it. The skill uses your existing agent and tools; no research service or additional
 API subscription is required. A studio and Git repository are optional.
 
-### 1. Open a folder for your work
+### 1. Install the skill and open your project
 
-Choose the content or code folder where you want to keep the research. New topics
-will go under `research/` there. It can be an ordinary local folder.
+Install the tagged release once (Git and Bash are needed for this installer):
 
-### 2. Point your agent at this checkout
+```sh
+git clone --branch v1.1.0 https://github.com/dbbaskette/harness-research-skill.git
+cd harness-research-skill
+bash scripts/Install-Harness-Research.sh
+```
 
-For this development preview, replace the first path below with the absolute path
-to this checkout's `SKILL.md`. This selects its new instructions and helper together.
+Return to the content or code folder where you want the research saved, then start
+a new agent session. New topics will go under `research/` there. It can be an
+ordinary local folder; your content does not need a Git repository.
+
+### 2. Ask your agent
+
+Invoke **`$harness-research`** in Codex, **`/harness-research`** in Claude Code,
+or ask Cursor to use Harness Research:
 
 ```text
-Use /absolute/path/to/harness-research-skill/SKILL.md with that checkout's
-local runtime and guidance.
-
-Research Valkey versus Redis for application engineers considering a move
-away from Redis. Use public primary sources. Explain where replacement is
-practical, where it is risky, and which requirements would change the choice.
+Use Harness Research to research Valkey versus Redis for application engineers
+considering a move away from Redis. Use public primary sources. Explain where
+replacement is practical, where it is risky, and which requirements would
+change the choice.
 ```
 
 The agent handles searching, source captures, citations, report files, and review.
@@ -278,7 +285,7 @@ The studio owns its shared repository, synchronization, remote conflicts, and
 sharing policy. Research never chooses a repository or runs Git. A failed studio
 sync can be retried without rerunning completed research.
 
-The local handoff contract is ready in this preview. Installed studio execution
+The local handoff contract is available in 1.1.0. Installed studio execution
 adapters are enabled separately; this checkout does not automatically update them
 or change running jobs.
 
@@ -286,31 +293,20 @@ or change running jobs.
 
 ## Install the published release
 
-For the published `1.0.1` synthesis workflow, you need Node.js 20+, Git, Bash,
-and a configured agent:
+The [first-report steps](#your-first-report) install stable `1.1.0`. For an update,
+use a fresh checkout of the chosen release and run its installer. The installer
+updates the shared skill links for Codex, Claude Code and Cursor while retaining
+older immutable runtimes for pinned tasks. Return to your content folder and start
+a new agent session afterward.
 
-```sh
-git clone --branch v1.0.1 https://github.com/dbbaskette/harness-research-skill.git
-cd harness-research-skill
-bash scripts/Install-Harness-Research.sh
-```
+New tasks on runtime 1.1.0 select stable 1.1.0 guidance automatically. Older runtimes
+retain compatible guidance until upgraded; refresh does not upgrade executable
+helpers. Existing research keeps its pinned runtime, guidance and layout.
 
-Return to your **content project** afterward—the commands leave you inside the
-skill checkout. Start a new agent session and invoke:
+For unpublished development work, select the checkout's `SKILL.md` and runtime
+explicitly as described in the [developer guide](docs/development.md).
 
-| Agent | Invocation |
-| --- | --- |
-| Codex | `$harness-research` |
-| Claude Code | `/harness-research` |
-| Cursor | Ask the agent to use Harness Research |
-
-The published release writes the earlier report layout. To try the new options
-in this checkout, use the explicit skill path from [Your first report](#your-first-report).
-Installing a preview helper alone does not opt into preview guidance; automatic
-guidance refresh selects compatible stable releases. Existing tasks keep their
-pinned runtime and guidance.
-
-[Install, update, and troubleshoot →](docs/setup.md)
+[Installation paths, dry runs, updates, and troubleshooting →](docs/setup.md)
 
 ## See the output and go deeper
 
@@ -319,7 +315,7 @@ pinned runtime and guidance.
 - [User guide](docs/using-harness-research.md) — more examples, source choices, and reuse.
 - [Developer guide](docs/development.md) — helper interfaces, testing, and progressive context loading.
 - [Architecture](docs/architecture.md) — the boundary between the skill, host, and local helper.
-- [Verification record](docs/verification/1.1.0-alpha.1/README.md) and [release history](docs/releases.md) — tested behavior, versions, and coverage limits.
+- [Release verification](docs/verification/1.1.0/README.md) and [release history](docs/releases.md) — tested behavior, versions, and coverage limits.
 
 Harness Research adapts Anthropic's Knowledge Synthesis. The original source,
 license, and adaptation notice are retained. [Attribution and licenses →](NOTICE.md)

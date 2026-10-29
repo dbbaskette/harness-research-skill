@@ -1,0 +1,16 @@
+{
+  "version": "1.1.0",
+  "base_commit": "3a999281b6b6d2c20631167b3ed306f6c4ac99ef",
+  "tested_tree": "native/source-files.sha256",
+  "matching_runtime_reference_test_files": 69,
+  "native": {
+    "result": "PASS",
+    "passed": 209,
+    "failed": 0,
+    "skipped": 0,
+    "vm": "harness-research-test-20261029205639-17302-c353d4cc",
+    "removed": true
+  },
+  "live_evidence": "../1.1.0-alpha.1/README.md",
+  "scope": "Stable promotion with controlled supplied-document acceptance; no new public-source or cross-harness live trial"
+}

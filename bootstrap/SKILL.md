@@ -43,7 +43,6 @@ refresh never installs or executes repository scripts.
 
 Honor the user’s scope, sources, editing freedom, and completion boundary.
 Research output requirements live in the selected guidance. Topic-asset and parallel
-collection guidance requires runtime 1.1.0-alpha.1 or newer; refresh cannot upgrade
-helpers. For this local preview, use the trusted checkout’s guidance and runtime
-together or explicitly pin an approved commit. Automatic refresh selects compatible
-stable releases.
+collection guidance requires runtime 1.1.0 or newer; refresh cannot upgrade helpers.
+Install the stable 1.1 runtime to use these features for new tasks. Existing tasks
+retain their pinned runtime and guidance.

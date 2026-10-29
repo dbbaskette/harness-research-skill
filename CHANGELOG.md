@@ -1,11 +1,13 @@
 # Changelog
 
-## 1.1.0-alpha.1 — unreleased
+## 1.1.0 — 2026-10-29
 
 - Add standalone local topic assets with tags, source inventories, retained documents and directory/URL-list intake. Studios supply destinations and own synchronization.
 - Add local evidence-packet validation, host-registered investigators, bounded collection checkpoints and deterministic assembly for native parallel research.
 - Keep existing schema-2 output/resume paths and independent review; the helper does not launch agents, fetch sources or operate Git.
 
+- Publish stable 1.1.0 guidance with a runtime 1.1.0 floor; retain older task pins and layouts.
+- Rewrite the README around first-time use, source options, local assets and studio handoffs. Release verification is in docs/verification/1.1.0.
 
 ## 1.0.1 — 2026-10-23
 

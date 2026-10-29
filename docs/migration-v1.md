@@ -81,7 +81,7 @@ the whole reviewed result. Consumers should pin that digest as well as the IDs.
 
 ## Local asset and collection development
 
-The 1.1.0-alpha.1 checkout adds local topic assets and optional bounded collection.
+The 1.1.0 release adds local topic assets and optional bounded collection.
 These are additive contracts. Existing 1.0 dossiers keep their original project
 root, output paths and saved runtime; do not move files to imitate the new layout.
 New topic assets default to `research/<topic>/` and carry their own owned state.

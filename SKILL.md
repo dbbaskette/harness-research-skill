@@ -5,8 +5,8 @@ description: Investigate topics, compare options and check claims using public o
 
 # Harness Research
 
-Guidance release: **1.1.0-alpha.1**. Report runtime version, guidance revision and
-freshness on start/resume. This workflow requires runtime **1.1.0-alpha.1 or newer**;
+Guidance release: **1.1.0**. Report runtime version, guidance revision and
+freshness on start/resume. This workflow requires runtime **1.1.0 or newer**;
 existing runs retain their original workflow. See [provenance](NOTICE.md).
 
 You research with the host’s reading/search tools. The helper preserves and

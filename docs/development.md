@@ -23,9 +23,9 @@ and agents; first-time users do not need to drive them.
 
 ## Local asset and collection development
 
-The checkout is `1.1.0-alpha.1`; published stable installation remains `1.0.1`.
-Use the checkout’s `SKILL.md` and executable together for these additive features.
-Normal stable guidance refresh does not select an unpublished prerelease.
+Version `1.1.0` includes local topic assets and bounded evidence collection.
+Installed tasks select compatible stable guidance. For unpublished development,
+select the checkout's `SKILL.md` and runtime explicitly.
 
 Create a topic asset from a directory/URL-list intake:
 
@@ -128,12 +128,11 @@ or automatic passing review.
 
 ## Development and installation
 
-The published stable version is `1.0.1`. Its guidance requires runtime 1.0.1 or
-newer because it uses the template, validate and compact interfaces; 1.0.0
-runtimes keep selecting 1.0.0 guidance. New installed tasks choose compatible stable
-release guidance. For unpublished development, select the checkout's `SKILL.md`
-and runtime explicitly. The guidance floor prevents older helpers from loading
-an unsupported workflow.
+The stable version is `1.1.0`; its guidance requires runtime 1.1.0 or newer for
+asset and collection operations. Older runtimes keep compatible stable guidance.
+For unpublished development, select the checkout's `SKILL.md` and runtime
+explicitly. Guidance refresh never upgrades executable helpers or changes an
+existing task's pin.
 
 Test an installation only in disposable destinations:
 
@@ -207,38 +206,38 @@ representative guidance-start response. Stage-only rows count their own referenc
 | Reading path | Tokens |
 | --- | ---: |
 | Discovery metadata | 36 |
-| Installed bootstrap | 543 |
-| Bootstrap + current guidance entry | 1,220 |
+| Installed bootstrap | 534 |
+| Bootstrap + current guidance entry | 1,205 |
 | Investigator stage | 1,143 |
 | Synthesis writer stage | 1,614 |
 | Independent reviewer stage | 1,528 |
-| New synthesis: coordinator entry and workflow | 4,341 |
-| New synthesis: all stages in one context | 8,626 |
-| Synthesis resume, verify or refresh | 2,420 |
-| Optional studio task handoff | 5,474 |
-| Optional local topic asset intake | 5,737 |
-| Parallel coordinator with Codex adapter | 5,907 |
-| Parallel coordinator with Claude Code adapter | 5,891 |
-| Delegated investigator with packet contract | 2,227 |
-| Legacy 0.9 queued coordinator | 4,951 |
-| Legacy 0.9 reuse or refresh | 2,003 |
-| Legacy explicit chat-only answer | 2,180 |
-| Legacy manual saved research | 3,371 |
-| Legacy manual status or resume | 1,781 |
-| Legacy comparative routing only | 1,933 |
-| Legacy Codex comparative outline | 2,893 |
-| Legacy Codex add items | 2,098 |
-| Legacy Codex add fields | 2,118 |
-| Legacy Codex deep results | 2,781 |
-| Legacy Codex deep results + saved evidence | 3,972 |
-| Legacy Claude comparative outline | 2,910 |
-| Legacy Claude deep results | 2,803 |
-| Investigation + general web strategy | 5,981 |
-| Investigation + academic strategy | 6,073 |
-| Investigation + GitHub strategy | 5,868 |
-| Investigation + technical Q&A strategy | 5,773 |
-| Investigation + Chinese sources strategy | 5,998 |
-| Legacy migration | 1,575 |
+| New synthesis: coordinator entry and workflow | 4,317 |
+| New synthesis: all stages in one context | 8,602 |
+| Synthesis resume, verify or refresh | 2,399 |
+| Optional studio task handoff | 5,450 |
+| Optional local topic asset intake | 5,713 |
+| Parallel coordinator with Codex adapter | 5,883 |
+| Parallel coordinator with Claude Code adapter | 5,867 |
+| Delegated investigator with packet contract | 2,212 |
+| Legacy 0.9 queued coordinator | 4,930 |
+| Legacy 0.9 reuse or refresh | 1,982 |
+| Legacy explicit chat-only answer | 2,159 |
+| Legacy manual saved research | 3,350 |
+| Legacy manual status or resume | 1,760 |
+| Legacy comparative routing only | 1,912 |
+| Legacy Codex comparative outline | 2,872 |
+| Legacy Codex add items | 2,077 |
+| Legacy Codex add fields | 2,097 |
+| Legacy Codex deep results | 2,760 |
+| Legacy Codex deep results + saved evidence | 3,951 |
+| Legacy Claude comparative outline | 2,889 |
+| Legacy Claude deep results | 2,782 |
+| Investigation + general web strategy | 5,957 |
+| Investigation + academic strategy | 6,049 |
+| Investigation + GitHub strategy | 5,844 |
+| Investigation + technical Q&A strategy | 5,749 |
+| Investigation + Chinese sources strategy | 5,974 |
+| Legacy migration | 1,554 |
 
 The new default starts with the entry and synthesis workflow. Investigation, writing
 and independent review each load their own reference when needed. The all-stages

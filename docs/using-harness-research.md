@@ -2,10 +2,10 @@
 
 [README](../README.md) · [Setup](setup.md) · [Architecture](architecture.md)
 
-This guide covers the local **1.1.0-alpha.1 development workflow**. The published
-stable release is 1.0.1; use this checkout’s skill and runtime together to try new
-asset/collection capabilities. Existing saved cases retain their original layout,
-pinned runtime and guidance. For 0.9, use the [legacy guide](legacy-using-harness-research.md).
+This guide covers **Harness Research 1.1.0**: local topic assets, source-directory
+and URL-list intake, and optional bounded parallel investigation. Existing saved
+cases retain their original layout, pinned runtime and guidance. For 0.9, use the
+[legacy guide](legacy-using-harness-research.md).
 
 ## Begin with what you need to understand
 
@@ -18,8 +18,7 @@ research**: key concepts, findings, perspectives, practical implications and
 uncertainties, organized for understanding rather than a specific content format.
 
 ```text
-Use the skill at /absolute/path/to/harness-research-skill/SKILL.md with its
-local runtime. Research Valkey versus Redis for engineers considering Redis
+Use Harness Research to research Valkey versus Redis for engineers considering Redis
 replacement. Use public primary sources. Cover where migration is practical,
 which dependencies make it harder, and what to test before switching.
 ```
