@@ -1,0 +1,11 @@
+{
+  "scope": "Installed runtime smoke using synthetic local inputs, no live research",
+  "version": "harness-research 1.1.0",
+  "layout": "topic",
+  "status": "draft",
+  "integrity": "verified",
+  "inventory_entries": 3,
+  "handoff_files": 11,
+  "collection_protocol": "parallel-v1",
+  "collection_phase": "investigating"
+}

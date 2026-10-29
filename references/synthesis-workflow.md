@@ -30,7 +30,7 @@ contract; ordinary standalone research does not need that reference.
 Use the installed runtime returned by bootstrap. Report its actual version and
 guidance revision/freshness, including when using a local development build. Do not
 execute downloaded guidance as a substitute runtime. This workflow requires runtime
-1.1.0-alpha.1 or newer; continue old runs with their saved guidance rather than changing
+1.1.0 or newer; continue old runs with their saved guidance rather than changing
 formats silently. New work creates a local [topic asset](topic-assets.md), normally
 `research/<topic>/`; a studio may supply its local destination. A topic asset has
 one active bundle and owned state; multiple topics remain isolated. Existing

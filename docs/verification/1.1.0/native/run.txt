@@ -1,0 +1,20 @@
+Project: /Users/dbbaskette/Projects/harness-research-skill
+Test suite: harness-research
+Base VM: tanzu-brand-golden-gate-base
+Test VM: harness-research-test-20261029205639-17302-c353d4cc
+Source commit: 3a999281b6b6d2c20631167b3ed306f6c4ac99ef
+ M CHANGELOG.md
+ M README.md
+ M SKILL.md
+ M bootstrap/SKILL.md
+ M docs/development.md
+ M docs/images/context-loading.svg
+ M docs/migration-v1.md
+ M docs/releases.md
+ M docs/setup.md
+ M docs/using-harness-research.md
+ M guidance/manifest.json
+ M package-lock.json
+ M package.json
+ M references/synthesis-workflow.md
+?? docs/verification/1.1.0/

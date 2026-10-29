@@ -1,0 +1,147 @@
+{
+  "status": "installed",
+  "runtimeVersion": "1.1.0",
+  "shared": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/shared",
+  "runtime": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/shared/versions/1.1.0-a3a84926502fbd0bf4a3",
+  "targets": [
+    "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.agents/skills/harness-research",
+    "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.claude/skills/harness-research",
+    "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.cursor/skills/harness-research"
+  ],
+  "legacy": [
+    {
+      "path": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.agents/skills/research",
+      "old": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.agents/skills/tanzu-brand/scripts/research/codex/skills/research",
+      "source": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/shared/current/upstream/codex/skills/research",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.agents/skills/research-add-items",
+      "old": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.agents/skills/tanzu-brand/scripts/research/codex/skills/research-add-items",
+      "source": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/shared/current/upstream/codex/skills/research-add-items",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.agents/skills/research-add-fields",
+      "old": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.agents/skills/tanzu-brand/scripts/research/codex/skills/research-add-fields",
+      "source": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/shared/current/upstream/codex/skills/research-add-fields",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.agents/skills/research-deep",
+      "old": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.agents/skills/tanzu-brand/scripts/research/codex/skills/research-deep",
+      "source": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/shared/current/upstream/codex/skills/research-deep",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.agents/skills/research-report",
+      "old": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.agents/skills/tanzu-brand/scripts/research/codex/skills/research-report",
+      "source": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/shared/current/upstream/codex/skills/research-report",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.codex/agents/web-researcher.toml",
+      "old": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.agents/skills/tanzu-brand/scripts/research/codex/agents/web-researcher.toml",
+      "source": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/shared/current/upstream/codex/agents/web-researcher.toml",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.codex/agents/web-search-modules",
+      "old": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.agents/skills/tanzu-brand/scripts/research/codex/agents/web-search-modules",
+      "source": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/shared/current/upstream/codex/agents/web-search-modules",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.codex/skills/research",
+      "old": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.codex/skills/tanzu-brand/scripts/research/codex/skills/research",
+      "source": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/shared/current/upstream/codex/skills/research",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.codex/skills/research-add-items",
+      "old": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.codex/skills/tanzu-brand/scripts/research/codex/skills/research-add-items",
+      "source": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/shared/current/upstream/codex/skills/research-add-items",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.codex/skills/research-add-fields",
+      "old": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.codex/skills/tanzu-brand/scripts/research/codex/skills/research-add-fields",
+      "source": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/shared/current/upstream/codex/skills/research-add-fields",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.codex/skills/research-deep",
+      "old": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.codex/skills/tanzu-brand/scripts/research/codex/skills/research-deep",
+      "source": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/shared/current/upstream/codex/skills/research-deep",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.codex/skills/research-report",
+      "old": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.codex/skills/tanzu-brand/scripts/research/codex/skills/research-report",
+      "source": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/shared/current/upstream/codex/skills/research-report",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.claude/skills/research",
+      "old": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.claude/skills/tanzu-brand/scripts/research/claude/skills/research",
+      "source": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/shared/current/upstream/claude/skills/research",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.claude/skills/research-add-items",
+      "old": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.claude/skills/tanzu-brand/scripts/research/claude/skills/research-add-items",
+      "source": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/shared/current/upstream/claude/skills/research-add-items",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.claude/skills/research-add-fields",
+      "old": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.claude/skills/tanzu-brand/scripts/research/claude/skills/research-add-fields",
+      "source": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/shared/current/upstream/claude/skills/research-add-fields",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.claude/skills/research-deep",
+      "old": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.claude/skills/tanzu-brand/scripts/research/claude/skills/research-deep",
+      "source": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/shared/current/upstream/claude/skills/research-deep",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.claude/skills/research-report",
+      "old": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.claude/skills/tanzu-brand/scripts/research/claude/skills/research-report",
+      "source": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/shared/current/upstream/claude/skills/research-report",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.claude/agents/web-search-agent.md",
+      "old": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.claude/skills/tanzu-brand/scripts/research/claude/agents/web-search-agent.md",
+      "source": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/shared/current/upstream/claude/agents/web-search-agent.md",
+      "status": "preserved",
+      "previous": null
+    },
+    {
+      "path": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.claude/agents/web-search-modules",
+      "old": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/home/.claude/skills/tanzu-brand/scripts/research/claude/agents/web-search-modules",
+      "source": "/private/var/folders/p6/w6y5shc933z4dp9jzzc9qytc0000gn/T/harness-research-guest.tGcLKL/shared/current/upstream/claude/agents/web-search-modules",
+      "status": "preserved",
+      "previous": null
+    }
+  ],
+  "contentDigest": "a3a84926502fbd0bf4a30f5e8a5a93d903160841761dfb1627ef7c077cd6ebb3"
+}

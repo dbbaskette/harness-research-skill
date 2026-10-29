@@ -1,0 +1,31 @@
+{
+  "scope": "Synthetic callback benchmark; not native harness or provider performance",
+  "workstreams": 3,
+  "simulated_work_ms_per_stream": 40,
+  "serial": {
+    "collection_ms": 244.941375,
+    "synthesis_review_ms": 90.89491599999997,
+    "end_to_end_ms": 335.83629099999996,
+    "active_wall_seconds": 0.201,
+    "assistant_seconds": 0.201,
+    "max_investigators": 1,
+    "tokens": null,
+    "dollars": null,
+    "failures": 0,
+    "retries": 0,
+    "callbacks_overlap": false
+  },
+  "parallel": {
+    "collection_ms": 165.33691699999997,
+    "synthesis_review_ms": 89.04562499999997,
+    "end_to_end_ms": 254.38254199999994,
+    "active_wall_seconds": 0.163,
+    "assistant_seconds": 0.376,
+    "max_investigators": 3,
+    "tokens": null,
+    "dollars": null,
+    "failures": 0,
+    "retries": 0,
+    "callbacks_overlap": true
+  }
+}

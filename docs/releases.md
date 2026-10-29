@@ -1,8 +1,18 @@
 # Versioned releases
 
-The local development tree is now `1.1.0-alpha.1` for topic assets and native
-parallel investigation. It is not a published release or active installation
-update. [Implementation verification](verification/1.1.0-alpha.1/README.md).
+**1.1.0** (2026-10-29) adds standalone local topic assets, source-directory and
+URL-list intake, retained originals, source inventories/tags and a portable asset
+handoff. Bounded native investigation preserves host identities, source receipts,
+checkpoint recovery and full final independent review. The helper remains local;
+studios own execution integration and repository synchronization.
+
+The owner requested a new release after merging PR #29. This stable promotion
+updates the guidance/runtime floor to 1.1.0 so new tasks on the updated runtime
+select the new workflow. Existing cases and tasks keep their layouts and pins.
+See [release verification](verification/1.1.0/README.md) and the preserved
+[development acceptance](verification/1.1.0-alpha.1/README.md). Live acceptance is a
+controlled supplied-document exercise on this host, not a public-source/provider
+benchmark or a live Claude Code comparison. Studio adapters are enabled separately.
 
 **1.0.1** (2026-10-23) is a patch release of the 1.0 synthesis workflow. It
 fixes synthesis integrity exits, external-original pinning and evidence
