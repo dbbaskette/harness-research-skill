@@ -2,9 +2,10 @@
 
 [README](../README.md) · [Setup](setup.md) · [Architecture](architecture.md)
 
-This guide covers **Harness Research 1.0**. For an existing 0.9 run,
-use the [legacy guide](legacy-using-harness-research.md) and its pinned runtime.
-New tasks on the installed 1.0 runtime select stable synthesis guidance.
+This guide covers the local **1.1.0-alpha.1 development workflow**. The published
+stable release is 1.0.1; use this checkout’s skill and runtime together to try new
+asset/collection capabilities. Existing saved cases retain their original layout,
+pinned runtime and guidance. For 0.9, use the [legacy guide](legacy-using-harness-research.md).
 
 ## Begin with what you need to understand
 
@@ -51,9 +52,50 @@ original evidence. Partial captures, inaccessible sources, transcriptions and
 uncertain versions must remain visible. Source selection does not promise offline
 execution: your host and model provider determine how documents are processed.
 
+## Supply one input directory
+
+```text
+inputs/my-topic/
+  documents/
+    background.pdf
+    requirements.md
+  urls.txt
+```
+
+Point the agent at the directory and give the topic in ordinary language. The
+optional `urls.txt` contains one HTTP(S) URL per nonblank line; comment lines start
+with `#`. A separate URL-list path and individual file/URL inputs also work.
+
+Intake preserves originals and records every supplied reference, including
+unsupported documents, invalid URLs and inaccessible or unused sources. PDF/Office
+reading still depends on the agent’s actual tools. Retained original bytes are not
+a completed text extraction. The selected source boundary continues to govern:
+passing a directory does not authorize wider public research.
+
+## Local topic assets
+
+New standalone work defaults to `research/<topic>/` in the current working directory.
+Inside it, `topic.json` carries the stable identity, title, description and tags;
+`sources.json` is the supplied/discovered source inventory. `documents/` retains
+originals and `sources/` contains readable captures and evidence snapshots.
+`asset-manifest.json` hashes the complete portable handoff, including metadata and
+unused retained inputs. `output.json` remains the reviewed research manifest;
+a valid asset hash does not semantically approve tags or unused source entries.
+No studio, Git repository or central library is needed.
+
+A studio may provide a different local destination. Harness Research writes and
+verifies the local asset; the studio controls its shared repository and sync.
+Local research status and sync status are distinct. Reusing a shared asset means
+referencing its identity and reviewed digest; consumers adopt later revisions
+explicitly rather than having their evidence change underneath them. Tags and
+metadata titles are discovery labels. For a different topic, audience, purpose or
+source permission, the agent creates an explicit asset variant with a distinct
+destination rather than changing the recorded request underneath consumers.
+
 ## Read the result
 
-Open `research/report.md`. A useful report leads with its answer and important
+Open the returned `report.md` inside the topic asset. Existing cases keep
+`research/report.md`. A useful report leads with its answer and important
 findings, then explains the evidence, implications, counter-evidence and limits.
 When useful, comparison tables use named criteria and explicitly identify missing
 information. Comparisons examine the strongest supported case for alternatives,
@@ -61,12 +103,12 @@ including staying with the current option, without forcing equal source counts.
 The shape varies with the request; an explanatory article need not mimic a
 product comparison or a checklist of research questions.
 
-`research/brief.md` is the short editorial handoff, ordered for the stated task.
+`brief.md` is the short editorial handoff, ordered for the stated task.
 It leads with the most consequential takeaways and selects useful evidence,
 material counterarguments, qualifications to retain when shortening the message,
 and unresolved gaps. There is no compulsory number of takeaways. The full fact
 inventory stays in the evidence appendix. Older dossiers without authored brief
-sections keep their automatic findings view. `research/evidence.md` contains the
+sections keep their automatic findings view. `evidence.md` contains the
 inspectable facts and source passages. `facts.json` and `output.json` serve
 compatible structured consumers; their schema and hashes matter when moving or
 reusing the work. Saved files are the deliverable, not a promise to write later.
@@ -96,6 +138,21 @@ Unsupported findings must be removed or revised and reviewed again.
 If independent review is unavailable, the agent saves a clearly labeled draft and
 explains the limitation. It cannot change its name to count as another invocation.
 A missing source becomes a named limitation, not an invented fact.
+
+## Optional parallel investigation
+
+For a broad topic with independent themes, the agent can coordinate at most three
+native investigators within the host’s capacity and your limits. Workers collect
+bounded evidence packets; one coordinator assembles them and writes a coherent
+report. Questions do not become a compulsory Q&A outline. Actual investigator
+authors, source permissions, original documents and contradictions survive assembly.
+
+The helper does not launch models or manage provider accounts. The host controls
+worker execution, supported budget accounting and cancellation. Small topics or
+restricted hosts can investigate sequentially. Independent review still needs a
+separate invocation; unavailable review produces a saved draft. Pausing can retain
+checkpoints; retries target affected workstreams rather than repeating sound work.
+The [coordination contract](../references/parallel-research.md) explains details.
 
 ## Useful follow-ups
 
@@ -139,7 +196,7 @@ editorial judgment; no format code, keyword parser or mandatory intake form is
 needed. A blog or training studio can pass its own task in the same way.
 
 Give the next skill paths to the report and brief, access to the evidence, the
-actual status and the saved digest from `research/output.json`. A presentation
+actual status and the saved digest from its returned `output.json`. A presentation
 can use the key messages; a blog can develop the mechanism; training can build
 on the concept sequence. The content skill remains responsible for its structure,
 voice and learning outcomes. The [studio handoff reference](../references/studio-handoff.md)

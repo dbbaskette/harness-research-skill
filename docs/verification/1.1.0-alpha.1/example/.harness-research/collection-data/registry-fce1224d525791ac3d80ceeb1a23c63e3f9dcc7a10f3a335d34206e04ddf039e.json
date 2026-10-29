@@ -1,0 +1,397 @@
+{
+  "schema": 1,
+  "protocol": "parallel-v1",
+  "request_digest": "91ea1febc96aabe79e2a147a96f94bc3e17138cc60532b6deb2b95f116bdf039",
+  "generation": 1,
+  "request": {
+    "schema": 1,
+    "topic": "Meridian vs Boreal for an internal inventory application",
+    "audience": "Application engineers",
+    "purpose": "Help select an operating approach for a small internal app; explain what would change the choice",
+    "source_mode": "selected",
+    "scope": "Deployment, concurrency, maintenance and evidence limits in the supplied synthetic materials only",
+    "workstreams": [
+      {
+        "id": "deployment-concurrency",
+        "questions": [
+          "Explain deployment and concurrency differences and their practical boundaries."
+        ]
+      },
+      {
+        "id": "maintenance-evidence",
+        "questions": [
+          "Explain backup, security, maintenance and what the supplied material cannot establish."
+        ]
+      }
+    ],
+    "max_investigators": 3,
+    "execution_mode": "parallel",
+    "supplied_sources": [
+      {
+        "origin": "/private/tmp/harness-local-acceptance-110/inputs/documents/boreal.md",
+        "file": "documents/dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259.md",
+        "sha256": "dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259"
+      },
+      {
+        "origin": "/private/tmp/harness-local-acceptance-110/inputs/documents/meridian.md",
+        "file": "documents/b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06.md",
+        "sha256": "b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06"
+      },
+      {
+        "origin": "https://example.invalid/optional-reference"
+      }
+    ],
+    "allowed_domains": [],
+    "input_fingerprint": "4773023cb85b35c72b702125700910ed1081a436de2ed920f2f623f1ed838d08"
+  },
+  "sources": [
+    {
+      "id": "s-91b01fbd77a5cd94a00b1a24198ff36757cbff4f5e03ed53",
+      "origin": "/private/tmp/harness-local-acceptance-110/inputs/documents/meridian.md",
+      "title": "Meridian DB — synthetic supplied fixture",
+      "publisher": "Supplied synthetic test fixture",
+      "permission": "selected",
+      "context": "full",
+      "file": "sources/b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06.txt",
+      "original_file": "documents/b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06.md",
+      "accessed_at": "2026-10-29"
+    },
+    {
+      "id": "s-1b40d381dc355411602ce8a2ff1e50a358541881a8ba3191",
+      "origin": "/private/tmp/harness-local-acceptance-110/inputs/documents/boreal.md",
+      "title": "Boreal DB — synthetic supplied fixture",
+      "publisher": "Supplied synthetic test fixture",
+      "permission": "selected",
+      "context": "full",
+      "file": "sources/dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259.txt",
+      "original_file": "documents/dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259.md",
+      "accessed_at": "2026-10-29"
+    },
+    {
+      "id": "s-8c0bf633d48d3bacf5e472ea1c0ad8c99b3d16d69202a0f3",
+      "origin": "/private/tmp/harness-local-acceptance-110/inputs/documents/meridian.md",
+      "title": "Meridian DB — synthetic supplied fixture",
+      "publisher": "Synthetic supplied fixture; author unspecified",
+      "file": "sources/b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06.txt",
+      "original_file": "documents/b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06.md",
+      "permission": "selected",
+      "context": "full",
+      "accessed_at": "2026-10-29"
+    },
+    {
+      "id": "s-cad497a627f8037787cd642aaea6f4c7e730a8841438ba25",
+      "origin": "/private/tmp/harness-local-acceptance-110/inputs/documents/boreal.md",
+      "title": "Boreal DB — synthetic supplied fixture",
+      "publisher": "Synthetic supplied fixture; author unspecified",
+      "file": "sources/dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259.txt",
+      "original_file": "documents/dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259.md",
+      "permission": "selected",
+      "context": "full",
+      "accessed_at": "2026-10-29"
+    }
+  ],
+  "facts": [
+    {
+      "id": "f-1bac23d9aac4a8ca1c1934ce8b9a8eae3694b29a495ec074",
+      "statement": "Meridian embeds in the application process and stores its data in one local file.",
+      "author": "asset-investigator",
+      "citations": [
+        {
+          "source": "s-91b01fbd77a5cd94a00b1a24198ff36757cbff4f5e03ed53",
+          "quote": "Meridian embeds in the application's process and stores data in one local file."
+        }
+      ]
+    },
+    {
+      "id": "f-2b671e92b1f9c12e72ed23d5055c416159a1f3417e4a4e8b",
+      "statement": "Meridian permits one writer at a time per database.",
+      "author": "asset-investigator",
+      "citations": [
+        {
+          "source": "s-91b01fbd77a5cd94a00b1a24198ff36757cbff4f5e03ed53",
+          "quote": "It permits one writer at a time per database."
+        }
+      ]
+    },
+    {
+      "id": "f-609c7f001d477435a02859d84d669eaa3b7da07e2349cf9b",
+      "statement": "Meridian readers can continue during a write transaction when journal mode is enabled.",
+      "author": "asset-investigator",
+      "citations": [
+        {
+          "source": "s-91b01fbd77a5cd94a00b1a24198ff36757cbff4f5e03ed53",
+          "quote": "Readers can continue during a write transaction when journal mode is enabled."
+        }
+      ]
+    },
+    {
+      "id": "f-1e08dc0b3a70a953840b93c441f067844c282a92abc1d62b",
+      "statement": "Meridian requires validation of filesystem locking before use on a shared filesystem.",
+      "author": "asset-investigator",
+      "citations": [
+        {
+          "source": "s-91b01fbd77a5cd94a00b1a24198ff36757cbff4f5e03ed53",
+          "quote": "The operator must validate filesystem locking before using a shared filesystem."
+        }
+      ]
+    },
+    {
+      "id": "f-212228958e6e8643b8199cbcb0c6d84aa89c183c753f922a",
+      "statement": "The Meridian fixture describes suitability for a single application instance with modest write traffic.",
+      "author": "asset-investigator",
+      "citations": [
+        {
+          "source": "s-91b01fbd77a5cd94a00b1a24198ff36757cbff4f5e03ed53",
+          "quote": "Meridian is suitable for a single application instance with modest write traffic."
+        }
+      ]
+    },
+    {
+      "id": "f-877913d109b7b64c747c0165764dbb3327d781c7a11817ca",
+      "statement": "Boreal runs as a separate database service.",
+      "author": "asset-investigator",
+      "citations": [
+        {
+          "source": "s-1b40d381dc355411602ce8a2ff1e50a358541881a8ba3191",
+          "quote": "Boreal runs as a separate database service."
+        }
+      ]
+    },
+    {
+      "id": "f-b78fe11312529141fc9bb01de42aa6ec7c6efde2c991cafe",
+      "statement": "Boreal supports multiple concurrent writers, but conflicting updates can wait or retry.",
+      "author": "asset-investigator",
+      "citations": [
+        {
+          "source": "s-1b40d381dc355411602ce8a2ff1e50a358541881a8ba3191",
+          "quote": "It supports multiple concurrent writers, but conflicting updates can wait or retry."
+        }
+      ]
+    },
+    {
+      "id": "f-a120e72417922aee2093261e703aa38c5cffef1ad69eb927",
+      "statement": "Boreal connection limits and transaction behavior require workload-specific tuning.",
+      "author": "asset-investigator",
+      "citations": [
+        {
+          "source": "s-1b40d381dc355411602ce8a2ff1e50a358541881a8ba3191",
+          "quote": "Its connection limit and transaction behavior require workload-specific tuning."
+        }
+      ]
+    },
+    {
+      "id": "f-f5accb58347e9c81b3fe6f31134798b5404ca644c8970723",
+      "statement": "Boreal can serve several application instances over the network.",
+      "author": "asset-investigator",
+      "citations": [
+        {
+          "source": "s-1b40d381dc355411602ce8a2ff1e50a358541881a8ba3191",
+          "quote": "Boreal can serve several application instances over the network."
+        }
+      ]
+    },
+    {
+      "id": "f-02dde3dbb82c3cd28e38115587480c8d124d309ab422e313",
+      "statement": "Copying an open Meridian database file can yield an incomplete backup; the fixture directs the operator to use the backup interface or stop writes first.",
+      "author": "packet-investigator",
+      "citations": [
+        {
+          "source": "s-8c0bf633d48d3bacf5e472ea1c0ad8c99b3d16d69202a0f3",
+          "quote": "A backup taken by copying the open database file can be incomplete; use the backup interface or stop writes first.",
+          "locator": "Backup/security paragraph"
+        }
+      ]
+    },
+    {
+      "id": "f-03485d1e334bd2ead354ef53cf32afe2d4fe8401091ad66b",
+      "statement": "Meridian has no built-in network authentication because it exposes no database server; the application and operating system must restrict file access.",
+      "author": "packet-investigator",
+      "citations": [
+        {
+          "source": "s-8c0bf633d48d3bacf5e472ea1c0ad8c99b3d16d69202a0f3",
+          "quote": "There is no built-in network authentication because Meridian exposes no database server. The application and operating system must restrict file access.",
+          "locator": "Backup/security paragraph"
+        }
+      ]
+    },
+    {
+      "id": "f-4f07a22ea780bb44c1aa6d87d2aa9773bf1149b4decaa618",
+      "statement": "The Boreal operator must configure access control and install supported updates.",
+      "author": "packet-investigator",
+      "citations": [
+        {
+          "source": "s-cad497a627f8037787cd642aaea6f4c7e730a8841438ba25",
+          "quote": "The operator must configure access control, install supported updates, schedule backups and test restores.",
+          "locator": "Operations paragraph"
+        }
+      ]
+    },
+    {
+      "id": "f-d3e66b5ebd86176707efb16b3f772fec81f23f4351239997",
+      "statement": "The Boreal operator must schedule backups and test restores, and the fixture provides a logical export.",
+      "author": "packet-investigator",
+      "citations": [
+        {
+          "source": "s-cad497a627f8037787cd642aaea6f4c7e730a8841438ba25",
+          "quote": "The operator must configure access control, install supported updates, schedule backups and test restores. A logical export is available; high-availability operation requires additional service configuration.",
+          "locator": "Operations paragraph"
+        }
+      ]
+    },
+    {
+      "id": "f-af55ed278fd8bc17e9cbfff6f95bf7429bb0ffd63045b107",
+      "statement": "Boreal high availability requires additional service configuration; the fixture does not promise uninterrupted failover.",
+      "author": "packet-investigator",
+      "citations": [
+        {
+          "source": "s-cad497a627f8037787cd642aaea6f4c7e730a8841438ba25",
+          "quote": "A logical export is available; high-availability operation requires additional service configuration. This fixture does not promise uninterrupted failover.",
+          "locator": "Operations paragraph"
+        }
+      ]
+    },
+    {
+      "id": "f-db5459e93dd8f6d73cfcb7b3b70099d4bfd5f2d6a934ebbf",
+      "statement": "Boreal requires service monitoring and someone responsible for recovery.",
+      "author": "packet-investigator",
+      "citations": [
+        {
+          "source": "s-cad497a627f8037787cd642aaea6f4c7e730a8841438ba25",
+          "quote": "It requires service monitoring and someone responsible for recovery.",
+          "locator": "Final paragraph"
+        }
+      ]
+    },
+    {
+      "id": "f-763534c5b1514b6d1e947ed7dc0c0d402c30fa6790b40f2e",
+      "statement": "The Boreal fixture supplies no comparative throughput measurements or operating cost figures.",
+      "author": "packet-investigator",
+      "citations": [
+        {
+          "source": "s-cad497a627f8037787cd642aaea6f4c7e730a8841438ba25",
+          "quote": "No comparative throughput measurements or operating cost figures are supplied by this fixture.",
+          "locator": "Final paragraph"
+        }
+      ]
+    },
+    {
+      "id": "f-7d4911a64fa83bc899ad32e470d240ac6e077492ecfe8d9f",
+      "statement": "The Meridian fixture supplies no comparative throughput measurements.",
+      "author": "packet-investigator",
+      "citations": [
+        {
+          "source": "s-8c0bf633d48d3bacf5e472ea1c0ad8c99b3d16d69202a0f3",
+          "quote": "No comparative throughput measurements are provided by this fixture.",
+          "locator": "Final paragraph"
+        }
+      ]
+    }
+  ],
+  "mappings": [
+    {
+      "workstream": "deployment-concurrency",
+      "sources": {
+        "source-meridian": "s-91b01fbd77a5cd94a00b1a24198ff36757cbff4f5e03ed53",
+        "source-boreal": "s-1b40d381dc355411602ce8a2ff1e50a358541881a8ba3191"
+      },
+      "facts": {
+        "meridian-deployment": "f-1bac23d9aac4a8ca1c1934ce8b9a8eae3694b29a495ec074",
+        "meridian-write-limit": "f-2b671e92b1f9c12e72ed23d5055c416159a1f3417e4a4e8b",
+        "meridian-readers": "f-609c7f001d477435a02859d84d669eaa3b7da07e2349cf9b",
+        "meridian-shared-filesystem": "f-1e08dc0b3a70a953840b93c441f067844c282a92abc1d62b",
+        "meridian-instance-fit": "f-212228958e6e8643b8199cbcb0c6d84aa89c183c753f922a",
+        "boreal-deployment": "f-877913d109b7b64c747c0165764dbb3327d781c7a11817ca",
+        "boreal-writers": "f-b78fe11312529141fc9bb01de42aa6ec7c6efde2c991cafe",
+        "boreal-tuning": "f-a120e72417922aee2093261e703aa38c5cffef1ad69eb927",
+        "boreal-application-instances": "f-f5accb58347e9c81b3fe6f31134798b5404ca644c8970723"
+      }
+    },
+    {
+      "workstream": "maintenance-evidence",
+      "sources": {
+        "meridian-guide": "s-8c0bf633d48d3bacf5e472ea1c0ad8c99b3d16d69202a0f3",
+        "boreal-guide": "s-cad497a627f8037787cd642aaea6f4c7e730a8841438ba25"
+      },
+      "facts": {
+        "meridian-backup-boundary": "f-02dde3dbb82c3cd28e38115587480c8d124d309ab422e313",
+        "meridian-access-boundary": "f-03485d1e334bd2ead354ef53cf32afe2d4fe8401091ad66b",
+        "boreal-maintenance-owner": "f-4f07a22ea780bb44c1aa6d87d2aa9773bf1149b4decaa618",
+        "boreal-backup-restore": "f-d3e66b5ebd86176707efb16b3f772fec81f23f4351239997",
+        "boreal-availability-boundary": "f-af55ed278fd8bc17e9cbfff6f95bf7429bb0ffd63045b107",
+        "boreal-recovery-owner": "f-db5459e93dd8f6d73cfcb7b3b70099d4bfd5f2d6a934ebbf",
+        "boreal-measurement-gap": "f-763534c5b1514b6d1e947ed7dc0c0d402c30fa6790b40f2e",
+        "meridian-measurement-gap": "f-7d4911a64fa83bc899ad32e470d240ac6e077492ecfe8d9f"
+      }
+    }
+  ],
+  "packets": [
+    {
+      "workstream": "deployment-concurrency",
+      "investigator": "asset-investigator",
+      "invocation": "collaboration:/root/topic_assets",
+      "attempt": 1,
+      "file": ".harness-research/collection-data/packet-1-deployment-concurrency-1-e4b67a9ab640a17eba569c982e24da0fba32f0c51b30d594303b35cfe52bf37c.json",
+      "sha256": "e4b67a9ab640a17eba569c982e24da0fba32f0c51b30d594303b35cfe52bf37c"
+    },
+    {
+      "workstream": "maintenance-evidence",
+      "investigator": "packet-investigator",
+      "invocation": "collaboration:/root/parallel_packets",
+      "attempt": 1,
+      "file": ".harness-research/collection-data/packet-1-maintenance-evidence-1-c303df5a12599ff8bc0f68fab6850117a96087c450b19132bf276ab2bd8d428c.json",
+      "sha256": "c303df5a12599ff8bc0f68fab6850117a96087c450b19132bf276ab2bd8d428c"
+    }
+  ],
+  "limitations": [
+    {
+      "workstream": "deployment-concurrency",
+      "text": "Both sources explicitly describe invented products for a controlled skill test; findings are not real product guidance."
+    },
+    {
+      "workstream": "deployment-concurrency",
+      "text": "Only the supplied document bytes were inspected. No network requests, external searches, benchmarks or workload experiments were performed."
+    },
+    {
+      "workstream": "deployment-concurrency",
+      "text": "The optional supplied URL was not accessed under this invocation's no-network constraint; malformed URL input remains rejected in the shared inventory."
+    },
+    {
+      "workstream": "maintenance-evidence",
+      "text": "Both documents describe invented products for a controlled test; conclusions are fixture-specific, not guidance for real databases."
+    },
+    {
+      "workstream": "maintenance-evidence",
+      "text": "This assigned workstream inspected only the two retained supplied Markdown documents and their identical readable captures. The optional example.invalid URL was not opened because the controlled test permits no network; the malformed URL remains rejected in the input inventory."
+    },
+    {
+      "workstream": "maintenance-evidence",
+      "text": "The absence of a stated Meridian service operator or update process does not establish zero operational work. The fixture instead explicitly requires application/OS file protection and a valid backup procedure."
+    }
+  ],
+  "gaps": [
+    {
+      "workstream": "deployment-concurrency",
+      "text": "The application's actual instance count, write rate, conflicting-update pattern and filesystem topology are not supplied."
+    },
+    {
+      "workstream": "deployment-concurrency",
+      "text": "Neither source provides comparative throughput measurements; concurrency capabilities alone do not establish application throughput or response time."
+    },
+    {
+      "workstream": "deployment-concurrency",
+      "text": "The sources do not quantify where modest write traffic stops being appropriate or provide concrete Boreal connection/transaction tuning settings."
+    },
+    {
+      "workstream": "maintenance-evidence",
+      "text": "The app’s recovery point/recovery time objectives, restore drill results, data size and maintenance ownership are not supplied."
+    },
+    {
+      "workstream": "maintenance-evidence",
+      "text": "No comparative cost or workload benchmark establishes an operating-cost or throughput winner."
+    },
+    {
+      "workstream": "maintenance-evidence",
+      "text": "The materials do not quantify backup/restore duration, backup-interface consistency guarantees, supported-update cadence, access-control implementation or failover interruption."
+    }
+  ]
+}

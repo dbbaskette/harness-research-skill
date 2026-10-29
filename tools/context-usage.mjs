@@ -20,7 +20,12 @@ export function readingPath(paths, files, helpers = {}, samples = []) {
 }
 export async function measureContext() {
   const encoder = new Tiktoken(ranks), count = source => encoder.encode(source).length;
-  const refs = (await readdir(new URL('references/', root))).filter(name => name.endsWith('.md')).sort().map(name => 'references/' + name);
+  async function referenceFiles(path = 'references/') {
+    const entries = await readdir(new URL(path, root), { withFileTypes: true });
+    const groups = await Promise.all(entries.map(entry => entry.isDirectory() ? referenceFiles(path + entry.name + '/') : entry.name.endsWith('.md') ? [path + entry.name] : []));
+    return groups.flat().sort();
+  }
+  const refs = await referenceFiles();
   const paths = ['bootstrap/SKILL.md', 'SKILL.md', ...refs, ...['upstream/codex/agents/web-search-modules/academic-papers.md', 'upstream/codex/agents/web-search-modules/chinese-tech.md', 'upstream/codex/agents/web-search-modules/general-web.md', 'upstream/codex/agents/web-search-modules/github-debug.md', 'upstream/codex/agents/web-search-modules/stackoverflow.md', 'upstream/codex/skills/research/SKILL.md', 'upstream/codex/skills/research-add-fields/SKILL.md', 'upstream/codex/skills/research-add-items/SKILL.md', 'upstream/codex/skills/research-deep/SKILL.md', 'upstream/codex/skills/research-report/SKILL.md', 'upstream/claude/agents/web-search-agent.md', 'upstream/claude/agents/web-search-modules/academic-papers.md', 'upstream/claude/agents/web-search-modules/chinese-tech.md', 'upstream/claude/agents/web-search-modules/general-web.md', 'upstream/claude/agents/web-search-modules/github-debug.md', 'upstream/claude/agents/web-search-modules/stackoverflow.md', 'upstream/claude/skills/research/SKILL.md', 'upstream/claude/skills/research-add-fields/SKILL.md', 'upstream/claude/skills/research-add-items/SKILL.md', 'upstream/claude/skills/research-deep/SKILL.md', 'upstream/claude/skills/research-report/SKILL.md']];
   const contents = Object.fromEntries(await Promise.all(paths.map(async path => [path, await readFile(new URL(path, root), 'utf8')])));
   const files = Object.fromEntries(paths.map(path => [path, count(contents[path])]));
@@ -44,6 +49,10 @@ export async function measureContext() {
     investigator: path(['references/investigate.md']), synthesisWriter: path(['references/synthesize.md']), synthesisReviewer: path(['references/review-synthesis.md']),
     synthesisReuse: path([...entry, 'references/synthesis-reuse.md']),
     studioHandoff: path([...entry, 'references/synthesis-workflow.md', 'references/studio-handoff.md']),
+    topicAssets: path([...entry, 'references/synthesis-workflow.md', 'references/topic-assets.md']),
+    parallelCodex: path([...entry, 'references/synthesis-workflow.md', 'references/parallel-research.md', 'references/harnesses/codex.md']),
+    parallelClaude: path([...entry, 'references/synthesis-workflow.md', 'references/parallel-research.md', 'references/harnesses/claude-code.md']),
+    packetInvestigator: path(['references/investigate.md', 'references/investigation-packet.md']),
     queued: path(queued), researchWorker: path(['references/task-research.md']), checkWorker: path(['references/task-check.md']), writeWorker: path(['references/task-write.md']), refreshWorker: path(['references/reuse.md']), focused: path(focused), quick: path([...entry, 'references/workflow.md']),
     resume: path([...entry, 'references/resume.md']),
     reuse: path([...entry, 'references/reuse.md']),
@@ -64,7 +73,7 @@ export async function measureContext() {
   const activation = files['bootstrap/SKILL.md'] + files['SKILL.md'];
   const routes = { 'Discovery metadata': count(description), 'Installed bootstrap': files['bootstrap/SKILL.md'], 'Bootstrap + current guidance entry': activation,
     'Investigator stage': readingPaths.investigator.total, 'Synthesis writer stage': readingPaths.synthesisWriter.total, 'Independent reviewer stage': readingPaths.synthesisReviewer.total,
-    ...Object.fromEntries(Object.entries({ synthesisCoordinator: 'New synthesis: coordinator entry and workflow', synthesisFull: 'New synthesis: all stages in one context', synthesisReuse: 'Synthesis resume, verify or refresh', studioHandoff: 'Optional studio task handoff',
+    ...Object.fromEntries(Object.entries({ synthesisCoordinator: 'New synthesis: coordinator entry and workflow', synthesisFull: 'New synthesis: all stages in one context', synthesisReuse: 'Synthesis resume, verify or refresh', studioHandoff: 'Optional studio task handoff', topicAssets: 'Optional local topic asset intake', parallelCodex: 'Parallel coordinator with Codex adapter', parallelClaude: 'Parallel coordinator with Claude Code adapter', packetInvestigator: 'Delegated investigator with packet contract',
       queued: 'Legacy 0.9 queued coordinator', reuse: 'Legacy 0.9 reuse or refresh', quick: 'Legacy explicit chat-only answer', focused: 'Legacy manual saved research', resume: 'Legacy manual status or resume', comparative: 'Legacy comparative routing only', codexoutline: 'Legacy Codex comparative outline', codexitems: 'Legacy Codex add items', codexfields: 'Legacy Codex add fields', codexdeep: 'Legacy Codex deep results', codexdeepSaved: 'Legacy Codex deep results + saved evidence', claudeoutline: 'Legacy Claude comparative outline', claudedeep: 'Legacy Claude deep results', general: 'Investigation + general web strategy', academic: 'Investigation + academic strategy', github: 'Investigation + GitHub strategy', technical: 'Investigation + technical Q&A strategy', chinese: 'Investigation + Chinese sources strategy', migration: 'Legacy migration' }).map(([name, label]) => [label, standalone[name].total])) };
   const hashes = Object.fromEntries(paths.map(path => [path, createHash('sha256').update(contents[path]).digest('hex')]));
   const inputDigest = createHash('sha256').update(JSON.stringify({ hashes, outputs, readingPaths, routes })).digest('hex');

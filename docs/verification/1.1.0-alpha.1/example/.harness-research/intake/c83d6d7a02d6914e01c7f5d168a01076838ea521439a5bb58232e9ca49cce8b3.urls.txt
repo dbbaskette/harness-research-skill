@@ -1,0 +1,3 @@
+# Synthetic test links. Do not access the network in this exercise.
+https://example.invalid/optional-reference
+malformed-url

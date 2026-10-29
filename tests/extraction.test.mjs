@@ -102,7 +102,11 @@ test('legacy migration refuses active locks, unowned state and hostile history w
   assert.equal(await readFile(path, 'utf8'), options.before); await assert.rejects(access(lock), /ENOENT/);
 });
 test('generic entrypoint routes valid local resources and CLI refuses irrelevant flags', async () => {
-  for (const name of ['SKILL.md', ...await readdir(join(source, 'references')).then(names => names.map(name => `references/${name}`))]) {
+  async function markdownFiles(path) {
+    const entries = await readdir(join(source, path), { withFileTypes: true });
+    return (await Promise.all(entries.map(entry => entry.isDirectory() ? markdownFiles(`${path}/${entry.name}`) : entry.name.endsWith('.md') ? [`${path}/${entry.name}`] : []))).flat();
+  }
+  for (const name of ['SKILL.md', ...await markdownFiles('references')]) {
     const content = await readFile(join(source, name), 'utf8');
     // Section fragments are validated by context-usage.test.mjs; only the file
     // part is a filesystem path.

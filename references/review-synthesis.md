@@ -115,3 +115,15 @@ If anything needs changing, return specific objections. The author revises and
 saves a new dossier; old review approval cannot be transferred to that digest.
 Conclude with the actual status, not an unsupported “looks good.” If your ability
 to inspect evidence is limited, state that limitation plainly.
+
+## Topic assets and collected evidence
+
+Use the actual paths returned by the helper: a topic asset holds `report.md`,
+`brief.md` and `evidence.md` directly, while existing cases keep their `research/`
+layout. Inspect the final saved dossier, not merely investigator summaries or
+packet acceptance status. Your invocation must differ from the final save author
+and every fact investigator. Collection receipts and structural acceptance are
+not prior semantic approval. Verify preserved source context, permissions and
+contradictions across workstreams before assessing final coverage/usefulness.
+`topic.json` tags and the full supplied-source inventory aid discovery; they do
+not certify unused or inaccessible material as evidence.

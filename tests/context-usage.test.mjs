@@ -5,7 +5,11 @@ import { measureContext, renderReport, renderMap, readingPath } from '../tools/c
 const root = new URL('../', import.meta.url);
 
 test('routed instruction links and sections resolve', async () => {
-  const paths = ['SKILL.md', 'bootstrap/SKILL.md', ...(await readdir(new URL('references/', root))).filter(x => x.endsWith('.md')).map(x => 'references/' + x)];
+  async function markdownFiles(path = 'references/') {
+    const entries = await readdir(new URL(path, root), { withFileTypes: true });
+    return (await Promise.all(entries.map(entry => entry.isDirectory() ? markdownFiles(path + entry.name + '/') : entry.name.endsWith('.md') ? [path + entry.name] : []))).flat();
+  }
+  const paths = ['SKILL.md', 'bootstrap/SKILL.md', ...await markdownFiles()];
   for (const path of paths) {
     const url = new URL(path, root), source = await readFile(url, 'utf8');
     for (const [, target] of source.matchAll(/\[[^\]]+\]\(([^)]+)\)/g)) {
@@ -43,6 +47,12 @@ test('reported paths count each input once and the developer guide reflects the 
   }
   assert.deepEqual(data.readingPaths.synthesisFull.files.map(x => x.path), ['SKILL.md', 'references/synthesis-workflow.md', 'references/investigate.md', 'references/synthesize.md', 'references/review-synthesis.md']);
   assert.ok(data.readingPaths.synthesisFull.total > data.readingPaths.synthesisCoordinator.total);
+  assert.deepEqual(data.readingPaths.packetInvestigator.files.map(x => x.path), ['references/investigate.md', 'references/investigation-packet.md']);
+  for (const [route, adapter] of [['parallelCodex','codex.md'], ['parallelClaude','claude-code.md']]) {
+    const adapters = data.readingPaths[route].files.filter(x => x.path.includes('/harnesses/'));
+    assert.deepEqual(adapters.map(x => x.path), ['references/harnesses/' + adapter]);
+    assert.equal(data.readingPaths[route].files.some(x => x.path.endsWith('topic-assets.md')), false);
+  }
   for (const route of ['synthesisCoordinator', 'synthesisFull', 'synthesisReuse']) assert.equal(data.readingPaths[route].files.some(x => /task-|research-run|evidence\.md|comparative/.test(x.path)), false);
   assert.equal(data.readingPaths.quick.files.some(x => x.path.endsWith('evidence.md')), false);
   assert.ok(data.readingPaths.focused.files.some(x => x.path.endsWith('evidence.md')));

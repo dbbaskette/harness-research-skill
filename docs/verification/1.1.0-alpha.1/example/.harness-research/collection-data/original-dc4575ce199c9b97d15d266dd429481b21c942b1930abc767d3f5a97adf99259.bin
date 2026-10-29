@@ -1,0 +1,9 @@
+# Boreal DB — synthetic supplied fixture
+
+This document describes an invented product for a controlled skill test. It is not real product guidance.
+
+Boreal runs as a separate database service. It supports multiple concurrent writers, but conflicting updates can wait or retry. Its connection limit and transaction behavior require workload-specific tuning.
+
+The operator must configure access control, install supported updates, schedule backups and test restores. A logical export is available; high-availability operation requires additional service configuration. This fixture does not promise uninterrupted failover.
+
+Boreal can serve several application instances over the network. It requires service monitoring and someone responsible for recovery. No comparative throughput measurements or operating cost figures are supplied by this fixture.

@@ -8,6 +8,11 @@ and [Apache 2.0 license](../upstream/anthropic/LICENSE) are retained.
 
 Use this stage after evidence is collected or when revising a report. Work from
 the actual dossier and reader’s purpose, not a prescribed series of answers.
+For collected workstreams, use the assembled registry's sources/facts unchanged;
+preserve their real investigator authors. Deduplicate exposition, not immutable
+source identity or contradictory evidence. Ask for registered follow-up evidence
+when a new factual premise is needed. You may be the coordinator; the final
+reviewer must still be a separate invocation.
 
 With no intended use supplied, default to general-purpose topic research. Explain
 what the topic is, its key concepts and findings, important perspectives or

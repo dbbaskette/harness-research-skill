@@ -1,0 +1,140 @@
+{
+  "schema": 1,
+  "request_digest": "91ea1febc96aabe79e2a147a96f94bc3e17138cc60532b6deb2b95f116bdf039",
+  "generation": 1,
+  "workstream": "maintenance-evidence",
+  "attempt": 1,
+  "investigator": "packet-investigator",
+  "sources": [
+    {
+      "id": "meridian-guide",
+      "origin": "/private/tmp/harness-local-acceptance-110/inputs/documents/meridian.md",
+      "title": "Meridian DB — synthetic supplied fixture",
+      "publisher": "Synthetic supplied fixture; author unspecified",
+      "file": "sources/b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06.txt",
+      "original_file": "documents/b43bcd8e0123db19d7977f535807647a588aebd13686645a67e1bb509c9cce06.md",
+      "permission": "selected",
+      "context": "full",
+      "accessed_at": "2026-10-29"
+    },
+    {
+      "id": "boreal-guide",
+      "origin": "/private/tmp/harness-local-acceptance-110/inputs/documents/boreal.md",
+      "title": "Boreal DB — synthetic supplied fixture",
+      "publisher": "Synthetic supplied fixture; author unspecified",
+      "file": "sources/dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259.txt",
+      "original_file": "documents/dc4575ce199c9b97d15d266dd429481b21c942b1930abc767d3f5a97adf99259.md",
+      "permission": "selected",
+      "context": "full",
+      "accessed_at": "2026-10-29"
+    }
+  ],
+  "facts": [
+    {
+      "id": "meridian-backup-boundary",
+      "statement": "Copying an open Meridian database file can yield an incomplete backup; the fixture directs the operator to use the backup interface or stop writes first.",
+      "author": "packet-investigator",
+      "citations": [
+        {
+          "source": "meridian-guide",
+          "quote": "A backup taken by copying the open database file can be incomplete; use the backup interface or stop writes first.",
+          "locator": "Backup/security paragraph"
+        }
+      ]
+    },
+    {
+      "id": "meridian-access-boundary",
+      "statement": "Meridian has no built-in network authentication because it exposes no database server; the application and operating system must restrict file access.",
+      "author": "packet-investigator",
+      "citations": [
+        {
+          "source": "meridian-guide",
+          "quote": "There is no built-in network authentication because Meridian exposes no database server. The application and operating system must restrict file access.",
+          "locator": "Backup/security paragraph"
+        }
+      ]
+    },
+    {
+      "id": "boreal-maintenance-owner",
+      "statement": "The Boreal operator must configure access control and install supported updates.",
+      "author": "packet-investigator",
+      "citations": [
+        {
+          "source": "boreal-guide",
+          "quote": "The operator must configure access control, install supported updates, schedule backups and test restores.",
+          "locator": "Operations paragraph"
+        }
+      ]
+    },
+    {
+      "id": "boreal-backup-restore",
+      "statement": "The Boreal operator must schedule backups and test restores, and the fixture provides a logical export.",
+      "author": "packet-investigator",
+      "citations": [
+        {
+          "source": "boreal-guide",
+          "quote": "The operator must configure access control, install supported updates, schedule backups and test restores. A logical export is available; high-availability operation requires additional service configuration.",
+          "locator": "Operations paragraph"
+        }
+      ]
+    },
+    {
+      "id": "boreal-availability-boundary",
+      "statement": "Boreal high availability requires additional service configuration; the fixture does not promise uninterrupted failover.",
+      "author": "packet-investigator",
+      "citations": [
+        {
+          "source": "boreal-guide",
+          "quote": "A logical export is available; high-availability operation requires additional service configuration. This fixture does not promise uninterrupted failover.",
+          "locator": "Operations paragraph"
+        }
+      ]
+    },
+    {
+      "id": "boreal-recovery-owner",
+      "statement": "Boreal requires service monitoring and someone responsible for recovery.",
+      "author": "packet-investigator",
+      "citations": [
+        {
+          "source": "boreal-guide",
+          "quote": "It requires service monitoring and someone responsible for recovery.",
+          "locator": "Final paragraph"
+        }
+      ]
+    },
+    {
+      "id": "boreal-measurement-gap",
+      "statement": "The Boreal fixture supplies no comparative throughput measurements or operating cost figures.",
+      "author": "packet-investigator",
+      "citations": [
+        {
+          "source": "boreal-guide",
+          "quote": "No comparative throughput measurements or operating cost figures are supplied by this fixture.",
+          "locator": "Final paragraph"
+        }
+      ]
+    },
+    {
+      "id": "meridian-measurement-gap",
+      "statement": "The Meridian fixture supplies no comparative throughput measurements.",
+      "author": "packet-investigator",
+      "citations": [
+        {
+          "source": "meridian-guide",
+          "quote": "No comparative throughput measurements are provided by this fixture.",
+          "locator": "Final paragraph"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Both documents describe invented products for a controlled test; conclusions are fixture-specific, not guidance for real databases.",
+    "This assigned workstream inspected only the two retained supplied Markdown documents and their identical readable captures. The optional example.invalid URL was not opened because the controlled test permits no network; the malformed URL remains rejected in the input inventory.",
+    "The absence of a stated Meridian service operator or update process does not establish zero operational work. The fixture instead explicitly requires application/OS file protection and a valid backup procedure."
+  ],
+  "gaps": [
+    "The app’s recovery point/recovery time objectives, restore drill results, data size and maintenance ownership are not supplied.",
+    "No comparative cost or workload benchmark establishes an operating-cost or throughput winner.",
+    "The materials do not quantify backup/restore duration, backup-interface consistency guarantees, supported-update cadence, access-control implementation or failover interruption."
+  ]
+}

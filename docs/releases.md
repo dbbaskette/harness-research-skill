@@ -1,5 +1,9 @@
 # Versioned releases
 
+The local development tree is now `1.1.0-alpha.1` for topic assets and native
+parallel investigation. It is not a published release or active installation
+update. [Implementation verification](verification/1.1.0-alpha.1/README.md).
+
 **1.0.1** (2026-10-23) is a patch release of the 1.0 synthesis workflow. It
 fixes synthesis integrity exits, external-original pinning and evidence
 qualifications; preserves overwritten outputs; recovers abandoned locks; and adds

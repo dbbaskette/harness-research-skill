@@ -1,0 +1,42 @@
+{
+  "version": "1.1.0-alpha.1",
+  "base_commit": "bc78e1213a89c6bd7804c1b7db7dc2809cd34a4d",
+  "branch": "codex/topic-assets-parallel",
+  "native": {
+    "result": "PASS",
+    "tests": 209,
+    "passed": 209,
+    "failed": 0,
+    "skipped": 0,
+    "vm": "harness-research-test-20261029204513-11355-adf81ea2",
+    "vm_removed": true,
+    "environment": [
+      "OS: 27.0",
+      "Node: v22.23.2",
+      "Python: Python 3.9.6",
+      "Source: bc78e1213a89c6bd7804c1b7db7dc2809cd34a4d"
+    ]
+  },
+  "tested_implementation_files": 68,
+  "post_gate_documentation": [
+    "bootstrap/SKILL.md: corrected preview runtime notice; generated context table/map refreshed; context checks passed3/3"
+  ],
+  "example": {
+    "type": "controlled fictional supplied documents; actual separate investigator/reviewer invocations",
+    "investigators": [
+      "asset-investigator",
+      "packet-investigator"
+    ],
+    "reviewer": "guidance-checker",
+    "facts": 17,
+    "findings": 3,
+    "prose_blocks": 13,
+    "status": "complete",
+    "artifact_integrity": "verified",
+    "digest": "8813e2092de19b1d3371ce08c6d94f3ea0ccbeec8f3fce487ba5036585da26c0",
+    "initial_objection": "only when overstated a when source condition; corrected and independently re-reviewed"
+  },
+  "studio_execution_adapter_enabled": false,
+  "active_installation_updated": false,
+  "published": false
+}

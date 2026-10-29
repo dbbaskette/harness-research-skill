@@ -1,0 +1,42 @@
+
+> harness-research-skill@1.1.0-alpha.1 context:check
+> node tools/context-usage.mjs --check
+
+{
+  "routes": {
+    "Discovery metadata": 36,
+    "Installed bootstrap": 521,
+    "Bootstrap + current guidance entry": 1198,
+    "Investigator stage": 1143,
+    "Synthesis writer stage": 1614,
+    "Independent reviewer stage": 1528,
+    "New synthesis: coordinator entry and workflow": 4319,
+    "New synthesis: all stages in one context": 8604,
+    "Synthesis resume, verify or refresh": 2398,
+    "Optional studio task handoff": 5452,
+    "Optional local topic asset intake": 5715,
+    "Parallel coordinator with Codex adapter": 5885,
+    "Parallel coordinator with Claude Code adapter": 5869,
+    "Delegated investigator with packet contract": 2205,
+    "Legacy 0.9 queued coordinator": 4929,
+    "Legacy 0.9 reuse or refresh": 1981,
+    "Legacy explicit chat-only answer": 2158,
+    "Legacy manual saved research": 3349,
+    "Legacy manual status or resume": 1759,
+    "Legacy comparative routing only": 1911,
+    "Legacy Codex comparative outline": 2871,
+    "Legacy Codex add items": 2076,
+    "Legacy Codex add fields": 2096,
+    "Legacy Codex deep results": 2759,
+    "Legacy Codex deep results + saved evidence": 3950,
+    "Legacy Claude comparative outline": 2888,
+    "Legacy Claude deep results": 2781,
+    "Investigation + general web strategy": 5959,
+    "Investigation + academic strategy": 6051,
+    "Investigation + GitHub strategy": 5846,
+    "Investigation + technical Q&A strategy": 5751,
+    "Investigation + Chinese sources strategy": 5976,
+    "Legacy migration": 1553
+  },
+  "inputDigest": "2ae90bd3e152d331f0ffc7f881b27b15735545a378e0a12e7e884dcaeadfa4b5"
+}

@@ -26,13 +26,20 @@ conclusions have support and remaining searches have low expected value. A userâ
 explicit depth or budget takes precedence. Repeated inaccessible sources are a
 limitation, not a reason to loop indefinitely. Record unresolved gaps at the stop.
 There is no minimum source count, fixed question count or mandatory parallel wave.
+For an assigned workstream, follow the coordinator's [packet contract](investigation-packet.md)
+and permission boundary. Write only your isolated captures/packet, not shared
+registry or final output state. Do not launch another layer of researchers.
 
 ## Read and retain evidence
 
 Use public sources for `public`, supplied sources for `selected`, and both only
 when additional public research is permitted (`mixed`). Selected URLs may be
 opened as supplied references. Do not send private supplied text to public search.
-Claim targets are assertions to test, not evidence for themselves.
+Claim targets are assertions to test, not evidence for themselves. A selected
+source directory or URL-list file is batch intake, not permission for wider web
+research. Read the local intake inventory for originals and access limitations;
+keep inaccessible/unused supplied references visible. The asset helper retains
+originals; the host's actual tools must still produce readable PDF/Office captures.
 
 Read original supporting passages with surrounding qualifications. Search snippets
 and model memory are discovery aids. Prefer primary material appropriate to the
@@ -42,7 +49,8 @@ claims until supported by appropriate evidence. One authoritative source can
 suffice; seek independent corroboration where consequence or uncertainty warrants
 it. Two copies of the same announcement are one evidence lineage.
 
-Save a faithful readable capture in `research/sources/`, with origin, title,
+Save a faithful readable capture in `sources/` inside a topic asset, or the
+existing caseâ€™s `research/sources/`, with origin, title,
 publisher, access date and relevant release/date in the capture or working note.
 Retain the relevant section including caveats; do not construct a source file
 containing only selected quotations. Keep supplied originals as well as any

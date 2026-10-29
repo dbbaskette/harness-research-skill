@@ -5,6 +5,22 @@ research-side contract uses existing dossier fields; it does not migrate an
 installed studio or its legacy adapter automatically. A caller using schema 1
 must deliberately adopt the [schema-2 contract](../docs/migration-v1.md).
 
+## Supply a local destination and inputs
+
+The skill also works standalone. A studio supplies a local asset destination,
+topic/audience/purpose, source permissions and any limits. It may supply a source
+directory with `documents/` and `urls.txt`, or an explicit URL-list path; see
+[local assets](topic-assets.md). Do not expand selected-library context silently.
+
+Harness Research writes and verifies local files. The studio owns its shared
+repository, synchronization, remote conflicts and sharing policy. A failed sync
+is separate from research status and can be retried without recollecting evidence.
+No Git operation or studio application is required by the research helper.
+Topic assets retain their recorded request. A changed audience, purpose or source
+permission needs an explicit new asset variant/destination; tags and metadata
+text do not mutate that request. Existing same-request assets can refresh sources
+through intake and revalidation.
+
 ## Send the actual task
 
 Pass the intended audience, the content task and what it should help that audience
@@ -39,8 +55,8 @@ authored brief prose receive independent review against the saved digest.
 ## Return the saved bundle
 
 After saving, reviewing and verifying, return the report and brief paths together
-with their actual state. Use `research/output.json` as the existing machine-readable
-return contract: `owner`, `schema`, `digest`, `status` and `artifacts` containing
+with their actual state, asset identity and local root. Use the returned
+`output.json` path as the machine-readable return contract: `owner`, `schema`, `digest`, `status` and `artifacts` containing
 relative file paths and SHA-256 hashes. Artifact paths resolve from the manifest's
 directory. Do not invent a second callback format or read legacy `facts.json`
 as schema 2.
@@ -48,13 +64,24 @@ as schema 2.
 For a human or agent handoff, this concise description is sufficient:
 
 ```text
-Report: <project>/research/report.md
-Brief: <project>/research/brief.md
-Bundle: <project>/research/output.json
+Asset: <local-asset-root> (<stable asset ID>)
+Report: <local-asset-root>/report.md
+Brief: <local-asset-root>/brief.md
+Bundle: <local-asset-root>/output.json
+Asset files: <local-asset-root>/asset-manifest.json
 Status: <actual saved status>
 Digest: <exact digest from output.json>
 Limits: <material gaps or review/source limitations>
 ```
+
+For topic assets, the studio synchronizes the relative files listed in
+`asset-manifest.json` after synthesis verification, subject to its sharing policy.
+That manifest covers metadata, full source inventory, retained inputs and the
+reviewed bundle while excluding private helper state. A handoff hash does not
+approve an unused source or replace the reviewed digest in `output.json`.
+
+Existing cases keep their `<project>/research/` paths. Resolve artifact paths
+from the actual manifest directory, not from an assumed fixed repository root.
 
 A draft remains a draft; a matching hash establishes integrity, not source truth
 or current website contents. Preserve the evidence and pinned sources when copying
@@ -65,3 +92,13 @@ new save and review, as described in [reuse](synthesis-reuse.md).
 
 The studio still owns slide design, article writing or lesson development. This
 handoff supplies research suited to that work and grants no publication authority.
+
+## Execution capability is a separate opt-in
+
+A studio enabling bounded parallel collection uses the
+[portable contract](parallel-research.md), host-issued invocation registration and
+capture receipts. It supplies native execution, capacity, shared budget
+reservation and cancellation; it does not reimplement packet merging. Retain the
+execution protocol separately from pinned runtime/guidance. Existing serial jobs
+stay serial, and no running job or installed companion is migrated automatically.
+The report/brief/schema-2 output remains the final consumption boundary.

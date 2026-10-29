@@ -26,7 +26,7 @@ npm ci --ignore-scripts 2>&1 | tee "$results_dir/npm-ci.log"
 npm audit --audit-level=high 2>&1 | tee "$results_dir/audit.log"
 python3 -m venv "$work/validator"
 "$work/validator/bin/pip" install 'PyYAML==6.0.3' 2>&1 | tee "$results_dir/validator-install.log"
-HARNESS_RESEARCH_PYTHON="$work/validator/bin/python" npm test 2>&1 | tee "$results_dir/tests.log"
+HARNESS_RESEARCH_BENCHMARK_OUT="$results_dir/collection-benchmark.json" HARNESS_RESEARCH_PYTHON="$work/validator/bin/python" npm test 2>&1 | tee "$results_dir/tests.log"
 npm run context:check 2>&1 | tee "$results_dir/context.log"
 bash scripts/Install-Harness-Research.sh --home "$work/home" --shared "$work/shared" 2>&1 | tee "$results_dir/installer.log"
 node "$work/home/.agents/skills/harness-research/scripts/harness-research.mjs" --help 2>&1 | tee "$results_dir/installed-help.log"
@@ -63,4 +63,5 @@ assert.equal(status.reviewer, null);
 assert.match(await readFile(process.argv[3], 'utf8'), /Draft.*independent review is pending/);
 JS
 cp -R "$work/synthesis-content/research" "$results_dir/installed-synthesis-artifacts"
+node scripts/ci/topic-smoke.mjs "$work/shared/current" "$work/asset-smoke" "$results_dir" 2>&1 | tee "$results_dir/installed-topic-smoke.log"
 printf 'PASS\n' > "$results_dir/result.txt"

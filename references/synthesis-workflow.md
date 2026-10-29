@@ -9,7 +9,8 @@ bundle. Stage guides load only when the corresponding work begins.
 Honor the supplied topic, reader, intended use and source permissions. Infer
 ordinary details and note the assumption. A migration focus is a hypothesis to
 test, not a conclusion to prove. Preserve a brief working `research/plan.md`; its
-notes are outside the checked output manifest. For broad unresolved scope, settle
+notes are outside the checked output manifest. In a topic asset, keep this as
+`plan.md` at the asset root instead; no fixed question ledger is required. For broad unresolved scope, settle
 the consequential boundary before deep investigation. Do not add a new approval
 gate to already authorized scope.
 
@@ -29,18 +30,29 @@ contract; ordinary standalone research does not need that reference.
 Use the installed runtime returned by bootstrap. Report its actual version and
 guidance revision/freshness, including when using a local development build. Do not
 execute downloaded guidance as a substitute runtime. This workflow requires runtime
-1.0.1 or newer; continue old runs with their saved guidance rather than changing
-formats silently. Keep one active output bundle per project; use a separate case
-directory for a comparison experiment or when preserving another report.
+1.1.0-alpha.1 or newer; continue old runs with their saved guidance rather than changing
+formats silently. New work creates a local [topic asset](topic-assets.md), normally
+`research/<topic>/`; a studio may supply its local destination. A topic asset has
+one active bundle and owned state; multiple topics remain isolated. Existing
+single-project cases retain their original `research/` outputs. Do not move them
+or silently adopt a topic marker.
+
+Select bounded [parallel investigation](parallel-research.md) when independent
+workstreams justify it and native delegation is permitted. Small or restricted
+requests can investigate sequentially. Packet acceptance does not replace the
+final independent review. Load parallel coordination only for that mode.
 
 Save a draft early, continue through investigation and writing, and finish by
-checking the saved revision. These commands use files relative to `--project`:
+checking the saved revision. These commands use files relative to `--project`. Here `DIR` is a newly created
+asset root with its owned marker, so outputs are `report.md`, `brief.md` and their
+companions directly inside it. For an existing case without that marker, use its
+existing project and `research/dossier.json` / `research/review.json` paths:
 
 ```sh
-node "<runtime>/scripts/harness-research.mjs" synthesis save --project DIR --file research/dossier.json --worker AUTHOR
+node "<runtime>/scripts/harness-research.mjs" synthesis save --project DIR --file dossier.json --worker AUTHOR
 node "<runtime>/scripts/harness-research.mjs" synthesis status --project DIR --compact
-node "<runtime>/scripts/harness-research.mjs" synthesis template --project DIR --out research/review.json
-node "<runtime>/scripts/harness-research.mjs" synthesis review --project DIR --file research/review.json --worker CHECKER
+node "<runtime>/scripts/harness-research.mjs" synthesis template --project DIR --out review.json
+node "<runtime>/scripts/harness-research.mjs" synthesis review --project DIR --file review.json --worker CHECKER
 node "<runtime>/scripts/harness-research.mjs" synthesis verify --project DIR --compact
 ```
 
@@ -66,7 +78,7 @@ that review is incomplete.
    changed dossier invalidates the previous review. After two unsuccessful
    correction cycles, preserve the draft, name unresolved objections and stop
    expanding the task. Do not relabel unsupported work as complete.
-5. Read status, verify the bundle and inspect `research/report.md`. Return that
+5. Read status, verify the bundle and inspect the returned report path (`report.md` in a topic asset). Return that
    file with its actual state and important limitations before downstream authoring.
 
 The report leads with the answer; metadata and evidence remain accessible.
@@ -88,9 +100,9 @@ unchanged; change an ID when it would otherwise point to a different assertion.
 Source, fact and finding IDs share one namespace; prefixes such as `src-`, `fact-`
 and `finding-` avoid collisions. `status --compact` returns state, counts, digest and integrity problems without
 repeating source records or the full template. `template` prints the pending
-review object; `template --out research/review.json` creates it without overwriting
+review object; `template --out review.json` creates it without overwriting
 an existing file. Omit `--compact` for the compatible full response. Use
-`validate --project DIR --file research/dossier.json --worker AUTHOR` to check
+`validate --project DIR --file dossier.json --worker AUTHOR` to check
 fields, references and quotes without creating state or changing a saved review.
 
 Top-level fields:
@@ -113,7 +125,8 @@ is `public` or `selected`; `context` is `full` or `partial`. Partial context nee
 `context_note`. Retain `source_date`, `accessed_at` and `version` when known.
 `file` is a faithful readable capture under the project; `origin` identifies the
 public URL or supplied document. Save originals/extractions as described in
-[investigation](investigate.md). The helper computes hashes; never fabricate them.
+[investigation](investigate.md). The helper computes hashes; never fabricate them. Source inventory entries in
+`sources.json` are intake records, not automatically cited evidence.
 For an extraction of a supplied PDF, Office document or other local original,
 include `original_file` with its project-relative path. The helper pins its bytes
 separately and invalidates review if either original or readable capture changes.
@@ -207,6 +220,11 @@ Stale evidence or failed artifact integrity exits 1. Submitting a rejected revie
 also exits 1 while saving its objections. Accepted review and completed verified
 output exit 0. Invalid input/command failures exit 1. Read JSON `status` alongside
 the exit code when completion is required.
+
+For a parallel collection, author from the helper's assembled registry. Preserve
+source/fact content, investigator attribution and returned ID mappings. New facts
+must pass registered investigation acceptance. The final saved dossier is checked
+against that registry, and the separate review still covers the entire digest.
 
 When network access, source access or review is blocked, save what is known with
 explicit limits. Do not claim live currency from a cached source hash. For later
