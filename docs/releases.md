@@ -1,12 +1,15 @@
 # Versioned releases
 
-## Unreleased — 1.1.1
+## 1.1.1
 
 Adds explicit `synthesis save --reuse-unchanged --context FILE`. Matching validated
 content and source/protocol/guidance/runtime/independence identities preserve eligible
 review evidence and return a no-change receipt. Old saves keep revision semantics.
 Opted-in internal state uses schema 3; portable outputs remain schema 2. Missing or
 changed identities and damaged captures cannot retain a complete reviewed status.
+
+See [the verification record](verification/1.1.1/README.md). This additive opt-in
+capability is the canonical companion portion of Marketing Studio audit Week 5.
 
 **1.1.0** (2026-10-29) adds standalone local topic assets, source-directory and
 URL-list intake, retained originals, source inventories/tags and a portable asset
