@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1080" height="700" viewBox="0 0 1080 700" role="img" aria-labelledby="title description">
   <title id="title">Harness Research: progressive context loading</title>
   <desc id="description">Discovery metadata: 36 tokens. Installed bootstrap: 534 tokens. Bootstrap + current guidance entry: ~1.2k. Investigator stage: ~1.1k. Synthesis writer stage: ~1.6k. Independent reviewer stage: ~1.5k. New synthesis: coordinator entry and workflow: ~4.3k. New synthesis: all stages in one context: ~8.6k. Synthesis resume, verify or refresh: ~2.7k. Optional studio task handoff: ~5.5k. Optional local topic asset intake: ~5.7k. Parallel coordinator with Codex adapter: ~5.9k. Parallel coordinator with Claude Code adapter: ~5.9k. Delegated investigator with packet contract: ~2.2k. Each stage loads when needed. Branches are not added together; all-stages total is shown explicitly.</desc>
-  <!-- Input digest: 9883ff46ddcfb0d6944cc07f95b5a8bc4c7827c69b61ebff2d9fb976a94f5bda -->
+  <!-- Input digest: 7c37d59336bd1fc5b202d7163b862e4ee7bcc2caf120dc553ac252dadba27630 -->
   <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#005C8A"/></marker></defs>
   <rect width="1080" height="700" rx="16" fill="#F5F7F9"/>
   <g font-family="Arial, Helvetica, sans-serif" fill="#1B1D36">
