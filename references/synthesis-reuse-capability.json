@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "protocol": "harness-synthesis-reuse-v1",
+  "save_flag": "--reuse-unchanged",
+  "context_flag": "--context",
+  "state_schema": 3,
+  "output_schema": 2
+}

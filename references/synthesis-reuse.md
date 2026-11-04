@@ -55,6 +55,32 @@ it does not establish that an upstream website or product is unchanged. A
 previously supported claim may be unsuitable for a different audience, workload,
 version or purpose. Reassess those assumptions before reusing a recommendation.
 
+## Explicit unchanged-save reuse
+
+New compatible callers may opt in with:
+
+```sh
+node "<runtime>/scripts/harness-research.mjs" synthesis save --project DIR --file dossier.json --worker AUTHOR --reuse-unchanged --context context.json
+```
+
+The local context file contains schema `1` and nonempty `protocol`, `guidance` and
+`independence` identities. The host supplies its actual pinned protocol/guidance and
+isolated-invocation contract; never invent identities to obtain reuse. Runtime and
+reference bytes are hashed automatically. Dossier, author, source bytes/permissions,
+audience, purpose, scope, collection and topic-input identities must also match.
+
+An eligible save returns `save_result: no-change`, retaining the exact valid review;
+`review_preserved` is true only for complete reviewed work. Otherwise it returns
+`saved`, clears review and requires a new independent check. Old reviews cannot be
+retroactively adopted: the first opted-in save needs a fresh check. Old callers
+without these flags retain revision-based saves. Opted-in internal state uses schema
+3, which older runtimes refuse; portable dossier/output schema stays 2.
+
+Changed/missing context or runtime identity makes opted-in work stale. Missing or
+damaged source/snapshot bytes remain failures. A matching canonical dossier may repair
+generated outputs using the existing preserved-backup behavior; it never silently
+adopts edits to generated prose as reviewed content.
+
 ## Refresh selected evidence
 
 When the user requests current information, inspect the relevant live sources
@@ -64,7 +90,7 @@ do not silently replace a quotation while preserving its old approval.
 
 Update affected facts, findings, prose and comparison cells. Resolve a gap only
 to the extent the new evidence supports; a compound gap may remain partly open.
-Save the revised dossier. A new save invalidates the previous review; arrange an
+Save the revised dossier. Changed content or a revision-based save invalidates the previous review; arrange an
 independent review of the saved revision using [review synthesis](review-synthesis.md).
 The current runtime reviews the complete dossier rather than promising selective
 carry-forward of semantic approvals.

@@ -16,9 +16,10 @@ evidence, writing, checking, and keeping the result.
 **[Start here](#your-first-report)** · **[Bring your sources](#bring-your-own-sources)** ·
 **[Explore the options](#make-the-research-fit-your-task)** · **[User guide](docs/using-harness-research.md)**
 
-> **Harness Research 1.1.0.** Local topic assets, directory/URL-list intake, and
-> bounded parallel investigation are included in this release.
-> [Release and downloads](https://github.com/dbbaskette/harness-research-skill/releases/tag/v1.1.0) ·
+> **Harness Research 1.1.1.** Explicit unchanged-save reuse preserves eligible review
+> evidence only when content, sources and all required context identities match.
+> Local topic assets and bounded parallel investigation remain available.
+> [Release and downloads](https://github.com/dbbaskette/harness-research-skill/releases/tag/v1.1.1) ·
 > [Install and update](docs/setup.md)
 
 ## Your first report

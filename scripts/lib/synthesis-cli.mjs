@@ -7,8 +7,10 @@ import { OUTPUT_NAMES, outputPrefix, outputPath, digestContent, managedSource } 
 import { assetContext, verifyAssetDossier, updateAssetRevision } from './topic-assets.mjs';
 import { verifyCollectionDossier, bindCollectionDossier, verifyCollectionReviewer } from './collection.mjs';
 
+import { reuseIdentity, checkReuseIdentity } from './synthesis-reuse.mjs';
+
 const OUTPUTS = OUTPUT_NAMES;
-const HELP = 'synthesis save|review|validate --project DIR --file INPUT.json --worker ID [--compact|--verbose] | status|verify --project DIR [--compact|--verbose] | template --project DIR [--out NEW.json]. Paths are project-relative. Full responses remain the default; --compact omits sources and review_template. Validate does not write. Template prints pending review JSON or creates --out without overwriting. Save writes drafts; review binds to exact content. Verify exits 1 for stale/failed integrity; review exits 1 for rejected work. Intact drafts and completed outputs exit 0. The helper never fetches sources or makes semantic judgments.';
+const HELP = 'synthesis save|review|validate --project DIR --file INPUT.json --worker ID [--compact|--verbose] | status|verify --project DIR [--compact|--verbose] | template --project DIR [--out NEW.json]. Paths are project-relative. Full responses remain the default; --compact omits sources and review_template. Validate does not write. Template prints pending review JSON or creates --out without overwriting. Save writes drafts; save --reuse-unchanged --context FILE preserves matching reviewed work and returns save_result. Context pins protocol, guidance and independence; runtime bytes are checked. Review binds to exact content. Verify exits 1 for stale/failed integrity; review exits 1 for rejected work. Intact drafts and completed outputs exit 0. The helper never fetches sources or makes semantic judgments.';
 export function synthesisExitCode(action, result) {
   return result?.artifact_integrity === 'failed' || result?.status === 'stale' ||
     (action === 'review' && result?.status === 'needs-revision') ? 1 : 0;
@@ -18,14 +20,15 @@ function args(argv) {
   if (!['save','review','validate','template','status','verify','help'].includes(action)) throw new Error(`Unknown synthesis action. ${HELP}`);
   for (let i = 1; i < argv.length; i++) {
     const name = argv[i], key = name.slice(2);
-    if (['--compact','--verbose'].includes(name)) {
+    if (['--compact','--verbose','--reuse-unchanged'].includes(name)) {
       if (result[key]) throw new Error(`Duplicate ${name}.`);
       result[key] = true;
     } else {
-      if (!['--project','--file','--worker','--out'].includes(name) || !argv[i + 1] || argv[i + 1].startsWith('--') || result[key]) throw new Error(`Invalid synthesis arguments. ${HELP}`);
+      if (!['--project','--file','--worker','--out','--context'].includes(name) || !argv[i + 1] || argv[i + 1].startsWith('--') || result[key]) throw new Error(`Invalid synthesis arguments. ${HELP}`);
       result[key] = argv[++i];
     }
   }
+  if ((result['reuse-unchanged'] || result.context) && (action !== 'save' || !result['reuse-unchanged'] || !result.context)) throw new Error('--reuse-unchanged and --context FILE belong together on save.');
   if (result.compact && result.verbose) throw new Error('Choose --compact or --verbose.');
   if (action !== 'help' && !result.project) throw new Error('--project is required.');
   if (['save','review','validate'].includes(action) && (!result.file || !result.worker)) throw new Error('--file and --worker are required.');
@@ -38,7 +41,8 @@ async function readState(path) {
   const info = await exists(path); if (!info) return null;
   if (!info.isFile() || info.isSymbolicLink()) throw new Error('Synthesis state must be a regular owned file.');
   const state = parseJson(await readFile(path, 'utf8'));
-  if (state.owner !== OWNER || state.schema !== 2 || !Array.isArray(state.sources) || !state.dossier || !state.digest) throw new Error('Unrecognized synthesis state; preserve it.');
+  if (state.owner !== OWNER || ![2, 3].includes(state.schema) || !Array.isArray(state.sources) || !state.dossier || !state.digest) throw new Error('Unrecognized synthesis state; preserve it.');
+  if (state.schema === 3 && !['unchanged', 'revision'].includes(state.save_policy)) throw new Error('Unrecognized synthesis save policy; preserve it.');
   return state;
 }
 async function preserveState(derived, state) {
@@ -60,6 +64,9 @@ async function protectOutputs(output, state) {
 }
 async function stateStatus(root, state) {
   const problems = [], artifactProblems = [], checked = new Map();
+  if (state.schema === 3 && state.save_policy === 'unchanged') {
+    try { await checkReuseIdentity(root, state.reuse); } catch (error) { problems.push(error.message); }
+  }
   let bytesHashed = 0;
   const recomputed = hash(stable(digestContent(state.dossier, state.author, state.sources.map(digestSource), outputPrefix(state))));
   if (recomputed !== state.digest) problems.push('Saved content digest does not match the dossier.');
@@ -147,13 +154,17 @@ export async function runSynthesisCli(argv) {
   try {
     if (await exists(join(derived, 'research-run.json')) || await exists(join(derived, 'research.json'))) throw new Error('Existing legacy research engine owns this project. Use a separate project directory; existing research is preserved.');
     const context = await assetContext(root), layout = context ? { layout: 'topic' } : {};
-    let state = await readState(statePath);
+    let state = await readState(statePath), saveReceipt = null;
     if (state && (state.layout || null) !== (context?.layout || null)) throw new Error('Saved output layout does not match the topic asset; preserve and inspect it.');
     if (options.action === 'save') {
       const input = parseJson(await readText(root, options.file));
       const validated = await validateDossier(root, input, options.worker, { outputPrefix: context ? '' : 'research' });
       await verifyAssetDossier(root, validated.dossier);
       const collection = await verifyCollectionDossier(root, validated.dossier, options.worker);
+      const reuse = options['reuse-unchanged'] ? await reuseIdentity(root, options.context) : null;
+      if (state && reuse && (await stateStatus(root, state)).artifact_problems.length) {
+        throw new Error('Existing immutable snapshots are missing or changed; restore them before unchanged-save reuse.');
+      }
       const output = join(root, outputPrefix(layout));
       await protectOutputs(output, state);
       await directory(output);
@@ -173,11 +184,27 @@ export async function runSynthesisCli(argv) {
           source.original_snapshot = await pin(capture.original_file, capture.original_sha256, /^\.[a-z0-9]{1,10}$/i.test(suffix) ? suffix.toLowerCase() : '.bin');
         }
       }
-      await preserveState(derived, state);
-      // Every save is a revision, even when text is unchanged: no old review is carried over.
-      state = { owner: OWNER, schema: 2, ...layout, ...(context ? { asset_input_fingerprint: context.inputFingerprint } : {}), ...(collection ? { collection } : {}), dossier: validated.dossier, author: validated.author, digest: validated.digest, sources: validated.sources, review: null };
-      await atomic(statePath, JSON.stringify(state, null, 2) + '\n');
-      if (collection) await bindCollectionDossier(root, state.digest);
+      const unchanged = reuse && state?.schema === 3 && state.save_policy === 'unchanged'
+        && stable(reuse) === stable(state.reuse) && state.digest === validated.digest
+        && state.author === validated.author && stable(state.sources) === stable(validated.sources)
+        && stable(state.collection || null) === stable(collection || null)
+        && (state.asset_input_fingerprint || null) === (context?.inputFingerprint || null);
+      const prior = unchanged ? await stateStatus(root, state) : null;
+      if (prior && prior.status !== 'stale') {
+        saveReceipt = {save_result: 'no-change', review_preserved: prior.status === 'complete'};
+      } else {
+        await preserveState(derived, state);
+        // Legacy save remains revision-based. Explicit reuse adopts an internal schema
+        // older runtimes refuse, without changing portable dossier/output schema 2.
+        const modern = Boolean(reuse) || state?.schema === 3;
+        state = {owner: OWNER, schema: modern ? 3 : 2, ...layout,
+          ...(modern ? {save_policy: reuse ? 'unchanged' : 'revision'} : {}), ...(reuse ? {reuse} : {}),
+          ...(context ? {asset_input_fingerprint: context.inputFingerprint} : {}), ...(collection ? {collection} : {}),
+          dossier: validated.dossier, author: validated.author, digest: validated.digest, sources: validated.sources, review: null};
+        await atomic(statePath, JSON.stringify(state, null, 2) + '\n');
+        if (collection) await bindCollectionDossier(root, state.digest);
+        saveReceipt = {save_result: 'saved', review_preserved: false};
+      }
     } else if (!state) throw new Error('No synthesis dossier saved in this project.');
     if (options.action === 'template') {
       const template = reviewTemplate(state);
@@ -199,8 +226,9 @@ export async function runSynthesisCli(argv) {
     // Review changes no source bytes; reuse its inspection, but recompute acceptance.
     if (current) current.status = state.review.accepted ? 'complete' : 'needs-revision';
     else current = await stateStatus(root, state);
+    if (saveReceipt?.review_preserved && current.status !== 'complete') saveReceipt.review_preserved = false;
     const artifacts = await materialize(root, state, current);
-    const response = { ...result(state, current, options.compact), ...artifacts };
+    const response = { ...result(state, current, options.compact), ...artifacts, ...(saveReceipt || {}) };
     if (context) await updateAssetRevision(root, state, response);
     return response;
   } finally { await releaseLock(lock, owned); }
