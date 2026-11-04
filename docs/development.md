@@ -213,7 +213,7 @@ representative guidance-start response. Stage-only rows count their own referenc
 | Independent reviewer stage | 1,528 |
 | New synthesis: coordinator entry and workflow | 4,317 |
 | New synthesis: all stages in one context | 8,602 |
-| Synthesis resume, verify or refresh | 2,399 |
+| Synthesis resume, verify or refresh | 2,700 |
 | Optional studio task handoff | 5,450 |
 | Optional local topic asset intake | 5,713 |
 | Parallel coordinator with Codex adapter | 5,883 |
