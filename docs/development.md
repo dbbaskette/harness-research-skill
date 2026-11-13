@@ -215,7 +215,7 @@ representative guidance-start response. Stage-only rows count their own referenc
 | New synthesis: all stages in one context | 8,602 |
 | Synthesis resume, verify or refresh | 2,700 |
 | Optional studio task handoff | 5,450 |
-| Optional local topic asset intake | 5,713 |
+| Optional local topic asset intake | 5,783 |
 | Parallel coordinator with Codex adapter | 5,883 |
 | Parallel coordinator with Claude Code adapter | 5,867 |
 | Delegated investigator with packet contract | 2,212 |

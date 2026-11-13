@@ -1,5 +1,16 @@
 # Versioned releases
 
+## 1.2.0
+
+Raises the intake limits so a studio can register a long source list in one run:
+2,000 entries per intake or source update (was 200), a 5,000-entry inventory (was
+1,000) and 512 MiB of supplied input (was 128 MiB). One input is still at most
+64 MiB. `references/intake-limits.json` states the limits for hosts. Nothing else
+changes; existing cases keep their runtime and layout. The owner asked for the
+limits to be raised, merged and released.
+
+See [the verification record](verification/1.2.0/README.md).
+
 ## 1.1.1
 
 Adds explicit `synthesis save --reuse-unchanged --context FILE`. Matching validated
