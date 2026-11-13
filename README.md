@@ -320,3 +320,14 @@ explicitly as described in the [developer guide](docs/development.md).
 
 Harness Research adapts Anthropic's Knowledge Synthesis. The original source,
 license, and adaptation notice are retained. [Attribution and licenses →](NOTICE.md)
+
+## Working with brands
+
+[Harness Brand](https://github.com/dbbaskette/harness-brand-skill) is the optional
+brand companion. Install it once and select a local folder containing your brand
+packs. Company assets stay in that separate folder; these public skills do not
+include them or require access to a private brand repository.
+
+Harness Research produces cited findings and briefs. Harness Brand and Harness
+Slides can use those findings to create branded content; research itself does not
+require either companion or a brand folder.
