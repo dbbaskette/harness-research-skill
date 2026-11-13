@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.0 — 2026-11-12
+
+- Raise intake limits: 2,000 entries per intake or source update (was 200), a 5,000-entry source inventory (was 1,000) and 512 MiB of supplied input in total (was 128 MiB). The 64 MiB limit on one input is unchanged.
+- State the limits for hosts in `references/intake-limits.json`, so a studio can check a source list before registering anything.
+- Publish 1.2.0 guidance with a runtime 1.2.0 floor; existing runs keep their runtime and layout.
+
 ## 1.1.0 — 2026-10-29
 
 - Add standalone local topic assets with tags, source inventories, retained documents and directory/URL-list intake. Studios supply destinations and own synchronization.

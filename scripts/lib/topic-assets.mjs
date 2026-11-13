@@ -7,7 +7,8 @@ import { hash, stable, text, identifier, exists, localFile, readText, atomic, di
 export const ASSET_OWNER = 'harness-research-asset';
 const SCHEMA = 1;
 const DEFAULT_PURPOSE = 'General-purpose topic research';
-const MAX_FILES = 200, MAX_BYTES = 64 * 1024 * 1024, MAX_TOTAL = 128 * 1024 * 1024;
+// Stated for hosts in references/intake-limits.json; a test keeps the two the same.
+const MAX_FILES = 2000, MAX_INVENTORY = 5000, MAX_BYTES = 64 * 1024 * 1024, MAX_TOTAL = 512 * 1024 * 1024;
 const TEXT_EXTENSIONS = new Set(['.txt','.md','.markdown','.html','.htm','.csv','.json','.yaml','.yml','.xml','.toml','.rst','.log']);
 const DOCUMENT_EXTENSIONS = new Set(['.pdf','.docx','.pptx','.xlsx','.odt','.rtf']);
 const SKIP = new Set(['.git','.harness-research','node_modules','.codex-build','.DS_Store','.claude','.codex','.cursor','.agents','.aws','.ssh','.env']);
@@ -176,7 +177,7 @@ async function intakeSnapshot(workspace, destination, options) {
         try { bytes=await readFile(path); } catch { addEntry({...base,outcome:'unreadable',note:'Original input could not be read.'}); fingerprint.push({path:local,outcome:'unreadable'}); continue; }
         const after=await lstat(path);
         if (after.ino!==info.ino || after.size!==info.size || after.mtimeMs!==info.mtimeMs || after.isSymbolicLink()) throw new Error('Source changed during intake; retry after inputs are stable.');
-        bytesTotal+=bytes.length; if (bytesTotal>MAX_TOTAL) throw new Error('Intake exceeds 128 MiB; select fewer inputs.');
+        bytesTotal+=bytes.length; if (bytesTotal>MAX_TOTAL) throw new Error(`Intake exceeds ${MAX_TOTAL / 1048576} MiB; select fewer inputs.`);
         const h=hash(bytes), extension=extname(item.name).toLowerCase(), suffix=/^\.[a-z0-9]{1,10}$/.test(extension)?extension:'.bin';
         const original='documents/'+h+suffix;
         addBytes(original,bytes);
@@ -244,7 +245,7 @@ async function sourceUpdate(root,state,input) {
       const checked=urlOrigin(update.origin);
       if (!checked.valid || update.permission!=='public') throw new Error('A discovered source requires a credential-free HTTP(S) URL and public permission.');
       const id=update.id||'source-'+hash(update.origin).slice(0,32); identifier(id,'Inventory source ID');
-      if (changed.length>=1000) throw new Error('Source inventory exceeds 1000 entries.');
+      if (changed.length>=MAX_INVENTORY) throw new Error(`Source inventory exceeds ${MAX_INVENTORY} entries.`);
       entry={id,type:'url',role:'discovered',origin:update.origin,permission:'public',outcome:'pending'};
       changed.push(entry);
     }

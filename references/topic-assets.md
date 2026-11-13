@@ -22,6 +22,11 @@ another path. Audience and purpose can be supplied naturally and preserved with
 `--audience` and `--purpose`; omitted purpose means general-purpose topic research.
 Do not ask the person to drive helper commands or prepare JSON.
 
+One intake or source update takes at most 2,000 entries, an inventory holds at most
+5,000, one input is at most 64 MiB and supplied input totals at most 512 MiB. A URL
+with a captured text counts as two entries. Hosts read these from
+`references/intake-limits.json`.
+
 Use the returned **asset root** as `--project` for subsequent synthesis and
 collection operations. The owned marker selects the topic layout automatically:
 
