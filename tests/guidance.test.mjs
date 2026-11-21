@@ -149,15 +149,29 @@ test('synthesis guidance requires its prerelease runtime and keeps its saved gui
   await f.commit();
   await assert.rejects(start(f), /newer installed runtime/);
 });
-test('automatic refresh stays on stable releases even for a preview runtime', async t => {
+test('new work always takes main, even when release tags point elsewhere', async t => {
   const f = await fixture(t);
   await exec('git', ['-C', f.source, 'tag', 'v0.3.0', f.first]);
+  await writeFile(join(f.source, 'SKILL.md'), `---\nname: ${skill}\n---\nGuidance on main\n`);
+  await writeFile(join(f.source, 'guidance/manifest.json'), JSON.stringify({ schema: 1, skill, version: '0.4.0', entry: 'SKILL.md', minimumRuntime: '0.2.0' }));
+  const tip = await f.commit();
+  await exec('git', ['-C', f.source, 'tag', 'v9.9.9', f.first]);
+  const started = await start(f);
+  assert.equal(started.revision, tip); assert.equal(started.channel, 'main'); assert.equal(started.ref, 'refs/heads/main');
+  assert.equal(started.freshness, 'current-at-start'); assert.equal(started.guidanceVersion, '0.4.0');
+  assert.equal(started.notice, undefined); assert.equal(started.newerRelease, undefined);
+  assert.match(await readFile(started.guidance, 'utf8'), /Guidance on main/);
+  const pin = JSON.parse(await readFile(join(started.guidance, '..', 'pin.json'), 'utf8'));
+  assert.equal(pin.channel, 'main'); assert.equal(pin.ref, 'refs/heads/main');
+  // Tags are never fetched into the guidance cache.
+  const tags = await exec('git', ['--git-dir=' + join(f.project, '.' + skill, 'guidance', 'repository.git'), 'tag', '--list']);
+  assert.equal(tags.stdout.trim(), '');
+  // A preview runtime also reads main; a prerelease floor it meets is accepted.
   await writeFile(join(f.runtime, 'package.json'), JSON.stringify({ name: pkg.name, version: '1.0.0-alpha.1' }));
   await writeFile(join(f.source, 'guidance/manifest.json'), JSON.stringify({ schema: 1, skill, version: '1.0.0-alpha.1', entry: 'SKILL.md', minimumRuntime: '1.0.0-alpha.1' }));
   const preview = await f.commit();
-  await exec('git', ['-C', f.source, 'tag', 'v1.0.0-alpha.1', preview]);
-  assert.equal((await start(f)).revision, f.first);
-  assert.equal((await start({ ...f, revision: preview })).guidanceVersion, '1.0.0-alpha.1');
+  const previewStart = await start(f);
+  assert.equal(previewStart.revision, preview); assert.equal(previewStart.guidanceVersion, '1.0.0-alpha.1');
 });
 test('fetch failures preserve existing tasks and never claim current guidance', async t => {
   const f = await fixture(t), pin = await start(f);
@@ -201,6 +215,12 @@ test('pins an approved ancestor explicitly and rejects other commits or malforme
   const f = await fixture(t); await writeFile(join(f.source, 'references/design.md'), 'New'); await f.commit();
   const pin = await start({ ...f, revision: f.first }); assert.equal(pin.revision, f.first);
   await assert.rejects(start({ ...f, revision: 'a'.repeat(40) }), /Git operation failed \(git merge-base\)/);
+  // A real commit on another branch, present in the guidance cache, is still not on main.
+  await exec('git', ['-C', f.source, 'checkout', '-q', '-b', 'side', f.first]);
+  await writeFile(join(f.source, 'references/design.md'), 'Side branch'); const side = await f.commit();
+  await exec('git', ['-C', f.source, 'checkout', '-q', 'main']);
+  await exec('git', ['--git-dir=' + join(f.project, '.' + skill, 'guidance', 'repository.git'), 'fetch', '-q', f.source, 'refs/heads/side']);
+  await assert.rejects(start({ ...f, revision: side }), /Git operation failed \(git merge-base\)/);
   await assert.rejects(resume({ ...f, task: '../escape' }), /Invalid saved task/);
 });
 test('refresh lock refuses concurrent updates without deleting another owner’s lock', async t => {
@@ -257,24 +277,20 @@ test('after an update, work pinned to a removed version folder resumes on the st
   assert.equal(cached.freshness, 'cached-by-choice'); assert.equal(cached.runtime, current); assert.match(cached.notice, /installed runtime 99\.0\.0/);
   assert.equal(await readlink(current), `versions/${second.id}`);
 });
-test('new work takes the newest release its runtime supports, so unreleased guidance on main is not served', async t => {
+test('main guidance that needs a newer runtime is refused with the update message, whatever the tags say', async t => {
   const f = await fixture(t);
   await exec('git', ['-C', f.source, 'tag', 'v0.3.0', f.first]);
-  await writeFile(join(f.source, 'SKILL.md'), `---\nname: ${skill}\n---\nUnreleased guidance\n`); await f.commit();
   await writeFile(join(f.source, 'guidance/manifest.json'), JSON.stringify({ schema: 1, skill, version: '9.0.0', entry: 'SKILL.md', minimumRuntime: '9.0.0' }));
-  await exec('git', ['-C', f.source, 'tag', 'v9.0.0', await f.commit()]);
-  const started = await start(f);
-  assert.equal(started.revision, f.first); assert.equal(started.channel, 'release'); assert.equal(started.ref, 'refs/tags/v0.3.0');
-  assert.match(await readFile(started.guidance, 'utf8'), /First guidance/);
-  // Using an older release because a newer one needs a newer runtime is disclosed, never silent.
-  assert.equal(started.freshness, 'older-compatible-release');
-  assert.deepEqual(started.newerRelease, { ref: 'refs/tags/v9.0.0', minimumRuntime: '9.0.0' });
-  assert.match(started.notice, /v9\.0\.0 needs runtime 9\.0\.0.*trusted installer/);
-  await exec('git', ['-C', f.source, 'tag', '-d', 'v9.0.0']);
-  const newest = await start(f);
-  assert.equal(newest.freshness, 'current-at-start'); assert.equal(newest.newerRelease, undefined); assert.equal(newest.notice, undefined);
-  await exec('git', ['-C', f.source, 'tag', '-d', 'v0.3.0']);
-  await assert.rejects(start(f), /newer installed runtime/);
+  await f.commit();
+  // No fallback to the older compatible tag: the remedy is to update the installation from main.
+  await assert.rejects(start(f), error => {
+    assert.equal(error.message, 'Current guidance needs a newer installed runtime. Update with this skill’s trusted installer.');
+    assert.equal(error.minimumRuntime, '9.0.0'); return true;
+  });
+  assert.deepEqual((await readdir(join(f.project, '.' + skill, 'guidance'))).sort(), ['repository.git']);
+  await writeFile(join(f.runtime, 'package.json'), JSON.stringify({ name: pkg.name, version: '9.0.0' }));
+  const updated = await start(f);
+  assert.equal(updated.guidanceVersion, '9.0.0'); assert.equal(updated.ref, 'refs/heads/main');
 });
 
 test('guidance lock recovers an abandoned process but retains an old live owner', async t => {
@@ -288,17 +304,25 @@ test('guidance lock recovers an abandoned process but retains an old live owner'
   await assert.rejects(readFile(lock),{code:'ENOENT'});
 });
 
-test('guidance searches beyond ten incompatible releases and distinguishes its search budget', async t => {
-  const f = await fixture(t);
-  await exec('git',['-C',f.source,'tag','v0.3.0',f.first]);
-  await writeFile(join(f.source,'guidance/manifest.json'),JSON.stringify({schema:1,skill,version:'9.0.0',entry:'SKILL.md',minimumRuntime:'9.0.0'}));
-  const incompatible = await f.commit();
-  for (let i=0;i<12;i++) await exec('git',['-C',f.source,'tag',`v9.0.${i}`,incompatible]);
-  await assert.rejects(start({...f,releaseLimit:10}),/search limit reached.*older compatible guidance may exist/);
-  const started = await start(f); assert.equal(started.revision,f.first);
-  assert.equal(started.ref,'refs/tags/v0.3.0'); assert.equal(started.freshness,'older-compatible-release');
-  await exec('git',['-C',f.source,'tag','-d','v0.3.0']);
-  await assert.rejects(start(f),/No guidance release supports/);
+test('a task saved from a release tag still resumes unchanged', async t => {
+  const f = await fixture(t), started = await start(f), file = join(started.guidance, '..', 'pin.json');
+  // Runtimes before 1.3.1 could start work from a release tag and record it that way.
+  const pin = JSON.parse(await readFile(file, 'utf8'));
+  Object.assign(pin, { channel: 'release', ref: 'refs/tags/v0.3.0' });
+  await chmod(file, 0o600); await writeFile(file, JSON.stringify(pin, null, 2) + '\n');
+  await writeFile(join(f.source, 'SKILL.md'), `---\nname: ${skill}\n---\nNewer guidance on main\n`); await f.commit();
+  await rm(f.source, { recursive: true });
+  const continued = await resume({ ...f, task: started.task });
+  assert.equal(continued.freshness, 'saved-guidance'); assert.equal(continued.revision, f.first);
+  assert.equal(continued.guidanceVersion, '0.3.0'); assert.equal(continued.runtime, f.runtime); assert.equal(continued.notice, undefined);
+  assert.match(await readFile(continued.guidance, 'utf8'), /First guidance/);
+  assert.equal((await resume({ ...f, task: started.task, cached: true })).freshness, 'cached-by-choice');
+  // An older-format release pin on a newer installed runtime continues with a notice.
+  await oldFormatPin(started, join(f.dir, 'versions', '0.2.0-0123456789abcdef0123'), '0.2.0');
+  const upgraded = join(f.dir, 'upgraded'); await mkdir(upgraded);
+  await writeFile(join(upgraded, 'package.json'), JSON.stringify({ name: pkg.name, version: '0.3.0' }));
+  const moved = await resume({ ...f, runtime: upgraded, task: started.task });
+  assert.equal(moved.revision, f.first); assert.match(moved.notice, /started on runtime 0\.2\.0 and now continues on the installed runtime 0\.3\.0/);
 });
 
 test('new command guidance cannot load on the older 1.0.0 runtime', async t => {

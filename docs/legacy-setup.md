@@ -1,4 +1,5 @@
-> Historical 0.9 workflow. For new research, see the [current user guide](using-harness-research.md).
+> Historical 0.9 workflow, kept as a record. New installations and updates come from
+> `main`; see the [setup guide](setup.md) and the [current user guide](using-harness-research.md).
 
 # Setup, updates, and troubleshooting
 

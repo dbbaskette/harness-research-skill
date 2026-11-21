@@ -16,9 +16,9 @@ evidence, writing, checking, and keeping the result.
 **[Start here](#your-first-report)** · **[Bring your sources](#bring-your-own-sources)** ·
 **[Explore the options](#make-the-research-fit-your-task)** · **[User guide](docs/using-harness-research.md)**
 
-> **Harness Research 1.3.0.** Nothing is pinned to one installed version any more:
-> saved research continues on whatever version is installed, the installer keeps only
-> the newest version, and every tool runs from one stable address.
+> **Harness Research 1.3.1.** Everything comes from `main`: install from `main`,
+> and new research uses the instructions on `main`. Saved research continues on
+> whatever version is installed, and every tool runs from one stable address.
 > [Release history](docs/releases.md) ·
 > [Install and update](docs/setup.md)
 
@@ -31,10 +31,10 @@ API subscription is required. A studio and Git repository are optional.
 
 ### 1. Install the skill and open your project
 
-Install the tagged release once (Git and Bash are needed for this installer):
+Install from `main` once (Git and Bash are needed for this installer):
 
 ```sh
-git clone --branch v1.1.0 https://github.com/dbbaskette/harness-research-skill.git
+git clone https://github.com/dbbaskette/harness-research-skill.git
 cd harness-research-skill
 bash scripts/Install-Harness-Research.sh
 ```
@@ -292,21 +292,25 @@ or change running jobs.
 
 [Studio integration contract →](references/studio-handoff.md)
 
-## Install the published release
+## Install and update from main
 
-The [first-report steps](#your-first-report) install stable `1.1.0`. For an update,
-use a fresh checkout of the chosen release and run its installer. The installer
-points the shared skill links for Codex, Claude Code and Cursor at the new version
-and removes the older ones, so there is one installed version and one address for
-it. Return to your content folder and start a new agent session afterward.
+The [first-report steps](#your-first-report) install from `main`, where every
+change lands. To update, use a fresh clone of `main` (or `git pull` an unmodified
+one) and run its installer again. The installer points the shared skill links for
+Codex, Claude Code and Cursor at the new version and removes the older ones, so
+there is one installed version and one address for it. Return to your content
+folder and start a new agent session afterward.
 
-New tasks select the newest stable guidance the installed runtime supports. Older
-runtimes keep compatible guidance until updated; refresh does not update executable
-helpers. Existing research keeps its saved instructions and layout and continues on
-the newly installed version: nothing has to be restored or converted, and your
-agent tells you when the version has changed since the work began.
+New tasks always use the instructions on `main`. If those need a newer installed
+version than yours, the agent says so and asks you to update from `main`; it never
+falls back to older instructions. Refresh does not update executable helpers.
+Existing research keeps its saved instructions and layout and continues on the
+newly installed version: nothing has to be restored or converted, and your agent
+tells you when the version has changed since the work began. Version numbers and
+the [release history](docs/releases.md) label points in `main`'s history; nothing
+waits for a tag.
 
-For unpublished development work, select the checkout's `SKILL.md` and runtime
+To try changes that are not on `main` yet, select the checkout's `SKILL.md` and runtime
 explicitly as described in the [developer guide](docs/development.md).
 
 [Installation paths, dry runs, updates, and troubleshooting →](docs/setup.md)

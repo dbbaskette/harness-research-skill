@@ -97,7 +97,7 @@ export function renderMap(data) {
   const r = data.routes, main = '#005C8A', stage = '#6C4B94', legacy = '#6B7280';
   const rows = [
     box(24, 80, 328, main, 'Skill discovery', tokens(r['Discovery metadata']), 'Name and description, always visible'),
-    box(376, 80, 328, main, 'Installed bootstrap', tokens(r['Installed bootstrap']), 'Pins compatible stable guidance'),
+    box(376, 80, 328, main, 'Installed bootstrap', tokens(r['Installed bootstrap']), 'Saves guidance from main'),
     box(728, 80, 328, main, 'Guidance entry', tokens(r['Bootstrap + current guidance entry']), 'Routes to the needed workflow'),
     box(24, 230, 328, main, 'Synthesis coordinator', tokens(r['New synthesis: coordinator entry and workflow']), 'Entry + synthesis-workflow.md'),
     box(376, 230, 328, main, 'Resume or refresh', tokens(r['Synthesis resume, verify or refresh']), 'Entry + synthesis-reuse.md'),

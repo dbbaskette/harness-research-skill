@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.3.1 — 2026-11-20
+
+- Take everything from `main`. `start` always uses the guidance on `refs/heads/main` of the trusted repository; it no longer lists or selects release tags, and the older-compatible-release fallback, its `newerRelease` and notice, and the `releaseLimit` option are removed. New pins record `channel: "main"` and `ref: "refs/heads/main"`.
+- When `main`'s guidance needs a newer runtime than the one installed, `start` is refused with the existing update message; update the installation from `main`.
+- `resume`, `cached` and `pin --revision` (a commit on `main`) are unchanged. Tasks saved from a release tag (`channel: "release"`) resume as they are.
+- The README and setup guide install and update from `main` instead of a tag; version numbers and release notes label points in `main`'s history.
+- Publish 1.3.1 guidance with a runtime 1.3.1 floor.
+
 ## 1.3.0 — 2026-11-20
 
 - Stop pinning to one installed version. Everything returned as the runtime is the stable `current` address; saved work continues on whatever version is installed.

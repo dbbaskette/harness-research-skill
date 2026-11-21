@@ -23,9 +23,9 @@ and agents; first-time users do not need to drive them.
 
 ## Local asset and collection development
 
-Version `1.1.0` includes local topic assets and bounded evidence collection.
-Installed tasks select compatible stable guidance. For unpublished development,
-select the checkout's `SKILL.md` and runtime explicitly.
+Version `1.1.0` added local topic assets and bounded evidence collection.
+Installed tasks take their guidance from `main`. To try changes that are not on
+`main` yet, select the checkout's `SKILL.md` and runtime explicitly.
 
 Create a topic asset from a directory/URL-list intake:
 
@@ -128,11 +128,18 @@ or automatic passing review.
 
 ## Development and installation
 
-The stable version is `1.1.0`; its guidance requires runtime 1.1.0 or newer for
-asset and collection operations. Older runtimes keep compatible stable guidance.
-For unpublished development, select the checkout's `SKILL.md` and runtime
-explicitly. Guidance refresh never upgrades executable helpers or changes an
-existing task's saved guidance.
+Everything is served from `main`: users install from `main`, and `start` always
+takes the guidance on `refs/heads/main` of the trusted repository. Release tags
+are not listed or selected. When `main`'s guidance declares a `minimumRuntime`
+newer than the installed runtime, `start` is refused with the update message, and
+the fix is to update the installation from `main`. So merge guidance and the
+runtime it needs together, and keep `guidance/manifest.json`'s `minimumRuntime`
+equal to the package version (a test enforces it). `pin --revision` accepts only a
+commit on `main`. New pins record `channel: "main"` and `ref: "refs/heads/main"`;
+pins from earlier versions with `channel: "release"` and a tag `ref` resume
+unchanged. To try changes that are not on `main` yet, select the checkout's
+`SKILL.md` and runtime explicitly. Guidance refresh never upgrades executable
+helpers or changes an existing task's saved guidance.
 
 Nothing is tied to one installed version. A task pin saves the guidance snapshot
 and, for information, the runtime version and guidance floor it started with;
@@ -219,38 +226,38 @@ representative guidance-start response. Stage-only rows count their own referenc
 | Reading path | Tokens |
 | --- | ---: |
 | Discovery metadata | 36 |
-| Installed bootstrap | 602 |
-| Bootstrap + current guidance entry | 1,277 |
+| Installed bootstrap | 600 |
+| Bootstrap + current guidance entry | 1,275 |
 | Investigator stage | 1,143 |
 | Synthesis writer stage | 1,614 |
 | Independent reviewer stage | 1,528 |
-| New synthesis: coordinator entry and workflow | 4,389 |
-| New synthesis: all stages in one context | 8,674 |
-| Synthesis resume, verify or refresh | 2,855 |
-| Optional studio task handoff | 5,561 |
-| Optional local topic asset intake | 5,855 |
-| Parallel coordinator with Codex adapter | 5,955 |
-| Parallel coordinator with Claude Code adapter | 5,939 |
-| Delegated investigator with packet contract | 2,280 |
-| Legacy 0.9 queued coordinator | 5,020 |
-| Legacy 0.9 reuse or refresh | 2,054 |
-| Legacy explicit chat-only answer | 2,231 |
-| Legacy manual saved research | 3,422 |
-| Legacy manual status or resume | 1,865 |
-| Legacy comparative routing only | 1,984 |
-| Legacy Codex comparative outline | 2,944 |
-| Legacy Codex add items | 2,149 |
-| Legacy Codex add fields | 2,169 |
-| Legacy Codex deep results | 2,832 |
-| Legacy Codex deep results + saved evidence | 4,023 |
-| Legacy Claude comparative outline | 2,961 |
-| Legacy Claude deep results | 2,854 |
-| Investigation + general web strategy | 6,029 |
-| Investigation + academic strategy | 6,121 |
-| Investigation + GitHub strategy | 5,916 |
-| Investigation + technical Q&A strategy | 5,821 |
-| Investigation + Chinese sources strategy | 6,046 |
-| Legacy migration | 1,626 |
+| New synthesis: coordinator entry and workflow | 4,387 |
+| New synthesis: all stages in one context | 8,672 |
+| Synthesis resume, verify or refresh | 2,853 |
+| Optional studio task handoff | 5,559 |
+| Optional local topic asset intake | 5,853 |
+| Parallel coordinator with Codex adapter | 5,953 |
+| Parallel coordinator with Claude Code adapter | 5,937 |
+| Delegated investigator with packet contract | 2,278 |
+| Legacy 0.9 queued coordinator | 5,018 |
+| Legacy 0.9 reuse or refresh | 2,052 |
+| Legacy explicit chat-only answer | 2,229 |
+| Legacy manual saved research | 3,420 |
+| Legacy manual status or resume | 1,863 |
+| Legacy comparative routing only | 1,982 |
+| Legacy Codex comparative outline | 2,942 |
+| Legacy Codex add items | 2,147 |
+| Legacy Codex add fields | 2,167 |
+| Legacy Codex deep results | 2,830 |
+| Legacy Codex deep results + saved evidence | 4,021 |
+| Legacy Claude comparative outline | 2,959 |
+| Legacy Claude deep results | 2,852 |
+| Investigation + general web strategy | 6,027 |
+| Investigation + academic strategy | 6,119 |
+| Investigation + GitHub strategy | 5,914 |
+| Investigation + technical Q&A strategy | 5,819 |
+| Investigation + Chinese sources strategy | 6,044 |
+| Legacy migration | 1,624 |
 
 The new default starts with the entry and synthesis workflow. Investigation, writing
 and independent review each load their own reference when needed. The all-stages

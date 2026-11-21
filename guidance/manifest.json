@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "skill": "harness-research",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "entry": "SKILL.md",
-  "minimumRuntime": "1.3.0"
+  "minimumRuntime": "1.3.1"
 }
