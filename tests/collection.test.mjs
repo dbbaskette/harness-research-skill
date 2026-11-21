@@ -184,3 +184,19 @@ test('generation invalidation cannot discard running or unconfirmed-cancelled oc
   await f.call('finish',{workstream:'first',investigator:'investigator-first',attempt:1,outcome:'cancelled',note:'Host confirmed old invocation terminated.'});
   const changed=await f.call('invalidate',f.request);assert.equal(changed.generation,2);await f.call('register',{workstream:'first',investigator:'new-context',invocation:'host/actual-new'});assert.equal((await f.call('status')).workstreams[0].investigator,'new-context');
 });
+
+test('batch capture registers all receipts together and retries preserve single-source semantics',async t=>{
+  const f=await fixture(t), registration=await f.register('first');
+  assert.equal(registration.batch_capture,true);
+  const one=f.source('first'), two={...f.source('second'),id:'source-b'};
+  const terminal={workstream:'first',investigator:'investigator-first'};
+  await writeFile(join(f.root,one.file),'First full source.');
+  await assert.rejects(f.call('capture',{...terminal,sources:[one,two]}));
+  // The failed batch must not reserve the first ID.
+  await writeFile(join(f.root,one.file),'Revised full source.');
+  await writeFile(join(f.root,two.file),'Second full source.');
+  const batch=await f.call('capture',{...terminal,sources:[one,two]});
+  assert.deepEqual(batch.receipts.map(r=>r.id),[one.id,two.id]);
+  const single=await f.call('capture',{...terminal,source:one});
+  assert.deepEqual(single.receipt,batch.receipts[0]);
+});

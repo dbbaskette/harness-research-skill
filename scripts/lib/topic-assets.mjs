@@ -295,14 +295,24 @@ export async function updateAssetRevision(project,synthesisState,result) {
   if (!state) return;
   if (!synthesisState?.digest || !result?.status) throw new Error('A saved synthesis digest and actual result status are required.');
   const oldInventory = stable(state.inventory);
-  if (synthesisState.dossier) for (const entry of state.inventory) {
-    const ids = synthesisState.dossier.sources.filter(source => {
-      const pin = synthesisState.sources.find(value => value.id === source.id);
-      return source.origin === entry.origin && source.permission === entry.permission && pin?.sha256 === entry.capture_sha256;
-    }).map(source => source.id);
-    entry.evidence_ids = ids;
-    if (ids.length) entry.used_in_digest = synthesisState.digest;
-    else delete entry.used_in_digest;
+  if (synthesisState.dossier) {
+    const pins = new Map();
+    for (const pin of synthesisState.sources) {
+      if (!pins.has(pin.id)) pins.set(pin.id, pin);
+    }
+    const evidence = new Map();
+    const key = (origin, permission, sha256) => JSON.stringify({origin, permission, sha256});
+    for (const source of synthesisState.dossier.sources) {
+      const match = key(source.origin, source.permission, pins.get(source.id)?.sha256);
+      if (!evidence.has(match)) evidence.set(match, []);
+      evidence.get(match).push(source.id);
+    }
+    for (const entry of state.inventory) {
+      const ids = evidence.get(key(entry.origin, entry.permission, entry.capture_sha256)) ?? [];
+      entry.evidence_ids = [...ids];
+      if (ids.length) entry.used_in_digest = synthesisState.digest;
+      else delete entry.used_in_digest;
+    }
   }
   const revision={digest:synthesisState.digest,status:result.status,inputFingerprint:state.inputFingerprint,author:synthesisState.author,reviewer:synthesisState.review?.worker||null,updated_at:now()};
   const old=state.revisions.findIndex(r=>r.digest===revision.digest);
