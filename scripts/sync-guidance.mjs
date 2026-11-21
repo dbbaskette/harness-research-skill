@@ -94,13 +94,6 @@ async function blob(repository, id, size) {
   new TextDecoder('utf-8', { fatal: true }).decode(bytes);
   return bytes;
 }
-// Releases, newest first: tags named vMAJOR.MINOR.PATCH on the trusted source.
-async function releaseTags(repository, source) {
-  const listing = (await git(repository, 'ls-remote', '--tags', '--refs', source, 'refs/tags/v*')).toString('utf8');
-  return listing.split('\n').map(line => line.trim().split(/\s+/)[1]).filter(ref => /^refs\/tags\/v\d+\.\d+\.\d+$/.test(ref ?? ''))
-    .map(ref => ({ ref, parts: parseVersion(ref.slice('refs/tags/v'.length)).core }))
-    .sort((a, b) => b.parts[0] - a.parts[0] || b.parts[1] - a.parts[1] || b.parts[2] - a.parts[2]);
-}
 // Read a commit's guidance inventory and manifest, refusing one the installed runtime cannot run.
 async function inspectCommit(repository, commit, config, guidance) {
   if (!revisionPattern.test(commit)) throw new Error('Invalid guidance revision.');
@@ -135,8 +128,7 @@ async function savedCompatibility(pin, config, repository) {
     compatible(pin.runtimeVersion, config.version, saved);
   }
 }
-export async function start({ project, runtime = root, source, revision, releaseLimit = 100 } = {}) {
-  if (!Number.isSafeInteger(releaseLimit) || releaseLimit < 1 || releaseLimit > 1000) throw new Error('releaseLimit must be between 1 and 1000.');
+export async function start({ project, runtime = root, source, revision } = {}) {
   const config = await settings(runtime), cache = await cacheFor(project, config, true);
   const lockPath = join(cache, '.sync-lock');
   const lock = await acquireLock(lockPath, { wait: 0, busy: 'Another guidance refresh is running' });
@@ -150,27 +142,18 @@ export async function start({ project, runtime = root, source, revision, release
     const trustedSource = source ?? config.repository;
     const shallow = (await git(repository, 'rev-parse', '--is-shallow-repository')).toString().trim() === 'true';
     const head = async () => (await git(repository, 'rev-parse', '--verify', 'FETCH_HEAD^{commit}')).toString().trim();
-    let commit, inspected, channel = 'main', ref = 'refs/heads/main';
-    const skipped = [];
+    // Everything comes from main. Release numbers label points in its history; nothing selects or
+    // waits for a tag. Guidance on main that needs a newer runtime is refused with the update message,
+    // and the remedy is to update the installation from main.
+    const channel = 'main', ref = 'refs/heads/main';
+    let commit;
     if (revision) {
       await git(repository, 'fetch', '--quiet', '--no-tags', ...(shallow ? ['--unshallow'] : []), trustedSource, ref);
       await git(repository, 'merge-base', '--is-ancestor', revision, await head()); commit = revision;
     } else {
-      // New work uses the newest release the installed runtime supports, so unreleased guidance on
-      // main never reaches installed users. A repository with no release tags is served from main.
-      const releases = await releaseTags(repository, trustedSource);
-      for (const release of releases.slice(0, releaseLimit)) {
-        await git(repository, 'fetch', '--quiet', '--no-tags', '--depth=1', trustedSource, release.ref);
-        const candidate = await head();
-        try { inspected = await inspectCommit(repository, candidate, config); commit = candidate; channel = 'release'; ref = release.ref; break; }
-        catch (error) { if (!/newer installed runtime/.test(error.message)) throw error; skipped.push({ ref: release.ref, minimumRuntime: error.minimumRuntime }); }
-      }
-      if (!commit && releases.length > releaseLimit) throw new Error(`Guidance compatibility search limit reached after ${releaseLimit} releases; older compatible guidance may exist. Resume a saved task, pin an approved revision, or update with the trusted installer.`);
-      if (!commit && releases.length) throw new Error('No guidance release supports this installed runtime; it needs a newer installed runtime. Update with this skill’s trusted installer.');
-      if (!commit) { await git(repository, 'fetch', '--quiet', '--no-tags', '--depth=1', trustedSource, ref); commit = await head(); }
+      await git(repository, 'fetch', '--quiet', '--no-tags', '--depth=1', trustedSource, ref); commit = await head();
     }
-    inspected ??= await inspectCommit(repository, commit, config);
-    const { listing, guidanceVersion, minimumRuntime } = inspected;
+    const { listing, guidanceVersion, minimumRuntime } = await inspectCommit(repository, commit, config);
     const selected = listing.filter(item => allowed(item.name));
     if (!selected.some(item => item.name === 'SKILL.md') || selected.length > 500 || selected.reduce((n, item) => n + item.size, 0) > 8 * 1024 * 1024) throw new Error('Guidance inventory is missing or too large.');
     const task = randomUUID().replaceAll('-', '');
@@ -188,11 +171,7 @@ export async function start({ project, runtime = root, source, revision, release
     const pin = { schema: 1, skill: config.skill, repository: config.repository, revision: commit, channel, ref, guidanceVersion, minimumRuntime, task, createdAt: new Date().toISOString(), runtimeVersion: config.version, files: hashes };
     await writeFile(join(stage, 'pin.json'), JSON.stringify(pin, null, 2) + '\n', { flag: 'wx', mode: 0o400 });
     const snapshot = join(cache, 'tasks', task); await rename(stage, snapshot); stage = null;
-    // Falling back to an older release because a newer one needs a newer runtime is disclosed, so the
-    // agent can tell the person and offer the update; it is never reported as the current guidance.
-    const tag = name => name.slice('refs/tags/'.length), newer = skipped[0];
-    const disclosure = newer ? { freshness: 'older-compatible-release', newerRelease: newer, notice: `Guidance ${tag(newer.ref)} needs runtime ${newer.minimumRuntime}; this task uses ${tag(ref)}, the newest release runtime ${config.version} supports. Update with this skill’s trusted installer to use the newer guidance.` } : { freshness: 'current-at-start' };
-    return { ...disclosure, channel, ref, runtimeVersion: config.version, guidanceVersion, revision: commit, task, guidance: join(snapshot, 'SKILL.md'), runtime: config.runtime };
+    return { freshness: 'current-at-start', channel, ref, runtimeVersion: config.version, guidanceVersion, revision: commit, task, guidance: join(snapshot, 'SKILL.md'), runtime: config.runtime };
   } finally { try { if (stage) await rm(stage, { recursive: true, force: true }); } finally { await releaseLock(lockPath, lock); } }
 }
 export async function resume({ project, task, runtime = root, cached = false } = {}) {

@@ -1,5 +1,32 @@
 # Versioned releases
 
+Everything comes from `main`. A version number and its entry here label a point
+in `main`'s history; installing, updating and new guidance all read `main`, and
+nothing selects or waits for a tag.
+
+## 1.3.1
+
+Takes everything from `main`. The owner's decision: "we could just have everything
+go to main. that would fix our versioning issues."
+
+- **New work reads `main`.** `start` always takes the guidance on
+  `refs/heads/main` of the trusted repository. It no longer lists release tags,
+  picks the newest compatible one or falls back to an older compatible release; the
+  `older-compatible-release` freshness, its `newerRelease` and notice, and the
+  library-only `releaseLimit` option are gone. New pins record `channel` `main` and
+  `ref` `refs/heads/main`.
+- **Update rather than fall back.** When `main`'s guidance needs a newer runtime
+  than the one installed, `start` is refused with the existing update message; the
+  fix is to update the installation from `main`.
+- **Saved work is unchanged.** `resume` and `cached` behave as in 1.3.0, and tasks
+  saved from a release tag (`channel` `release`) resume as they are.
+  `pin --revision` still accepts only a commit on `main`.
+- **Install from `main`.** The README and setup guide clone `main` instead of a tag.
+
+The guidance floor is runtime 1.3.1, following the rule that it equals the
+package version, so a 1.3.0 installation is asked to update from `main` before it
+starts new work from this guidance.
+
 ## 1.3.0
 
 Stops pinning to one installed version. The owner's decision: "we need to change
@@ -156,19 +183,21 @@ cross-harness acceptance.
    mechanical tests.
 3. When authorized, merge the reviewed change and verify the merged source matches
    the tested source. Keep required remote gates; local success does not bypass them.
-4. Archive the exact release commit, publish an unused immutable version tag and
-   checksum, then download the assets and verify their contents and installation.
-   Do not overwrite an existing release tag.
+4. The merged change carries the version bump in `package.json`,
+   `package-lock.json` and `guidance/manifest.json` (its `minimumRuntime` equals the package version)
+   and its CHANGELOG and release-history entries. A version tag, if one is made, is
+   only a label; nothing installs from it or waits for it.
 
-Automatic guidance refresh enumerates stable `vMAJOR.MINOR.PATCH` tags and selects
-the newest one compatible with the installed runtime. A development prerelease
-requires explicit checkout guidance or an approved pinned commit. Guidance cannot
-upgrade executable helpers. After a stable 1.0 release, users must install its
-runtime before its synthesis guidance becomes eligible.
+Installing, updating and automatic guidance refresh all read `main`: `start`
+takes the guidance on `refs/heads/main`, and refuses it with the update message
+when it needs a newer runtime than the one installed. Merge guidance together with
+the runtime it needs. Guidance cannot upgrade executable helpers; users update by
+installing from `main`. An approved earlier commit on `main` can still be pinned
+explicitly with `pin --revision`.
 
 Keep each release's guidance and old commands usable: existing tasks resume their
 saved guidance on whatever runtime is installed, so a release must not remove a
 command or state format that saved work depends on. Only one runtime is installed
-at a time. Rollback means installing the earlier release; a task whose saved
+at a time. Rollback means installing an earlier commit of `main`; a task whose saved
 guidance needs a newer runtime is then refused until the runtime is updated again.
 Neither direction converts existing research formats.

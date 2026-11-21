@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1080" height="700" viewBox="0 0 1080 700" role="img" aria-labelledby="title description">
   <title id="title">Harness Research: progressive context loading</title>
-  <desc id="description">Discovery metadata: 36 tokens. Installed bootstrap: 602 tokens. Bootstrap + current guidance entry: ~1.3k. Investigator stage: ~1.1k. Synthesis writer stage: ~1.6k. Independent reviewer stage: ~1.5k. New synthesis: coordinator entry and workflow: ~4.4k. New synthesis: all stages in one context: ~8.7k. Synthesis resume, verify or refresh: ~2.9k. Optional studio task handoff: ~5.6k. Optional local topic asset intake: ~5.9k. Parallel coordinator with Codex adapter: ~6.0k. Parallel coordinator with Claude Code adapter: ~5.9k. Delegated investigator with packet contract: ~2.3k. Each stage loads when needed. Branches are not added together; all-stages total is shown explicitly.</desc>
-  <!-- Input digest: 463d9584efbdda8f5e75936c0c9726cd1043f1835b2d6ed09440a1bc91cab81c -->
+  <desc id="description">Discovery metadata: 36 tokens. Installed bootstrap: 600 tokens. Bootstrap + current guidance entry: ~1.3k. Investigator stage: ~1.1k. Synthesis writer stage: ~1.6k. Independent reviewer stage: ~1.5k. New synthesis: coordinator entry and workflow: ~4.4k. New synthesis: all stages in one context: ~8.7k. Synthesis resume, verify or refresh: ~2.9k. Optional studio task handoff: ~5.6k. Optional local topic asset intake: ~5.9k. Parallel coordinator with Codex adapter: ~6.0k. Parallel coordinator with Claude Code adapter: ~5.9k. Delegated investigator with packet contract: ~2.3k. Each stage loads when needed. Branches are not added together; all-stages total is shown explicitly.</desc>
+  <!-- Input digest: d05c3dfc231e0b3f865f543e697b117d856506d6a0181896688fe83fd012fd9f -->
   <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#005C8A"/></marker></defs>
   <rect width="1080" height="700" rx="16" fill="#F5F7F9"/>
   <g font-family="Arial, Helvetica, sans-serif" fill="#1B1D36">
@@ -22,8 +22,8 @@
   <g transform="translate(376 80)">
     <rect width="328" height="96" rx="12" fill="white" stroke="#005C8A" stroke-width="2"/>
     <text x="16" y="26" font-size="17" font-weight="700" fill="#005C8A">Installed bootstrap</text>
-    <text x="16" y="56" font-size="26" font-weight="700">602 tokens</text>
-    <text x="16" y="80" font-size="13">Pins compatible stable guidance</text>
+    <text x="16" y="56" font-size="26" font-weight="700">600 tokens</text>
+    <text x="16" y="80" font-size="13">Saves guidance from main</text>
   </g>
   <g transform="translate(728 80)">
     <rect width="328" height="96" rx="12" fill="white" stroke="#005C8A" stroke-width="2"/>

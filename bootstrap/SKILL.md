@@ -33,10 +33,10 @@ Existing work keeps its saved instructions and continues on the runtime installe
 now, even after an update; nothing needs restoring. Explicitly adopting new
 guidance starts a new task and requires rechecking affected review conclusions.
 
-New tasks use the newest stable release this runtime supports (main only when the
-repository has no release tags). When a newer release needs a newer runtime,
-`freshness` is `older-compatible-release`: tell the user its `notice`. A failed
-fetch or incompatible runtime is reported, not described as current. An existing task
+New tasks always use the guidance on the repository's `main` branch. When it needs
+a newer runtime, start is refused: tell the user to update the installation from
+`main` with the trusted installer. A failed fetch or incompatible runtime is
+reported, not described as current. An existing task
 resumes without fetching and is refused only when its saved guidance needs a newer
 runtime than the one installed. For an
 agent sandbox DNS/network failure, retry the same command through the host's
@@ -49,5 +49,5 @@ refresh never installs or executes repository scripts.
 Honor the user’s scope, sources, editing freedom, and completion boundary.
 Research output requirements live in the selected guidance. Topic-asset and parallel
 collection guidance requires runtime 1.1.0 or newer; refresh cannot upgrade helpers.
-Install the current stable runtime to use these features. Existing tasks keep their
+Install the runtime from `main` to use these features. Existing tasks keep their
 saved guidance and use the installed runtime.
