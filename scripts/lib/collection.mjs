@@ -160,15 +160,18 @@ function timing(state, now = Date.now()) {
   if (from !== null) active += until-from;
   return { elapsed_seconds: Math.max(0,(now-Date.parse(state.created_at))/1000), active_wall_seconds: unresolved ? null : active/1000, assistant_seconds: unresolved ? null : assistant/1000, observed_active_wall_seconds: active/1000, observed_assistant_seconds: assistant/1000, unresolved_invocations: unresolved, waiting_or_stopped_seconds: null, dollars: null, note: unresolved ? 'Cancellation requested but terminal context not confirmed. Observed intervals are lower bounds; active/assistant totals are unknown until the host records finish. No process cancellation was performed by the helper.' : 'Intervals run from host registration to returned evidence or host-confirmed terminal context. Costs and process cancellation remain host-owned; unrecorded gaps are not classified as pauses.' };
 }
-async function status(root, state) {
+async function status(root, state, inputsVerified = false) {
   const problems=[];
-  try { await currentInputs(root,state); if(state.registry) await verifiedRegistry(root,state); } catch(error) { problems.push(error.message); }
+  try {
+    if (!inputsVerified) await currentInputs(root,state);
+    if (state.registry) await checkRegistry(root,state);
+  } catch(error) { problems.push(error.message); }
   let phase = state.status === 'stopped' ? 'stopped' : state.registry ? 'combining-findings' : 'investigating';
   if (state.final_digest) {
     try { const saved = parseJson(await readText(root, '.harness-research/synthesis.json')); if (saved.digest === state.final_digest) phase = saved.review?.accepted ? 'ready-for-review' : saved.review ? 'needs-revision' : 'independent-check'; } catch { /* No final dossier yet. */ }
   }
   if(problems.length) phase='needs-attention';
-  return { schema: VERSION, protocol: state.protocol, request_digest: state.request_digest, generation: state.generation, status: problems.length?'stale':state.status, artifact_integrity:problems.length?'failed':'verified', problems, phase, execution_mode: state.request.execution_mode, max_investigators: state.request.max_investigators, workstreams: state.workstreams.map(s => ({id:s.id, status:s.attempts.at(-1)?.status ?? 'pending', attempt:s.attempts.at(-1)?.number ?? 1, investigator:s.attempts.at(-1)?.investigator ?? null})), ...(state.registry ? {registry_digest:state.registry.digest,registry_file:state.registry.file} : {}), ...(state.final_digest ? {final_digest:state.final_digest} : {}), timing:timing(state), caveat: 'Invocation registration and capture permissions are supplied by the host; these local records cannot prove identity, source truth or actual process cancellation.' };
+  return { schema: VERSION, protocol: state.protocol, request_digest: state.request_digest, generation: state.generation, status: problems.length?'stale':state.status, batch_capture:true, artifact_integrity:problems.length?'failed':'verified', problems, phase, execution_mode: state.request.execution_mode, max_investigators: state.request.max_investigators, workstreams: state.workstreams.map(s => ({id:s.id, status:s.attempts.at(-1)?.status ?? 'pending', attempt:s.attempts.at(-1)?.number ?? 1, investigator:s.attempts.at(-1)?.investigator ?? null})), ...(state.registry ? {registry_digest:state.registry.digest,registry_file:state.registry.file} : {}), ...(state.final_digest ? {final_digest:state.final_digest} : {}), timing:timing(state), caveat: 'Invocation registration and capture permissions are supplied by the host; these local records cannot prove identity, source truth or actual process cancellation.' };
 }
 async function newState(root, request, previous = null) {
   const context = await asset(root), normalized = validateRequest(request, context);
@@ -178,7 +181,6 @@ async function newState(root, request, previous = null) {
   return state;
 }
 async function assemble(root, state) {
-  await currentInputs(root,state);
   if (state.status === 'stopped') throw new Error('Stopped collection cannot assemble evidence.');
   const sources=[],facts=[],mappings=[],packets=[],limitations=[],gaps=[],ids=new Set();
   const newId = (kind, stream, local) => {const id=`${kind}-${digest([stream,local]).slice(0,48)}`; if(ids.has(id)) throw new Error('Namespaced evidence ID collision.');ids.add(id);return id;};
@@ -210,6 +212,9 @@ async function assemble(root, state) {
 }
 async function verifiedRegistry(root,state) {
   await currentInputs(root,state);
+  return checkRegistry(root,state);
+}
+async function checkRegistry(root,state) {
   if (!state.registry || state.status === 'stopped') throw new Error('Collection needs a current assembled registry before synthesis.');
   const registered=state.registry,registry=await checkedJson(root,registered.file,registered.sha256);
   if(digest(registry)!==registered.digest || registry.request_digest!==state.request_digest || registry.generation!==state.generation) throw new Error('Collection registry is stale or changed.');
@@ -267,18 +272,18 @@ export async function runCollectionCli(argv) {
     if(options.action==='init') {
       if(state)throw new Error('Collection already initialized; preserve it or use invalidate for an explicit new generation.');
       if(await exists(join(root,'.harness-research/synthesis.json')))throw new Error('Existing serial synthesis must retain its protocol; start collection in a fresh topic asset.');
-      state=await newState(root,input);await saveState(root,state);return status(root,state);
+      state=await newState(root,input);await saveState(root,state);return await status(root,state,true);
     }
     if(!state)throw new Error('No collection initialized.');
     if(options.action==='invalidate'){
       if(state.workstreams.flatMap(stream=>stream.attempts).some(attempt=>attempt.started_at&&!attempt.ended_at))throw new Error('Host must confirm every registered context terminal with finish before invalidating the generation; cancellation requests alone do not release capacity.');
-      state=await newState(root,input,state);await saveState(root,state);return status(root,state);
+      state=await newState(root,input,state);await saveState(root,state);return await status(root,state,true);
     }
-    if(options.action==='status')return status(root,state);
+    if(options.action==='status')return await status(root,state);
     if(options.action==='stop') {
       state.status='stopped';state.registry=null;state.final_digest=null;
       for(const stream of state.workstreams){const attempt=stream.attempts.at(-1);if(attempt?.status==='running'){attempt.status='cancelled';attempt.cancellation_requested_at=new Date().toISOString();}}
-      await saveState(root,state);return status(root,state);
+      await saveState(root,state);return await status(root,state);
     }
     if(options.action==='finish') {
       keys(input,['workstream','investigator','attempt','outcome','note'],'host finish');
@@ -287,20 +292,20 @@ export async function runCollectionCli(argv) {
       text(input.note,'Host terminal observation',20000);
       const stream=workstream(state,input.workstream),attempt=stream.attempts.find(a=>a.number===input.attempt&&a.investigator===input.investigator);
       if(!attempt)throw new Error('Host finish does not match a registered invocation.');
-      if(attempt.ended_at){if(attempt.outcome&&attempt.outcome!==input.outcome)throw new Error('Host finish conflicts with the recorded terminal observation.');return status(root,state);}
+      if(attempt.ended_at){if(attempt.outcome&&attempt.outcome!==input.outcome)throw new Error('Host finish conflicts with the recorded terminal observation.');return await status(root,state);}
       attempt.ended_at=new Date().toISOString();attempt.outcome=input.outcome;attempt.terminal_note=input.note;
       if(attempt.status==='running')attempt.status=input.outcome==='completed'?'finished':input.outcome;
-      await saveState(root,state);return status(root,state);
+      await saveState(root,state);return await status(root,state);
     }
     await currentInputs(root,state);
-    if(options.action==='pause'){if(state.status==='stopped')throw new Error('Stopped collection requires explicit invalidate.');state.status='paused';await saveState(root,state);return status(root,state);}
-    if(options.action==='resume'){if(state.status!=='paused')throw new Error('Only a paused collection can resume.');state.status='active';await saveState(root,state);return status(root,state);}
+    if(options.action==='pause'){if(state.status==='stopped')throw new Error('Stopped collection requires explicit invalidate.');state.status='paused';await saveState(root,state);return await status(root,state,true);}
+    if(options.action==='resume'){if(state.status!=='paused')throw new Error('Only a paused collection can resume.');state.status='active';await saveState(root,state);return await status(root,state,true);}
     if(options.action==='register') {
       keys(input,['workstream','investigator','invocation','attempt'],'registration');
       if(state.status!=='active')throw new Error('Collection is not dispatching new investigations.');
       identifier(input.investigator,'Investigator');text(input.invocation,'Actual host invocation',4000);
       const stream=workstream(state,input.workstream),previous=stream.attempts.at(-1),number=previous?.status==='reserved'?previous.number:(previous?.number??0)+1;
-      if(previous?.status==='running'&&previous.investigator===input.investigator&&previous.invocation===input.invocation&&(input.attempt===undefined||input.attempt===previous.number))return {...await status(root,state),registration:{workstream:stream.id,...previous}};
+      if(previous?.status==='running'&&previous.investigator===input.investigator&&previous.invocation===input.invocation&&(input.attempt===undefined||input.attempt===previous.number))return {...await status(root,state,true),registration:{workstream:stream.id,...previous}};
       if(previous&&previous.status!=='reserved')throw new Error('Use retry before registering another attempt.');
       if(input.attempt!==undefined&&input.attempt!==number)throw new Error('Registration attempt is stale.');
       if(state.identities.some(v=>v.investigator===input.investigator||v.invocation===input.invocation))throw new Error('Investigator and invocation must identify a distinct registered context.');
@@ -308,15 +313,27 @@ export async function runCollectionCli(argv) {
       const attempt={number,investigator:input.investigator,invocation:input.invocation,status:'running',started_at:new Date().toISOString(),receipts:[]};
       if(previous?.status==='reserved')stream.attempts[stream.attempts.length-1]=attempt;else stream.attempts.push(attempt);
       state.identities.push({investigator:input.investigator,invocation:input.invocation});state.registry=null;state.final_digest=null;
-      await saveState(root,state);return {...await status(root,state),registration:{workstream:stream.id,...attempt}};
+      await saveState(root,state);return {...await status(root,state,true),registration:{workstream:stream.id,...attempt}};
     }
     if(options.action==='capture') {
-      keys(input,['workstream','investigator','attempt','source'],'capture receipt');
-      const {attempt}=activeAttempt(state,input);sourceShape(input.source);
-      const checked=await validateEvidence(root,state.request,[input.source],[],attempt.investigator);
-      const receipt=await pinReceipt(root,checked,input.source),prior=attempt.receipts.find(r=>r.id===receipt.id);
-      if(prior&&!same(prior,receipt))throw new Error('Capture ID already registered with different metadata or bytes; retry investigation.');
-      if(!prior)attempt.receipts.push(receipt);await saveState(root,state);return {schema:VERSION,request_digest:state.request_digest,generation:state.generation,receipt};
+      keys(input,['workstream','investigator','attempt','source','sources'],'capture receipt');
+      const batch = Object.hasOwn(input,'sources');
+      if (batch === Object.hasOwn(input,'source')) throw new Error('Choose either one source or a batch of sources.');
+      const sources = batch ? list(input.sources,'Capture sources') : [input.source];
+      if (!sources.length) throw new Error('A capture needs at least one source.');
+      const {attempt} = activeAttempt(state,input);
+      const checked = await validateEvidence(root,state.request,sources,[],attempt.investigator);
+      const receipts = [];
+      for (const source of sources) {
+        const receipt = await pinReceipt(root,checked,source);
+        const prior = attempt.receipts.find(r=>r.id===receipt.id);
+        if (prior && !same(prior,receipt)) throw new Error('Capture ID already registered with different metadata or bytes; retry investigation.');
+        if (!prior) attempt.receipts.push(receipt);
+        receipts.push(receipt);
+      }
+      await saveState(root,state);
+      return {schema:VERSION,request_digest:state.request_digest,generation:state.generation,
+        ...(batch ? {receipts} : {receipt:receipts[0]})};
     }
     if(options.action==='accept') {
       packetShape(input,state);const {stream,attempt}=activeAttempt(state,input,{accepting:true});
@@ -324,20 +341,20 @@ export async function runCollectionCli(argv) {
       if(attempt.status==='accepted'){
         if(attempt.packet.sha256!==packetHash)throw new Error('Attempt already accepted different evidence; use retry.');
         await checkedJson(root,attempt.packet.file,attempt.packet.sha256);for(const receipt of attempt.receipts)await checkReceipt(root,receipt);
-        return {...await status(root,state),accepted:true,idempotent:true};
+        return {...await status(root,state,true),accepted:true,idempotent:true};
       }
       await validateEvidence(root,state.request,input.sources,input.facts,attempt.investigator);
       for(const source of input.sources){const receipt=attempt.receipts.find(r=>r.id===source.id);if(!receipt||!same(receipt.source,source))throw new Error('Packet source has no matching host capture receipt.');await checkReceipt(root,receipt);}
       const file=await immutable(root,`packet-${state.generation}-${stream.id}-${attempt.number}-${packetHash}.json`,packetBytes);
       attempt.packet={file,sha256:packetHash};attempt.status='accepted';attempt.ended_at??=new Date().toISOString();attempt.outcome??='completed';state.registry=null;state.final_digest=null;
-      await saveState(root,state);return {...await status(root,state),accepted:true,idempotent:false};
+      await saveState(root,state);return {...await status(root,state,true),accepted:true,idempotent:false};
     }
     if(options.action==='retry') {
       keys(input,['workstream','reason'],'retry');text(input.reason,'Retry reason',20000);if(state.status!=='active')throw new Error('Collection is not dispatching retries.');
       const stream=workstream(state,input.workstream),previous=stream.attempts.at(-1);
       if(previous?.status==='running'){previous.status='cancelled';previous.cancellation_requested_at=new Date().toISOString();}
       if(previous?.status==='reserved')throw new Error('A retry is already reserved.');
-      stream.attempts.push({number:(previous?.number??0)+1,status:'reserved',reason:input.reason});state.registry=null;state.final_digest=null;await saveState(root,state);return status(root,state);
+      stream.attempts.push({number:(previous?.number??0)+1,status:'reserved',reason:input.reason});state.registry=null;state.final_digest=null;await saveState(root,state);return await status(root,state,true);
     }
     if(options.action==='assemble'){const registry=await assemble(root,state);await saveState(root,state);return registry;}
     throw new Error(`Unknown collection action. ${HELP}`);

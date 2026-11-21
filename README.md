@@ -16,7 +16,7 @@ evidence, writing, checking, and keeping the result.
 **[Start here](#your-first-report)** · **[Bring your sources](#bring-your-own-sources)** ·
 **[Explore the options](#make-the-research-fit-your-task)** · **[User guide](docs/using-harness-research.md)**
 
-> **Harness Research 1.3.1.** Everything comes from `main`: install from `main`,
+> **Harness Research 1.5.0.** Everything comes from `main`: install from `main`,
 > and new research uses the instructions on `main`. Saved research continues on
 > whatever version is installed, and every tool runs from one stable address.
 > [Release history](docs/releases.md) ·
