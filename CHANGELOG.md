@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.3.0 — 2026-11-20
+
+- Stop pinning to one installed version. Everything returned as the runtime is the stable `current` address; saved work continues on whatever version is installed.
+- `resume` and `cached` no longer fail when the installed runtime has moved, changed or lost its old folder. They return the installed runtime, a `notice` when its version differs from the one the work started on, and `startedRuntimeVersion`. Their `freshness` is `saved-guidance` (was `pinned`). Tasks saved by earlier releases resume without a migration.
+- New task pins save the guidance snapshot, its runtime floor and the starting runtime version only. Saved or fetched guidance that needs a newer runtime is still refused with the update message.
+- Unchanged-save receipts no longer include a hash of the installed runtime, and one in an older receipt is ignored, so an update does not make reviewed work stale.
+- The installer removes every other entry in `versions/` after a successful update, repoints its own alias-skill and agent links at `current`, reports links and folders it left alone, and returns `runtime` (stable address), `id`, `versionDirectory`, `removed` and `retained`. It also runs when started through a link.
+- Publish 1.3.0 guidance with a runtime 1.3.0 floor.
+
 ## 1.2.0 — 2026-11-12
 
 - Raise intake limits: 2,000 entries per intake or source update (was 200), a 5,000-entry source inventory (was 1,000) and 512 MiB of supplied input in total (was 128 MiB). The 64 MiB limit on one input is unchanged.

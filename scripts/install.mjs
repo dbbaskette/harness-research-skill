@@ -57,7 +57,10 @@ async function safeParent(path) {
   const stat = await lstat(path);
   if ((stat.mode & 0o022) !== 0 || typeof process.getuid === 'function' && stat.uid !== process.getuid()) throw new Error(`Unsafe installer directory: ${path}`);
 }
-async function legacyLinks(home, claude, current) {
+// Alias skills and agent files this tool owns always follow <shared>/current, so they never stay on one
+// installed version. A link is this tool's own when it points at the old Brand location or into this
+// tool's versions folder. Anything else at that name is someone's own and is reported, never changed.
+async function legacyLinks(home, claude, shared, current) {
   const entries = [];
   for (const [runtime, config, skills] of [['codex', join(home, '.codex'), join(home, '.agents', 'skills')], ['codex', join(home, '.codex'), join(home, '.codex', 'skills')], ['claude', claude, join(claude, 'skills')]]) {
     for (const name of aliases) entries.push({ path: join(skills, name), old: join(skills, 'tanzu-brand', 'scripts', 'research', runtime, 'skills', name), source: join(current, 'upstream', runtime, 'skills', name) });
@@ -65,12 +68,27 @@ async function legacyLinks(home, claude, current) {
     if (runtime === 'codex' && skills === join(home, '.codex', 'skills')) continue;
     for (const name of [runtime === 'codex' ? 'web-researcher.toml' : 'web-search-agent.md', 'web-search-modules']) entries.push({ path: join(config, 'agents', name), old: join(skills, 'tanzu-brand', 'scripts', 'research', runtime, 'agents', name), source: join(current, 'upstream', runtime, 'agents', name) });
   }
+  const versions = join(shared, 'versions') + '/';
   for (const entry of entries) {
-    const existing = await state(entry.path);
-    entry.status = existing?.link && await systemPath(resolve(dirname(entry.path), existing.link)) === entry.old ? 'would-migrate' : 'preserved';
+    const existing = await state(entry.path), target = existing?.link ? await systemPath(resolve(dirname(entry.path), existing.link)) : null;
+    entry.status = !existing ? 'absent' : target === entry.source ? 'current' : target === entry.old || target?.startsWith(versions) ? 'would-migrate' : 'preserved';
+    if (entry.status === 'preserved') entry.reason = target ? `A link to ${target}, outside this tool; left as it is.` : 'Not a link; left as it is.';
     entry.previous = existing;
   }
   return entries;
+}
+// After the pointer names the new version, every other entry directly inside this tool's versions
+// folder is removed, so no saved work, alias or caller can stay on an older copy. A link is unlinked
+// and never followed. An entry that cannot be removed is reported; it does not fail the installation.
+async function prune(versions, keep) {
+  const removed = [], retained = [];
+  for (const name of (await readdir(versions)).sort()) {
+    if (name === keep) continue;
+    const path = join(versions, name);
+    try { await rm(path, (await lstat(path)).isDirectory() ? { recursive: true } : {}); removed.push(path); }
+    catch (error) { retained.push({ path, reason: error.code ?? error.message }); }
+  }
+  return { removed, retained };
 }
 
 export async function install({ source = packageRoot, home = homedir(), claudeConfigDir, shared, dryRun = false } = {}) {
@@ -94,12 +112,18 @@ export async function install({ source = packageRoot, home = homedir(), claudeCo
     if (existing && existing.link !== current) throw new Error(`Existing unrelated skill: ${target}; preserve or move it before installation.`);
   }
   await checkParents(shared);
-  const legacy = await legacyLinks(home, claude, current);
+  const legacy = await legacyLinks(home, claude, shared, current);
   for (const entry of legacy.filter(entry => entry.status === 'would-migrate')) await checkParents(dirname(entry.path));
-  if (dryRun) return { status: 'dry-run', runtimeVersion: pkg.version, shared, runtime, targets, legacy, contentDigest };
+  // `runtime` is the address to use and to save: the stable link. `versionDirectory` is where this
+  // version's files are, and is replaced by the next update.
+  const result = { runtimeVersion: pkg.version, shared, runtime: current, id, versionDirectory: runtime, targets, legacy, contentDigest };
+  if (dryRun) {
+    const names = await readdir(join(shared, 'versions')).catch(error => { if (error.code === 'ENOENT') return []; throw error; });
+    return { status: 'dry-run', ...result, wouldRemove: names.filter(name => name !== id).sort().map(name => join(shared, 'versions', name)) };
+  }
   await safeParent(shared);
   const lockPath = join(shared, '.install-lock');
-  const lock = await acquireLock(lockPath, { wait: 0, busy: 'Another skill installation is running' }), created = [], migrated = [];
+  const lock = await acquireLock(lockPath, { wait: 0, busy: 'Another skill installation is running' }), created = [], migrated = [], cleanup = { removed: [], retained: [] };
   try {
     await safeParent(join(shared, 'versions'));
     const existing = await state(runtime);
@@ -132,7 +156,14 @@ export async function install({ source = packageRoot, home = homedir(), claudeCo
     const temp = join(shared, `.pointer-${randomUUID()}`);
     try { await symlink(`versions/${id}`, temp); await rename(temp, current); }
     finally { await rm(temp, { force: true }); }
-    return { status: 'installed', runtimeVersion: pkg.version, shared, runtime, targets, legacy, contentDigest };
+    // Older versions go only now: the installation is complete and the pointer is confirmed to name
+    // the new version. Nothing here can fail the installation or undo it.
+    try {
+      const versions = join(shared, 'versions'), info = await lstat(versions);
+      if (!info.isDirectory() || info.isSymbolicLink() || (await state(current))?.link !== `versions/${id}`) throw new Error('The installed pointer or versions folder changed; older versions were left in place.');
+      Object.assign(cleanup, await prune(versions, id));
+    } catch (error) { cleanup.retained.push({ path: join(shared, 'versions'), reason: error.code ?? error.message }); }
+    return { status: 'installed', ...result, ...cleanup };
   } catch (error) {
     const failures = [];
     for (const entry of migrated.reverse()) try {
@@ -148,7 +179,9 @@ export async function install({ source = packageRoot, home = homedir(), claudeCo
 
 async function main() {
   const { values } = parseArgs({ options: { home: { type: 'string' }, shared: { type: 'string' }, 'claude-config': { type: 'string' }, 'dry-run': { type: 'boolean' }, help: { type: 'boolean', short: 'h' } } });
-  if (values.help) { console.log('Usage: node scripts/install.mjs [--dry-run] [--home DIR] [--shared DIR] [--claude-config DIR]\nCreates one shared harness-research skill; migrates only existing Brand-owned aliases.'); return; }
+  if (values.help) { console.log('Usage: node scripts/install.mjs [--dry-run] [--home DIR] [--shared DIR] [--claude-config DIR]\nCreates one shared harness-research skill at a stable address, removes older installed versions and repoints its own alias links; other skills and links are left alone.'); return; }
   console.log(JSON.stringify(await install({ home: values.home, shared: values.shared, claudeConfigDir: values['claude-config'] ?? (values.home ? undefined : process.env.CLAUDE_CONFIG_DIR), dryRun: values['dry-run'] }), null, 2));
 }
-if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) main().catch(error => { console.error(error.message); process.exitCode = 1; });
+// Compare real locations, so the installer also runs when started through a link such as <shared>/current.
+const invokedPath = process.argv[1] && process.argv[1] !== '-' ? await realpath(resolve(process.argv[1])).catch(() => null) : null;
+if (invokedPath && import.meta.url === pathToFileURL(invokedPath).href) main().catch(error => { console.error(error.message); process.exitCode = 1; });

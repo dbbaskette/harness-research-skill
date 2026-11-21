@@ -4,7 +4,8 @@
 
 This guide covers **Harness Research 1.1.0**: local topic assets, source-directory
 and URL-list intake, and optional bounded parallel investigation. Existing saved
-cases retain their original layout, pinned runtime and guidance. For 0.9, use the
+cases retain their original layout and saved guidance, and continue on whatever
+version is installed. For 0.9, use the
 [legacy guide](legacy-using-harness-research.md).
 
 ## Begin with what you need to understand
@@ -212,7 +213,7 @@ explicitly; consumers using structured data need a deliberate
 
 A 0.9 queue retains its original commands, evidence rules and saved guidance. Do
 not start the new engine over the same `research/` output. Resume the old run with
-its runtime, or create a separate project for new research. The new helper refuses
+its saved task, or create a separate project for new research. The new helper refuses
 conflicting output ownership rather than silently converting it.
 
 For a new-format project, ask the agent to inspect synthesis status, correct any

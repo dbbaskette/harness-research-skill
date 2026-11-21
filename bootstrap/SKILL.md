@@ -19,21 +19,26 @@ node "<installed-skill>/scripts/sync-guidance.mjs" start --project "<content-pro
 
 The compact result returns runtime/guidance versions, the guidance entry, exact
 revision, task ID and installed runtime. Briefly tell the user the versions,
-revision and freshness on start/resume. Read that entry, then only this task's references.
+revision and freshness on start/resume, and any `notice`. Read that entry, then only this task's references.
 References are relative to the fetched guidance directory; every executable
 command uses the returned **runtime**, never the fetched directory. The AI owns
 helper JSON and commands; do not require users to run them or repeat settled intake.
 
-Record the returned task ID and runtime with the work. Continue with
+Record the returned task ID with the work. The returned runtime is the stable
+installed address and always runs the newest installed helpers: use it as returned
+and never save or build a path under `versions/`. Continue with
 `sync-guidance.mjs resume --project "<content-project>" --task <saved-id>`; do not
 start a new task merely to resume, inspect status, or revise the same work.
-Existing work retains its instructions and runtime. Explicitly adopting new
+Existing work keeps its saved instructions and continues on the runtime installed
+now, even after an update; nothing needs restoring. Explicitly adopting new
 guidance starts a new task and requires rechecking affected review conclusions.
 
 New tasks use the newest stable release this runtime supports (main only when the
 repository has no release tags). When a newer release needs a newer runtime,
 `freshness` is `older-compatible-release`: tell the user its `notice`. A failed
-fetch or incompatible runtime is reported, not described as current. An existing task can resume without fetching. For an
+fetch or incompatible runtime is reported, not described as current. An existing task
+resumes without fetching and is refused only when its saved guidance needs a newer
+runtime than the one installed. For an
 agent sandbox DNS/network failure, retry the same command through the host's
 available network-permission flow. Report a denied or unavailable retry; do not
 switch entrypoints expecting a separate runtime or silently bypass the refresh.
@@ -44,5 +49,5 @@ refresh never installs or executes repository scripts.
 Honor the user’s scope, sources, editing freedom, and completion boundary.
 Research output requirements live in the selected guidance. Topic-asset and parallel
 collection guidance requires runtime 1.1.0 or newer; refresh cannot upgrade helpers.
-Install the stable 1.1 runtime to use these features for new tasks. Existing tasks
-retain their pinned runtime and guidance.
+Install the current stable runtime to use these features. Existing tasks keep their
+saved guidance and use the installed runtime.

@@ -1,6 +1,6 @@
 {
   "name": "harness-research-skill",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "type": "module",
   "license": "MIT",
   "description": "Synthesis-first research skill with cited reports, reusable briefs and independently reviewed evidence.",

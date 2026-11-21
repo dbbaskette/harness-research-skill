@@ -1,4 +1,4 @@
-import { readFile, readdir, realpath, access } from 'node:fs/promises';
+import { readFile, readdir, access } from 'node:fs/promises';
 import { join, isAbsolute, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { resume as resumeGuidance } from '../sync-guidance.mjs';
@@ -313,7 +313,6 @@ export async function startRun(args) {
     const pkg = JSON.parse(await readFile(new URL('package.json', packageRoot), 'utf8'));
     const manifest = JSON.parse(await readFile(new URL('guidance/manifest.json', packageRoot), 'utf8'));
     const guidance = args.guidanceTask ? await resumeGuidance({ project: locations.root, task: args.guidanceTask, runtime: fileURLToPath(packageRoot) }) : null;
-    if (guidance && guidance.runtime !== await realpath(fileURLToPath(packageRoot))) throw new Error('Use the saved guidance task\'s installed runtime.');
     const inputs = [], givenSources = [];
     if (!Array.isArray(args.sources ?? []) || (args.sources ?? []).length > 100) throw new Error('Select at most 100 starting sources.');
     for (const supplied of args.sources ?? []) {
