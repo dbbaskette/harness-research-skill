@@ -1,7 +1,8 @@
 #!/usr/bin/env node
-// Refresh instructions only. All executable operations use the installed runtime.
-import { readFile, writeFile, mkdir, rename, rm, lstat, readdir, realpath } from 'node:fs/promises';
-import { resolve, join, dirname, relative, sep } from 'node:path';
+// Refresh instructions only. All executable operations use the installed runtime, which is
+// always handed out by its stable address and is never pinned to one installed version.
+import { readFile, writeFile, mkdir, rename, rm, lstat, realpath } from 'node:fs/promises';
+import { resolve, join, dirname, basename, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { execFile } from 'node:child_process';
 import { promisify, parseArgs } from 'node:util';
@@ -18,11 +19,21 @@ const revisionPattern = /^[a-f0-9]{40,64}$/;
 const taskPattern = /^[a-f0-9]{32}$/;
 const allowed = name => ['SKILL.md', 'NOTICE.md', 'LICENSE'].includes(name) || /^upstream\/(?:[\w./ -]+\/)?LICENSE$/.test(name) || /^(references|upstream)\/[\w./ -]+\.(md|json|toml|txt|yaml|yml)$/.test(name);
 const validPath = name => typeof name === 'string' && !name.startsWith('/') && !name.split('/').includes('..') && !name.includes('\\');
+// An installed runtime lives in <shared>/versions/<id> behind the <shared>/current link, and the
+// installer replaces that folder on every update. Callers are therefore given <shared>/current, the
+// one address that survives updates, and the version reported is the one that link points at now.
+// A checkout or a disposable test runtime has no such link and is its own address.
 async function settings(runtime) {
-  runtime = await realpath(runtime);
-  const pkg = JSON.parse(await readFile(join(runtime, 'package.json'), 'utf8')), config = sources[pkg.name];
+  let real = await realpath(runtime), address = real;
+  if (basename(dirname(real)) === 'versions') {
+    const current = join(dirname(dirname(real)), 'current');
+    const linked = await lstat(current).then(stat => stat.isSymbolicLink(), () => false);
+    const target = linked ? await realpath(current).catch(() => null) : null;
+    if (target && dirname(target) === dirname(real)) { address = current; real = target; }
+  }
+  const pkg = JSON.parse(await readFile(join(real, 'package.json'), 'utf8')), config = sources[pkg.name];
   if (!config) throw new Error('Unrecognized installed skill runtime.');
-  return { ...config, packageName: pkg.name, version: pkg.version, runtime };
+  return { ...config, packageName: pkg.name, version: pkg.version, runtime: address, real };
 }
 async function directory(path) {
   const parent = dirname(path);
@@ -37,7 +48,7 @@ async function file(path) {
 }
 async function cacheFor(project, config, create = false) {
   const base = await realpath(resolve(project));
-  if (base === config.runtime || base.startsWith(config.runtime + sep)) throw new Error('Keep guidance and work outside the installed skill.');
+  if (base === config.real || base.startsWith(config.real + sep)) throw new Error('Keep guidance and work outside the installed skill.');
   const cache = join(base, '.' + config.skill, 'guidance');
   if (create) await directory(cache);
   else {
@@ -73,20 +84,8 @@ async function git(repository, ...args) {
     throw new Error(`${prefix} (git ${operation}). ${reason} ${recovery}`);
   }
 }
-function compatible(required, actual) {
-  if (compareVersions(required, actual) > 0) throw Object.assign(new Error('Current guidance needs a newer installed runtime. Update with this skill’s trusted installer.'), { minimumRuntime: required });
-}
-async function runtimeHashes(runtime) {
-  const hashes = {};
-  async function walk(name) {
-    const path = join(runtime, name), stat = await lstat(path);
-    if (stat.isSymbolicLink()) throw new Error('Installed runtime contains a symlink.');
-    if (stat.isDirectory()) { for (const item of (await readdir(path)).sort()) await walk(name + '/' + item); }
-    else if (stat.isFile()) hashes[name] = sha(await readFile(path));
-    else throw new Error('Unsupported installed runtime member.');
-  }
-  await walk('scripts'); await walk('package.json'); await walk('package-lock.json');
-  return hashes;
+function compatible(required, actual, guidance = 'Current guidance') {
+  if (compareVersions(required, actual) > 0) throw Object.assign(new Error(`${guidance} needs a newer installed runtime. Update with this skill’s trusted installer.`), { minimumRuntime: required });
 }
 async function blob(repository, id, size) {
   if (!Number.isSafeInteger(size) || size < 0 || size > 1024 * 1024) throw new Error('Guidance file exceeds size limit.');
@@ -103,7 +102,7 @@ async function releaseTags(repository, source) {
     .sort((a, b) => b.parts[0] - a.parts[0] || b.parts[1] - a.parts[1] || b.parts[2] - a.parts[2]);
 }
 // Read a commit's guidance inventory and manifest, refusing one the installed runtime cannot run.
-async function inspectCommit(repository, commit, config) {
+async function inspectCommit(repository, commit, config, guidance) {
   if (!revisionPattern.test(commit)) throw new Error('Invalid guidance revision.');
   const listing = (await git(repository, 'ls-tree', '-r', '-l', '-z', commit)).toString('utf8').split('\0').filter(Boolean).map(line => {
     const [meta, name] = line.split('\t'), [mode, type, id, size] = meta.trim().split(/\s+/);
@@ -116,9 +115,25 @@ async function inspectCommit(repository, commit, config) {
   if (guidanceVersion !== null) parseVersion(guidanceVersion);
   if (metadata.name === 'guidance/manifest.json') {
     if (manifest.schema !== 1 || manifest.skill !== config.skill || manifest.entry !== 'SKILL.md') throw new Error('Unsupported guidance contract.');
-    compatible(manifest.minimumRuntime, config.version);
-  } else { if (manifest.name !== config.packageName) throw new Error('Unrecognized guidance package.'); compatible(manifest.version, config.version); }
-  return { listing, guidanceVersion };
+  } else if (manifest.name !== config.packageName) throw new Error('Unrecognized guidance package.');
+  const minimumRuntime = metadata.name === 'guidance/manifest.json' ? manifest.minimumRuntime : manifest.version;
+  compatible(minimumRuntime, config.version, guidance);
+  return { listing, guidanceVersion, minimumRuntime };
+}
+// The one compatibility rule that survives an update: saved instructions may not need a newer runtime
+// than the one installed. Tasks started before 1.3.0 did not record that floor. A runtime at least as
+// new as the one that started them satisfies it; for an older one the floor is read from the task's
+// cached revision, without the network.
+async function savedCompatibility(pin, config, repository) {
+  const saved = 'This task’s saved guidance';
+  if (pin.minimumRuntime !== undefined) return compatible(pin.minimumRuntime, config.version, saved);
+  if (typeof pin.runtimeVersion !== 'string' || compareVersions(pin.runtimeVersion, config.version) <= 0) return;
+  try { await inspectCommit(repository, pin.revision, config, saved); }
+  catch (error) {
+    if (/newer installed runtime/.test(error.message)) throw error;
+    // The floor cannot be read locally; the only runtime known to satisfy it is the newer one.
+    compatible(pin.runtimeVersion, config.version, saved);
+  }
 }
 export async function start({ project, runtime = root, source, revision, releaseLimit = 100 } = {}) {
   if (!Number.isSafeInteger(releaseLimit) || releaseLimit < 1 || releaseLimit > 1000) throw new Error('releaseLimit must be between 1 and 1000.');
@@ -155,7 +170,7 @@ export async function start({ project, runtime = root, source, revision, release
       if (!commit) { await git(repository, 'fetch', '--quiet', '--no-tags', '--depth=1', trustedSource, ref); commit = await head(); }
     }
     inspected ??= await inspectCommit(repository, commit, config);
-    const { listing, guidanceVersion } = inspected;
+    const { listing, guidanceVersion, minimumRuntime } = inspected;
     const selected = listing.filter(item => allowed(item.name));
     if (!selected.some(item => item.name === 'SKILL.md') || selected.length > 500 || selected.reduce((n, item) => n + item.size, 0) > 8 * 1024 * 1024) throw new Error('Guidance inventory is missing or too large.');
     const task = randomUUID().replaceAll('-', '');
@@ -168,7 +183,9 @@ export async function start({ project, runtime = root, source, revision, release
       await mkdir(dirname(path), { recursive: true, mode: 0o700 }); await writeFile(path, bytes, { flag: 'wx', mode: 0o400 });
       hashes[item.name] = sha(bytes);
     }
-    const pin = { schema: 1, skill: config.skill, repository: config.repository, revision: commit, channel, ref, guidanceVersion, task, createdAt: new Date().toISOString(), runtime: config.runtime, runtimeVersion: config.version, runtimeFiles: await runtimeHashes(config.runtime), files: hashes };
+    // The pin saves this task's instructions. It records the runtime version that started the work for
+    // information only: no installed folder, path or file hash is saved, so an update never strands it.
+    const pin = { schema: 1, skill: config.skill, repository: config.repository, revision: commit, channel, ref, guidanceVersion, minimumRuntime, task, createdAt: new Date().toISOString(), runtimeVersion: config.version, files: hashes };
     await writeFile(join(stage, 'pin.json'), JSON.stringify(pin, null, 2) + '\n', { flag: 'wx', mode: 0o400 });
     const snapshot = join(cache, 'tasks', task); await rename(stage, snapshot); stage = null;
     // Falling back to an older release because a newer one needs a newer runtime is disclosed, so the
@@ -192,14 +209,18 @@ export async function resume({ project, task, runtime = root, cached = false } =
     while (parent !== snapshot) { const stat = await lstat(parent); if (!stat.isDirectory() || stat.isSymbolicLink()) throw new Error('Unsafe saved guidance path.'); parent = dirname(parent); }
     if (sha(await file(join(snapshot, name))) !== digest) throw new Error('Saved guidance changed; reopen an intact task or start new work.');
   }
-  const saved = await settings(pin.runtime);
-  if (saved.skill !== config.skill || saved.version !== pin.runtimeVersion || JSON.stringify(await runtimeHashes(saved.runtime)) !== JSON.stringify(pin.runtimeFiles)) throw new Error('Saved executable runtime changed or is unavailable; restore it with its trusted installer.');
-  return { freshness: cached ? 'cached-by-choice' : 'pinned', runtimeVersion: saved.version, guidanceVersion: pin.guidanceVersion ?? null, revision: pin.revision, task, guidance: join(snapshot, 'SKILL.md'), runtime: saved.runtime };
+  // Saved work keeps its instructions and always continues on the runtime installed now. Pins written
+  // before 1.3.0 also carry runtime, runtimeFiles and an exact runtimeVersion; those are not checked.
+  await savedCompatibility(pin, config, join(cache, 'repository.git'));
+  const guidanceVersion = pin.guidanceVersion ?? null, startedRuntimeVersion = typeof pin.runtimeVersion === 'string' ? pin.runtimeVersion : null;
+  const notice = startedRuntimeVersion && startedRuntimeVersion !== config.version
+    ? `This work started on runtime ${startedRuntimeVersion} and now continues on the installed runtime ${config.version} with its saved instructions${guidanceVersion ? ` (guidance ${guidanceVersion})` : ''}. Start a new task to adopt the newest instructions.` : null;
+  return { freshness: cached ? 'cached-by-choice' : 'saved-guidance', ...(notice ? { notice } : {}), runtimeVersion: config.version, startedRuntimeVersion, guidanceVersion, revision: pin.revision, task, guidance: join(snapshot, 'SKILL.md'), runtime: config.runtime };
 }
 async function main() {
   const { values, positionals } = parseArgs({ options: { project: { type: 'string' }, task: { type: 'string' }, revision: { type: 'string' }, help: { type: 'boolean' } }, allowPositionals: true });
   const [action, ...extra] = positionals;
-  if (values.help || !action) { console.log('Usage: node scripts/sync-guidance.mjs start|resume|cached|pin --project DIR [--task ID] [--revision COMMIT]\nOnly guidance refreshes. Executable helpers stay in the installed runtime.'); return; }
+  if (values.help || !action) { console.log('Usage: node scripts/sync-guidance.mjs start|resume|cached|pin --project DIR [--task ID] [--revision COMMIT]\nOnly guidance refreshes. Executable helpers stay in the installed runtime; the returned runtime is its stable address.'); return; }
   if (extra.length || !values.project || !['start', 'resume', 'cached', 'pin'].includes(action)) throw new Error('Choose an action and --project DIR.');
   if ((action === 'start' && (values.task || values.revision)) || (action === 'pin' && (!values.revision || values.task)) || (['resume', 'cached'].includes(action) && (!values.task || values.revision))) throw new Error('Invalid guidance action options.');
   const result = ['start', 'pin'].includes(action) ? await start({ project: values.project, revision: values.revision }) : await resume({ project: values.project, task: values.task, cached: action === 'cached' });

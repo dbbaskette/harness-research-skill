@@ -7,11 +7,12 @@ settled scope, existing authorization and the requested completion boundary.
 
 ## Start or resume
 
-Commands use the installed runtime returned by the bootstrap. An explicitly
-supplied development runtime is valid for isolated testing; disclose its local
-guidance/version instead of claiming a public refresh.
+Commands use the installed runtime returned by the bootstrap, at its stable
+address; a run started on an earlier runtime continues on the installed one. An
+explicitly supplied development runtime is valid for isolated testing; disclose its
+local guidance/version instead of claiming a public refresh.
 For installed use, pass `--guidance-task TASK` from the bootstrap's saved task;
-the helper verifies that pin offline and records its exact guidance identity.
+the helper verifies that saved guidance offline and records its exact identity.
 Omit it only for an explicitly supplied local runtime/guidance, which is reported
 as local runtime guidance. Resume the saved bootstrap task before continuing a run.
 

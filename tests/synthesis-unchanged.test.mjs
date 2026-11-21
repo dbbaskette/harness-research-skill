@@ -1,10 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {mkdtemp, writeFile, readFile, mkdir, readdir, rm, symlink, cp} from 'node:fs/promises';
+import {mkdtemp, writeFile, readFile, readdir, rm, cp} from 'node:fs/promises';
 import {join} from 'node:path';
 import {tmpdir} from 'node:os';
 import {runSynthesisCli} from '../scripts/lib/synthesis-cli.mjs';
-import {runtimeIdentity} from '../scripts/lib/synthesis-reuse.mjs';
 import {execFile} from 'node:child_process';
 import {promisify} from 'node:util';
 import {fileURLToPath} from 'node:url';
@@ -107,14 +106,31 @@ test('concurrent duplicate intents serialize and preserve one reviewed revision'
   for(const result of results){assert.equal(result.save_result,'no-change');assert.equal(result.status,'complete');assert.equal(result.review_preserved,true);}
 });
 
-test('CLI verification detects changed runtime/guidance bytes',async t=>{
-  const f=await fixture(t),draft=await f.save();await f.review(draft);
+test('an updated runtime keeps reviewed work complete, including receipts saved with a runtime digest',async t=>{
+  const f=await fixture(t),draft=await f.save(),complete=await f.review(draft);
   const copied=await mkdtemp(join(tmpdir(),'research-reuse-runtime-'));t.after(()=>rm(copied,{recursive:true,force:true}));
   const root=fileURLToPath(new URL('../',import.meta.url));
   for(const name of ['package.json','SKILL.md','guidance','scripts','references'])await cp(join(root,name),join(copied,name),{recursive:true});
-  const cli=join(copied,'scripts/harness-research.mjs');
-  const verified=await exec(process.execPath,[cli,'synthesis','verify','--project',f.root]);assert.equal(JSON.parse(verified.stdout).status,'complete');
-  await writeFile(join(copied,'references/synthesis-reuse.md'),'Changed required review guidance.');
+  const cli=join(copied,'scripts/harness-research.mjs'),run=async(...args)=>JSON.parse((await exec(process.execPath,[cli,'synthesis',...args,'--project',f.root])).stdout);
+  const statePath=join(f.root,'.harness-research/synthesis.json'),saved=JSON.parse(await readFile(statePath,'utf8'));
+  // New receipts carry no runtime identity at all.
+  assert.deepEqual(Object.keys(saved.reuse).sort(),['context_digest','context_file','protocol','schema']);
+  assert.equal((await run('verify')).status,'complete');
+  // Receipts written before 1.3.0 named one installed runtime by digest; an update changes those bytes.
+  saved.reuse.runtime_digest='c'.repeat(64);await writeFile(statePath,JSON.stringify(saved,null,2)+'\n');
+  const pkg=JSON.parse(await readFile(join(copied,'package.json'),'utf8'));
+  await writeFile(join(copied,'package.json'),JSON.stringify({...pkg,version:'99.0.0'}));
+  await writeFile(join(copied,'references/synthesis-reuse.md'),'Changed reference bytes in the updated runtime.');
+  await writeFile(join(copied,'scripts/lib/added-by-update.mjs'),'export {};\n');
+  const verified=await run('verify');assert.equal(verified.status,'complete');assert.equal(verified.digest,complete.digest);assert.equal(verified.reviewer,'independent-checker');
+  await writeFile(join(f.root,'dossier.json'),JSON.stringify(f.dossier));
+  const resaved=await run('save','--file','dossier.json','--worker','writer','--reuse-unchanged','--context','context.json');
+  assert.equal(resaved.save_result,'no-change');assert.equal(resaved.review_preserved,true);assert.equal(resaved.status,'complete');
+  // The host's own identities still bind the review, and a damaged receipt is not trusted.
+  f.context.guidance+='-changed';await f.writeContext();
+  await assert.rejects(exec(process.execPath,[cli,'synthesis','verify','--project',f.root]),error=>{const result=JSON.parse(error.stdout);assert.equal(result.status,'stale');assert.match(JSON.stringify(result),/protocol, guidance or independence context changed/);return true;});
+  f.context.guidance=f.context.guidance.replace('-changed','');await f.writeContext();assert.equal((await run('verify')).status,'complete');
+  saved.reuse.runtime_digest='not-a-digest';await writeFile(statePath,JSON.stringify(saved,null,2)+'\n');
   await assert.rejects(exec(process.execPath,[cli,'synthesis','verify','--project',f.root]),error=>JSON.parse(error.stdout).status==='stale');
 });
 
@@ -125,15 +141,4 @@ test('context is explicit, bounded, project-local and valid only on opted-in sav
   await assert.rejects(runSynthesisCli([...base,'--context','context.json']),/belong together/);
   await writeFile(join(f.root,'context.json'),'x'.repeat(64_001));await assert.rejects(f.save(),/64,000/);
   await writeFile(join(f.root,'context.json'),'{}');await assert.rejects(f.save(),/protocol, guidance and independence/);
-});
-
-test('runtime identity covers executable, protocol and guidance bytes and refuses links',async t=>{
-  const root=await mkdtemp(join(tmpdir(),'research-runtime-id-'));t.after(()=>rm(root,{recursive:true,force:true}));
-  for(const name of ['scripts','references','guidance'])await mkdir(join(root,name));
-  for(const name of ['package.json','SKILL.md','guidance/manifest.json','scripts/runtime.mjs','references/rules.md'])await writeFile(join(root,name),'initial');
-  let before=await runtimeIdentity(root);
-  for(const name of ['scripts/runtime.mjs','references/rules.md','guidance/manifest.json']){
-    await writeFile(join(root,name),'changed');const next=await runtimeIdentity(root);assert.notEqual(next,before);before=next;
-  }
-  await symlink(join(root,'SKILL.md'),join(root,'scripts/link'));await assert.rejects(runtimeIdentity(root),/ordinary runtime/);
 });

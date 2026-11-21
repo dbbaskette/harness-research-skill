@@ -1,26 +1,13 @@
 // Explicit unchanged-save receipts. The portable dossier/output format remains schema 2.
-import { readFile, readdir, lstat } from 'node:fs/promises';
-import { resolve, join, relative } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { readFile, lstat } from 'node:fs/promises';
 import { localFile, hash, stable, parseJson } from './run-storage.mjs';
 
 export const REUSE_PROTOCOL = 'harness-synthesis-reuse-v1';
-const RUNTIME = fileURLToPath(new URL('../../', import.meta.url));
 
-export async function runtimeIdentity(runtime = RUNTIME) {
-  const files = [];
-  async function visit(path) {
-    const info = await lstat(path);
-    if (info.isSymbolicLink()) throw new Error('Reuse requires an intact ordinary runtime tree.');
-    if (info.isDirectory()) {
-      for (const name of (await readdir(path)).sort()) await visit(join(path, name));
-    } else if (info.isFile()) files.push([relative(runtime, path).split('\\').join('/'), hash(await readFile(path))]);
-    else throw new Error('Reuse requires ordinary runtime files.');
-  }
-  for (const name of ['package.json', 'SKILL.md', 'guidance/manifest.json', 'scripts', 'references']) await visit(join(runtime, name));
-  return hash(stable(files));
-}
-
+// A receipt binds reviewed work to the host's own protocol, guidance and independence identities.
+// It does not bind to the installed runtime: an update must never make reviewed work stale, and
+// every status or verify already rechecks the dossier digest, source bytes and review with the
+// runtime installed now.
 export async function reuseIdentity(root, file) {
   if (typeof file !== 'string' || !file) throw new Error('Unchanged-save reuse needs a project-local context file.');
   const path = await localFile(root, file), info = await lstat(path);
@@ -30,15 +17,19 @@ export async function reuseIdentity(root, file) {
       || ['protocol','guidance','independence'].some(key => typeof context[key] !== 'string' || !context[key].trim() || context[key].length > 4000)) {
     throw new Error('Reuse context needs schema 1 and nonempty protocol, guidance and independence identities.');
   }
-  return {schema: 1, protocol: REUSE_PROTOCOL, context_file: file,
-    context_digest: hash(stable(context)), runtime_digest: await runtimeIdentity()};
+  return {schema: 1, protocol: REUSE_PROTOCOL, context_file: file, context_digest: hash(stable(context))};
+}
+
+// Receipts saved before 1.3.0 also carry runtime_digest, a hash of one installed runtime. It is
+// accepted and ignored, so work reviewed on an earlier runtime stays reviewed after an update.
+export function sameReuseIdentity(left, right) {
+  return Boolean(left && right) && ['schema','protocol','context_file','context_digest'].every(key => left[key] === right[key]);
 }
 
 export async function checkReuseIdentity(root, receipt) {
-  if (!receipt || receipt.schema !== 1 || receipt.protocol !== REUSE_PROTOCOL
-      || !/^[a-f0-9]{64}$/.test(receipt.context_digest) || !/^[a-f0-9]{64}$/.test(receipt.runtime_digest)) {
+  if (!receipt || receipt.schema !== 1 || receipt.protocol !== REUSE_PROTOCOL || typeof receipt.context_file !== 'string'
+      || !/^[a-f0-9]{64}$/.test(receipt.context_digest) || receipt.runtime_digest !== undefined && !/^[a-f0-9]{64}$/.test(receipt.runtime_digest)) {
     throw new Error('Saved unchanged-save context is invalid.');
   }
-  const current = await reuseIdentity(root, receipt.context_file);
-  if (stable(current) !== stable(receipt)) throw new Error('Research protocol, guidance, independence or runtime context changed.');
+  if (!sameReuseIdentity(await reuseIdentity(root, receipt.context_file), receipt)) throw new Error('Research protocol, guidance or independence context changed.');
 }

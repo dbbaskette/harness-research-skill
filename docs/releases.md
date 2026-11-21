@@ -1,5 +1,37 @@
 # Versioned releases
 
+## 1.3.0
+
+Stops pinning to one installed version. The owner's decision: "we need to change
+things so that we don't pin to a specific version of skills. We should have a link
+that points to the most recent, or just not name things with a version, so we
+always get the new code."
+
+- **One address.** `start`, `resume`, `cached`, `pin` and the installer return the
+  stable `current` link as the runtime, never a folder under `versions/`.
+- **No runtime pin.** A task saves its guidance and, for information, the runtime
+  version it started with. `resume` and `cached` return the installed runtime and a
+  one-line `notice` when its version differs. Tasks saved by earlier releases resume
+  without a migration. The one refusal that remains is saved or fetched guidance
+  that needs a newer runtime than the one installed.
+- **Guidance stays with the task.** Resume keeps the saved instructions, needs no
+  network and does not change a workflow under work in progress; starting a new
+  task is still the way to adopt newer guidance. The resume result's `freshness` is
+  now `saved-guidance` (was `pinned`).
+- **Reviews survive updates.** An unchanged-save receipt no longer includes a hash
+  of the installed runtime, and such a hash in an older receipt is ignored, so
+  reviewed work stays reviewed. `status` and `verify` recheck it with the installed
+  runtime; nothing has to be rerun by hand.
+- **One installed version.** After the pointer moves, the installer removes every
+  other entry in `versions/`, and points this tool's own alias-skill and agent links
+  at `current`. Links and folders that belong to someone else are left and reported.
+
+Callers that stored a folder under `versions/`, read the installer's `runtime` as a
+version folder, or compared a hash of the installed files must change; the
+[setup guide](setup.md) and [developer guide](development.md) state the contract.
+The guidance floor is runtime 1.3.0. See
+[the verification record](verification/1.3.0/README.md).
+
 ## 1.2.0
 
 Raises the intake limits so a studio can register a long source list in one run:
@@ -134,6 +166,9 @@ requires explicit checkout guidance or an approved pinned commit. Guidance canno
 upgrade executable helpers. After a stable 1.0 release, users must install its
 runtime before its synthesis guidance becomes eligible.
 
-Retain immutable runtimes and guidance for existing tasks. New research can use a
-new release while old projects resume their own contract. Rollback changes the
-entrypoint used for new tasks; it does not convert existing research formats.
+Keep each release's guidance and old commands usable: existing tasks resume their
+saved guidance on whatever runtime is installed, so a release must not remove a
+command or state format that saved work depends on. Only one runtime is installed
+at a time. Rollback means installing the earlier release; a task whose saved
+guidance needs a newer runtime is then refused until the runtime is updated again.
+Neither direction converts existing research formats.

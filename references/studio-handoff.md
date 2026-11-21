@@ -99,6 +99,9 @@ A studio enabling bounded parallel collection uses the
 [portable contract](parallel-research.md), host-issued invocation registration and
 capture receipts. It supplies native execution, capacity, shared budget
 reservation and cancellation; it does not reimplement packet merging. Retain the
-execution protocol separately from pinned runtime/guidance. Existing serial jobs
-stay serial, and no running job or installed companion is migrated automatically.
+execution protocol separately from the saved guidance. Run helpers from the stable
+runtime address the bootstrap returns and do not store an installed version's folder,
+version or file hash as a condition for continuing: the installer replaces that
+folder on every update. Existing serial jobs stay serial, and no running job or
+installed companion is migrated automatically.
 The report/brief/schema-2 output remains the final consumption boundary.

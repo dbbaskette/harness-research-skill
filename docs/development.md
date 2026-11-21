@@ -132,7 +132,20 @@ The stable version is `1.1.0`; its guidance requires runtime 1.1.0 or newer for
 asset and collection operations. Older runtimes keep compatible stable guidance.
 For unpublished development, select the checkout's `SKILL.md` and runtime
 explicitly. Guidance refresh never upgrades executable helpers or changes an
-existing task's pin.
+existing task's saved guidance.
+
+Nothing is tied to one installed version. A task pin saves the guidance snapshot
+and, for information, the runtime version and guidance floor it started with;
+`resume` and `cached` return the installed runtime at its stable address,
+`<shared>/current`, with a `notice` when its version differs, and refuse only when
+the saved guidance needs a newer runtime. Pins from before 1.3.0 also carry
+`runtime`, `runtimeFiles` and an exact `runtimeVersion`; these are read without a
+migration and not checked. Unchanged-save receipts bind the host's context only,
+and a `runtime_digest` in an older receipt is ignored. The installer returns
+`runtime` (the stable address), `id` and `versionDirectory` (the folder an update
+replaces), removes every other entry in `versions/` after the pointer moves, and
+lists what it removed and what it could not remove. Do not store or compare an
+installed path, version or file hash as a condition for continuing work.
 
 Test an installation only in disposable destinations:
 
@@ -206,38 +219,38 @@ representative guidance-start response. Stage-only rows count their own referenc
 | Reading path | Tokens |
 | --- | ---: |
 | Discovery metadata | 36 |
-| Installed bootstrap | 534 |
-| Bootstrap + current guidance entry | 1,205 |
+| Installed bootstrap | 602 |
+| Bootstrap + current guidance entry | 1,277 |
 | Investigator stage | 1,143 |
 | Synthesis writer stage | 1,614 |
 | Independent reviewer stage | 1,528 |
-| New synthesis: coordinator entry and workflow | 4,317 |
-| New synthesis: all stages in one context | 8,602 |
-| Synthesis resume, verify or refresh | 2,700 |
-| Optional studio task handoff | 5,450 |
-| Optional local topic asset intake | 5,783 |
-| Parallel coordinator with Codex adapter | 5,883 |
-| Parallel coordinator with Claude Code adapter | 5,867 |
-| Delegated investigator with packet contract | 2,212 |
-| Legacy 0.9 queued coordinator | 4,930 |
-| Legacy 0.9 reuse or refresh | 1,982 |
-| Legacy explicit chat-only answer | 2,159 |
-| Legacy manual saved research | 3,350 |
-| Legacy manual status or resume | 1,760 |
-| Legacy comparative routing only | 1,912 |
-| Legacy Codex comparative outline | 2,872 |
-| Legacy Codex add items | 2,077 |
-| Legacy Codex add fields | 2,097 |
-| Legacy Codex deep results | 2,760 |
-| Legacy Codex deep results + saved evidence | 3,951 |
-| Legacy Claude comparative outline | 2,889 |
-| Legacy Claude deep results | 2,782 |
-| Investigation + general web strategy | 5,957 |
-| Investigation + academic strategy | 6,049 |
-| Investigation + GitHub strategy | 5,844 |
-| Investigation + technical Q&A strategy | 5,749 |
-| Investigation + Chinese sources strategy | 5,974 |
-| Legacy migration | 1,554 |
+| New synthesis: coordinator entry and workflow | 4,389 |
+| New synthesis: all stages in one context | 8,674 |
+| Synthesis resume, verify or refresh | 2,855 |
+| Optional studio task handoff | 5,561 |
+| Optional local topic asset intake | 5,855 |
+| Parallel coordinator with Codex adapter | 5,955 |
+| Parallel coordinator with Claude Code adapter | 5,939 |
+| Delegated investigator with packet contract | 2,280 |
+| Legacy 0.9 queued coordinator | 5,020 |
+| Legacy 0.9 reuse or refresh | 2,054 |
+| Legacy explicit chat-only answer | 2,231 |
+| Legacy manual saved research | 3,422 |
+| Legacy manual status or resume | 1,865 |
+| Legacy comparative routing only | 1,984 |
+| Legacy Codex comparative outline | 2,944 |
+| Legacy Codex add items | 2,149 |
+| Legacy Codex add fields | 2,169 |
+| Legacy Codex deep results | 2,832 |
+| Legacy Codex deep results + saved evidence | 4,023 |
+| Legacy Claude comparative outline | 2,961 |
+| Legacy Claude deep results | 2,854 |
+| Investigation + general web strategy | 6,029 |
+| Investigation + academic strategy | 6,121 |
+| Investigation + GitHub strategy | 5,916 |
+| Investigation + technical Q&A strategy | 5,821 |
+| Investigation + Chinese sources strategy | 6,046 |
+| Legacy migration | 1,626 |
 
 The new default starts with the entry and synthesis workflow. Investigation, writing
 and independent review each load their own reference when needed. The all-stages

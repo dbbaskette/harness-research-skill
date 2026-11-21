@@ -63,7 +63,7 @@ or independent-checking stages merely by loading newer guidance.
 
 ## Where installation puts things
 
-The installer copies an immutable runtime into a shared directory and registers
+The installer copies the runtime into a shared directory and registers
 three links to its current version:
 
 | Agent | Default skill discovery link |
@@ -75,7 +75,8 @@ three links to its current version:
 The default shared package directory is
 `~/Library/Application Support/Harness Research` on macOS, and
 `~/.local/share/harness-research` on other platforms. It contains `versions/`
-and a `current` link. Native verification currently covers macOS; the path choice
+and a `current` link; from 1.3.0 an update leaves only the new version there, and
+`current` is the address to use. Native verification currently covers macOS; the path choice
 alone does not establish acceptance on another operating system.
 
 The installer preserves unrelated existing skills and only migrates links it
@@ -141,8 +142,9 @@ git switch --detach v0.8.1
 bash scripts/Install-Harness-Research.sh
 ```
 
-Older retained runtimes must remain available for the runs pinned to them.
-Do not edit files in `versions/` or remove a saved run's runtime to update it.
+Up to 1.2.0 a saved run was tied to the installed version that started it. From
+1.3.0 it is not: a run continues on the installed version with its saved guidance,
+and the installer removes older versions. Do not edit files in `versions/`.
 
 ## Instructions and executables update differently
 

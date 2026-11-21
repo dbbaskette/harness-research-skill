@@ -4,8 +4,8 @@
 
 The 1.0 release changes the default workflow and structured output. It does not
 silently upgrade existing projects or rewrite installed skills. Keep 0.9 projects
-and their pinned runtime/guidance intact while starting 1.0 research in a fresh
-content folder.
+and their saved guidance intact while starting 1.0 research in a fresh content
+folder.
 
 | Concern | 0.9 queue | 1.0 synthesis |
 | --- | --- | --- |
@@ -19,9 +19,10 @@ content folder.
 
 ## Existing projects
 
-Resume them with the original runtime and saved guidance. The old CLI remains
-available in this checkout for compatibility tests, but adopting new instructions
-is not ordinary resume. The new helper refuses an old engine's project and
+Resume them with their saved guidance on the installed runtime, which keeps the
+old commands. From 1.3.0 a saved task is not tied to the version that started it.
+The old CLI remains available in this checkout for compatibility tests, but
+adopting new instructions is not ordinary resume. The new helper refuses an old engine's project and
 existing unowned outputs rather than overwriting them.
 
 To research the same subject in the new format, use a new case folder. You may
@@ -83,7 +84,7 @@ the whole reviewed result. Consumers should pin that digest as well as the IDs.
 
 The 1.1.0 release adds local topic assets and optional bounded collection.
 These are additive contracts. Existing 1.0 dossiers keep their original project
-root, output paths and saved runtime; do not move files to imitate the new layout.
+root and output paths; do not move files to imitate the new layout.
 New topic assets default to `research/<topic>/` and carry their own owned state.
 They write `report.md`, `brief.md`, `evidence.md`, `facts.json` and `output.json`
 directly at that root. Relative artifact paths resolve from the actual manifest.

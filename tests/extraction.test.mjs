@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, mkdir, readFile, writeFile, readlink, symlink, realpath, rm, access, cp, readdir, utimes } from 'node:fs/promises';
+import { mkdtemp, mkdir, readFile, writeFile, readlink, symlink, realpath, rm, access, cp, readdir, utimes, chmod } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -23,8 +23,12 @@ test('shared shell installation is repeatable, isolated and usable in three harn
   assert.equal(dry.targets.length, 3);
   await assert.rejects(access(options.home), /ENOENT/);
   const first = await install(options);
-  for (const target of first.targets) { assert.equal(await realpath(target), first.runtime); await access(join(target, 'SKILL.md')); }
-  assert.equal((await install(options)).runtime, first.runtime);
+  // The address handed out is the stable link; the version folder behind it is replaced by updates.
+  assert.equal(first.runtime, join(options.shared, 'current')); assert.equal(first.versionDirectory, join(options.shared, 'versions', first.id));
+  assert.equal(dry.runtime, first.runtime); assert.equal(dry.id, first.id); assert.deepEqual(dry.wouldRemove, []);
+  for (const target of first.targets) { assert.equal(await readlink(target), first.runtime); assert.equal(await realpath(target), first.versionDirectory); await access(join(target, 'SKILL.md')); }
+  const again = await install(options);
+  assert.equal(again.runtime, first.runtime); assert.equal(again.versionDirectory, first.versionDirectory); assert.deepEqual(again.removed, []);
   await assert.rejects(access(join(options.home, '.agents/skills/research')), /ENOENT/);
   const project = join(options.root, 'project'); await mkdir(project); await writeFile(join(project, 'brief.md'), 'Feature A is supported.');
   const input = join(project, 'plan.json'); await writeFile(input, JSON.stringify(plan()));
@@ -48,9 +52,90 @@ test('installer migrates exact Brand-owned aliases and agents while preserving i
   const result = await install(options);
   assert.equal(result.legacy.filter(entry => entry.status === 'migrated').length, 2);
   await access(join(legacy, 'SKILL.md')); await access(agent);
-  assert.ok((await readlink(legacy)).startsWith(options.shared));
+  assert.equal(await readlink(legacy), join(options.shared, 'current/upstream/codex/skills/research'));
+  assert.equal(await readlink(agent), join(options.shared, 'current/upstream/codex/agents/web-researcher.toml'));
   assert.equal(await readFile(join(independent, 'personal.md'), 'utf8'), 'keep');
-  assert.equal((await install(options)).legacy.filter(entry => entry.status === 'migrated').length, 0);
+  assert.deepEqual(result.legacy.filter(entry => entry.status === 'preserved').map(entry => [entry.path, entry.reason]), [[independent, 'Not a link; left as it is.']]);
+  const repeated = await install(options);
+  assert.equal(repeated.legacy.filter(entry => entry.status === 'migrated').length, 0);
+  assert.deepEqual(repeated.legacy.filter(entry => entry.status === 'current').map(entry => entry.path).sort(), [agent, legacy].sort());
+});
+
+// The same package with a later version number, as an update would deliver it.
+async function updatedSource(options, version) {
+  const update = join(options.root, `update-${version}`); await mkdir(update);
+  for (const name of ['SKILL.md', 'LICENSE', 'NOTICE.md', 'package.json', 'package-lock.json', 'bootstrap', 'guidance', 'references', 'scripts', 'upstream', 'examples']) await cp(join(source, name), join(update, name), { recursive: true });
+  await writeFile(join(update, 'package.json'), JSON.stringify({ ...JSON.parse(await readFile(join(source, 'package.json'), 'utf8')), version }));
+  return update;
+}
+test('an update leaves exactly one version folder and repoints its own alias links, leaving foreign ones alone', async t => {
+  const options = await fixture(t), first = await install(options), versions = join(options.shared, 'versions');
+  const skills = join(options.home, '.claude/skills'), agents = join(options.home, '.claude/agents'); await mkdir(agents, { recursive: true });
+  // Alias links an earlier installation left pointing into one version folder.
+  const alias = join(skills, 'research'), agent = join(agents, 'web-search-agent.md'), modules = join(agents, 'web-search-modules');
+  await symlink(join(first.versionDirectory, 'upstream/claude/skills/research'), alias);
+  await symlink(join(first.versionDirectory, 'upstream/claude/agents/web-search-agent.md'), agent);
+  await symlink(join(versions, '0.8.0-00000000000000000000/upstream/claude/agents/web-search-modules'), modules);
+  // Someone's own: a link elsewhere and a real folder under alias names.
+  const elsewhere = join(options.root, 'my-research-deep'); await mkdir(elsewhere); await writeFile(join(elsewhere, 'SKILL.md'), 'mine');
+  const foreign = join(skills, 'research-deep'); await symlink(elsewhere, foreign);
+  const own = join(skills, 'research-report'); await mkdir(own); await writeFile(join(own, 'SKILL.md'), 'mine too');
+  // Other things an older installer or an interrupted one left in the versions folder.
+  await mkdir(join(versions, '0.8.0-00000000000000000000/upstream'), { recursive: true }); await writeFile(join(versions, '0.8.0-00000000000000000000/upstream/file'), 'old');
+  await mkdir(join(versions, '.stage-abandoned')); await writeFile(join(versions, '.stage-abandoned/SKILL.md'), 'partial');
+  const outside = join(options.root, 'outside'); await mkdir(outside); await writeFile(join(outside, 'keep.txt'), 'keep');
+  await symlink(outside, join(versions, 'link-to-outside'));
+  const update = await updatedSource(options, '99.0.0');
+  const dry = await install({ ...options, source: update, dryRun: true });
+  assert.deepEqual(dry.wouldRemove.map(path => path.slice(versions.length + 1)), ['.stage-abandoned', '0.8.0-00000000000000000000', first.id, 'link-to-outside']);
+  assert.equal(dry.legacy.filter(entry => entry.status === 'would-migrate').length, 3);
+  assert.equal((await readdir(versions)).length, 4); assert.equal(await readlink(alias), join(first.versionDirectory, 'upstream/claude/skills/research'));
+  const second = await install({ ...options, source: update });
+  assert.equal(second.status, 'installed'); assert.equal(second.runtime, join(options.shared, 'current'));
+  assert.deepEqual(await readdir(versions), [second.id]);
+  assert.deepEqual(second.removed.sort(), dry.wouldRemove); assert.deepEqual(second.retained, []);
+  assert.equal(await readlink(join(options.shared, 'current')), `versions/${second.id}`);
+  // A link in the versions folder was unlinked, not followed.
+  assert.equal(await readFile(join(outside, 'keep.txt'), 'utf8'), 'keep');
+  for (const [path, name] of [[alias, 'skills/research'], [agent, 'agents/web-search-agent.md'], [modules, 'agents/web-search-modules']]) {
+    assert.equal(await readlink(path), join(options.shared, 'current/upstream/claude', name)); await access(path);
+    assert.ok((await realpath(path)).startsWith(second.versionDirectory + '/'));
+  }
+  assert.equal(second.legacy.filter(entry => entry.status === 'migrated').length, 3);
+  assert.equal(await readlink(foreign), elsewhere); assert.equal(await readFile(join(own, 'SKILL.md'), 'utf8'), 'mine too');
+  assert.deepEqual(second.legacy.filter(entry => entry.status === 'preserved').map(entry => [entry.path, entry.reason]).sort(),
+    [[foreign, `A link to ${elsewhere}, outside this tool; left as it is.`], [own, 'Not a link; left as it is.']]);
+  // Alias names nobody had are not created.
+  await assert.rejects(access(join(skills, 'research-add-items')), /ENOENT/);
+  assert.ok(second.legacy.some(entry => entry.path === join(skills, 'research-add-items') && entry.status === 'absent'));
+  // A later update follows without touching the links again.
+  const third = await install({ ...options, source: await updatedSource(options, '99.1.0') });
+  assert.deepEqual(await readdir(versions), [third.id]); assert.equal(third.legacy.filter(entry => entry.status === 'migrated').length, 0);
+  assert.ok((await realpath(alias)).startsWith(third.versionDirectory + '/'));
+});
+test('a failed installation removes nothing, and a version folder that cannot be removed is reported', { skip: typeof process.getuid === 'function' && process.getuid() === 0 }, async t => {
+  const options = await fixture(t), first = await install(options), versions = join(options.shared, 'versions');
+  const alias = join(options.home, '.claude/skills/research'); await symlink(join(first.versionDirectory, 'upstream/claude/skills/research'), alias);
+  const update = await updatedSource(options, '99.0.0'), planned = await install({ ...options, source: update, dryRun: true });
+  // The new version's folder already exists with other content, so the installation stops before the pointer moves.
+  await mkdir(planned.versionDirectory); await writeFile(join(planned.versionDirectory, 'SKILL.md'), 'not this package');
+  await assert.rejects(install({ ...options, source: update }), /ENOENT|Retained runtime was modified/);
+  assert.equal(await readlink(join(options.shared, 'current')), `versions/${first.id}`);
+  assert.deepEqual((await readdir(versions)).sort(), [first.id, planned.id].sort());
+  assert.equal(await readlink(alias), join(first.versionDirectory, 'upstream/claude/skills/research'));
+  assert.equal((await exec(process.execPath, [join(first.runtime, 'scripts/harness-research.mjs'), '--version'])).stdout.trim(), `harness-research ${JSON.parse(await readFile(join(source, 'package.json'), 'utf8')).version}`);
+  await rm(planned.versionDirectory, { recursive: true });
+  // A folder the installer may not empty stays, is reported, and does not fail the update.
+  const stuck = join(versions, '0.7.0-11111111111111111111'); await mkdir(stuck); await writeFile(join(stuck, 'file'), 'in use'); await chmod(stuck, 0o500);
+  t.after(() => chmod(stuck, 0o700).catch(() => {}));
+  const second = await install({ ...options, source: update });
+  assert.equal(second.status, 'installed'); assert.equal(await readlink(join(options.shared, 'current')), `versions/${second.id}`);
+  assert.deepEqual(second.removed, [first.versionDirectory]);
+  assert.deepEqual(second.retained.map(entry => entry.path), [stuck]); assert.match(second.retained[0].reason, /EACCES|EPERM/);
+  assert.deepEqual((await readdir(versions)).sort(), ['0.7.0-11111111111111111111', second.id].sort());
+  assert.equal(await readlink(alias), join(options.shared, 'current/upstream/claude/skills/research'));
+  await chmod(stuck, 0o700);
+  assert.deepEqual(await readdir(join((await install({ ...options, source: update })).shared, 'versions')), [second.id]);
 });
 
 test('installer rejects unsafe parents and unrelated destinations before writes', async t => {

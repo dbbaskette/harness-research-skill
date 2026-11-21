@@ -435,6 +435,10 @@ test('new research records and verifies the saved bootstrap guidance identity of
   const exec=promisify(execFile);await exec('git',['init','-q','--initial-branch=main',source]);await exec('git',['-C',source,'add','.']);
   await exec('git',['-C',source,'-c','user.name=Fixture','-c','user.email=fixture@example.invalid','-c','commit.gpgsign=false','commit','-qm','Synthetic guidance']);
   const pin=await startGuidance({project:f.project,source,runtime});await rm(source,{recursive:true});
+  // A task saved before 1.3.0 names a version folder that an update has since removed; the run still starts.
+  const pinFile=join(pin.guidance,'..','pin.json'),saved=JSON.parse(await readFile(pinFile,'utf8'));delete saved.minimumRuntime;
+  Object.assign(saved,{runtime:join(f.project,'versions','0.9.5-0123456789abcdef0123'),runtimeVersion:'0.9.5',runtimeFiles:{'package.json':'a'.repeat(64)}});
+  await chmod(pinFile,0o600);await writeFile(pinFile,JSON.stringify(saved));
   const started=await startRun({project:f.project,topic:'Pinned identity',guidanceTask:pin.task});
   assert.equal(started.guidanceTask,pin.task);assert.equal(started.guidanceRevision,pin.revision);assert.equal(started.guidanceVersion,'0.9.5');assert.equal(started.runtimeVersion,packageVersion);
   await chmod(pin.guidance,0o600);await writeFile(pin.guidance,'Changed guidance');

@@ -7,7 +7,7 @@ import { OUTPUT_NAMES, outputPrefix, outputPath, digestContent, managedSource } 
 import { assetContext, verifyAssetDossier, updateAssetRevision } from './topic-assets.mjs';
 import { verifyCollectionDossier, bindCollectionDossier, verifyCollectionReviewer } from './collection.mjs';
 
-import { reuseIdentity, checkReuseIdentity } from './synthesis-reuse.mjs';
+import { reuseIdentity, checkReuseIdentity, sameReuseIdentity } from './synthesis-reuse.mjs';
 
 const OUTPUTS = OUTPUT_NAMES;
 const HELP = 'synthesis save|review|validate --project DIR --file INPUT.json --worker ID [--compact|--verbose] | status|verify --project DIR [--compact|--verbose] | template --project DIR [--out NEW.json]. Paths are project-relative. Full responses remain the default; --compact omits sources and review_template. Validate does not write. Template prints pending review JSON or creates --out without overwriting. Save writes drafts; save --reuse-unchanged --context FILE preserves matching reviewed work and returns save_result. Context pins protocol, guidance and independence; runtime bytes are checked. Review binds to exact content. Verify exits 1 for stale/failed integrity; review exits 1 for rejected work. Intact drafts and completed outputs exit 0. The helper never fetches sources or makes semantic judgments.';
@@ -185,7 +185,7 @@ export async function runSynthesisCli(argv) {
         }
       }
       const unchanged = reuse && state?.schema === 3 && state.save_policy === 'unchanged'
-        && stable(reuse) === stable(state.reuse) && state.digest === validated.digest
+        && sameReuseIdentity(reuse, state.reuse) && state.digest === validated.digest
         && state.author === validated.author && stable(state.sources) === stable(validated.sources)
         && stable(state.collection || null) === stable(collection || null)
         && (state.asset_input_fingerprint || null) === (context?.inputFingerprint || null);

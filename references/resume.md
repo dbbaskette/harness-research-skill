@@ -1,6 +1,8 @@
 # Status and resume
 
-Use the saved guidance task/runtime from the installed bootstrap. Do not refresh
+Resume the saved guidance task through the installed bootstrap and run commands
+from the runtime it returns: the installed runtime's stable address, whatever version
+started the work. Relay its `notice` when the runtime has changed. Do not refresh
 guidance or create another plan merely to inspect status or continue the same work.
 
 For queued runs (a saved `.harness-research/research-run.json`), use `research

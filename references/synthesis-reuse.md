@@ -7,7 +7,7 @@ different contracts. Do not silently reinterpret one as the other.
 
 ## Resume the saved work
 
-Resume the bootstrap task to recover its pinned runtime/guidance, then run:
+Resume the bootstrap task to recover its saved guidance and the installed runtime, then run:
 
 ```sh
 node "<runtime>/scripts/harness-research.mjs" synthesis status --project DIR --compact
@@ -25,8 +25,10 @@ review the new digest. Source/snapshot damage cannot be repaired by regeneration
 claiming the previous bundle is verified.
 
 If new guidance is explicitly adopted, disclose the change and recheck conclusions
-affected by changed review rules. A newer installed release does not retroactively
-alter a pinned task’s instructions or evidence.
+affected by changed review rules. A newer installed release runs the commands for
+existing work; it does not alter a task’s saved instructions or evidence, and the
+resume `notice` says when the runtime has changed. Nothing needs rerunning after an
+update: `status` and `verify` recheck the saved digest, source bytes and review.
 
 ## Use the report as source material
 
@@ -64,10 +66,11 @@ node "<runtime>/scripts/harness-research.mjs" synthesis save --project DIR --fil
 ```
 
 The local context file contains schema `1` and nonempty `protocol`, `guidance` and
-`independence` identities. The host supplies its actual pinned protocol/guidance and
-isolated-invocation contract; never invent identities to obtain reuse. Runtime and
-reference bytes are hashed automatically. Dossier, author, source bytes/permissions,
-audience, purpose, scope, collection and topic-input identities must also match.
+`independence` identities. The host supplies its actual protocol, guidance and
+isolated-invocation contract; never invent identities to obtain reuse, and do not
+put an installed path, runtime version or runtime file hash in them. Dossier, author,
+source bytes/permissions, audience, purpose, scope, collection and topic-input
+identities must also match.
 
 An eligible save returns `save_result: no-change`, retaining the exact valid review;
 `review_preserved` is true only for complete reviewed work. Otherwise it returns
@@ -76,8 +79,9 @@ retroactively adopted: the first opted-in save needs a fresh check. Old callers
 without these flags retain revision-based saves. Opted-in internal state uses schema
 3, which older runtimes refuse; portable dossier/output schema stays 2.
 
-Changed/missing context or runtime identity makes opted-in work stale. Missing or
-damaged source/snapshot bytes remain failures. A matching canonical dossier may repair
+Changed or missing context makes opted-in work stale. An updated runtime does not:
+the receipt is not tied to the installed runtime, and a `runtime_digest` saved by an
+earlier release is ignored. Missing or damaged source/snapshot bytes remain failures. A matching canonical dossier may repair
 generated outputs using the existing preserved-backup behavior; it never silently
 adopts edits to generated prose as reviewed content.
 

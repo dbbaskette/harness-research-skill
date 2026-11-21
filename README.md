@@ -16,10 +16,10 @@ evidence, writing, checking, and keeping the result.
 **[Start here](#your-first-report)** · **[Bring your sources](#bring-your-own-sources)** ·
 **[Explore the options](#make-the-research-fit-your-task)** · **[User guide](docs/using-harness-research.md)**
 
-> **Harness Research 1.2.0.** One research run now takes up to 2,000 source entries
-> (was 200), a 5,000-entry inventory and 512 MiB of supplied input, so a host can
-> register a long link list in one run.
-> [Release and downloads](https://github.com/dbbaskette/harness-research-skill/releases/tag/v1.2.0) ·
+> **Harness Research 1.3.0.** Nothing is pinned to one installed version any more:
+> saved research continues on whatever version is installed, the installer keeps only
+> the newest version, and every tool runs from one stable address.
+> [Release history](docs/releases.md) ·
 > [Install and update](docs/setup.md)
 
 ## Your first report
@@ -296,13 +296,15 @@ or change running jobs.
 
 The [first-report steps](#your-first-report) install stable `1.1.0`. For an update,
 use a fresh checkout of the chosen release and run its installer. The installer
-updates the shared skill links for Codex, Claude Code and Cursor while retaining
-older immutable runtimes for pinned tasks. Return to your content folder and start
-a new agent session afterward.
+points the shared skill links for Codex, Claude Code and Cursor at the new version
+and removes the older ones, so there is one installed version and one address for
+it. Return to your content folder and start a new agent session afterward.
 
-New tasks on runtime 1.1.0 select stable 1.1.0 guidance automatically. Older runtimes
-retain compatible guidance until upgraded; refresh does not upgrade executable
-helpers. Existing research keeps its pinned runtime, guidance and layout.
+New tasks select the newest stable guidance the installed runtime supports. Older
+runtimes keep compatible guidance until updated; refresh does not update executable
+helpers. Existing research keeps its saved instructions and layout and continues on
+the newly installed version: nothing has to be restored or converted, and your
+agent tells you when the version has changed since the work began.
 
 For unpublished development work, select the checkout's `SKILL.md` and runtime
 explicitly as described in the [developer guide](docs/development.md).
