@@ -116,6 +116,25 @@ test('metadata keeps stable identity and exact review revision; reintake creates
   assert.equal(revised.revisions[0].digest,'a'.repeat(64));
 });
 
+test('revision saves retain ordered evidence with the same capture and clear obsolete matches',async t=>{
+  const f=await fixture(t);
+  await writeFile(join(f.inputs,'shared.md'),'One capture');
+  const a=await f.init('Evidence',['--directory',f.inputs]);
+  const [entry]=(await assetContext(a.asset)).inventory;
+  const source={origin:entry.origin,permission:entry.permission};
+  const dossier={sources:['second','first','changed'].map(id=>({...source,id}))};
+  const state={digest:'c'.repeat(64),author:'writer',dossier,sources:[
+    {id:'first',sha256:entry.capture_sha256},{id:'changed',sha256:'different'},{id:'second',sha256:entry.capture_sha256}
+  ]};
+  await updateAssetRevision(a.asset,state,{status:'draft'});
+  assert.deepEqual((await assetContext(a.asset)).inventory[0].evidence_ids,['second','first']);
+  dossier.sources=[];
+  await updateAssetRevision(a.asset,state,{status:'draft'});
+  const [cleared]=(await assetContext(a.asset)).inventory;
+  assert.deepEqual(cleared.evidence_ids,[]);
+  assert.equal(cleared.used_in_digest,undefined);
+});
+
 test('asset projections repair from authoritative state but changed input copies block reuse',async t=>{
   const f=await fixture(t);await writeFile(join(f.inputs,'one.txt'),'Authoritative input');
   const a=await f.init('Integrity',['--directory',f.inputs]);
