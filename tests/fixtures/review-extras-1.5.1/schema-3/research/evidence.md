@@ -1,0 +1,46 @@
+# Synthetic extras
+
+> Reviewed synthesis.
+
+Source hashes establish capture integrity; they do not establish truth.
+
+Content digest: `1427a80f32cb14bb6282a91947d50fcfc8c805ef30dd1807e93fc67c79ae3385`. Author: writer.
+
+<a id="fact-a"></a>
+## fact-a
+
+The default is 10.
+
+Author: researcher
+
+> The default is 10.
+
+Source: [source-a](#source-a).
+
+<a id="finding-a"></a>
+## Default
+
+**Summary:** The default is 10. ([fact-a](evidence.md#fact-a))
+
+Supporting facts: [fact-a](evidence.md#fact-a). Counterevidence: none recorded.
+
+## Report prose
+
+### Answer
+
+**Summary:** The default is 10. ([finding-a](evidence.md#finding-a))
+
+<a id="source-a"></a>
+## Synthetic docs
+
+[Original source](https://example.test/docs) · Synthetic fixture · public · full context
+
+Capture: [saved context](sources/revisions/fd87556ff265ae334c12ca253752c8a9186080faec7a03f601f7d52267cf9571.txt); SHA-256: `fd87556ff265ae334c12ca253752c8a9186080faec7a03f601f7d52267cf9571`.
+
+## Independent review
+
+Reviewer: checker. Synthetic fixture saved by Harness Research 1.5.1.
+
+- fact-a — supported: Synthetic fixture checked.
+- finding-a — supported: Synthetic fixture checked.
+- answer:0 — supported: Synthetic fixture checked.

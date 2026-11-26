@@ -69,7 +69,7 @@ export function renderOutputs(state, status) {
     evidence += `Capture: [saved context](${fromOutput(pin.snapshot)}); SHA-256: \`${pin.sha256}\`.\n\n`;
   }
   if (state.review) {
-    const who = state.review.units ? `Reviewers, one per review unit: ${state.review.units.receipts.map(r => `${md(r.reviewer)} (${md(r.unit)})`).join(', ')}.` : `Reviewer: ${md(state.review.worker)}.`;
+    const who = state.schema === 4 ? `Reviewers, one per review unit: ${state.review.units.receipts.map(r => `${md(r.reviewer)} (${md(r.unit)})`).join(', ')}.` : `Reviewer: ${md(state.review.worker)}.`;
     evidence += `## Independent review\n\n${who} ${md(state.review.assessment.note)}\n\n`;
     for (const r of state.review.originals) if (!r.read_original) evidence += `- ${md(r.source)} — original unavailable: ${md(r.access_error)}\n`;
     for (const group of ['facts','findings','prose']) for (const r of state.review[group]) evidence += `- ${md(r.id)} — ${md(r.verdict)}: ${md(r.note)}\n`;

@@ -1,0 +1,40 @@
+{
+  "schema": 2,
+  "digest": "1427a80f32cb14bb6282a91947d50fcfc8c805ef30dd1807e93fc67c79ae3385",
+  "originals": [
+    {
+      "source": "source-a",
+      "sha256": "fd87556ff265ae334c12ca253752c8a9186080faec7a03f601f7d52267cf9571",
+      "read_original": true
+    }
+  ],
+  "facts": [
+    {
+      "id": "fact-a",
+      "verdict": "supported",
+      "note": "Synthetic fixture checked."
+    }
+  ],
+  "findings": [
+    {
+      "id": "finding-a",
+      "verdict": "supported",
+      "note": "Synthetic fixture checked."
+    }
+  ],
+  "prose": [
+    {
+      "id": "answer:0",
+      "verdict": "supported",
+      "note": "Synthetic fixture checked."
+    }
+  ],
+  "assessment": {
+    "coverage": "accurate",
+    "usefulness": "adequate",
+    "note": "Synthetic fixture saved by Harness Research 1.5.1."
+  },
+  "units": {
+    "note": "A host field that 1.5.1 stored with the review."
+  }
+}

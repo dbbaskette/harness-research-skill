@@ -1,0 +1,116 @@
+{
+  "owner": "harness-research-synthesis",
+  "schema": 2,
+  "digest": "1427a80f32cb14bb6282a91947d50fcfc8c805ef30dd1807e93fc67c79ae3385",
+  "status": "complete",
+  "topic": "Synthetic extras",
+  "audience": "Maintainers",
+  "purpose": "Keep a 1.5.1 review readable",
+  "scope": "Synthetic fixture only",
+  "source_mode": "public",
+  "sources": [
+    {
+      "id": "source-a",
+      "file": "source.txt",
+      "origin": "https://example.test/docs",
+      "title": "Synthetic docs",
+      "publisher": "Synthetic fixture",
+      "permission": "public",
+      "context": "full",
+      "sha256": "fd87556ff265ae334c12ca253752c8a9186080faec7a03f601f7d52267cf9571",
+      "snapshot": "research/sources/revisions/fd87556ff265ae334c12ca253752c8a9186080faec7a03f601f7d52267cf9571.txt"
+    }
+  ],
+  "facts": [
+    {
+      "id": "fact-a",
+      "statement": "The default is 10.",
+      "author": "researcher",
+      "citations": [
+        {
+          "source": "source-a",
+          "quote": "The default is 10."
+        }
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "finding-a",
+      "title": "Default",
+      "summary": {
+        "text": "The default is 10.",
+        "kind": "summary",
+        "refs": [
+          "fact-a"
+        ]
+      },
+      "support": [
+        "fact-a"
+      ],
+      "counter": [],
+      "implications": [],
+      "conditions": [],
+      "gaps": []
+    }
+  ],
+  "sections": [
+    {
+      "id": "answer",
+      "title": "Answer",
+      "blocks": [
+        {
+          "text": "The default is 10.",
+          "kind": "summary",
+          "refs": [
+            "finding-a"
+          ]
+        }
+      ]
+    }
+  ],
+  "brief": null,
+  "comparisons": [],
+  "review": {
+    "schema": 2,
+    "digest": "1427a80f32cb14bb6282a91947d50fcfc8c805ef30dd1807e93fc67c79ae3385",
+    "originals": [
+      {
+        "source": "source-a",
+        "sha256": "fd87556ff265ae334c12ca253752c8a9186080faec7a03f601f7d52267cf9571",
+        "read_original": true
+      }
+    ],
+    "facts": [
+      {
+        "id": "fact-a",
+        "verdict": "supported",
+        "note": "Synthetic fixture checked."
+      }
+    ],
+    "findings": [
+      {
+        "id": "finding-a",
+        "verdict": "supported",
+        "note": "Synthetic fixture checked."
+      }
+    ],
+    "prose": [
+      {
+        "id": "answer:0",
+        "verdict": "supported",
+        "note": "Synthetic fixture checked."
+      }
+    ],
+    "assessment": {
+      "coverage": "accurate",
+      "usefulness": "adequate",
+      "note": "Synthetic fixture saved by Harness Research 1.5.1."
+    },
+    "units": {
+      "note": "A host field that 1.5.1 stored with the review."
+    },
+    "worker": "checker",
+    "accepted": true
+  }
+}

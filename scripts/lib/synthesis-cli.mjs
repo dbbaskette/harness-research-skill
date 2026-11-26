@@ -44,8 +44,9 @@ async function readState(path) {
   const state = parseJson(await readFile(path, 'utf8'));
   if (state.owner !== OWNER || ![2, 3, 4].includes(state.schema) || !Array.isArray(state.sources) || !state.dossier || !state.digest) throw new Error('Unrecognized synthesis state; preserve it.');
   if (state.schema >= 3 && !['unchanged', 'revision'].includes(state.save_policy)) throw new Error('Unrecognized synthesis save policy; preserve it.');
-  // Schema 4 holds a review assembled from review units, which runtimes before 1.6.0 refuse.
-  if ((state.schema === 4) !== Boolean(state.review?.units)) throw new Error('Unrecognized synthesis state; preserve it.');
+  // Schema 4, and only schema 4, holds a review assembled from review units; runtimes before 1.6.0
+  // refuse it. Schema 2 and 3 are read as 1.5.1 read them, whatever fields their stored review has.
+  if (state.schema === 4 && !state.review?.units) throw new Error('Unrecognized synthesis state; preserve it.');
   return state;
 }
 async function preserveState(derived, state) {
@@ -103,7 +104,7 @@ async function stateStatus(root, state) {
     }
   }
   let accepted = false;
-  if (state.review?.units) {
+  if (state.schema === 4) {
     try { for (const reviewer of state.review.reviewers) await verifyCollectionReviewer(root, reviewer); accepted = await checkAssembledReview(root, state, state.collection ? await collectionGrain(root) : null); } catch (e) { problems.push(`Review invalid: ${e.message}`); }
   } else if (state.review) { try { await verifyCollectionReviewer(root, state.review.worker); accepted = validateReview(state, state.review, state.review.worker).accepted; } catch (e) { problems.push(`Review invalid: ${e.message}`); } }
   return { status: problems.length ? 'stale' : !state.review ? 'draft' : accepted ? 'complete' : 'needs-revision', problems, artifact_problems: [...new Set(artifactProblems)], integrity_checks: { files_checked: checked.size, bytes_hashed: bytesHashed } };
@@ -128,7 +129,7 @@ async function materialize(root, state, current) {
   return { artifact_integrity: current.artifact_problems.length ? 'failed' : regenerated.length ? 'repaired' : 'verified', regenerated_files: regenerated, preserved_files: preserved };
 }
 function result(state, current, compact) {
-  const base = { schema: 2, ...current, digest: state.digest, author: state.author, reviewer: state.review?.worker || null, ...(state.review?.units ? { reviewers: state.review.reviewers, review_units: { protocol: state.review.units.protocol, plan: state.review.units.plan, units: state.review.units.receipts.length } } : {}), ...(state.layout ? { layout: state.layout } : {}), ...(state.collection ? { collection: state.collection } : {}), outputs: OUTPUTS.map(f => outputPath(state, f)) };
+  const base = { schema: 2, ...current, digest: state.digest, author: state.author, reviewer: state.review?.worker || null, ...(state.schema === 4 ? { reviewers: state.review.reviewers, review_units: { protocol: state.review.units.protocol, plan: state.review.units.plan, units: state.review.units.receipts.length } } : {}), ...(state.layout ? { layout: state.layout } : {}), ...(state.collection ? { collection: state.collection } : {}), outputs: OUTPUTS.map(f => outputPath(state, f)) };
   if (compact) return { ...base, counts: { sources: state.sources.length, facts: state.dossier.facts.length, findings: state.dossier.findings.length }, template_command: 'synthesis template --project DIR' };
   return { ...base, sources: state.sources, review_template: reviewTemplate(state), caveat: 'Worker identities and original-read attestations are supplied by the harness. Hashes and structural validation do not prove truth or process independence.' };
 }
@@ -244,6 +245,8 @@ export async function runSynthesisCli(argv) {
     if (options.action === 'review') {
       current = await stateStatus(root, state); if (current.status === 'stale') throw new Error(`Evidence is stale. Save revised content before review. ${current.problems.join(' ')}`);
       const review = parseJson(await readText(root, options.file));
+      // Fields that belong to an assembled review are refused before anything is written.
+      for (const field of ['units', 'reviewers']) if (review && typeof review === 'object' && Object.hasOwn(review, field)) throw new Error(`A single review cannot carry ${field}; that field belongs to an assembled review (review-units assemble).`);
       await verifyCollectionReviewer(root, options.worker);
       const checked = validateReview(state, review, options.worker);
       await protectOutputs(join(root, outputPrefix(state)), state);
