@@ -61,3 +61,32 @@ test('fix 1: a single review cannot carry assembled-review fields, and 1.5.1 sta
     for (const [i, file] of files.entries()) assert.deepEqual(await readFile(join(root, file)), kept[i], `${file} is read as 1.5.1 wrote it`);
   }
 });
+
+test('fix 2: a receipt retired by retry, an unsuccessful outcome or stop is never kept again', async t => {
+  const f = await project(t); await f.save(dossier()); await f.units('plan');
+  const plan = await f.units('status'), a = plan.units.find(u => u.kind === 'content');
+  const bad = await f.review(a.id, 'bad-reviewer', x => x.facts[0].verdict = 'unsupported');
+  await f.units('retry', { unit: a.id, reason: 'The host discarded this answer.' });
+  const changed = dossier(); changed.facts[1].statement = 'The documented limit is 20.';
+  await f.save(changed);
+  const replanned = await f.units('plan'), unit = replanned.units.find(u => u.id === a.id);
+  assert.equal(unit.status, 'pending'); assert.equal(unit.kept, false); assert.notEqual(unit.reviewer, 'bad-reviewer');
+  const state = JSON.parse(await readFile(join(f.root, '.harness-research/review-units.json'), 'utf8'));
+  const entry = state.receipts.find(r => r.file === bad.receipt.file);
+  assert.equal(entry.retired.reason, 'retry'); assert.equal(entry.retired.note, 'The host discarded this answer.');
+  // Only accepted, never-retired receipts are kept: a good one is, and once retired it is not.
+  await f.review(a.id, 'good-reviewer');
+  await f.save(dossier()); const kept = await f.units('plan');
+  assert.equal(kept.units.find(u => u.id === a.id).status, 'kept'); assert.equal(kept.units.find(u => u.id === a.id).reviewer, 'good-reviewer');
+  await f.units('retry', { unit: a.id, reason: 'Review the kept unit again.' });
+  await f.save(changed); const again = await f.units('plan');
+  assert.equal(again.units.find(u => u.id === a.id).status, 'pending');
+  // A retired receipt planted back on the unit is refused at assembly.
+  const units = JSON.parse(await readFile(join(f.root, '.harness-research/review-units.json'), 'utf8'));
+  const goodEntry = units.receipts.find(r => r.reviewer === 'good-reviewer');
+  assert.equal(goodEntry.retired.reason, 'retry');
+  units.units.find(u => u.id === a.id).kept = { file: goodEntry.file, sha256: goodEntry.sha256, plan: goodEntry.plan, digest: goodEntry.digest, reviewer: goodEntry.reviewer, invocation: goodEntry.invocation, attempt: goodEntry.attempt };
+  await writeFile(join(f.root, '.harness-research/review-units.json'), JSON.stringify(units));
+  await f.reviewAll('round-three');
+  await assert.rejects(f.units('assemble'), /retired/);
+});

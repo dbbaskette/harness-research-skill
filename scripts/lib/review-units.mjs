@@ -60,6 +60,14 @@ async function readPlan(root, state) {
 const unitRecord = (state, id) => { identifier(id, 'Unit'); const unit = state.units.find(u => u.id === id); if (!unit) throw new Error('Unknown review unit.'); return unit; };
 const running = state => state.units.flatMap(u => u.attempts).filter(a => a.started_at && !a.ended_at);
 const receiptOf = unit => unit.kept ?? (unit.attempts.at(-1)?.status === 'accepted' ? unit.attempts.at(-1).receipt : null);
+// A receipt the host gave up on (retry, an unsuccessful outcome, stop) is retired for good, with why.
+const indexed = (state, ref) => ref ? state.receipts.find(e => e.file === ref.file && e.sha256 === ref.sha256) : null;
+function retire(state, ref, reason, note) { const entry = indexed(state, ref); if (entry && !entry.retired) entry.retired = { reason, note, at: now() }; }
+function usable(state, ref) {
+  const entry = indexed(state, ref);
+  if (!entry) throw new Error('Review unit receipt is not an accepted receipt of this review.');
+  if (entry.retired) throw new Error(`Review unit receipt for ${entry.unit} was retired by ${entry.retired.reason}; review the unit again.`);
+}
 const unitStatus = unit => unit.kept ? 'kept' : unit.attempts.at(-1)?.status ?? 'pending';
 
 function timing(state, current = Date.now()) {
@@ -80,7 +88,7 @@ async function report(root, state, synthesis, check = true) {
     for (const [index, record] of state.units.entries()) {
       const ref = receiptOf(record);
       if (!ref) continue;
-      try { await checkReceipt(root, synthesis.state, plan.units[index], ref); } catch (error) { problems.push(error.message); }
+      try { usable(state, ref); await checkReceipt(root, synthesis.state, plan.units[index], ref); } catch (error) { problems.push(error.message); }
     }
   }
   const assembled = current && synthesis.state.review?.units?.plan === state.plan.digest;
@@ -108,7 +116,7 @@ function currentPlan(state, synthesis) {
 // Keep an earlier accepted content receipt whose basis is unchanged and whose bytes and reviewer still hold.
 async function keptReceipt(root, state, synthesis, unit) {
   if (unit.kind !== 'content') return null;
-  for (const entry of state.receipts.filter(r => r.basis === unit.basis).reverse()) {
+  for (const entry of state.receipts.filter(r => r.basis === unit.basis && !r.retired).reverse()) {
     try {
       await checkReceipt(root, synthesis.state, unit, entry, { reviewer: entry.reviewer, invocation: entry.invocation, attempt: entry.attempt, plan: entry.plan });
       await verifyCollectionReviewer(root, entry.reviewer);
@@ -165,6 +173,7 @@ async function assemble(root, state, synthesis) {
     if (unit.kind === 'final' && attempt?.status !== 'accepted') throw new Error('The final unit has no accepted answer for this plan.');
     const ref = record.kept ?? (attempt?.status === 'accepted' ? attempt.receipt : null);
     if (!ref) throw new Error(`Unit ${unit.id} has no kept or accepted receipt.`);
+    usable(state, ref);
     const expected = record.kept ? { reviewer: ref.reviewer, invocation: ref.invocation, attempt: ref.attempt, plan: ref.plan } : { reviewer: attempt.reviewer, invocation: attempt.invocation, attempt: attempt.number, plan: state.plan.digest, digest: synthesis.state.digest };
     const receipt = await checkReceipt(root, synthesis.state, unit, ref, expected);
     await verifyCollectionReviewer(root, receipt.reviewer);
@@ -192,7 +201,7 @@ export async function runReviewUnitsCli(argv) {
     if (options.action === 'status') return await report(root, state, synthesis);
     if (options.action === 'stop') {
       state.status = 'stopped';
-      for (const unit of state.units) { const attempt = unit.attempts.at(-1); if (attempt?.status === 'running') { attempt.status = 'cancelled'; attempt.cancellation_requested_at = now(); } }
+      for (const unit of state.units) { const attempt = unit.attempts.at(-1); if (attempt?.status === 'running') { attempt.status = 'cancelled'; attempt.cancellation_requested_at = now(); retire(state, attempt.receipt, 'stop', 'Stopped before acceptance.'); } }
       await saveState(root, state); return await report(root, state, synthesis, false);
     }
     if (options.action === 'finish') {
@@ -204,6 +213,7 @@ export async function runReviewUnitsCli(argv) {
       if (!attempt) throw new Error('Host finish does not match a registered review invocation.');
       if (attempt.ended_at) { if (attempt.outcome && attempt.outcome !== input.outcome) throw new Error('Host finish conflicts with the recorded terminal observation.'); return await report(root, state, synthesis, false); }
       attempt.ended_at = now(); attempt.outcome = input.outcome; attempt.terminal_note = input.note;
+      if (input.outcome !== 'completed') retire(state, attempt.receipt, input.outcome, input.note);
       if (attempt.status === 'running') attempt.status = input.outcome === 'completed' ? 'finished' : input.outcome;
       await saveState(root, state); return await report(root, state, synthesis, false);
     }
@@ -214,6 +224,7 @@ export async function runReviewUnitsCli(argv) {
       const unit = unitRecord(state, input.unit), previous = unit.attempts.at(-1);
       if (previous?.status === 'reserved') throw new Error('A retry is already reserved.');
       if (previous?.status === 'running') { previous.status = 'cancelled'; previous.cancellation_requested_at = now(); }
+      retire(state, previous?.receipt, 'retry', input.reason); retire(state, unit.kept, 'retry', input.reason);
       unit.kept = null;
       unit.attempts.push({ number: (previous?.number ?? 0) + 1, status: 'reserved', reason: input.reason });
       await saveState(root, state); return await report(root, state, synthesis, false);
