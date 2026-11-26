@@ -1,7 +1,7 @@
 import { readFile, writeFile, realpath } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { exists, directory, localFile, readText, atomic, hash, stable, parseJson, identifier, text, acquireLock, releaseLock } from './run-storage.mjs';
-import { loadSynthesis, synthesisStatus, recordAssembledReview, setAsideAssembledReview, writeTemplate } from './synthesis-cli.mjs';
+import { loadSynthesis, synthesisStatus, recordAssembledReview, setAsideAssembledReview, checkSetAside, writeTemplate } from './synthesis-cli.mjs';
 import { verifyCollectionReviewer, collectionGrain } from './collection.mjs';
 import { outputPath } from './synthesis-layout.mjs';
 import { proseItems } from './synthesis-model.mjs';
@@ -168,6 +168,7 @@ async function planAction(root, existing, synthesis, input) {
   const stored = await storedPlan(root, name, bytes);
   const again = !existing || existing.plan.digest !== digest || Boolean(broken);
   if (existing && running(existing).length && (again || existing.status === 'stopped')) throw new Error(again ? REPLAN_RUNNING : RESUME_RUNNING);
+  if (broken) await checkSetAside(root, synthesis.state);
   // Writes only from here.
   if (stored.changed) {
     // The plan file is derived from the saved state: keep the changed bytes, then write the plan again.

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, writeFile, readFile, rm, cp, readdir } from 'node:fs/promises';
+import { mkdtemp, mkdir, writeFile, readFile, rm, cp, readdir } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { runReviewUnitsCli } from '../scripts/lib/review-units.mjs';
@@ -250,4 +250,16 @@ test('stop refuses a late answer the host saw complete, also after plan resumes'
   await assert.rejects(f.units('accept', answer), /not active/);
   await f.units('retry', { unit, reason: 'Dispatch after stop.' });
   assert.equal((await f.review(unit, 'r2')).accepted, true);
+});
+
+test('I2: assemble and plan check output backups before writing anything', async t => {
+  // A backup already stored for the current report, but with other bytes: writing over the report would fail.
+  const plant = async f => { const report = await readFile(join(f.root, 'research/report.md')), dir = join(f.root, '.harness-research/output-backups'); await mkdir(dir, { recursive: true }); await writeFile(join(dir, `${hash(report)}-report.md`), 'A changed backup.'); };
+  const f = await project(t); await f.save(dossier()); await f.units('plan'); await f.reviewAll('first');
+  await plant(f);
+  await refusesUntouched(f, () => f.units('assemble'), /Output backup changed/);
+  const g = await assembled(t);
+  await g.units('retry', { unit: (await g.units('status')).units.find(u => u.kind === 'content').id, reason: 'Discarded.' });
+  await plant(g);
+  await refusesUntouched(g, () => g.units('plan'), /Output backup changed/);
 });

@@ -149,6 +149,16 @@ async function writeTemplate(root, name, template, state) {
   if (managed(relative(root, join(parent, basename(path))).split(sep).join('/'))) throw new Error('--out cannot write through an alias to managed research files.');
   await writeFile(path, JSON.stringify(template, null, 2) + '\n', { flag: 'wx', mode: 0o600 });
 }
+// Every refusal materialize could make, made without writing: review units call it before any write.
+async function checkMaterialize(root, state, status) {
+  const output = join(root, outputPrefix(state)); await protectOutputs(output, state);
+  for (const [name, content] of Object.entries(renderOutputs(state, status))) {
+    let previous = null; try { previous = await readFile(join(output, name)); } catch (e) { if (e.code !== 'ENOENT') throw e; }
+    if (previous === null || previous.equals(Buffer.from(content))) continue;
+    const path = join(root, '.harness-research', 'output-backups', `${hash(previous)}-${name}`), info = await exists(path);
+    if (info && (!info.isFile() || info.isSymbolicLink() || !(await readFile(path)).equals(previous))) throw new Error('Output backup changed; preserve and inspect it.');
+  }
+}
 // Lock-free pieces for review units, which hold the shared research lock themselves.
 export async function loadSynthesis(root) {
   const derived = join(root, '.harness-research');
@@ -162,7 +172,7 @@ export const synthesisStatus = stateStatus;
 export { writeTemplate };
 export async function recordAssembledReview(root, state, review, current, context, compact = false) {
   const derived = join(root, '.harness-research');
-  await protectOutputs(join(root, outputPrefix(state)), state);
+  await checkMaterialize(root, { ...state, schema: 4, save_policy: state.save_policy ?? 'revision', review }, review.accepted ? 'complete' : 'needs-revision');
   await preserveState(derived, state);
   state.schema = 4; state.save_policy ??= 'revision'; state.review = review;
   await atomic(join(derived, 'synthesis.json'), JSON.stringify(state, null, 2) + '\n');
@@ -174,9 +184,13 @@ export async function recordAssembledReview(root, state, review, current, contex
 }
 // Sets aside an assembled review that no longer checks out: the state is kept in history, as a
 // replaced review is, and the dossier returns to a draft awaiting review.
+export async function checkSetAside(root, state) {
+  const next = { ...state, schema: 3, review: null };
+  await checkMaterialize(root, next, (await stateStatus(root, next)).status);
+}
 export async function setAsideAssembledReview(root, state, context) {
   const derived = join(root, '.harness-research');
-  await protectOutputs(join(root, outputPrefix(state)), state);
+  await checkSetAside(root, state);
   await preserveState(derived, state);
   state.schema = 3; state.review = null;
   await atomic(join(derived, 'synthesis.json'), JSON.stringify(state, null, 2) + '\n');
