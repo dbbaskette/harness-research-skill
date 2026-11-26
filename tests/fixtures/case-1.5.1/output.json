@@ -1,0 +1,45 @@
+{
+  "owner": "harness-research-synthesis",
+  "schema": 2,
+  "digest": "605dc2d4800d941f61bee7c47215806b6b393cf21f344ba2962c9d495a36f17c",
+  "status": "complete",
+  "collection": {
+    "request_digest": "57169dcdad57b6d5f8e23b0c8aaa0f9aa1add391b2c553f82741fbc43d485b79",
+    "generation": 1,
+    "registry_digest": "e52ce5a7487c6c22539d91994543dcd2738fe97e9c50c3f34579016af99cd5ad"
+  },
+  "artifacts": [
+    {
+      "file": "report.md",
+      "sha256": "6338bf0f54806208a6d39459f12af415c305378cb0d6419147a04a4c852ec925"
+    },
+    {
+      "file": "brief.md",
+      "sha256": "ceddc4cd4c2313c0ba2950e85fb9b04c0cbe180c432f158ac5b8305e03b19e6e"
+    },
+    {
+      "file": "evidence.md",
+      "sha256": "cbdcf4e5c851cd867048fa52fda7af3e6494c2a9b5a17aa10cc57f06041532cc"
+    },
+    {
+      "file": "facts.json",
+      "sha256": "b03378851a1c1c2976167c8a61809cd646e33117506de8ae40397bb4c18a1af0"
+    },
+    {
+      "file": "sources/revisions/b237834374e2b34977bc418420988b1275f7aeb7ba9598f7d42e7c86f4688e61.txt",
+      "sha256": "b237834374e2b34977bc418420988b1275f7aeb7ba9598f7d42e7c86f4688e61"
+    },
+    {
+      "file": "sources/revisions/b237834374e2b34977bc418420988b1275f7aeb7ba9598f7d42e7c86f4688e61.md",
+      "sha256": "b237834374e2b34977bc418420988b1275f7aeb7ba9598f7d42e7c86f4688e61"
+    },
+    {
+      "file": "sources/revisions/faaf4d627d472167473353dd6e141cbd4ac944928114a8114928efa34375b244.txt",
+      "sha256": "faaf4d627d472167473353dd6e141cbd4ac944928114a8114928efa34375b244"
+    },
+    {
+      "file": "sources/revisions/faaf4d627d472167473353dd6e141cbd4ac944928114a8114928efa34375b244.md",
+      "sha256": "faaf4d627d472167473353dd6e141cbd4ac944928114a8114928efa34375b244"
+    }
+  ]
+}

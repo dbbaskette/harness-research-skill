@@ -16,7 +16,7 @@ evidence, writing, checking, and keeping the result.
 **[Start here](#your-first-report)** · **[Bring your sources](#bring-your-own-sources)** ·
 **[Explore the options](#make-the-research-fit-your-task)** · **[User guide](docs/using-harness-research.md)**
 
-> **Harness Research 1.5.1.** Everything comes from `main`: install from `main`,
+> **Harness Research 1.6.0.** Everything comes from `main`: install from `main`,
 > and new research uses the instructions on `main`. Saved research continues on
 > whatever version is installed, and every tool runs from one stable address.
 > [Release history](docs/releases.md) ·
@@ -251,7 +251,16 @@ check verifies saved files; a live refresh requires reading permitted sources
 again. Source hashes and exact quote matching help preserve the evidence, while
 the reviewer judges its meaning and whether it supports the claims.
 
-[How evidence and review work →](docs/using-harness-research.md#evidence-and-review)
+A host can also split that review into **review units** that run at the same
+time, up to three at once: each source, claim and prose block is owned by exactly
+one unit with its own registered reviewer, every unit leaves a receipt bound to the
+exact source bytes it checked, and the receipts assemble into the same review. After
+a correction, units whose content is unchanged keep their receipts and only the
+changed units and a final whole-report check run again. The single review stays
+the default.
+
+[How evidence and review work →](docs/using-harness-research.md#evidence-and-review) ·
+[Review units →](references/review-units.md)
 
 ## Continue the work later
 

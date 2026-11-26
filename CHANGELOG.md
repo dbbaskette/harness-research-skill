@@ -1,5 +1,24 @@
 # Changelog
 
+## 1.6.0 — 2026-11-26
+
+- Add review units (protocol `harness-review-units-v1`): `review-units plan|assign|template|register|accept|finish|retry|stop|status|assemble`. A deterministic plan gives every source original, fact, finding and prose block to exactly one unit and the coverage and usefulness assessment to a final unit; each unit is given what its items cite to read. Registered reviewers, independent of every author and investigator and one per unit, answer up to `max_reviewers` (1 to 3) units at once; each accepted answer leaves an immutable receipt bound to its attempt, its basis and the exact capture and original hashes. `assemble` records the ordinary review from the receipts; after a correction, units whose basis is unchanged keep their receipts.
+- An assembled review is saved in synthesis state schema 4, which earlier runtimes refuse. Its results set `reviewer` to `null` and add `reviewers` and `review_units`; `evidence.md` names each unit's reviewer; asset revisions record `reviewers`. `status` and `verify` recheck every receipt. A later single review returns the state to schema 3.
+- Describe the capability in `references/review-units-capability.json` and `references/review-units.schema.json`, with a host page (`references/review-units.md`) and a unit reviewer page (`references/review-unit.md`). `synthesis template` and `synthesis review` are unchanged.
+- A newly taken-in supplied document records its origin as `supplied:` followed by its name inside the supplied folder, not the full path of that folder. A document already in an asset's inventory keeps its origin on every later intake, so assets and cases made earlier keep their absolute origins and still verify.
+- Publish 1.6.0 guidance with a runtime 1.6.0 floor.
+
+## 1.5.1 — 2026-11-21
+
+- Saving or reviewing synthesis in a topic asset matches inventory entries to the saved sources through one index per revision instead of a search per entry; `evidence_ids` and `used_in_digest` are unchanged.
+- Publish 1.5.1 guidance with a runtime 1.5.1 floor.
+
+## 1.5.0 — 2026-11-21
+
+- `collection capture` accepts a batch: `sources`, an array, in place of `source`. The batch is registered together, a failed batch registers none of its sources, and the result lists `receipts`. Collection results report `batch_capture: true`.
+- Collection commands verify supplied inputs once per command: a result that follows a check already made reuses it, and status rechecks the registry without verifying the inputs a second time.
+- Publish 1.5.0 guidance; its runtime floor was raised from 1.3.1 to 1.5.0 in a follow-up commit.
+
 ## 1.3.1 — 2026-11-20
 
 - Take everything from `main`. `start` always uses the guidance on `refs/heads/main` of the trusted repository; it no longer lists or selects release tags, and the older-compatible-release fallback, its `newerRelease` and notice, and the `releaseLimit` option are removed. New pins record `channel: "main"` and `ref: "refs/heads/main"`.

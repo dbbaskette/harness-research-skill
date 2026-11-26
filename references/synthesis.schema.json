@@ -556,6 +556,18 @@
             }
           }
         },
+        "reviewers": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+          },
+          "description": "Present only on a review assembled from review units: every actual unit reviewer, sorted. Such a review names no single worker."
+        },
+        "units": {
+          "type": "object",
+          "description": "Present only on a review assembled from review units; see review-units.schema.json#/$defs/assembled."
+        },
         "assessment": {
           "type": "object",
           "required": [

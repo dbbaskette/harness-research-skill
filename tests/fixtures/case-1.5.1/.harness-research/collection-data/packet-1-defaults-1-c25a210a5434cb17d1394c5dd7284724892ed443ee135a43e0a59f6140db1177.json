@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "request_digest": "57169dcdad57b6d5f8e23b0c8aaa0f9aa1add391b2c553f82741fbc43d485b79",
+  "generation": 1,
+  "workstream": "defaults",
+  "attempt": 1,
+  "investigator": "investigator-defaults",
+  "sources": [
+    {
+      "id": "supplied",
+      "origin": "/example/supplied-inputs/guide.md",
+      "title": "Synthetic defaults",
+      "publisher": "Synthetic fixture",
+      "file": "sources/b237834374e2b34977bc418420988b1275f7aeb7ba9598f7d42e7c86f4688e61.txt",
+      "original_file": "documents/b237834374e2b34977bc418420988b1275f7aeb7ba9598f7d42e7c86f4688e61.md",
+      "permission": "selected",
+      "context": "full"
+    }
+  ],
+  "facts": [
+    {
+      "id": "fact",
+      "statement": "The default is 10.",
+      "author": "investigator-defaults",
+      "citations": [
+        {
+          "source": "supplied",
+          "quote": "The default is 10."
+        }
+      ]
+    }
+  ],
+  "limitations": [],
+  "gaps": []
+}

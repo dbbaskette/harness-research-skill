@@ -4,8 +4,9 @@ import { exists, directory, localFile, readText, atomic, hash, stable, parseJson
 import { OWNER, digestSource, validateDossier, validateReview, reviewTemplate } from './synthesis-model.mjs';
 import { renderOutputs } from './synthesis-output.mjs';
 import { OUTPUT_NAMES, outputPrefix, outputPath, digestContent, managedSource } from './synthesis-layout.mjs';
-import { assetContext, verifyAssetDossier, updateAssetRevision } from './topic-assets.mjs';
-import { verifyCollectionDossier, bindCollectionDossier, verifyCollectionReviewer } from './collection.mjs';
+import { assetContext, verifyAssetDossier, updateAssetRevision, checkAssetRevision } from './topic-assets.mjs';
+import { verifyCollectionDossier, bindCollectionDossier, verifyCollectionReviewer, collectionGrain } from './collection.mjs';
+import { checkAssembledReview } from './review-units-model.mjs';
 
 import { reuseIdentity, checkReuseIdentity, sameReuseIdentity } from './synthesis-reuse.mjs';
 
@@ -41,8 +42,11 @@ async function readState(path) {
   const info = await exists(path); if (!info) return null;
   if (!info.isFile() || info.isSymbolicLink()) throw new Error('Synthesis state must be a regular owned file.');
   const state = parseJson(await readFile(path, 'utf8'));
-  if (state.owner !== OWNER || ![2, 3].includes(state.schema) || !Array.isArray(state.sources) || !state.dossier || !state.digest) throw new Error('Unrecognized synthesis state; preserve it.');
-  if (state.schema === 3 && !['unchanged', 'revision'].includes(state.save_policy)) throw new Error('Unrecognized synthesis save policy; preserve it.');
+  if (state.owner !== OWNER || ![2, 3, 4].includes(state.schema) || !Array.isArray(state.sources) || !state.dossier || !state.digest) throw new Error('Unrecognized synthesis state; preserve it.');
+  if (state.schema >= 3 && !['unchanged', 'revision'].includes(state.save_policy)) throw new Error('Unrecognized synthesis save policy; preserve it.');
+  // Schema 4, and only schema 4, holds a review assembled from review units; runtimes before 1.6.0
+  // refuse it. Schema 2 and 3 are read as 1.5.1 read them, whatever fields their stored review has.
+  // A malformed schema-4 review is read and then reported by status as an invalid review.
   return state;
 }
 async function preserveState(derived, state) {
@@ -64,7 +68,7 @@ async function protectOutputs(output, state) {
 }
 async function stateStatus(root, state) {
   const problems = [], artifactProblems = [], checked = new Map();
-  if (state.schema === 3 && state.save_policy === 'unchanged') {
+  if (state.schema >= 3 && state.save_policy === 'unchanged') {
     try { await checkReuseIdentity(root, state.reuse); } catch (error) { problems.push(error.message); }
   }
   let bytesHashed = 0;
@@ -100,7 +104,9 @@ async function stateStatus(root, state) {
     }
   }
   let accepted = false;
-  if (state.review) { try { await verifyCollectionReviewer(root, state.review.worker); accepted = validateReview(state, state.review, state.review.worker).accepted; } catch (e) { problems.push(`Review invalid: ${e.message}`); } }
+  if (state.schema === 4) {
+    try { accepted = await checkAssembledReview(root, state, state.collection ? await collectionGrain(root) : null); for (const reviewer of state.review.reviewers) await verifyCollectionReviewer(root, reviewer); } catch (e) { accepted = false; problems.push(`Review invalid: ${e.message}`); }
+  } else if (state.review) { try { await verifyCollectionReviewer(root, state.review.worker); accepted = validateReview(state, state.review, state.review.worker).accepted; } catch (e) { problems.push(`Review invalid: ${e.message}`); } }
   return { status: problems.length ? 'stale' : !state.review ? 'draft' : accepted ? 'complete' : 'needs-revision', problems, artifact_problems: [...new Set(artifactProblems)], integrity_checks: { files_checked: checked.size, bytes_hashed: bytesHashed } };
 }
 async function materialize(root, state, current) {
@@ -122,8 +128,13 @@ async function materialize(root, state, current) {
   }
   return { artifact_integrity: current.artifact_problems.length ? 'failed' : regenerated.length ? 'repaired' : 'verified', regenerated_files: regenerated, preserved_files: preserved };
 }
+// What a result says about an assembled review, read defensively: status reports a malformed one.
+function assembledSummary(review) {
+  const units = review && typeof review.units === 'object' ? review.units : null;
+  return { reviewers: Array.isArray(review?.reviewers) ? review.reviewers.filter(r => typeof r === 'string') : [], review_units: { protocol: units?.protocol ?? null, plan: units?.plan ?? null, units: Array.isArray(units?.receipts) ? units.receipts.length : 0 } };
+}
 function result(state, current, compact) {
-  const base = { schema: 2, ...current, digest: state.digest, author: state.author, reviewer: state.review?.worker || null, ...(state.layout ? { layout: state.layout } : {}), ...(state.collection ? { collection: state.collection } : {}), outputs: OUTPUTS.map(f => outputPath(state, f)) };
+  const base = { schema: 2, ...current, digest: state.digest, author: state.author, reviewer: state.review?.worker || null, ...(state.schema === 4 ? assembledSummary(state.review) : {}), ...(state.layout ? { layout: state.layout } : {}), ...(state.collection ? { collection: state.collection } : {}), outputs: OUTPUTS.map(f => outputPath(state, f)) };
   if (compact) return { ...base, counts: { sources: state.sources.length, facts: state.dossier.facts.length, findings: state.dossier.findings.length }, template_command: 'synthesis template --project DIR' };
   return { ...base, sources: state.sources, review_template: reviewTemplate(state), caveat: 'Worker identities and original-read attestations are supplied by the harness. Hashes and structural validation do not prove truth or process independence.' };
 }
@@ -137,6 +148,67 @@ async function writeTemplate(root, name, template, state) {
   if (parent !== root && !parent.startsWith(root + sep)) throw new Error('--out escapes the project.');
   if (managed(relative(root, join(parent, basename(path))).split(sep).join('/'))) throw new Error('--out cannot write through an alias to managed research files.');
   await writeFile(path, JSON.stringify(template, null, 2) + '\n', { flag: 'wx', mode: 0o600 });
+}
+// The refusal preserveState could make, made without writing.
+async function checkPreserve(derived, state) {
+  const history = join(derived, 'synthesis-history'), folder = await exists(history);
+  if (folder && (!folder.isDirectory() || folder.isSymbolicLink())) throw new Error(`Research storage must be a real directory: ${history}`);
+  const path = join(history, `${state.digest}-${hash(stable(state)).slice(0, 16)}.json`), info = await exists(path);
+  if (info && (!info.isFile() || info.isSymbolicLink() || await readFile(path, 'utf8') !== JSON.stringify(state, null, 2) + '\n')) throw new Error('Synthesis history changed; preserve and inspect it.');
+}
+// Every refusal materialize could make, made without writing: review units call it before any write.
+async function checkMaterialize(root, state, status) {
+  const output = join(root, outputPrefix(state)); await protectOutputs(output, state);
+  for (const [name, content] of Object.entries(renderOutputs(state, status))) {
+    let previous = null; try { previous = await readFile(join(output, name)); } catch (e) { if (e.code !== 'ENOENT') throw e; }
+    if (previous === null || previous.equals(Buffer.from(content))) continue;
+    const path = join(root, '.harness-research', 'output-backups', `${hash(previous)}-${name}`), info = await exists(path);
+    if (info && (!info.isFile() || info.isSymbolicLink() || !(await readFile(path)).equals(previous))) throw new Error('Output backup changed; preserve and inspect it.');
+  }
+}
+// Lock-free pieces for review units, which hold the shared research lock themselves.
+export async function loadSynthesis(root) {
+  const derived = join(root, '.harness-research');
+  if (await exists(join(derived, 'research-run.json')) || await exists(join(derived, 'research.json'))) throw new Error('Existing legacy research engine owns this project. Use a separate project directory; existing research is preserved.');
+  const context = await assetContext(root), state = await readState(join(derived, 'synthesis.json'));
+  if (!state) throw new Error('No synthesis dossier saved in this project.');
+  if ((state.layout || null) !== (context?.layout || null)) throw new Error('Saved output layout does not match the topic asset; preserve and inspect it.');
+  return { state, context };
+}
+export const synthesisStatus = stateStatus;
+export { writeTemplate };
+export async function recordAssembledReview(root, state, review, current, context, compact = false) {
+  const derived = join(root, '.harness-research');
+  await checkPreserve(derived, state);
+  await checkMaterialize(root, { ...state, schema: 4, save_policy: state.save_policy ?? 'revision', review }, review.accepted ? 'complete' : 'needs-revision');
+  if (context) await checkAssetRevision(root);
+  await preserveState(derived, state);
+  state.schema = 4; state.save_policy ??= 'revision'; state.review = review;
+  await atomic(join(derived, 'synthesis.json'), JSON.stringify(state, null, 2) + '\n');
+  current.status = review.accepted ? 'complete' : 'needs-revision';
+  const artifacts = await materialize(root, state, current);
+  const response = { ...result(state, current, compact), ...artifacts };
+  if (context) await updateAssetRevision(root, state, response);
+  return response;
+}
+// Sets aside an assembled review that no longer checks out: the state is kept in history, as a
+// replaced review is, and the dossier returns to a draft awaiting review.
+export async function checkSetAside(root, state, context) {
+  const next = { ...state, schema: 3, review: null };
+  await checkPreserve(join(root, '.harness-research'), state);
+  await checkMaterialize(root, next, (await stateStatus(root, next)).status);
+  if (context) await checkAssetRevision(root);
+}
+export async function setAsideAssembledReview(root, state, context) {
+  const derived = join(root, '.harness-research');
+  await checkSetAside(root, state, context);
+  await preserveState(derived, state);
+  state.schema = 3; state.review = null;
+  await atomic(join(derived, 'synthesis.json'), JSON.stringify(state, null, 2) + '\n');
+  const current = await stateStatus(root, state);
+  const artifacts = await materialize(root, state, current);
+  if (context) await updateAssetRevision(root, state, { ...result(state, current, true), ...artifacts });
+  return current;
 }
 export async function runSynthesisCli(argv) {
   const options = args(argv); if (options.action === 'help') return { usage: HELP };
@@ -184,7 +256,7 @@ export async function runSynthesisCli(argv) {
           source.original_snapshot = await pin(capture.original_file, capture.original_sha256, /^\.[a-z0-9]{1,10}$/i.test(suffix) ? suffix.toLowerCase() : '.bin');
         }
       }
-      const unchanged = reuse && state?.schema === 3 && state.save_policy === 'unchanged'
+      const unchanged = reuse && state?.schema >= 3 && state.save_policy === 'unchanged'
         && sameReuseIdentity(reuse, state.reuse) && state.digest === validated.digest
         && state.author === validated.author && stable(state.sources) === stable(validated.sources)
         && stable(state.collection || null) === stable(collection || null)
@@ -196,7 +268,7 @@ export async function runSynthesisCli(argv) {
         await preserveState(derived, state);
         // Legacy save remains revision-based. Explicit reuse adopts an internal schema
         // older runtimes refuse, without changing portable dossier/output schema 2.
-        const modern = Boolean(reuse) || state?.schema === 3;
+        const modern = Boolean(reuse) || state?.schema >= 3;
         state = {owner: OWNER, schema: modern ? 3 : 2, ...layout,
           ...(modern ? {save_policy: reuse ? 'unchanged' : 'revision'} : {}), ...(reuse ? {reuse} : {}),
           ...(context ? {asset_input_fingerprint: context.inputFingerprint} : {}), ...(collection ? {collection} : {}),
@@ -216,11 +288,15 @@ export async function runSynthesisCli(argv) {
     if (options.action === 'review') {
       current = await stateStatus(root, state); if (current.status === 'stale') throw new Error(`Evidence is stale. Save revised content before review. ${current.problems.join(' ')}`);
       const review = parseJson(await readText(root, options.file));
+      // Fields that belong to an assembled review are refused before anything is written.
+      for (const field of ['units', 'reviewers']) if (review && typeof review === 'object' && Object.hasOwn(review, field)) throw new Error(`A single review cannot carry ${field}; that field belongs to an assembled review (review-units assemble).`);
       await verifyCollectionReviewer(root, options.worker);
       const checked = validateReview(state, review, options.worker);
       await protectOutputs(join(root, outputPrefix(state)), state);
       await preserveState(derived, state);
       state.review = checked;
+      // A single review replaces an assembled one; the state no longer needs schema 4.
+      if (state.schema === 4) state.schema = 3;
       await atomic(statePath, JSON.stringify(state, null, 2) + '\n');
     }
     // Review changes no source bytes; reuse its inspection, but recompute acceptance.

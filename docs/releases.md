@@ -4,6 +4,62 @@ Everything comes from `main`. A version number and its entry here label a point
 in `main`'s history; installing, updating and new guidance all read `main`, and
 nothing selects or waits for a tag.
 
+## 1.6.0
+
+Lets a host have the independent review of a saved dossier done as bounded units
+that run at the same time (Marketing Studio issue 378), and keeps folders of the
+computer out of supplied documents' origins (Marketing Studio issue 550).
+
+- **Review units.** `review-units plan` gives every source original, fact, finding
+  and prose block to exactly one unit, following the collection's workstreams or,
+  without a collection, each source; findings and prose follow the unit owning most
+  of what they cite; prose citing nothing and the coverage and usefulness
+  assessment go to a final unit. Each unit is also given what its items cite, to
+  read and not to attest. The same saved state and options give the same plan.
+- **Real, independent reviewers.** A host registers one reviewer invocation per
+  unit, independent of the save author, every fact author and every investigator,
+  and at most `max_reviewers` (1 to 3) at once. A unit answer carries the same
+  per-item fields and hash checks as the single review, for what the unit owns.
+- **Durable receipts.** Each accepted answer leaves an immutable receipt bound to
+  its attempt, its basis (owned and given content and their pins) and the exact
+  capture and original hashes. `finish`, `retry` and `stop` work as they do for
+  collection; other units' receipts are never touched. A receipt given up by
+  `retry` is retired: nothing uses it again, and a recorded review resting on it is
+  reported invalid until `plan` sets that review aside. `stop` refuses late answers.
+- **Strict assembly.** `assemble` refuses a missing, duplicate, stale, foreign or
+  non-independent receipt or a changed pinned file, and records the ordinary review
+  with the same `accepted` rule, its `reviewers` and its receipts. `status` and
+  `verify` recheck the receipts. After a correction, a new plan keeps each unit
+  whose basis is unchanged; only the changed units and the final unit run again.
+- **Compatibility.** An assembled review lives in synthesis state schema 4, which
+  1.5.1 and earlier refuse rather than misread; its results report `reviewer: null`
+  with `reviewers`. `synthesis template` and `synthesis review` are unchanged, and
+  a state reviewed the single way stays valid. Hosts discover the capability from
+  `references/review-units-capability.json`.
+- **Path-free origins.** A supplied document new to an asset's inventory records
+  its origin as `supplied:` followed by its name inside the supplied folder. Its
+  retained copy and hash still prove the bytes. A document already in the inventory
+  keeps its origin on every later intake, so inventories, cases and bundles made
+  earlier keep their absolute origins and verify unchanged; a host that echoes
+  inventory origins shows the new label only for documents new to an asset.
+
+The guidance floor is runtime 1.6.0. See
+[the verification record](verification/1.6.0/README.md).
+
+## 1.5.1
+
+Indexes evidence once per saved revision: saving or reviewing synthesis in a topic
+asset matches inventory entries to saved sources through one index instead of a
+search per entry. The recorded `evidence_ids` and `used_in_digest` are unchanged.
+The guidance floor is runtime 1.5.1.
+
+## 1.5.0
+
+Batches collection capture receipts: `collection capture` takes `sources`, an
+array, in place of `source`, registers them together or not at all, and returns
+`receipts`; collection results report `batch_capture: true`. Collection commands
+verify supplied inputs once per command. The guidance floor is runtime 1.5.0.
+
 ## 1.3.1
 
 Takes everything from `main`. The owner's decision: "we could just have everything

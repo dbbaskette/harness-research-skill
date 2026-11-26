@@ -1,0 +1,169 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "harness-review-units-v1",
+  "title": "Harness Research review units",
+  "description": "Protocol harness-review-units-v1. The runtime additionally checks every hash against the saved pins, every owned item against the plan, reviewer independence and registration, and the bytes of every pinned file.",
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,63}$" },
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "verdictItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "verdict", "note"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "verdict": { "enum": ["supported", "unsupported", "narrow"] },
+        "note": { "type": "string", "minLength": 1, "maxLength": 20000 }
+      }
+    },
+    "original": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "sha256", "read_original"],
+      "properties": {
+        "source": { "$ref": "#/$defs/id" },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "original_sha256": { "$ref": "#/$defs/sha256", "description": "Required when the source pins a separate original." },
+        "read_original": { "type": "boolean" },
+        "access_error": { "type": "string", "minLength": 1 }
+      },
+      "if": { "properties": { "read_original": { "const": false } } },
+      "then": { "required": ["access_error"] }
+    },
+    "assessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["coverage", "usefulness", "note"],
+      "properties": {
+        "coverage": { "enum": ["accurate", "needs-revision"] },
+        "usefulness": { "enum": ["adequate", "needs-revision"] },
+        "note": { "type": "string", "minLength": 1, "maxLength": 20000 }
+      }
+    },
+    "ownership": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sources", "facts", "findings", "prose"],
+      "properties": {
+        "sources": { "type": "array", "items": { "$ref": "#/$defs/id" } },
+        "facts": { "type": "array", "items": { "$ref": "#/$defs/id" } },
+        "findings": { "type": "array", "items": { "$ref": "#/$defs/id" } },
+        "prose": { "type": "array", "items": { "type": "string" } },
+        "assessment": { "type": "boolean" }
+      }
+    },
+    "options": {
+      "description": "Optional input to review-units plan --file.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema": { "const": 1 },
+        "max_units": { "type": "integer", "minimum": 1, "maximum": 64, "default": 8 },
+        "max_reviewers": { "type": "integer", "minimum": 1, "maximum": 3, "default": 3 }
+      }
+    },
+    "answer": {
+      "description": "One unit's answer, from review-units template and submitted with review-units accept. It covers exactly what the unit owns; only the final unit carries the assessment.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "protocol", "plan", "digest", "unit", "attempt", "reviewer", "originals", "facts", "findings", "prose"],
+      "properties": {
+        "schema": { "const": 1 },
+        "protocol": { "const": "harness-review-units-v1" },
+        "plan": { "$ref": "#/$defs/sha256" },
+        "digest": { "$ref": "#/$defs/sha256" },
+        "unit": { "$ref": "#/$defs/id" },
+        "attempt": { "type": "integer", "minimum": 1 },
+        "reviewer": { "$ref": "#/$defs/id" },
+        "originals": { "type": "array", "items": { "$ref": "#/$defs/original" } },
+        "facts": { "type": "array", "items": { "$ref": "#/$defs/verdictItem" } },
+        "findings": { "type": "array", "items": { "$ref": "#/$defs/verdictItem" } },
+        "prose": { "type": "array", "items": { "$ref": "#/$defs/verdictItem" } },
+        "assessment": { "$ref": "#/$defs/assessment" }
+      }
+    },
+    "pin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "source", "file", "sha256", "snapshot"],
+      "properties": {
+        "role": { "enum": ["owned", "given"] },
+        "source": { "$ref": "#/$defs/id" },
+        "file": { "type": "string" },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "snapshot": { "type": "string" },
+        "original_file": { "type": "string" },
+        "original_sha256": { "$ref": "#/$defs/sha256" },
+        "original_snapshot": { "type": "string" }
+      }
+    },
+    "receipt": {
+      "description": "Immutable file under .harness-research/review-units-data/, named by its own SHA-256 and bound by that hash to its accepted attempt.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "protocol", "kind", "plan", "digest", "unit", "unit_kind", "basis", "attempt", "reviewer", "invocation", "owns", "given", "pins", "answer"],
+      "properties": {
+        "schema": { "const": 1 },
+        "protocol": { "const": "harness-review-units-v1" },
+        "kind": { "const": "review-unit-receipt" },
+        "plan": { "$ref": "#/$defs/sha256" },
+        "digest": { "$ref": "#/$defs/sha256" },
+        "unit": { "$ref": "#/$defs/id" },
+        "unit_kind": { "enum": ["content", "final"] },
+        "basis": { "$ref": "#/$defs/sha256", "description": "SHA-256 of the context, the owned items' content, the given content and the source pins." },
+        "attempt": { "type": "integer", "minimum": 1 },
+        "reviewer": { "$ref": "#/$defs/id" },
+        "invocation": { "type": "string", "minLength": 1, "maxLength": 4000 },
+        "owns": { "$ref": "#/$defs/ownership" },
+        "given": { "$ref": "#/$defs/ownership" },
+        "pins": { "type": "array", "items": { "$ref": "#/$defs/pin" } },
+        "answer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["originals", "facts", "findings", "prose"],
+          "properties": {
+            "originals": { "type": "array", "items": { "$ref": "#/$defs/original" } },
+            "facts": { "type": "array", "items": { "$ref": "#/$defs/verdictItem" } },
+            "findings": { "type": "array", "items": { "$ref": "#/$defs/verdictItem" } },
+            "prose": { "type": "array", "items": { "$ref": "#/$defs/verdictItem" } },
+            "assessment": { "$ref": "#/$defs/assessment" }
+          }
+        }
+      }
+    },
+    "assembled": {
+      "description": "The units member of an assembled review in synthesis state schema 4 and in facts.json review. The review also has reviewers (sorted labels) and no single worker.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "protocol", "plan", "grain", "max_units", "receipts"],
+      "properties": {
+        "schema": { "const": 1 },
+        "protocol": { "const": "harness-review-units-v1" },
+        "plan": { "$ref": "#/$defs/sha256" },
+        "grain": { "enum": ["collection", "source"] },
+        "max_units": { "type": "integer", "minimum": 1, "maximum": 64 },
+        "receipts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["unit", "kind", "reviewer", "invocation", "attempt", "plan", "digest", "basis", "kept", "file", "sha256"],
+            "properties": {
+              "unit": { "$ref": "#/$defs/id" },
+              "kind": { "enum": ["content", "final"] },
+              "reviewer": { "$ref": "#/$defs/id" },
+              "invocation": { "type": "string" },
+              "attempt": { "type": "integer", "minimum": 1 },
+              "plan": { "$ref": "#/$defs/sha256" },
+              "digest": { "$ref": "#/$defs/sha256" },
+              "basis": { "$ref": "#/$defs/sha256" },
+              "kept": { "type": "boolean", "description": "True for a receipt made for an earlier plan whose basis is unchanged." },
+              "file": { "type": "string" },
+              "sha256": { "$ref": "#/$defs/sha256" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

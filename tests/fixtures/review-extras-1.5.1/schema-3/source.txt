@@ -1,0 +1,1 @@
+Synthetic context. The default is 10. Exceptions depend on workload.

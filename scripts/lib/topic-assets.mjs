@@ -16,6 +16,7 @@ const json = value => JSON.stringify(value, null, 2) + '\n';
 const now = () => new Date().toISOString();
 const markerName = '.harness-research/asset.json';
 const inventoryName = 'sources.json';
+export const SUPPLIED = 'supplied:';
 const within = (root, path) => path === root || path.startsWith(root + sep);
 const tags = value => {
   if (!Array.isArray(value) || value.length > 50 || value.some(v => typeof v !== 'string' || !v.trim() || v.length > 100)) throw new Error('Tags must be at most 50 nonempty strings of at most 100 characters.');
@@ -164,7 +165,10 @@ async function intakeSnapshot(workspace, destination, options) {
         if (SKIP.has(item.name) || item.name.startsWith('.env.')) continue;
         const path=join(folder,item.name), local=relative(sourceRoot,path).split(sep).join('/');
         if (path === urlFile) continue;
-        const id='input-'+hash('document\0'+local).slice(0,32), base={id,role:'supplied',type:'document',origin:path,filename:local,permission:'selected'};
+        // The origin names the document inside the supplied folder, never a folder of this computer. The
+        // label is not read as a path; the retained copy and its hash prove the bytes. A re-intake keeps the
+        // origin of every document already in the inventory, including absolute ones stored before 1.6.0.
+        const id='input-'+hash('document\0'+local).slice(0,32), base={id,role:'supplied',type:'document',origin:SUPPLIED+local,filename:local,permission:'selected'};
         const info=await lstat(path);
         if (info.isSymbolicLink()) { addEntry({...base,outcome:'rejected',note:'Symlink input was not followed.'}); fingerprint.push({path:local,kind:'symlink'}); continue; }
         if (info.isDirectory()) {
@@ -290,6 +294,15 @@ export async function verifyAssetDossier(project,dossier) {
     }
   }
 }
+// The refusals updateAssetRevision could make once its marker has been read: replacing a file that is
+// not a regular one. Review units call this before writing anything.
+export async function checkAssetRevision(project) {
+  const root=await realpath(resolve(project));
+  for (const name of [markerName,'topic.json',inventoryName,'asset-manifest.json']) {
+    const info=await exists(join(root,name));
+    if (info && (!info.isFile() || info.isSymbolicLink())) throw new Error(`Refusing to replace an unowned/nonregular output: ${join(root,name)}`);
+  }
+}
 export async function updateAssetRevision(project,synthesisState,result) {
   const root=await realpath(resolve(project)),state=await marker(root);
   if (!state) return;
@@ -314,9 +327,9 @@ export async function updateAssetRevision(project,synthesisState,result) {
       else delete entry.used_in_digest;
     }
   }
-  const revision={digest:synthesisState.digest,status:result.status,inputFingerprint:state.inputFingerprint,author:synthesisState.author,reviewer:synthesisState.review?.worker||null,updated_at:now()};
+  const revision={digest:synthesisState.digest,status:result.status,inputFingerprint:state.inputFingerprint,author:synthesisState.author,reviewer:synthesisState.review?.worker||null,...(synthesisState.schema===4?{reviewers:Array.isArray(synthesisState.review?.reviewers)?synthesisState.review.reviewers:[]}:{}),updated_at:now()};
   const old=state.revisions.findIndex(r=>r.digest===revision.digest);
-  if (state.current && ['digest','status','inputFingerprint','author','reviewer'].every(k=>state.current[k]===revision[k])) {if (stable(state.inventory) !== oldInventory) await persist(root,state); else await projections(root,state);return;}
+  if (state.current && ['digest','status','inputFingerprint','author','reviewer','reviewers'].every(k=>stable(state.current[k])===stable(revision[k]))) {if (stable(state.inventory) !== oldInventory) await persist(root,state); else await projections(root,state);return;}
   if (old<0) state.revisions.push(revision); else state.revisions[old]=revision;
   state.current=revision; state.updated_at=revision.updated_at;
   await persist(root,state);
@@ -341,6 +354,10 @@ export async function runAssetCli(argv) {
         const previous={intake:state.intake,inputFingerprint:state.inputFingerprint,inventory:state.inventory};
         await directory(join(root,'.harness-research/intake-history'));
         await immutable(root,'.harness-research/intake-history/'+hash(stable(previous))+'.json',Buffer.from(json(previous)));
+        // A document already in the inventory keeps the origin it has, however it was recorded; only a
+        // document new to the inventory gets a supplied: origin.
+        const earlier=new Map(state.inventory.filter(e=>e.type==='document').map(e=>[e.id,e.origin]));
+        for (const entry of snapshot.entries) if (entry.type==='document' && earlier.has(entry.id)) entry.origin=earlier.get(entry.id);
         state.intake=snapshot.intake; state.inputFingerprint=nextFingerprint; state.inventory=snapshot.entries;
       }
     } else if (action==='metadata'||action==='source') {
@@ -362,7 +379,7 @@ export async function runAssetCli(argv) {
   if (await exists(join(result.asset,'.harness-research/synthesis.json'))) {
     const {runSynthesisCli}=await import('./synthesis-cli.mjs');
     const checked=await runSynthesisCli(['status','--project',result.asset,'--compact']);
-    return {...result,status:checked.status,digest:checked.digest,reviewer:checked.reviewer,artifact_integrity:checked.artifact_integrity,problems:checked.problems};
+    return {...result,status:checked.status,digest:checked.digest,reviewer:checked.reviewer,...(checked.reviewers?{reviewers:checked.reviewers}:{}),artifact_integrity:checked.artifact_integrity,problems:checked.problems};
   }
   return result;
 }

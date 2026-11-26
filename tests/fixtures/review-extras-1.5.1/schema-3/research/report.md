@@ -1,0 +1,17 @@
+# Synthetic extras
+
+> Reviewed synthesis.
+
+## Answer
+
+The default is 10. ([finding-a](evidence.md#finding-a))
+
+## Research context
+
+**Audience:** Maintainers
+
+**Purpose:** Keep a 1.5.1 review readable
+
+**Scope:** Synthetic fixture only
+
+[Reusable findings](brief.md) · [Evidence and review](evidence.md)

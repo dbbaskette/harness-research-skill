@@ -1,0 +1,28 @@
+{
+  "owner": "harness-research-synthesis",
+  "schema": 2,
+  "digest": "1427a80f32cb14bb6282a91947d50fcfc8c805ef30dd1807e93fc67c79ae3385",
+  "status": "draft",
+  "artifacts": [
+    {
+      "file": "report.md",
+      "sha256": "c2517fa9fe711f4e7a1680c3df8e5893cfd04865ba1ff08486abc797acc7654c"
+    },
+    {
+      "file": "brief.md",
+      "sha256": "0d55c9c04df88dd2c85793557f5283c27497e6a08f8e74725c377e7df35dd5e9"
+    },
+    {
+      "file": "evidence.md",
+      "sha256": "8ad7c2569937b4fcfc69a733fc2c30d2213a3c755f7ba446dbed34d4715935b5"
+    },
+    {
+      "file": "facts.json",
+      "sha256": "3abf2f47fbe06cd825ea678abe1888a49c9d8790ab9fcca9c532724574cca085"
+    },
+    {
+      "file": "sources/revisions/fd87556ff265ae334c12ca253752c8a9186080faec7a03f601f7d52267cf9571.txt",
+      "sha256": "fd87556ff265ae334c12ca253752c8a9186080faec7a03f601f7d52267cf9571"
+    }
+  ]
+}

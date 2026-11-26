@@ -1,6 +1,7 @@
 import { hash } from './run-storage.mjs';
 import { OWNER } from './synthesis-model.mjs';
 import { outputPrefix } from './synthesis-layout.mjs';
+import { wellShaped } from './review-units-model.mjs';
 
 // Authored text is data: escape markup, HTML and newlines before putting it in generated Markdown.
 export const md = value => String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/([\\`*_{}\[\]()#+!|~])/g, '\\$1').replace(/[\r\n]+/g, ' ');
@@ -68,8 +69,10 @@ export function renderOutputs(state, status) {
     if (pin.original_snapshot) evidence += `Original: [saved original](${fromOutput(pin.original_snapshot)}); SHA-256: \`${pin.original_sha256}\`.\n\n`;
     evidence += `Capture: [saved context](${fromOutput(pin.snapshot)}); SHA-256: \`${pin.sha256}\`.\n\n`;
   }
-  if (state.review) {
-    evidence += `## Independent review\n\nReviewer: ${md(state.review.worker)}. ${md(state.review.assessment.note)}\n\n`;
+  if (state.schema === 4 && !wellShaped(state.review)) evidence += '## Independent review\n\nThe recorded assembled review is malformed and is not used. Plan and review the units again.\n';
+  else if (state.review) {
+    const who = state.schema === 4 ? `Reviewers, one per review unit: ${state.review.units.receipts.map(r => `${md(r.reviewer)} (${md(r.unit)})`).join(', ')}.` : `Reviewer: ${md(state.review.worker)}.`;
+    evidence += `## Independent review\n\n${who} ${md(state.review.assessment.note)}\n\n`;
     for (const r of state.review.originals) if (!r.read_original) evidence += `- ${md(r.source)} — original unavailable: ${md(r.access_error)}\n`;
     for (const group of ['facts','findings','prose']) for (const r of state.review[group]) evidence += `- ${md(r.id)} — ${md(r.verdict)}: ${md(r.note)}\n`;
   } else evidence += '## Independent review\n\nPending. Exact quote matching and source hashes are mechanical checks, not semantic evidence review.\n';

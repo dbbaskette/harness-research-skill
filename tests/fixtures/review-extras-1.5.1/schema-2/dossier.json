@@ -1,0 +1,67 @@
+{
+  "schema": 2,
+  "topic": "Synthetic extras",
+  "audience": "Maintainers",
+  "purpose": "Keep a 1.5.1 review readable",
+  "scope": "Synthetic fixture only",
+  "source_mode": "public",
+  "sources": [
+    {
+      "id": "source-a",
+      "file": "source.txt",
+      "origin": "https://example.test/docs",
+      "title": "Synthetic docs",
+      "publisher": "Synthetic fixture",
+      "permission": "public",
+      "context": "full"
+    }
+  ],
+  "facts": [
+    {
+      "id": "fact-a",
+      "statement": "The default is 10.",
+      "author": "researcher",
+      "citations": [
+        {
+          "source": "source-a",
+          "quote": "The default is 10."
+        }
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "finding-a",
+      "title": "Default",
+      "summary": {
+        "text": "The default is 10.",
+        "kind": "summary",
+        "refs": [
+          "fact-a"
+        ]
+      },
+      "support": [
+        "fact-a"
+      ],
+      "counter": [],
+      "implications": [],
+      "conditions": [],
+      "gaps": []
+    }
+  ],
+  "sections": [
+    {
+      "id": "answer",
+      "title": "Answer",
+      "blocks": [
+        {
+          "text": "The default is 10.",
+          "kind": "summary",
+          "refs": [
+            "finding-a"
+          ]
+        }
+      ]
+    }
+  ]
+}
