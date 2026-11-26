@@ -254,7 +254,7 @@ representative guidance-start response. Stage-only rows count their own referenc
 | Optional local topic asset intake | 5,970 |
 | Parallel coordinator with Codex adapter | 5,977 |
 | Parallel coordinator with Claude Code adapter | 5,961 |
-| Review units coordinator | 5,606 |
+| Review units coordinator | 5,715 |
 | Delegated investigator with packet contract | 2,278 |
 | Legacy 0.9 queued coordinator | 5,042 |
 | Legacy 0.9 reuse or refresh | 2,076 |

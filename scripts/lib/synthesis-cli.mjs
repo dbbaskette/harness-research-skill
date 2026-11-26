@@ -167,6 +167,19 @@ export async function recordAssembledReview(root, state, review, current, contex
   if (context) await updateAssetRevision(root, state, response);
   return response;
 }
+// Sets aside an assembled review that no longer checks out: the state is kept in history, as a
+// replaced review is, and the dossier returns to a draft awaiting review.
+export async function setAsideAssembledReview(root, state, context) {
+  const derived = join(root, '.harness-research');
+  await protectOutputs(join(root, outputPrefix(state)), state);
+  await preserveState(derived, state);
+  state.schema = 3; state.review = null;
+  await atomic(join(derived, 'synthesis.json'), JSON.stringify(state, null, 2) + '\n');
+  const current = await stateStatus(root, state);
+  const artifacts = await materialize(root, state, current);
+  if (context) await updateAssetRevision(root, state, { ...result(state, current, true), ...artifacts });
+  return current;
+}
 export async function runSynthesisCli(argv) {
   const options = args(argv); if (options.action === 'help') return { usage: HELP };
   const root = await realpath(resolve(options.project)), derived = join(root, '.harness-research'), statePath = join(derived, 'synthesis.json');

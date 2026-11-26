@@ -156,3 +156,28 @@ test('fix 5: synthesis status and verify check the stored plan file of an assemb
   await writeFile(file, bytes);
   assert.equal((await runSynthesisCli(['verify', '--project', f.root])).status, 'complete');
 });
+
+test('fix 7: status names a broken assembled review and plan sets it aside and plans afresh', async t => {
+  const f = await project(t); await f.save(dossier());
+  const planned = await f.units('plan'); await f.reviewAll('unit'); assert.equal((await f.units('assemble')).status, 'complete');
+  const units = JSON.parse(await readFile(join(f.root, '.harness-research/review-units.json'), 'utf8'));
+  const lost = units.units.find(u => u.id !== 'final');
+  await rm(join(f.root, lost.attempts.at(-1).receipt.file));
+  assert.equal((await runSynthesisCli(['status', '--project', f.root])).status, 'stale');
+  const status = await f.units('status');
+  assert.equal(status.phase, 'review-invalid'); assert.equal(status.assembled_review.status, 'invalid');
+  assert.ok(status.assembled_review.problems.some(p => /receipt .* unavailable/.test(p)));
+  assert.match(status.next_step, /review-units plan/);
+  await assert.rejects(f.units('assemble'), /review-units plan/);
+  const replanned = await f.units('plan');
+  assert.equal(replanned.generation, planned.generation + 1); assert.equal(replanned.set_aside.schema, 4);
+  assert.equal((await runSynthesisCli(['status', '--project', f.root])).status, 'draft');
+  const history = await readdir(join(f.root, '.harness-research/synthesis-history'));
+  const kept = await Promise.all(history.map(n => readFile(join(f.root, '.harness-research/synthesis-history', n), 'utf8').then(JSON.parse)));
+  assert.ok(kept.some(s => s.schema === 4 && s.review?.units), 'the broken assembled review is kept in history');
+  const byId = Object.fromEntries(replanned.units.map(u => [u.id, u.status]));
+  assert.equal(byId[lost.id], 'pending'); assert.equal(byId.final, 'pending');
+  for (const u of replanned.units) if (u.id !== lost.id && u.id !== 'final') assert.equal(u.status, 'kept');
+  await f.reviewAll('second');
+  assert.equal((await f.units('assemble')).status, 'complete');
+});

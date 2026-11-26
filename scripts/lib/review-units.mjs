@@ -1,7 +1,7 @@
 import { readFile, writeFile, realpath } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { exists, directory, localFile, readText, atomic, hash, stable, parseJson, identifier, text, acquireLock, releaseLock } from './run-storage.mjs';
-import { loadSynthesis, synthesisStatus, recordAssembledReview, writeTemplate } from './synthesis-cli.mjs';
+import { loadSynthesis, synthesisStatus, recordAssembledReview, setAsideAssembledReview, writeTemplate } from './synthesis-cli.mjs';
 import { verifyCollectionReviewer, collectionGrain } from './collection.mjs';
 import { outputPath } from './synthesis-layout.mjs';
 import { proseItems } from './synthesis-model.mjs';
@@ -79,8 +79,17 @@ function timing(state, current = Date.now()) {
   return { active_wall_seconds: unresolved ? null : active / 1000, assistant_seconds: unresolved ? null : assistant / 1000, observed_active_wall_seconds: active / 1000, observed_assistant_seconds: assistant / 1000, unresolved_invocations: unresolved, dollars: null, note: 'Intervals run from host registration to the accepted answer or host-confirmed terminal context. Costs and process cancellation remain host-owned.' };
 }
 
+// An assembled review that no longer checks out, while the evidence itself is intact.
+const SET_ASIDE = 'Run review-units plan: it sets the assembled review aside (kept in synthesis history) and plans the review again.';
+const reviewOnly = current => current.status === 'stale' && current.problems.length > 0 && current.problems.every(p => p.startsWith('Review invalid'));
+async function brokenReview(root, synthesis) {
+  if (synthesis.state.schema !== 4) return null;
+  const current = await synthesisStatus(root, synthesis.state);
+  return reviewOnly(current) ? current.problems : null;
+}
 async function report(root, state, synthesis, check = true) {
   const problems = [];
+  const broken = check ? await brokenReview(root, synthesis) : null;
   const current = synthesis.state.digest === state.plan.state_digest;
   let plan = null;
   try { plan = await readPlan(root, state); } catch (error) { problems.push(error.message); }
@@ -91,21 +100,23 @@ async function report(root, state, synthesis, check = true) {
       try { usable(state, ref); await checkReceipt(root, synthesis.state, plan.units[index], ref); } catch (error) { problems.push(error.message); }
     }
   }
-  const assembled = current && synthesis.state.review?.units?.plan === state.plan.digest;
+  const assembled = current && synthesis.state.schema === 4 && synthesis.state.review.units.plan === state.plan.digest;
   const ready = state.units.every(u => receiptOf(u)) && state.units.find(u => u.id === FINAL)?.attempts.at(-1)?.status === 'accepted';
-  const phase = problems.length ? 'needs-attention' : !current ? 'needs-plan' : state.status === 'stopped' ? 'stopped' : assembled ? 'assembled' : ready ? 'ready-to-assemble' : 'reviewing';
+  const phase = broken ? 'review-invalid' : problems.length ? 'needs-attention' : !current ? 'needs-plan' : state.status === 'stopped' ? 'stopped' : assembled ? 'assembled' : ready ? 'ready-to-assemble' : 'reviewing';
   const counts = unit => Object.fromEntries(['sources', 'facts', 'findings', 'prose'].map(g => [g, unit.owns[g].length]));
-  return { schema: VERSION, protocol: PROTOCOL, status: problems.length ? 'stale' : !current ? 'needs-plan' : state.status, phase, artifact_integrity: problems.length ? 'failed' : 'verified', problems,
+  return { schema: VERSION, protocol: PROTOCOL, status: problems.length || broken ? 'stale' : !current ? 'needs-plan' : state.status, phase, artifact_integrity: problems.length || broken ? 'failed' : 'verified', problems,
+    ...(broken ? { assembled_review: { status: 'invalid', problems: broken }, next_step: SET_ASIDE } : {}),
     digest: synthesis.state.digest, plan: state.plan.digest, plan_file: state.plan.file, planned_digest: state.plan.state_digest, generation: state.generation,
     grain: plan?.grain ?? null, max_units: state.plan.max_units, max_reviewers: state.max_reviewers, running: running(state).length,
     units: state.units.map((u, i) => ({ id: u.id, kind: plan?.units[i]?.kind ?? null, areas: plan?.units[i]?.areas ?? [], status: unitStatus(u), attempt: u.attempts.at(-1)?.number ?? null, reviewer: u.kept?.reviewer ?? u.attempts.at(-1)?.reviewer ?? null, kept: Boolean(u.kept), owns: plan ? counts(plan.units[i]) : null, given_sources: plan?.units[i]?.given.sources.length ?? null })),
-    review_status: synthesis.state.review ? (synthesis.state.review.units ? 'assembled' : 'single') : 'none', timing: timing(state),
+    review_status: synthesis.state.review ? (synthesis.state.schema === 4 ? 'assembled' : 'single') : 'none', timing: timing(state),
     caveat: 'Reviewer registration and invocation identities are supplied by the host; these local records cannot prove identity, semantic truth or actual process cancellation.' };
 }
 
 async function grain(root, synthesis) { return synthesis.state.collection ? collectionGrain(root) : null; }
 async function fresh(root, synthesis) {
   const current = await synthesisStatus(root, synthesis.state);
+  if (synthesis.state.schema === 4 && reviewOnly(current)) throw new Error(`The assembled review no longer checks out: ${current.problems.join(' ')} ${SET_ASIDE}`);
   if (current.status === 'stale') throw new Error(`Evidence is stale. Save revised content before review. ${current.problems.join(' ')}`);
   return current;
 }
@@ -128,17 +139,23 @@ async function keptReceipt(root, state, synthesis, unit) {
 
 async function planAction(root, existing, synthesis, input) {
   const options = unitOptions(input ?? {});
+  let setAside = null;
+  const broken = await brokenReview(root, synthesis);
+  if (broken) {
+    setAside = { schema: 4, plan: synthesis.state.review.units.plan, digest: synthesis.state.digest, problems: broken };
+    await setAsideAssembledReview(root, synthesis.state, synthesis.context);
+  }
   await fresh(root, synthesis);
   const { plan, digest } = computePlan(synthesis.state, options.max_units, await grain(root, synthesis));
   const bytes = planBytes(plan), file = await immutable(root, planFile(digest).slice(DATA.length + 1), bytes);
-  if (existing && existing.plan.digest === digest) {
+  if (existing && existing.plan.digest === digest && !setAside) {
     if (existing.status === 'stopped') {
       if (running(existing).length) throw new Error('Host must confirm every registered review invocation terminal with finish before resuming.');
       existing.status = 'active';
     }
     existing.max_reviewers = options.max_reviewers;
     await saveState(root, existing);
-    return existing;
+    return { state: existing, setAside };
   }
   if (existing) {
     if (running(existing).length) throw new Error('Host must confirm every registered review invocation terminal with finish before replanning; cancellation requests alone do not release capacity.');
@@ -149,7 +166,7 @@ async function planAction(root, existing, synthesis, input) {
     identities: existing?.identities ?? [], receipts: existing?.receipts ?? [], created_at: now(), updated_at: now() };
   for (const unit of plan.units) state.units.push({ id: unit.id, kept: existing ? await keptReceipt(root, state, synthesis, unit) : null, attempts: [] });
   await saveState(root, state);
-  return state;
+  return { state, setAside };
 }
 
 function view(synthesis, plan, unit) {
@@ -193,7 +210,7 @@ export async function runReviewUnitsCli(argv) {
     const synthesis = await loadSynthesis(root);
     let state = await readState(root);
     const input = options.file ? parseJson(await readText(root, options.file)) : null;
-    if (options.action === 'plan') { state = await planAction(root, state, synthesis, input); return await report(root, state, synthesis); }
+    if (options.action === 'plan') { const planned = await planAction(root, state, synthesis, input); return { ...await report(root, planned.state, synthesis), ...(planned.setAside ? { set_aside: planned.setAside } : {}) }; }
     if (!state) {
       if (options.action === 'status') return { schema: VERSION, protocol: PROTOCOL, status: 'not-planned', phase: 'needs-plan', digest: synthesis.state.digest, plan: null, limits: LIMITS, review_status: synthesis.state.review ? (synthesis.state.review.units ? 'assembled' : 'single') : 'none' };
       throw new Error('No review plan; run review-units plan first.');

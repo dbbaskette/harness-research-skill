@@ -74,7 +74,14 @@ hashes of every owned and given source. A unit whose basis is unchanged is `kept
 with its earlier receipt; review the others and the final unit
 with new invocations, then assemble. `stop` cancels outstanding units and refuses
 late answers; confirm each with `finish`, then `plan` resumes with accepted units
-intact. A kept unit can be reviewed again with `retry`.
+intact. A kept unit can be reviewed again with `retry`. A receipt given up by
+`retry`, an unsuccessful `finish` or `stop` is retired and never kept again.
+
+If an assembled review stops checking out (a receipt or the plan file is missing
+or changed) while the evidence is intact, `status` reports phase `review-invalid`
+with `assembled_review` problems and `next_step`. Run `plan`: it sets that review
+aside in synthesis history, returns `set_aside`, and plans again, keeping valid
+receipts; review the remaining units and assemble.
 
 An assembled review sets `reviewer` to `null` and lists `reviewers`, with each
 unit's reviewer in `review.units.receipts`. Its saved state is schema 4, which
