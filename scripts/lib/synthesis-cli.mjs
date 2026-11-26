@@ -5,7 +5,8 @@ import { OWNER, digestSource, validateDossier, validateReview, reviewTemplate } 
 import { renderOutputs } from './synthesis-output.mjs';
 import { OUTPUT_NAMES, outputPrefix, outputPath, digestContent, managedSource } from './synthesis-layout.mjs';
 import { assetContext, verifyAssetDossier, updateAssetRevision } from './topic-assets.mjs';
-import { verifyCollectionDossier, bindCollectionDossier, verifyCollectionReviewer } from './collection.mjs';
+import { verifyCollectionDossier, bindCollectionDossier, verifyCollectionReviewer, collectionGrain } from './collection.mjs';
+import { checkAssembledReview } from './review-units-model.mjs';
 
 import { reuseIdentity, checkReuseIdentity, sameReuseIdentity } from './synthesis-reuse.mjs';
 
@@ -41,8 +42,10 @@ async function readState(path) {
   const info = await exists(path); if (!info) return null;
   if (!info.isFile() || info.isSymbolicLink()) throw new Error('Synthesis state must be a regular owned file.');
   const state = parseJson(await readFile(path, 'utf8'));
-  if (state.owner !== OWNER || ![2, 3].includes(state.schema) || !Array.isArray(state.sources) || !state.dossier || !state.digest) throw new Error('Unrecognized synthesis state; preserve it.');
-  if (state.schema === 3 && !['unchanged', 'revision'].includes(state.save_policy)) throw new Error('Unrecognized synthesis save policy; preserve it.');
+  if (state.owner !== OWNER || ![2, 3, 4].includes(state.schema) || !Array.isArray(state.sources) || !state.dossier || !state.digest) throw new Error('Unrecognized synthesis state; preserve it.');
+  if (state.schema >= 3 && !['unchanged', 'revision'].includes(state.save_policy)) throw new Error('Unrecognized synthesis save policy; preserve it.');
+  // Schema 4 holds a review assembled from review units, which runtimes before 1.6.0 refuse.
+  if ((state.schema === 4) !== Boolean(state.review?.units)) throw new Error('Unrecognized synthesis state; preserve it.');
   return state;
 }
 async function preserveState(derived, state) {
@@ -64,7 +67,7 @@ async function protectOutputs(output, state) {
 }
 async function stateStatus(root, state) {
   const problems = [], artifactProblems = [], checked = new Map();
-  if (state.schema === 3 && state.save_policy === 'unchanged') {
+  if (state.schema >= 3 && state.save_policy === 'unchanged') {
     try { await checkReuseIdentity(root, state.reuse); } catch (error) { problems.push(error.message); }
   }
   let bytesHashed = 0;
@@ -100,7 +103,9 @@ async function stateStatus(root, state) {
     }
   }
   let accepted = false;
-  if (state.review) { try { await verifyCollectionReviewer(root, state.review.worker); accepted = validateReview(state, state.review, state.review.worker).accepted; } catch (e) { problems.push(`Review invalid: ${e.message}`); } }
+  if (state.review?.units) {
+    try { for (const reviewer of state.review.reviewers) await verifyCollectionReviewer(root, reviewer); accepted = await checkAssembledReview(root, state, state.collection ? await collectionGrain(root) : null); } catch (e) { problems.push(`Review invalid: ${e.message}`); }
+  } else if (state.review) { try { await verifyCollectionReviewer(root, state.review.worker); accepted = validateReview(state, state.review, state.review.worker).accepted; } catch (e) { problems.push(`Review invalid: ${e.message}`); } }
   return { status: problems.length ? 'stale' : !state.review ? 'draft' : accepted ? 'complete' : 'needs-revision', problems, artifact_problems: [...new Set(artifactProblems)], integrity_checks: { files_checked: checked.size, bytes_hashed: bytesHashed } };
 }
 async function materialize(root, state, current) {
@@ -123,7 +128,7 @@ async function materialize(root, state, current) {
   return { artifact_integrity: current.artifact_problems.length ? 'failed' : regenerated.length ? 'repaired' : 'verified', regenerated_files: regenerated, preserved_files: preserved };
 }
 function result(state, current, compact) {
-  const base = { schema: 2, ...current, digest: state.digest, author: state.author, reviewer: state.review?.worker || null, ...(state.layout ? { layout: state.layout } : {}), ...(state.collection ? { collection: state.collection } : {}), outputs: OUTPUTS.map(f => outputPath(state, f)) };
+  const base = { schema: 2, ...current, digest: state.digest, author: state.author, reviewer: state.review?.worker || null, ...(state.review?.units ? { reviewers: state.review.reviewers, review_units: { protocol: state.review.units.protocol, plan: state.review.units.plan, units: state.review.units.receipts.length } } : {}), ...(state.layout ? { layout: state.layout } : {}), ...(state.collection ? { collection: state.collection } : {}), outputs: OUTPUTS.map(f => outputPath(state, f)) };
   if (compact) return { ...base, counts: { sources: state.sources.length, facts: state.dossier.facts.length, findings: state.dossier.findings.length }, template_command: 'synthesis template --project DIR' };
   return { ...base, sources: state.sources, review_template: reviewTemplate(state), caveat: 'Worker identities and original-read attestations are supplied by the harness. Hashes and structural validation do not prove truth or process independence.' };
 }
@@ -137,6 +142,29 @@ async function writeTemplate(root, name, template, state) {
   if (parent !== root && !parent.startsWith(root + sep)) throw new Error('--out escapes the project.');
   if (managed(relative(root, join(parent, basename(path))).split(sep).join('/'))) throw new Error('--out cannot write through an alias to managed research files.');
   await writeFile(path, JSON.stringify(template, null, 2) + '\n', { flag: 'wx', mode: 0o600 });
+}
+// Lock-free pieces for review units, which hold the shared research lock themselves.
+export async function loadSynthesis(root) {
+  const derived = join(root, '.harness-research');
+  if (await exists(join(derived, 'research-run.json')) || await exists(join(derived, 'research.json'))) throw new Error('Existing legacy research engine owns this project. Use a separate project directory; existing research is preserved.');
+  const context = await assetContext(root), state = await readState(join(derived, 'synthesis.json'));
+  if (!state) throw new Error('No synthesis dossier saved in this project.');
+  if ((state.layout || null) !== (context?.layout || null)) throw new Error('Saved output layout does not match the topic asset; preserve and inspect it.');
+  return { state, context };
+}
+export const synthesisStatus = stateStatus;
+export { writeTemplate };
+export async function recordAssembledReview(root, state, review, current, context, compact = false) {
+  const derived = join(root, '.harness-research');
+  await protectOutputs(join(root, outputPrefix(state)), state);
+  await preserveState(derived, state);
+  state.schema = 4; state.save_policy ??= 'revision'; state.review = review;
+  await atomic(join(derived, 'synthesis.json'), JSON.stringify(state, null, 2) + '\n');
+  current.status = review.accepted ? 'complete' : 'needs-revision';
+  const artifacts = await materialize(root, state, current);
+  const response = { ...result(state, current, compact), ...artifacts };
+  if (context) await updateAssetRevision(root, state, response);
+  return response;
 }
 export async function runSynthesisCli(argv) {
   const options = args(argv); if (options.action === 'help') return { usage: HELP };
@@ -184,7 +212,7 @@ export async function runSynthesisCli(argv) {
           source.original_snapshot = await pin(capture.original_file, capture.original_sha256, /^\.[a-z0-9]{1,10}$/i.test(suffix) ? suffix.toLowerCase() : '.bin');
         }
       }
-      const unchanged = reuse && state?.schema === 3 && state.save_policy === 'unchanged'
+      const unchanged = reuse && state?.schema >= 3 && state.save_policy === 'unchanged'
         && sameReuseIdentity(reuse, state.reuse) && state.digest === validated.digest
         && state.author === validated.author && stable(state.sources) === stable(validated.sources)
         && stable(state.collection || null) === stable(collection || null)
@@ -196,7 +224,7 @@ export async function runSynthesisCli(argv) {
         await preserveState(derived, state);
         // Legacy save remains revision-based. Explicit reuse adopts an internal schema
         // older runtimes refuse, without changing portable dossier/output schema 2.
-        const modern = Boolean(reuse) || state?.schema === 3;
+        const modern = Boolean(reuse) || state?.schema >= 3;
         state = {owner: OWNER, schema: modern ? 3 : 2, ...layout,
           ...(modern ? {save_policy: reuse ? 'unchanged' : 'revision'} : {}), ...(reuse ? {reuse} : {}),
           ...(context ? {asset_input_fingerprint: context.inputFingerprint} : {}), ...(collection ? {collection} : {}),
@@ -221,6 +249,8 @@ export async function runSynthesisCli(argv) {
       await protectOutputs(join(root, outputPrefix(state)), state);
       await preserveState(derived, state);
       state.review = checked;
+      // A single review replaces an assembled one; the state no longer needs schema 4.
+      if (state.schema === 4) state.schema = 3;
       await atomic(statePath, JSON.stringify(state, null, 2) + '\n');
     }
     // Review changes no source bytes; reuse its inspection, but recompute acceptance.

@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "protocol": "harness-review-units-v1",
+  "command": "review-units",
+  "actions": ["plan", "assign", "template", "register", "accept", "finish", "retry", "stop", "status", "assemble"],
+  "json_schema": "references/review-units.schema.json",
+  "answer": "#/$defs/answer",
+  "receipt": "#/$defs/receipt",
+  "state_schema": 4,
+  "output_schema": 2,
+  "limits": {
+    "max_units": 64,
+    "default_max_units": 8,
+    "max_reviewers": 3,
+    "default_max_reviewers": 3
+  }
+}

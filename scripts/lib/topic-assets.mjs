@@ -314,9 +314,9 @@ export async function updateAssetRevision(project,synthesisState,result) {
       else delete entry.used_in_digest;
     }
   }
-  const revision={digest:synthesisState.digest,status:result.status,inputFingerprint:state.inputFingerprint,author:synthesisState.author,reviewer:synthesisState.review?.worker||null,updated_at:now()};
+  const revision={digest:synthesisState.digest,status:result.status,inputFingerprint:state.inputFingerprint,author:synthesisState.author,reviewer:synthesisState.review?.worker||null,...(synthesisState.review?.units?{reviewers:synthesisState.review.reviewers}:{}),updated_at:now()};
   const old=state.revisions.findIndex(r=>r.digest===revision.digest);
-  if (state.current && ['digest','status','inputFingerprint','author','reviewer'].every(k=>state.current[k]===revision[k])) {if (stable(state.inventory) !== oldInventory) await persist(root,state); else await projections(root,state);return;}
+  if (state.current && ['digest','status','inputFingerprint','author','reviewer','reviewers'].every(k=>stable(state.current[k])===stable(revision[k]))) {if (stable(state.inventory) !== oldInventory) await persist(root,state); else await projections(root,state);return;}
   if (old<0) state.revisions.push(revision); else state.revisions[old]=revision;
   state.current=revision; state.updated_at=revision.updated_at;
   await persist(root,state);
@@ -362,7 +362,7 @@ export async function runAssetCli(argv) {
   if (await exists(join(result.asset,'.harness-research/synthesis.json'))) {
     const {runSynthesisCli}=await import('./synthesis-cli.mjs');
     const checked=await runSynthesisCli(['status','--project',result.asset,'--compact']);
-    return {...result,status:checked.status,digest:checked.digest,reviewer:checked.reviewer,artifact_integrity:checked.artifact_integrity,problems:checked.problems};
+    return {...result,status:checked.status,digest:checked.digest,reviewer:checked.reviewer,...(checked.reviewers?{reviewers:checked.reviewers}:{}),artifact_integrity:checked.artifact_integrity,problems:checked.problems};
   }
   return result;
 }

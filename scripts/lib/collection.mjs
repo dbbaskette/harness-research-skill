@@ -245,6 +245,13 @@ export async function verifyCollectionReviewer(root,worker) {
   await verifiedRegistry(root,state);
   return {request_digest:state.request_digest,generation:state.generation,registry_digest:state.registry.digest};
 }
+// Review units follow the collection's workstreams: the verified registry's mappings, or null without a collection.
+export async function collectionGrain(root) {
+  root=await realpath(resolve(root));
+  const state=await readState(root,false);if(!state)return null;
+  const registry=await verifiedRegistry(root,state);
+  return {registry_digest:state.registry.digest,mappings:registry.mappings};
+}
 export async function bindCollectionDossier(root,dossierDigest) {
   root=await realpath(resolve(root));
   const state=await readState(root,false);if(!state)return null;

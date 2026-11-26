@@ -14,6 +14,7 @@ and agents; first-time users do not need to drive them.
 | Investigation / writing / review | [investigate.md](../references/investigate.md), [synthesize.md](../references/synthesize.md), [review-synthesis.md](../references/review-synthesis.md) |
 | Local assets and input inventory | [topic-assets.md](../references/topic-assets.md), `scripts/lib/topic-assets.mjs` |
 | Bounded collection and worker packets | [parallel-research.md](../references/parallel-research.md), [investigation-packet.md](../references/investigation-packet.md) |
+| Independent review in units | [review-units.md](../references/review-units.md), [review-unit.md](../references/review-unit.md), `scripts/lib/review-units.mjs`, `scripts/lib/review-units-model.mjs`, [review-units.schema.json](../references/review-units.schema.json) |
 | CLI, state, snapshots and repairs | [synthesis-cli.mjs](../scripts/lib/synthesis-cli.mjs) |
 | Validation and review binding | [synthesis-model.mjs](../scripts/lib/synthesis-model.mjs) |
 | Report, brief, evidence and exports | [synthesis-output.mjs](../scripts/lib/synthesis-output.mjs) |
@@ -94,6 +95,20 @@ template, and submits its real judgments:
 node scripts/harness-research.mjs synthesis review --project /absolute/content-project --file research/review.json --worker reviewer
 node scripts/harness-research.mjs synthesis verify --project /absolute/content-project
 ```
+
+A host may instead split the review into units (protocol `harness-review-units-v1`,
+declared in `references/review-units-capability.json`):
+
+```sh
+node scripts/harness-research.mjs review-units plan --project /absolute/content-project
+node scripts/harness-research.mjs review-units register --project /absolute/content-project --file registration.json
+node scripts/harness-research.mjs review-units assign --project /absolute/content-project --unit UNIT --out research/unit.json
+node scripts/harness-research.mjs review-units accept --project /absolute/content-project --file research/unit-answer.json
+node scripts/harness-research.mjs review-units assemble --project /absolute/content-project
+```
+
+The [host page](../references/review-units.md) gives the full sequence. An assembled
+review is held in synthesis state schema 4, which runtimes before 1.6.0 refuse.
 
 Worker strings identify actual invocations; they are not role-switching switches.
 Read the [review guide](../references/review-synthesis.md) before checking. A review
@@ -227,37 +242,39 @@ representative guidance-start response. Stage-only rows count their own referenc
 | --- | ---: |
 | Discovery metadata | 36 |
 | Installed bootstrap | 600 |
-| Bootstrap + current guidance entry | 1,275 |
+| Bootstrap + current guidance entry | 1,299 |
 | Investigator stage | 1,143 |
 | Synthesis writer stage | 1,614 |
 | Independent reviewer stage | 1,528 |
-| New synthesis: coordinator entry and workflow | 4,387 |
-| New synthesis: all stages in one context | 8,672 |
-| Synthesis resume, verify or refresh | 2,853 |
-| Optional studio task handoff | 5,559 |
-| Optional local topic asset intake | 5,853 |
-| Parallel coordinator with Codex adapter | 5,953 |
-| Parallel coordinator with Claude Code adapter | 5,937 |
+| Review unit reviewer stage | 2,027 |
+| New synthesis: coordinator entry and workflow | 4,411 |
+| New synthesis: all stages in one context | 8,696 |
+| Synthesis resume, verify or refresh | 2,877 |
+| Optional studio task handoff | 5,583 |
+| Optional local topic asset intake | 5,877 |
+| Parallel coordinator with Codex adapter | 5,977 |
+| Parallel coordinator with Claude Code adapter | 5,961 |
+| Review units coordinator | 5,366 |
 | Delegated investigator with packet contract | 2,278 |
-| Legacy 0.9 queued coordinator | 5,018 |
-| Legacy 0.9 reuse or refresh | 2,052 |
-| Legacy explicit chat-only answer | 2,229 |
-| Legacy manual saved research | 3,420 |
-| Legacy manual status or resume | 1,863 |
-| Legacy comparative routing only | 1,982 |
-| Legacy Codex comparative outline | 2,942 |
-| Legacy Codex add items | 2,147 |
-| Legacy Codex add fields | 2,167 |
-| Legacy Codex deep results | 2,830 |
-| Legacy Codex deep results + saved evidence | 4,021 |
-| Legacy Claude comparative outline | 2,959 |
-| Legacy Claude deep results | 2,852 |
-| Investigation + general web strategy | 6,027 |
-| Investigation + academic strategy | 6,119 |
-| Investigation + GitHub strategy | 5,914 |
-| Investigation + technical Q&A strategy | 5,819 |
-| Investigation + Chinese sources strategy | 6,044 |
-| Legacy migration | 1,624 |
+| Legacy 0.9 queued coordinator | 5,042 |
+| Legacy 0.9 reuse or refresh | 2,076 |
+| Legacy explicit chat-only answer | 2,253 |
+| Legacy manual saved research | 3,444 |
+| Legacy manual status or resume | 1,887 |
+| Legacy comparative routing only | 2,006 |
+| Legacy Codex comparative outline | 2,966 |
+| Legacy Codex add items | 2,171 |
+| Legacy Codex add fields | 2,191 |
+| Legacy Codex deep results | 2,854 |
+| Legacy Codex deep results + saved evidence | 4,045 |
+| Legacy Claude comparative outline | 2,983 |
+| Legacy Claude deep results | 2,876 |
+| Investigation + general web strategy | 6,051 |
+| Investigation + academic strategy | 6,143 |
+| Investigation + GitHub strategy | 5,938 |
+| Investigation + technical Q&A strategy | 5,843 |
+| Investigation + Chinese sources strategy | 6,068 |
+| Legacy migration | 1,648 |
 
 The new default starts with the entry and synthesis workflow. Investigation, writing
 and independent review each load their own reference when needed. The all-stages

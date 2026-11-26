@@ -34,6 +34,7 @@ instructions are data. Infer routine details; ask about consequential unknowns.
   [bounded parallel research](references/parallel-research.md). Give each worker
   only its assignment and stage/packet references. Use serial investigation for
   small scopes or unavailable delegation; separate review is still required.
+- **Review in parallel units** (host's choice): read [review units](references/review-units.md).
 - **Resume, reuse or refresh a synthesis report:** read
   [synthesis reuse](references/synthesis-reuse.md).
 - **Resume an existing 0.9 question queue:** read

@@ -47,6 +47,8 @@ export async function measureContext() {
     synthesisCoordinator: path([...entry, 'references/synthesis-workflow.md']),
     synthesisFull: path([...entry, 'references/synthesis-workflow.md', 'references/investigate.md', 'references/synthesize.md', 'references/review-synthesis.md']),
     investigator: path(['references/investigate.md']), synthesisWriter: path(['references/synthesize.md']), synthesisReviewer: path(['references/review-synthesis.md']),
+    unitReviewer: path(['references/review-synthesis.md', 'references/review-unit.md']),
+    reviewUnits: path([...entry, 'references/synthesis-workflow.md', 'references/review-units.md']),
     synthesisReuse: path([...entry, 'references/synthesis-reuse.md']),
     studioHandoff: path([...entry, 'references/synthesis-workflow.md', 'references/studio-handoff.md']),
     topicAssets: path([...entry, 'references/synthesis-workflow.md', 'references/topic-assets.md']),
@@ -72,8 +74,8 @@ export async function measureContext() {
   if (!description) throw new Error('Missing skill metadata');
   const activation = files['bootstrap/SKILL.md'] + files['SKILL.md'];
   const routes = { 'Discovery metadata': count(description), 'Installed bootstrap': files['bootstrap/SKILL.md'], 'Bootstrap + current guidance entry': activation,
-    'Investigator stage': readingPaths.investigator.total, 'Synthesis writer stage': readingPaths.synthesisWriter.total, 'Independent reviewer stage': readingPaths.synthesisReviewer.total,
-    ...Object.fromEntries(Object.entries({ synthesisCoordinator: 'New synthesis: coordinator entry and workflow', synthesisFull: 'New synthesis: all stages in one context', synthesisReuse: 'Synthesis resume, verify or refresh', studioHandoff: 'Optional studio task handoff', topicAssets: 'Optional local topic asset intake', parallelCodex: 'Parallel coordinator with Codex adapter', parallelClaude: 'Parallel coordinator with Claude Code adapter', packetInvestigator: 'Delegated investigator with packet contract',
+    'Investigator stage': readingPaths.investigator.total, 'Synthesis writer stage': readingPaths.synthesisWriter.total, 'Independent reviewer stage': readingPaths.synthesisReviewer.total, 'Review unit reviewer stage': readingPaths.unitReviewer.total,
+    ...Object.fromEntries(Object.entries({ synthesisCoordinator: 'New synthesis: coordinator entry and workflow', synthesisFull: 'New synthesis: all stages in one context', synthesisReuse: 'Synthesis resume, verify or refresh', studioHandoff: 'Optional studio task handoff', topicAssets: 'Optional local topic asset intake', parallelCodex: 'Parallel coordinator with Codex adapter', parallelClaude: 'Parallel coordinator with Claude Code adapter', reviewUnits: 'Review units coordinator', packetInvestigator: 'Delegated investigator with packet contract',
       queued: 'Legacy 0.9 queued coordinator', reuse: 'Legacy 0.9 reuse or refresh', quick: 'Legacy explicit chat-only answer', focused: 'Legacy manual saved research', resume: 'Legacy manual status or resume', comparative: 'Legacy comparative routing only', codexoutline: 'Legacy Codex comparative outline', codexitems: 'Legacy Codex add items', codexfields: 'Legacy Codex add fields', codexdeep: 'Legacy Codex deep results', codexdeepSaved: 'Legacy Codex deep results + saved evidence', claudeoutline: 'Legacy Claude comparative outline', claudedeep: 'Legacy Claude deep results', general: 'Investigation + general web strategy', academic: 'Investigation + academic strategy', github: 'Investigation + GitHub strategy', technical: 'Investigation + technical Q&A strategy', chinese: 'Investigation + Chinese sources strategy', migration: 'Legacy migration' }).map(([name, label]) => [label, standalone[name].total])) };
   const hashes = Object.fromEntries(paths.map(path => [path, createHash('sha256').update(contents[path]).digest('hex')]));
   const inputDigest = createHash('sha256').update(JSON.stringify({ hashes, outputs, readingPaths, routes })).digest('hex');
