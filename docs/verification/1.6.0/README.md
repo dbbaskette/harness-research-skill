@@ -1,10 +1,10 @@
 # Harness Research 1.6.0 verification
 
 The 1.6.0 working tree passed the local checks on a macOS 27 development host with
-Node.js 22: 256 Node tests with zero failures and one skip (the Python-gated
+Node.js 22: 263 Node tests with zero failures and one skip (the Python-gated
 comparative validator), and context-map validation after regenerating the
 measurements for the changed entry and the two new references. Every test that
-existed in 1.5.1 is unchanged and passes; 16 tests are new.
+existed in 1.5.1 is unchanged and passes; 23 tests are new.
 
 The new tests check that:
 
@@ -51,6 +51,24 @@ The new tests check that:
   its collection and its asset status, and none of its saved files is rewritten;
   a re-intake, unchanged or with files added and changed, keeps the origin of
   every document already in the inventory.
+
+An independent review of the first candidate found seven defects; each fix has a
+test that fails without it (`tests/review-units-fixes.test.mjs` and
+`tests/supplied-origins.test.mjs`):
+
+- a single review carrying `units` or `reviewers` is refused before anything is
+  written, and schema 2 and 3 states made by the 1.5.1 tree whose reviews carry
+  such fields (`tests/fixtures/review-extras-1.5.1`) read and verify as before;
+- a receipt retired by `retry` is never kept by a later plan, and a retired
+  receipt planted back on a unit is refused at assembly;
+- renaming a section, brief section, comparison or criterion, or reordering a
+  comparison's subjects, changes the basis of the units owning its prose;
+- adding areas never reorders units or moves a tied finding, below or above the cap;
+- `synthesis status` and `verify` report a changed or missing plan file;
+- re-taking an asset with one file added and one changed keeps the origins of the
+  documents already in it, for a 1.5.1-shaped asset and for the 1.5.1 case;
+- a deleted receipt after assembly shows as `review-invalid` with a next step, and
+  `plan` sets the review aside in history and plans a new generation.
 
 The synthetic timing test (`tests/review-units-concurrency.test.mjs`) runs three
 content units of 150 ms simulated work plus the final unit, through the real
