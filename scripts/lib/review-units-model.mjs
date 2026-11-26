@@ -125,6 +125,10 @@ export function computePlan(state, maxUnits, collection = null) {
   return { plan, digest: digestOf(plan) };
 }
 
+// The bytes of a stored plan file; review-units writes them and every status reads them back.
+export const planBytes = plan => JSON.stringify(plan, null, 2) + '\n';
+export const planFile = digest => `${DATA}/plan-${digest}.json`;
+
 // Every source attestation, fact, finding and prose item is owned exactly once; the assessment once.
 export function checkOwnership(state, plan) {
   const expected = { sources: state.sources.map(s => s.id), facts: state.dossier.facts.map(f => f.id), findings: state.dossier.findings.map(f => f.id), prose: proseItems(state.dossier).map(p => p.id) };
@@ -273,6 +277,9 @@ export async function checkAssembledReview(root, state, collection) {
   if ((u.grain === 'collection') !== Boolean(collection)) throw new Error('Assembled review plan no longer matches the saved collection provenance.');
   const { plan, digest } = computePlan(state, u.max_units, collection);
   if (digest !== u.plan) throw new Error('Assembled review plan no longer matches the saved dossier.');
+  let planned = null;
+  try { planned = await readFile(await localFile(root, planFile(digest))); } catch { /* reported below */ }
+  if (!planned?.equals(Buffer.from(planBytes(plan)))) throw new Error(`Assembled review plan file ${planFile(digest)} is missing or changed.`);
   const entries = [];
   for (const entry of u.receipts) {
     const unit = plan.units.find(x => x.id === entry?.unit);

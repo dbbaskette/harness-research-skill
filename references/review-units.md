@@ -61,7 +61,8 @@ missing, duplicate, stale or foreign receipt or a reviewer who is not independen
 and records the review in the saved state. Its result is the `synthesis review`
 result (with `reviewers` and a `review_units` summary) plus `units_status`; it exits 1
 when the review needs revision.
-`synthesis status` and `verify` then recheck the receipts every time.
+`synthesis status` and `verify` then recheck the receipts and the stored plan
+file every time.
 
 ## Corrections, stop and what a host sees
 

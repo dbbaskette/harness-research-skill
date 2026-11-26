@@ -5,7 +5,7 @@ import { loadSynthesis, synthesisStatus, recordAssembledReview, writeTemplate } 
 import { verifyCollectionReviewer, collectionGrain } from './collection.mjs';
 import { outputPath } from './synthesis-layout.mjs';
 import { proseItems } from './synthesis-model.mjs';
-import { PROTOCOL, LIMITS, DATA, FINAL, keys, bounded, proseContexts, unitOptions, computePlan, unitTemplate, validateUnitAnswer, independent, checkPins, makeReceipt, checkReceipt, assembleReview } from './review-units-model.mjs';
+import { PROTOCOL, LIMITS, DATA, FINAL, keys, bounded, proseContexts, planBytes, planFile, unitOptions, computePlan, unitTemplate, validateUnitAnswer, independent, checkPins, makeReceipt, checkReceipt, assembleReview } from './review-units-model.mjs';
 
 const OWNER = 'harness-research-review-units';
 const STATE = '.harness-research/review-units.json';
@@ -130,7 +130,7 @@ async function planAction(root, existing, synthesis, input) {
   const options = unitOptions(input ?? {});
   await fresh(root, synthesis);
   const { plan, digest } = computePlan(synthesis.state, options.max_units, await grain(root, synthesis));
-  const bytes = json(plan), file = await immutable(root, `plan-${digest}.json`, bytes);
+  const bytes = planBytes(plan), file = await immutable(root, planFile(digest).slice(DATA.length + 1), bytes);
   if (existing && existing.plan.digest === digest) {
     if (existing.status === 'stopped') {
       if (running(existing).length) throw new Error('Host must confirm every registered review invocation terminal with finish before resuming.');

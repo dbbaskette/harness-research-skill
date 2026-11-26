@@ -141,3 +141,18 @@ test('fix 4: unit order and tie-breaks do not depend on which other areas exist'
   }
   assert.ok(compared >= 8, 'the probe compared enough plans');
 });
+
+test('fix 5: synthesis status and verify check the stored plan file of an assembled review', async t => {
+  const f = await project(t); await f.save(dossier());
+  const planned = await f.units('plan'); await f.reviewAll('unit'); await f.units('assemble');
+  const file = join(f.root, planned.plan_file), bytes = await readFile(file);
+  await writeFile(file, bytes.toString().replace('"max_units": 8', '"max_units": 7'));
+  for (const action of ['status', 'verify']) {
+    const result = await runSynthesisCli([action, '--project', f.root]);
+    assert.equal(result.status, 'stale'); assert.ok(result.problems.some(p => /Review invalid: .*plan file/.test(p)), JSON.stringify(result.problems));
+  }
+  await rm(file);
+  assert.ok((await runSynthesisCli(['verify', '--project', f.root])).problems.some(p => /plan file/.test(p)));
+  await writeFile(file, bytes);
+  assert.equal((await runSynthesisCli(['verify', '--project', f.root])).status, 'complete');
+});
