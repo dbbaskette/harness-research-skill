@@ -35,6 +35,16 @@ export function unitOptions(input) {
   };
 }
 
+// Where a reader meets each prose item: its section or brief section heading, or for a comparison
+// cell its comparison's title and subjects, its row's criterion and its column's subject.
+export function proseContexts(d) {
+  const contexts = new Map();
+  for (const s of d.sections) s.blocks.forEach((_, i) => contexts.set(`${s.id}:${i}`, { place: 'report', section: { id: s.id, title: s.title }, index: i }));
+  for (const s of d.brief || []) s.blocks.forEach((_, i) => contexts.set(`brief:${s.id}:${i}`, { place: 'brief', section: { id: s.id, title: s.title }, index: i }));
+  for (const [ci, c] of (d.comparisons || []).entries()) for (const [ri, r] of c.rows.entries()) for (const [si, cell] of r.cells.entries())
+    contexts.set(`comparison:${ci}:${ri}:${si}`, { place: 'comparison', comparison: { title: c.title, subjects: c.subjects }, criterion: r.criterion, subject: cell.subject, row: ri, column: si });
+  return contexts;
+}
 const findingRefs = f => [...new Set([...f.summary.refs, ...f.support, ...f.counter, ...['implications', 'conditions', 'gaps'].flatMap(g => f[g].flatMap(b => b.refs))])];
 
 // The plan is a pure function of the saved state, the collection mappings and max_units.
@@ -100,7 +110,8 @@ export function computePlan(state, maxUnits, collection = null) {
   }
   const finalGiven = { sources: [...sourceById.keys()], facts: [...factById.keys()], findings: d.findings.map(f => f.id).filter(id => !finalOwns.findings.includes(id)), prose: prose.map(p => p.id).filter(id => !finalOwns.prose.includes(id)) };
   const context = { topic: d.topic, audience: d.audience, purpose: d.purpose, scope: d.scope, source_mode: d.source_mode };
-  const view = { sources: id => ({ record: sourceById.get(id), pin: digestSource(pins.get(id)) }), facts: id => factById.get(id), findings: id => findingById.get(id), prose: id => proseById.get(id) };
+  const placed = proseContexts(d);
+  const view = { sources: id => ({ record: sourceById.get(id), pin: digestSource(pins.get(id)) }), facts: id => factById.get(id), findings: id => findingById.get(id), prose: id => ({ item: proseById.get(id), context: placed.get(id) }) };
   const content = set => Object.fromEntries(['sources', ...GROUPS].map(g => [g, set[g].map(view[g])]));
   const basis = (kind, o, g) => digestOf({ protocol: PROTOCOL, kind, context, owns: { ...content(o), assessment: o.assessment }, given: content(g) });
   const planned = [...units.map((u, i) => { const g = given(owns[i]); return { ...u, owns: owns[i], given: g, basis: basis('content', owns[i], g) }; }),

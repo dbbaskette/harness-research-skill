@@ -61,8 +61,11 @@ when the review needs revision.
 ## Corrections, stop and what a host sees
 
 After the author saves a corrected dossier, `status` reports `needs-plan`; run
-`plan` again. A unit whose basis (its owned content, given content and pins) is
-unchanged is `kept` with its earlier receipt; review the others and the final unit
+`plan` again. A unit's basis is the dossier's topic, audience, purpose, scope and
+source mode, every owned and given item in full, the heading each prose item sits
+under (for a comparison cell: its title, subjects, criterion and subject), and the
+hashes of every owned and given source. A unit whose basis is unchanged is `kept`
+with its earlier receipt; review the others and the final unit
 with new invocations, then assemble. `stop` cancels outstanding units and refuses
 late answers; confirm each with `finish`, then `plan` resumes with accepted units
 intact. A kept unit can be reviewed again with `retry`.

@@ -5,7 +5,7 @@ import { loadSynthesis, synthesisStatus, recordAssembledReview, writeTemplate } 
 import { verifyCollectionReviewer, collectionGrain } from './collection.mjs';
 import { outputPath } from './synthesis-layout.mjs';
 import { proseItems } from './synthesis-model.mjs';
-import { PROTOCOL, LIMITS, DATA, FINAL, keys, bounded, unitOptions, computePlan, unitTemplate, validateUnitAnswer, independent, checkPins, makeReceipt, checkReceipt, assembleReview } from './review-units-model.mjs';
+import { PROTOCOL, LIMITS, DATA, FINAL, keys, bounded, proseContexts, unitOptions, computePlan, unitTemplate, validateUnitAnswer, independent, checkPins, makeReceipt, checkReceipt, assembleReview } from './review-units-model.mjs';
 
 const OWNER = 'harness-research-review-units';
 const STATE = '.harness-research/review-units.json';
@@ -156,7 +156,7 @@ function view(synthesis, plan, unit) {
   const d = synthesis.state.dossier, pins = new Map(synthesis.state.sources.map(p => [p.id, p]));
   const source = id => { const s = d.sources.find(x => x.id === id), p = pins.get(id); return { ...s, sha256: p.sha256, snapshot: p.snapshot, ...(p.original_file ? { original_sha256: p.original_sha256, original_snapshot: p.original_snapshot } : {}) }; };
   const fact = id => d.facts.find(f => f.id === id), finding = id => d.findings.find(f => f.id === id);
-  const prose = new Map(proseItems(d).map(p => [p.id, p]));
+  const placed = proseContexts(d), prose = new Map(proseItems(d).map(p => [p.id, { ...p, context: placed.get(p.id) }]));
   const items = set => ({ sources: set.sources.map(source), facts: set.facts.map(fact), findings: set.findings.map(finding), prose: set.prose.map(id => prose.get(id)) });
   return { owns: { ...items(unit.owns), assessment: unit.owns.assessment }, given: items(unit.given) };
 }

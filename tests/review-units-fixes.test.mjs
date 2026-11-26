@@ -90,3 +90,24 @@ test('fix 2: a receipt retired by retry, an unsuccessful outcome or stop is neve
   await f.reviewAll('round-three');
   await assert.rejects(f.units('assemble'), /retired/);
 });
+
+test('fix 3: a unit basis covers the headings, criterion, subjects and title a reader meets each prose item under', async () => {
+  const { computePlan } = await import('../scripts/lib/review-units-model.mjs');
+  const base = () => { const d = dossier(); d.brief = [{ id: 'lead', title: 'Lead with the default', blocks: [{ text: 'The default is 10.', kind: 'summary', refs: ['fact-a'] }] }]; return d; };
+  const state = d => ({ digest: '0'.repeat(64), author: 'writer', dossier: d, sources: d.sources.map((s, i) => ({ id: s.id, file: s.file, sha256: String(i + 1).repeat(64), snapshot: `research/sources/revisions/${i}.txt` })) });
+  const plan = d => computePlan(state(d), 8).plan;
+  const owner = (p, id) => p.units.find(u => u.owns.prose.includes(id));
+  const before = plan(base());
+  for (const [label, change, ids] of [
+    ['comparison criterion', d => d.comparisons[0].rows[0].criterion = 'Default forbidden', ['comparison:0:0:0', 'comparison:0:0:1']],
+    ['comparison title', d => d.comparisons[0].title = 'Limits compared', ['comparison:0:0:0', 'comparison:0:0:1']],
+    ['comparison subjects', d => { d.comparisons[0].subjects = ['B', 'A']; }, ['comparison:0:0:0', 'comparison:0:0:1']],
+    ['report section title', d => d.sections[0].title = 'What changed', ['answer:0', 'answer:1']],
+    ['brief section title', d => d.brief[0].title = 'Lead with the exception', ['brief:lead:0']],
+  ]) {
+    const after = plan((d => (change(d), d))(base()));
+    for (const id of ids) assert.notEqual(owner(after, id).basis, owner(before, id).basis, `${label} changes the basis of the unit owning ${id}`);
+  }
+  // The final unit is given every prose item in its context too.
+  const renamed = base(); renamed.sections[0].title = 'Renamed'; assert.notEqual(plan(renamed).units.at(-1).basis, before.units.at(-1).basis);
+});
