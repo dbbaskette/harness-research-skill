@@ -94,7 +94,7 @@ test('units assemble into the review a single reviewer records, naming every rev
   await f.units('plan'); await f.reviewAll('unit-checker');
   const ready = await f.units('status'); assert.equal(ready.phase, 'ready-to-assemble');
   const assembled = await f.units('assemble');
-  assert.equal(assembled.status, 'complete'); assert.equal(assembled.reviewer, null); assert.equal(assembled.reviewers.length, 4); assert.equal(assembled.review_units.phase, 'assembled');
+  assert.equal(assembled.status, 'complete'); assert.equal(assembled.reviewer, null); assert.equal(assembled.reviewers.length, 4); assert.equal(assembled.units_status.phase, 'assembled'); assert.deepEqual(assembled.review_units, { protocol: PROTOCOL, plan: assembled.units_status.plan, units: 4 });
   const state = await f.state();
   assert.equal(state.schema, 4, 'runtimes before 1.6.0 accept only schema 2 and 3, so they refuse this state'); assert.equal(state.review.worker, undefined);
   assert.deepEqual(state.review.reviewers, [...state.review.units.receipts.map(r => r.reviewer)].sort());

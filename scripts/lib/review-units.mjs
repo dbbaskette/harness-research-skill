@@ -276,7 +276,7 @@ export async function runReviewUnitsCli(argv) {
     }
     if (options.action === 'assemble') {
       const response = await assemble(root, state, synthesis);
-      return { ...response, review_units: await report(root, state, synthesis, false) };
+      return { ...response, units_status: await report(root, state, synthesis, false) };
     }
     throw new Error(`Unknown review-units action. ${HELP}`);
   } finally { await releaseLock(lock, owned); }

@@ -54,7 +54,8 @@ node "<runtime>/scripts/harness-research.mjs" review-units assemble --project CA
 Assembly rechecks every receipt, its unit's basis and every pinned file, refuses a
 missing, duplicate, stale or foreign receipt or a reviewer who is not independent,
 and records the review in the saved state. Its result is the `synthesis review`
-result plus `review_units`; it exits 1 when the review needs revision.
+result (with `reviewers` and a `review_units` summary) plus `units_status`; it exits 1
+when the review needs revision.
 `synthesis status` and `verify` then recheck the receipts every time.
 
 ## Corrections, stop and what a host sees
