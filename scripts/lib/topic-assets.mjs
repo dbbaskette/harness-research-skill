@@ -16,6 +16,7 @@ const json = value => JSON.stringify(value, null, 2) + '\n';
 const now = () => new Date().toISOString();
 const markerName = '.harness-research/asset.json';
 const inventoryName = 'sources.json';
+export const SUPPLIED = 'supplied:';
 const within = (root, path) => path === root || path.startsWith(root + sep);
 const tags = value => {
   if (!Array.isArray(value) || value.length > 50 || value.some(v => typeof v !== 'string' || !v.trim() || v.length > 100)) throw new Error('Tags must be at most 50 nonempty strings of at most 100 characters.');
@@ -164,7 +165,10 @@ async function intakeSnapshot(workspace, destination, options) {
         if (SKIP.has(item.name) || item.name.startsWith('.env.')) continue;
         const path=join(folder,item.name), local=relative(sourceRoot,path).split(sep).join('/');
         if (path === urlFile) continue;
-        const id='input-'+hash('document\0'+local).slice(0,32), base={id,role:'supplied',type:'document',origin:path,filename:local,permission:'selected'};
+        // The origin names the document inside the supplied folder, never a folder of this computer. The
+        // label is not read as a path; the retained copy and its hash prove the bytes. Inventories taken in
+        // before 1.6.0 keep the absolute origins they stored.
+        const id='input-'+hash('document\0'+local).slice(0,32), base={id,role:'supplied',type:'document',origin:SUPPLIED+local,filename:local,permission:'selected'};
         const info=await lstat(path);
         if (info.isSymbolicLink()) { addEntry({...base,outcome:'rejected',note:'Symlink input was not followed.'}); fingerprint.push({path:local,kind:'symlink'}); continue; }
         if (info.isDirectory()) {

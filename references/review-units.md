@@ -69,3 +69,8 @@ intact. A kept unit can be reviewed again with `retry`.
 An assembled review sets `reviewer` to `null` and lists `reviewers`, with each
 unit's reviewer in `review.units.receipts`. Its saved state is schema 4, which
 runtimes before 1.6.0 refuse rather than misread. A later single review replaces it.
+
+A supplied document taken in by 1.6.0 or later has the origin `supplied:` and its
+name inside the supplied folder, never a folder of the computer, so a host that
+echoes inventory origins shows that label. Cases taken in earlier keep their stored
+absolute origins unchanged and still verify.

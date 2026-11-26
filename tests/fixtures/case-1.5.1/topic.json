@@ -1,0 +1,28 @@
+{
+  "owner": "harness-research-asset",
+  "schema": 1,
+  "id": "topic-ca5815e3881841e78683cd0d56bf87bf",
+  "title": "Synthetic saved case",
+  "description": "",
+  "tags": [],
+  "created_at": "2026-11-26T14:28:52.537Z",
+  "updated_at": "2026-11-26T14:28:53.031Z",
+  "current": {
+    "digest": "605dc2d4800d941f61bee7c47215806b6b393cf21f344ba2962c9d495a36f17c",
+    "status": "complete",
+    "inputFingerprint": "225e70d8b7ae09db255e78683833892af597c038311aaa615d49115f354d12ec",
+    "author": "synthesis-author",
+    "reviewer": "independent-reviewer",
+    "updated_at": "2026-11-26T14:28:53.031Z"
+  },
+  "revisions": [
+    {
+      "digest": "605dc2d4800d941f61bee7c47215806b6b393cf21f344ba2962c9d495a36f17c",
+      "status": "complete",
+      "inputFingerprint": "225e70d8b7ae09db255e78683833892af597c038311aaa615d49115f354d12ec",
+      "author": "synthesis-author",
+      "reviewer": "independent-reviewer",
+      "updated_at": "2026-11-26T14:28:53.031Z"
+    }
+  ]
+}

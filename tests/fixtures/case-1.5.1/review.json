@@ -1,0 +1,49 @@
+{
+  "schema": 2,
+  "digest": "605dc2d4800d941f61bee7c47215806b6b393cf21f344ba2962c9d495a36f17c",
+  "originals": [
+    {
+      "source": "s-d0685616c7b033090424be2420d50c3297a64c7b0d9b8ce7",
+      "sha256": "b237834374e2b34977bc418420988b1275f7aeb7ba9598f7d42e7c86f4688e61",
+      "original_sha256": "b237834374e2b34977bc418420988b1275f7aeb7ba9598f7d42e7c86f4688e61",
+      "read_original": true
+    },
+    {
+      "source": "s-f6d4a09bbb90ac9e03d4c68813fa81e5c55467d4e974bf30",
+      "sha256": "faaf4d627d472167473353dd6e141cbd4ac944928114a8114928efa34375b244",
+      "original_sha256": "faaf4d627d472167473353dd6e141cbd4ac944928114a8114928efa34375b244",
+      "read_original": true
+    }
+  ],
+  "facts": [
+    {
+      "id": "f-1abb422ffc6b1cd53e835d787b4e996da9e6ff64df1add41",
+      "verdict": "supported",
+      "note": "Synthetic fixture checked against its retained original."
+    },
+    {
+      "id": "f-4bef5b39090358175a8e07f4c09a26e673a83ff5eb5d61ce",
+      "verdict": "supported",
+      "note": "Synthetic fixture checked against its retained original."
+    }
+  ],
+  "findings": [
+    {
+      "id": "finding",
+      "verdict": "supported",
+      "note": "Synthetic fixture checked against its retained original."
+    }
+  ],
+  "prose": [
+    {
+      "id": "answer:0",
+      "verdict": "supported",
+      "note": "Synthetic fixture checked against its retained original."
+    }
+  ],
+  "assessment": {
+    "coverage": "accurate",
+    "usefulness": "adequate",
+    "note": "Synthetic fixture saved by Harness Research 1.5.1."
+  }
+}

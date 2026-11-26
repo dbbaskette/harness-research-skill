@@ -1,0 +1,42 @@
+{
+  "owner": "harness-research-asset",
+  "schema": 1,
+  "asset": "topic-ca5815e3881841e78683cd0d56bf87bf",
+  "input_fingerprint": "225e70d8b7ae09db255e78683833892af597c038311aaa615d49115f354d12ec",
+  "entries": [
+    {
+      "id": "input-187a3d4674a400db73d419e5d38f00c7",
+      "role": "supplied",
+      "type": "document",
+      "origin": "/example/supplied-inputs/guide.md",
+      "filename": "guide.md",
+      "permission": "selected",
+      "original_file": "documents/b237834374e2b34977bc418420988b1275f7aeb7ba9598f7d42e7c86f4688e61.md",
+      "original_sha256": "b237834374e2b34977bc418420988b1275f7aeb7ba9598f7d42e7c86f4688e61",
+      "capture_file": "sources/b237834374e2b34977bc418420988b1275f7aeb7ba9598f7d42e7c86f4688e61.txt",
+      "capture_sha256": "b237834374e2b34977bc418420988b1275f7aeb7ba9598f7d42e7c86f4688e61",
+      "outcome": "ready",
+      "evidence_ids": [
+        "s-d0685616c7b033090424be2420d50c3297a64c7b0d9b8ce7"
+      ],
+      "used_in_digest": "605dc2d4800d941f61bee7c47215806b6b393cf21f344ba2962c9d495a36f17c"
+    },
+    {
+      "id": "input-c3a1fd02ce2801b3556032219afe9367",
+      "role": "supplied",
+      "type": "document",
+      "origin": "/example/supplied-inputs/notes/limits.md",
+      "filename": "notes/limits.md",
+      "permission": "selected",
+      "original_file": "documents/faaf4d627d472167473353dd6e141cbd4ac944928114a8114928efa34375b244.md",
+      "original_sha256": "faaf4d627d472167473353dd6e141cbd4ac944928114a8114928efa34375b244",
+      "capture_file": "sources/faaf4d627d472167473353dd6e141cbd4ac944928114a8114928efa34375b244.txt",
+      "capture_sha256": "faaf4d627d472167473353dd6e141cbd4ac944928114a8114928efa34375b244",
+      "outcome": "ready",
+      "evidence_ids": [
+        "s-f6d4a09bbb90ac9e03d4c68813fa81e5c55467d4e974bf30"
+      ],
+      "used_in_digest": "605dc2d4800d941f61bee7c47215806b6b393cf21f344ba2962c9d495a36f17c"
+    }
+  ]
+}

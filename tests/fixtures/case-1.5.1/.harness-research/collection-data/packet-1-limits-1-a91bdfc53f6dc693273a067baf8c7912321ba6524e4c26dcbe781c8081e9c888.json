@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "request_digest": "57169dcdad57b6d5f8e23b0c8aaa0f9aa1add391b2c553f82741fbc43d485b79",
+  "generation": 1,
+  "workstream": "limits",
+  "attempt": 1,
+  "investigator": "investigator-limits",
+  "sources": [
+    {
+      "id": "supplied",
+      "origin": "/example/supplied-inputs/notes/limits.md",
+      "title": "Synthetic limits",
+      "publisher": "Synthetic fixture",
+      "file": "sources/faaf4d627d472167473353dd6e141cbd4ac944928114a8114928efa34375b244.txt",
+      "original_file": "documents/faaf4d627d472167473353dd6e141cbd4ac944928114a8114928efa34375b244.md",
+      "permission": "selected",
+      "context": "full"
+    }
+  ],
+  "facts": [
+    {
+      "id": "fact",
+      "statement": "The limit is 20.",
+      "author": "investigator-limits",
+      "citations": [
+        {
+          "source": "supplied",
+          "quote": "The limit is 20."
+        }
+      ]
+    }
+  ],
+  "limitations": [],
+  "gaps": []
+}

@@ -1,0 +1,89 @@
+{
+  "owner": "harness-research-asset",
+  "schema": 1,
+  "asset": "topic-ca5815e3881841e78683cd0d56bf87bf",
+  "recorded_review": {
+    "status": "complete",
+    "digest": "605dc2d4800d941f61bee7c47215806b6b393cf21f344ba2962c9d495a36f17c"
+  },
+  "integrity": "verified",
+  "problems": [],
+  "artifacts": [
+    {
+      "file": "brief.md",
+      "sha256": "ceddc4cd4c2313c0ba2950e85fb9b04c0cbe180c432f158ac5b8305e03b19e6e",
+      "kind": "reviewed-bundle"
+    },
+    {
+      "file": "documents/b237834374e2b34977bc418420988b1275f7aeb7ba9598f7d42e7c86f4688e61.md",
+      "sha256": "b237834374e2b34977bc418420988b1275f7aeb7ba9598f7d42e7c86f4688e61",
+      "kind": "original"
+    },
+    {
+      "file": "documents/faaf4d627d472167473353dd6e141cbd4ac944928114a8114928efa34375b244.md",
+      "sha256": "faaf4d627d472167473353dd6e141cbd4ac944928114a8114928efa34375b244",
+      "kind": "original"
+    },
+    {
+      "file": "evidence.md",
+      "sha256": "cbdcf4e5c851cd867048fa52fda7af3e6494c2a9b5a17aa10cc57f06041532cc",
+      "kind": "reviewed-bundle"
+    },
+    {
+      "file": "facts.json",
+      "sha256": "b03378851a1c1c2976167c8a61809cd646e33117506de8ae40397bb4c18a1af0",
+      "kind": "reviewed-bundle"
+    },
+    {
+      "file": "output.json",
+      "sha256": "b128ffa3fe0a74df0a1b09f1472f1c57d3d272bb6077b030b0690b017f31570b",
+      "kind": "reviewed-bundle"
+    },
+    {
+      "file": "report.md",
+      "sha256": "6338bf0f54806208a6d39459f12af415c305378cb0d6419147a04a4c852ec925",
+      "kind": "reviewed-bundle"
+    },
+    {
+      "file": "sources.json",
+      "sha256": "799d4b8b61c24669b3a1fbba1659ddead88f7737d6057cfc7692ea60b550091f",
+      "kind": "metadata"
+    },
+    {
+      "file": "sources/b237834374e2b34977bc418420988b1275f7aeb7ba9598f7d42e7c86f4688e61.txt",
+      "sha256": "b237834374e2b34977bc418420988b1275f7aeb7ba9598f7d42e7c86f4688e61",
+      "kind": "capture"
+    },
+    {
+      "file": "sources/faaf4d627d472167473353dd6e141cbd4ac944928114a8114928efa34375b244.txt",
+      "sha256": "faaf4d627d472167473353dd6e141cbd4ac944928114a8114928efa34375b244",
+      "kind": "capture"
+    },
+    {
+      "file": "sources/revisions/b237834374e2b34977bc418420988b1275f7aeb7ba9598f7d42e7c86f4688e61.md",
+      "sha256": "b237834374e2b34977bc418420988b1275f7aeb7ba9598f7d42e7c86f4688e61",
+      "kind": "reviewed-bundle"
+    },
+    {
+      "file": "sources/revisions/b237834374e2b34977bc418420988b1275f7aeb7ba9598f7d42e7c86f4688e61.txt",
+      "sha256": "b237834374e2b34977bc418420988b1275f7aeb7ba9598f7d42e7c86f4688e61",
+      "kind": "reviewed-bundle"
+    },
+    {
+      "file": "sources/revisions/faaf4d627d472167473353dd6e141cbd4ac944928114a8114928efa34375b244.md",
+      "sha256": "faaf4d627d472167473353dd6e141cbd4ac944928114a8114928efa34375b244",
+      "kind": "reviewed-bundle"
+    },
+    {
+      "file": "sources/revisions/faaf4d627d472167473353dd6e141cbd4ac944928114a8114928efa34375b244.txt",
+      "sha256": "faaf4d627d472167473353dd6e141cbd4ac944928114a8114928efa34375b244",
+      "kind": "reviewed-bundle"
+    },
+    {
+      "file": "topic.json",
+      "sha256": "a5f8dea2c658c415538838959ae19868a436beddfe7538cfe94e0e65d6fde701",
+      "kind": "metadata"
+    }
+  ],
+  "note": "Local file integrity only. Recorded review state is separate; verify synthesis before synchronization. Private state and input URL-list snapshots are excluded."
+}

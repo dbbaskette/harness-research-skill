@@ -1,0 +1,1 @@
+Synthetic guide. The default is 10. Exceptions depend on workload.
