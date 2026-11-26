@@ -34,11 +34,12 @@ computer out of supplied documents' origins (Marketing Studio issue 550).
   with `reviewers`. `synthesis template` and `synthesis review` are unchanged, and
   a state reviewed the single way stays valid. Hosts discover the capability from
   `references/review-units-capability.json`.
-- **Path-free origins.** A supplied document taken in by 1.6.0 records its origin
-  as `supplied:` followed by its name inside the supplied folder. Its retained copy
-  and hash still prove the bytes. Inventories, cases and bundles made earlier keep
-  their stored absolute origins and verify unchanged; a host that echoes inventory
-  origins shows the new label for new intakes only.
+- **Path-free origins.** A supplied document new to an asset's inventory records
+  its origin as `supplied:` followed by its name inside the supplied folder. Its
+  retained copy and hash still prove the bytes. A document already in the inventory
+  keeps its origin on every later intake, so inventories, cases and bundles made
+  earlier keep their absolute origins and verify unchanged; a host that echoes
+  inventory origins shows the new label only for documents new to an asset.
 
 The guidance floor is runtime 1.6.0. See
 [the verification record](verification/1.6.0/README.md).

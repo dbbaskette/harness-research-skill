@@ -49,7 +49,8 @@ The new tests check that:
   (`tests/fixtures/case-1.5.1`, built by `tests/fixtures/make-1.5.1-case.mjs` from
   the 1.5.1 tree with a synthetic origin folder) verifies complete with its digest,
   its collection and its asset status, and none of its saved files is rewritten;
-  an unchanged re-intake keeps the origins an earlier intake stored.
+  a re-intake, unchanged or with files added and changed, keeps the origin of
+  every document already in the inventory.
 
 The synthetic timing test (`tests/review-units-concurrency.test.mjs`) runs three
 content units of 150 ms simulated work plus the final unit, through the real

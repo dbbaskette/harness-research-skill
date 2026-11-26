@@ -103,5 +103,40 @@ test('taking in the same unchanged folder again keeps the origins an earlier int
   assert.ok(inventory.every(e => e.origin === join(w.inputs, e.filename)), 'stored origins are not rewritten');
   await writeFile(join(w.inputs, 'added.md'), 'A changed folder is a new intake.\n');
   await runAssetCli(['intake', '--project', created.asset, '--directory', w.inputs]);
-  assert.ok((await assetContext(created.asset)).inventory.filter(e => e.type === 'document').every(e => e.origin === `supplied:${e.filename}`));
+  for (const e of (await assetContext(created.asset)).inventory.filter(e => e.type === 'document')) assert.equal(e.origin, e.filename === 'added.md' ? 'supplied:added.md' : join(w.inputs, e.filename));
+});
+
+test('re-intake with files added and changed keeps the origin of every document already in the inventory', async t => {
+  // An asset whose inventory holds what 1.5.1 stored, cited by a saved dossier.
+  const w = await workspace(t); await mkdir(w.project);
+  const created = await initializeAsset({ project: w.project, topic: 'Earlier intake', audience: 'Maintainers', purpose: 'Keep working after re-intake', directory: w.inputs });
+  const marker = join(created.asset, '.harness-research/asset.json'), state = JSON.parse(await readFile(marker, 'utf8'));
+  for (const entry of state.inventory) if (entry.type === 'document') entry.origin = join(w.inputs, entry.filename);
+  await writeFile(marker, JSON.stringify(state, null, 2) + '\n');
+  const guide = state.inventory.find(e => e.filename === 'guide.md');
+  const dossier = { schema: 2, ...state.request, scope: 'Synthetic fixture only', sources: [{ id: 'guide', origin: guide.origin, title: 'Synthetic guide', publisher: 'Synthetic fixture', permission: 'selected', context: 'full', file: guide.capture_file, original_file: guide.original_file }],
+    facts: [{ id: 'fact', statement: 'The default is 10.', author: 'researcher', citations: [{ source: 'guide', quote: 'The default is 10.' }] }],
+    findings: [{ id: 'finding', title: 'Default', summary: { text: 'The default is 10.', kind: 'summary', refs: ['fact'] }, support: ['fact'], counter: [], implications: [], conditions: [], gaps: [] }],
+    sections: [{ id: 'answer', title: 'Answer', blocks: [{ text: 'The default is 10.', kind: 'summary', refs: ['finding'] }] }] };
+  await writeFile(join(created.asset, 'dossier.json'), JSON.stringify(dossier));
+  const save = () => runSynthesisCli(['save', '--project', created.asset, '--file', 'dossier.json', '--worker', 'writer']);
+  await save();
+  await writeFile(join(w.inputs, 'added.md'), 'A document new to the folder.\n');
+  await writeFile(join(w.inputs, 'notes/limits.md'), 'Synthetic limits, revised. The limit is 25.\n');
+  const again = await runAssetCli(['intake', '--project', created.asset, '--directory', w.inputs]);
+  assert.notEqual(again.inputFingerprint, created.inputFingerprint);
+  const origins = Object.fromEntries((await assetContext(created.asset)).inventory.filter(e => e.type === 'document').map(e => [e.filename, e.origin]));
+  assert.deepEqual(origins, { 'added.md': 'supplied:added.md', 'guide.md': join(w.inputs, 'guide.md'), 'notes/limits.md': join(w.inputs, 'notes/limits.md'), 'scan.pdf': join(w.inputs, 'scan.pdf') });
+  assert.equal((await save()).status, 'draft', 'the dossier saves as 1.5.1 would save it');
+  // The same with the case 1.5.1 saved: its documents keep their stored origins.
+  const root = await mkdtemp(join(tmpdir(), 'case-1.5.1-reintake-')); t.after(() => rm(root, { recursive: true, force: true }));
+  const asset = join(root, 'case'), inputs = join(root, 'inputs');
+  await cp(new URL('./fixtures/case-1.5.1', import.meta.url), asset, { recursive: true });
+  await mkdir(join(inputs, 'notes'), { recursive: true });
+  await writeFile(join(inputs, 'guide.md'), 'Synthetic guide. The default is 10. Exceptions depend on workload.\n');
+  await writeFile(join(inputs, 'notes/limits.md'), 'Synthetic limits. The limit is 25. Editions differ.\n');
+  await writeFile(join(inputs, 'added.md'), 'A document new to the folder.\n');
+  await runAssetCli(['intake', '--project', asset, '--directory', inputs]);
+  const fixture = Object.fromEntries((await assetContext(asset)).inventory.map(e => [e.filename, e.origin]));
+  assert.deepEqual(fixture, { 'added.md': 'supplied:added.md', 'guide.md': '/example/supplied-inputs/guide.md', 'notes/limits.md': '/example/supplied-inputs/notes/limits.md' });
 });

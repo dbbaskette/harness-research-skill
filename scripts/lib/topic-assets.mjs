@@ -166,8 +166,8 @@ async function intakeSnapshot(workspace, destination, options) {
         const path=join(folder,item.name), local=relative(sourceRoot,path).split(sep).join('/');
         if (path === urlFile) continue;
         // The origin names the document inside the supplied folder, never a folder of this computer. The
-        // label is not read as a path; the retained copy and its hash prove the bytes. Inventories taken in
-        // before 1.6.0 keep the absolute origins they stored.
+        // label is not read as a path; the retained copy and its hash prove the bytes. A re-intake keeps the
+        // origin of every document already in the inventory, including absolute ones stored before 1.6.0.
         const id='input-'+hash('document\0'+local).slice(0,32), base={id,role:'supplied',type:'document',origin:SUPPLIED+local,filename:local,permission:'selected'};
         const info=await lstat(path);
         if (info.isSymbolicLink()) { addEntry({...base,outcome:'rejected',note:'Symlink input was not followed.'}); fingerprint.push({path:local,kind:'symlink'}); continue; }
@@ -345,6 +345,10 @@ export async function runAssetCli(argv) {
         const previous={intake:state.intake,inputFingerprint:state.inputFingerprint,inventory:state.inventory};
         await directory(join(root,'.harness-research/intake-history'));
         await immutable(root,'.harness-research/intake-history/'+hash(stable(previous))+'.json',Buffer.from(json(previous)));
+        // A document already in the inventory keeps the origin it has, however it was recorded; only a
+        // document new to the inventory gets a supplied: origin.
+        const earlier=new Map(state.inventory.filter(e=>e.type==='document').map(e=>[e.id,e.origin]));
+        for (const entry of snapshot.entries) if (entry.type==='document' && earlier.has(entry.id)) entry.origin=earlier.get(entry.id);
         state.intake=snapshot.intake; state.inputFingerprint=nextFingerprint; state.inventory=snapshot.entries;
       }
     } else if (action==='metadata'||action==='source') {

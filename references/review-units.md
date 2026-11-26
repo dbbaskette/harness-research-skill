@@ -80,7 +80,8 @@ An assembled review sets `reviewer` to `null` and lists `reviewers`, with each
 unit's reviewer in `review.units.receipts`. Its saved state is schema 4, which
 runtimes before 1.6.0 refuse rather than misread. A later single review replaces it.
 
-A supplied document taken in by 1.6.0 or later has the origin `supplied:` and its
-name inside the supplied folder, never a folder of the computer, so a host that
-echoes inventory origins shows that label. Cases taken in earlier keep their stored
-absolute origins unchanged and still verify.
+A supplied document new to an asset's inventory from 1.6.0 on has the origin
+`supplied:` and its name inside the supplied folder, never a folder of the
+computer, so a host that echoes inventory origins shows that label. A document
+already in the inventory keeps its origin on every later intake, so assets taken in
+earlier keep their absolute origins and still verify.

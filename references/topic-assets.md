@@ -75,8 +75,9 @@ requiring a new intake form.
 
 A supplied document's `origin` is `supplied:` followed by its name inside the
 selected folder (`supplied:notes/guide.md`); it names no folder of the computer.
-Copy it unchanged into dossier sources. Assets taken in before 1.6.0 keep the
-absolute origins they recorded.
+Copy it unchanged into dossier sources. A document already in the inventory keeps
+the origin it has on a later intake, so assets taken in before 1.6.0 keep their
+absolute origins; only documents new to the inventory get `supplied:` origins.
 
 Intake snapshots original bytes and the observed input inventory. Readable plain
 text can be retained directly; PDF/Office inputs still require the host’s actual
