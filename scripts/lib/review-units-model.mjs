@@ -50,7 +50,7 @@ const findingRefs = f => [...new Set([...f.summary.refs, ...f.support, ...f.coun
 // The plan is a pure function of the saved state, the collection mappings and max_units.
 // Areas: a collection's workstreams (registry mappings), or else each source. A fact belongs to
 // its workstream, or else to the area of its first cited source. Findings and prose go to the
-// unit owning most of what they cite (ties to the earlier unit); prose citing nothing, and the
+// unit owning most of what they cite (ties to the lower-ranked unit); prose citing nothing, and the
 // whole-dossier assessment, go to the final unit.
 export function computePlan(state, maxUnits, collection = null) {
   bounded(maxUnits, 'max_units', 1, LIMITS.max_units);
@@ -71,15 +71,19 @@ export function computePlan(state, maxUnits, collection = null) {
   for (const f of d.facts) if (factArea.get(f.id) === undefined) throw new Error(`Fact ${f.id} has no area.`);
   const used = new Set([...d.sources.map(s => sourceArea.get(s.id)), ...d.facts.map(f => factArea.get(f.id))]);
   const areas = order.filter((a, i) => used.has(a) && order.indexOf(a) === i);
+  // Each unit has a rank that depends only on its own areas: the area's own hash, or above the cap the
+  // bucket that the area's hash selects. Units are ordered by rank and ties go to the lower rank, so
+  // adding or removing other areas never reorders units or moves an item between unchanged units.
+  const areaHash = a => hash(`review-unit\0${a}`);
   let groups;
-  if (areas.length <= maxUnits) groups = areas.map(a => [a]);
+  if (areas.length <= maxUnits) groups = areas.map(a => ({ rank: areaHash(a), areas: [a] }));
   else {
-    // Above the cap, an area's unit depends only on its own key, so other areas' changes do not move it.
     const buckets = new Map();
-    for (const a of areas) { const b = parseInt(hash(`review-unit\0${a}`).slice(0, 12), 16) % maxUnits; if (!buckets.has(b)) buckets.set(b, []); buckets.get(b).push(a); }
-    groups = [...buckets.values()];
+    for (const a of areas) { const b = parseInt(areaHash(a).slice(0, 12), 16) % maxUnits; if (!buckets.has(b)) buckets.set(b, []); buckets.get(b).push(a); }
+    groups = [...buckets].map(([b, g]) => ({ rank: String(b).padStart(2, '0'), areas: g }));
   }
-  const units = groups.map(g => ({ id: 'unit-' + digestOf({ grain, areas: g }).slice(0, 16), kind: 'content', areas: g }));
+  groups.sort((x, y) => x.rank < y.rank ? -1 : x.rank > y.rank ? 1 : 0);
+  const units = groups.map(({ areas: g }) => ({ id: 'unit-' + digestOf({ grain, areas: g }).slice(0, 16), kind: 'content', areas: g }));
   if (new Set(units.map(u => u.id)).size !== units.length) throw new Error('Review unit identity collision.');
   const areaUnit = new Map(); units.forEach((u, i) => u.areas.forEach(a => areaUnit.set(a, i)));
   const unitOfSource = id => areaUnit.get(sourceArea.get(id)), unitOfFact = id => areaUnit.get(factArea.get(id));

@@ -20,10 +20,15 @@ dossier must not be stale. The same saved state and options give the same plan.
 Units follow the collection's workstreams, or each source when there is no
 collection; above `max_units`, areas are grouped by a hash of their own key. A
 fact goes with its workstream, or with its first cited source. A finding or prose
-block goes to the unit owning most of what it cites, ties to the earlier unit.
-Prose that cites nothing and the coverage and usefulness assessment go to the
-final unit, which is given the whole dossier. Every unit is also given, to read,
-what its owned items cite. `status` lists units with `owns` counts and status.
+block goes to the unit owning most of what it cites. Units are ordered, and ties
+broken, by a rank taken from their own areas only, so adding an area never moves
+an item between units that did not change. Prose that cites nothing and the
+coverage and usefulness assessment go to the final unit, which is given the whole
+dossier. Every unit is also given, to read, what its owned items cite. `status`
+lists units with `owns` counts and status. Two limits are deliberate: prose ids are
+positions, so inserting a block early in a section renumbers the blocks after it
+and their units are reviewed again; and above the cap, hashing areas into buckets
+can leave some of the `max_units` units unused.
 
 ## Run each unit
 

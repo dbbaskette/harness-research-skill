@@ -64,7 +64,8 @@ test('fix 1: a single review cannot carry assembled-review fields, and 1.5.1 sta
 
 test('fix 2: a receipt retired by retry, an unsuccessful outcome or stop is never kept again', async t => {
   const f = await project(t); await f.save(dossier()); await f.units('plan');
-  const plan = await f.units('status'), a = plan.units.find(u => u.kind === 'content');
+  const status = await f.units('status'), plan = JSON.parse(await readFile(join(f.root, status.plan_file), 'utf8'));
+  const a = plan.units.find(u => u.owns.sources.includes('source-a'));
   const bad = await f.review(a.id, 'bad-reviewer', x => x.facts[0].verdict = 'unsupported');
   await f.units('retry', { unit: a.id, reason: 'The host discarded this answer.' });
   const changed = dossier(); changed.facts[1].statement = 'The documented limit is 20.';
@@ -110,4 +111,33 @@ test('fix 3: a unit basis covers the headings, criterion, subjects and title a r
   }
   // The final unit is given every prose item in its context too.
   const renamed = base(); renamed.sections[0].title = 'Renamed'; assert.notEqual(plan(renamed).units.at(-1).basis, before.units.at(-1).basis);
+});
+
+test('fix 4: unit order and tie-breaks do not depend on which other areas exist', async () => {
+  const { computePlan } = await import('../scripts/lib/review-units-model.mjs');
+  const make = ids => {
+    const d = { schema: 2, topic: 'Synthetic', audience: 'Maintainers', purpose: 'Check ties', scope: 'Synthetic', source_mode: 'public',
+      sources: ids.map(id => ({ id, file: `${id}.txt`, origin: `https://example.test/${id}`, title: id, publisher: 'Synthetic', permission: 'public', context: 'full' })),
+      facts: ids.map(id => ({ id: `fact-${id}`, statement: `${id} states a value.`, author: 'researcher', citations: [{ source: id, quote: 'value' }] })),
+      findings: [{ id: 'fd', title: 'Tie', summary: { text: 'Both state values.', kind: 'summary', refs: ['fact-s0', 'fact-s1'] }, support: ['fact-s0', 'fact-s1'], counter: [], implications: [], conditions: [], gaps: [] }],
+      sections: [{ id: 'answer', title: 'Answer', blocks: [{ text: 'Both state values.', kind: 'summary', refs: ['fd'] }] }] };
+    return { digest: '0'.repeat(64), author: 'writer', dossier: d, sources: ids.map((id, i) => ({ id, file: `${id}.txt`, sha256: hashOf(id), snapshot: `s/${i}` })) };
+  };
+  const hashOf = id => Buffer.from(id.padEnd(32, 'x')).toString('hex').slice(0, 64);
+  let compared = 0;
+  for (const cap of [2, 3, 8]) {
+    const base = ['s0', 's1', 's3', 's5'], before = computePlan(make(base), cap).plan;
+    const unitWith = (p, area) => p.units.find(u => u.areas.includes(area));
+    if (unitWith(before, 's0') === unitWith(before, 's1')) continue;
+    const ownerArea = ['s0', 's1'].find(a => unitWith(before, a).owns.findings.includes('fd'));
+    for (const extra of ['s2', 's4', 's6', 's7', 's8', 's9', 'sa', 'sb']) {
+      const after = computePlan(make([extra, ...base]), cap).plan;
+      if (unitWith(after, 's0') === unitWith(after, 's1')) continue;
+      compared++;
+      assert.ok(unitWith(after, ownerArea).owns.findings.includes('fd'), `cap ${cap}: adding ${extra} moved the finding away from ${ownerArea}`);
+      const order = p => p.units.filter(u => u.kind === 'content').map(u => base.find(a => u.areas.includes(a))).filter(Boolean);
+      assert.deepEqual([...new Set(order(after))], [...new Set(order(before))], `cap ${cap}: adding ${extra} reordered the units`);
+    }
+  }
+  assert.ok(compared >= 8, 'the probe compared enough plans');
 });

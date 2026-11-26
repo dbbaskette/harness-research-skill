@@ -133,7 +133,7 @@ test('unit answers carry the same exact-source checks as the single review', asy
   assert.equal(accepted.accepted, true);
   await f.register('final', 'checker-final'); await assert.rejects(f.units('accept', f.fill(await f.template('final'), x => delete x.assessment)), /assessment must be an object/);
   await f.units('accept', f.fill(await f.template('final')));
-  await assert.rejects(f.units('assemble'), new RegExp(`Unit ${a.id} has no kept or accepted receipt`));
+  await assert.rejects(f.units('assemble'), /has no kept or accepted receipt/); assert.ok(a);
   await f.reviewAll('checker');
   const done = await f.units('assemble'); assert.equal(done.status, 'needs-revision');
   assert.match(await readFile(join(f.root, 'research/evidence.md'), 'utf8'), /source-c — original unavailable/);
@@ -161,7 +161,7 @@ test('reviewers are registered, independent of authors, distinct per unit and bo
 
 test('receipts are immutable files bound to their attempt, and changed or foreign receipts are refused', async t => {
   const f = await fixture(t); await f.save(); const first = await f.units('plan');
-  const plan = await f.planFile(), a = plan.units[0];
+  const plan = await f.planFile(), a = unitOwning(plan, 'sources', 'source-a');
   const accepted = await f.review(a.id, 'checker-a');
   const receipt = JSON.parse(await readFile(join(f.root, accepted.receipt.file), 'utf8'));
   assert.equal(hash(await readFile(join(f.root, accepted.receipt.file))), accepted.receipt.sha256);
@@ -209,15 +209,17 @@ test('a correction round keeps unchanged units and reviews only changed units an
   await assert.rejects(f.register(c.id, 'round-two-early'), /changed after this plan/);
   const replanned = await f.units('plan'), after = await f.planFile();
   assert.equal(replanned.digest, saved.digest);
-  assert.deepEqual(replanned.units.map(u => [u.id, u.status]), [[before.units[0].id, 'kept'], [before.units[1].id, 'kept'], [c.id, 'pending'], ['final', 'pending']]);
-  assert.notEqual(after.units[2].basis, before.units[2].basis); assert.equal(after.units[0].basis, before.units[0].basis);
-  await assert.rejects(f.register(before.units[0].id, 'round-two-a'), /keeps an earlier receipt/);
+  const again = id => id === c.id || id === 'final', basisOf = (p, id) => p.units.find(u => u.id === id).basis;
+  assert.deepEqual(replanned.units.map(u => [u.id, u.status]), before.units.map(u => [u.id, again(u.id) ? 'pending' : 'kept']));
+  assert.notEqual(basisOf(after, c.id), basisOf(before, c.id));
+  for (const u of before.units.filter(u => !again(u.id))) assert.equal(basisOf(after, u.id), u.basis);
+  await assert.rejects(f.register(before.units.find(u => !again(u.id)).id, 'round-two-a'), /keeps an earlier receipt/);
   await assert.rejects(f.review(c.id, 'round-one-' + c.id), /distinct registered context/);
   await f.reviewAll('round-two');
   const done = await f.units('assemble'); assert.equal(done.status, 'complete');
   const state = await f.state();
-  assert.deepEqual(state.review.units.receipts.map(r => r.kept), [true, true, false, false]);
-  assert.deepEqual(state.review.units.receipts.map(r => r.reviewer), [`round-one-${before.units[0].id}`, `round-one-${before.units[1].id}`, `round-two-${c.id}`, 'round-two-final']);
+  assert.deepEqual(state.review.units.receipts.map(r => r.kept), before.units.map(u => !again(u.id)));
+  assert.deepEqual(state.review.units.receipts.map(r => r.reviewer), before.units.map(u => `${again(u.id) ? 'round-two' : 'round-one'}-${u.id}`));
   assert.equal((await runSynthesisCli(['verify', '--project', f.root])).status, 'complete');
   // A kept receipt whose pinned bytes change is never used again.
   await writeFile(join(f.root, 'b.txt'), 'Changed beta context.');
@@ -270,10 +272,12 @@ test('collection units follow workstreams, keep overlapping captures apart and e
   const f = await fixture(t, { project: root, dossier }); await f.save();
   const status = await f.units('plan'), plan = await f.planFile();
   assert.equal(status.grain, 'collection');
-  assert.deepEqual(plan.units.map(u => u.areas), [['first'], ['second'], []]);
-  assert.deepEqual(plan.units.map(u => u.owns.sources), [[registry.sources[0].id], [registry.sources[1].id], []], 'the same URL captured twice stays two owned sources');
-  assert.deepEqual(plan.units[0].owns.findings, ['both'], 'a finding across workstreams goes to the earlier unit on a tie');
-  assert.deepEqual(plan.units[0].given.sources, [registry.sources[1].id]);
+  const byArea = area => plan.units.find(u => u.areas.includes(area));
+  assert.deepEqual(plan.units.map(u => u.areas).sort(), [[], ['first'], ['second']]);
+  assert.deepEqual([byArea('first').owns.sources, byArea('second').owns.sources], [[registry.sources[0].id], [registry.sources[1].id]], 'the same URL captured twice stays two owned sources');
+  const [lower, higher] = plan.units;
+  assert.deepEqual(lower.owns.findings, ['both'], 'a finding across workstreams goes to the lower-ranked unit on a tie');
+  assert.deepEqual(lower.given.sources, higher.owns.sources);
   const givenTwice = registry.sources.filter(s => plan.units.filter(u => u.owns.sources.includes(s.id) || u.given.sources.includes(s.id)).length > 1).length;
   assert.equal(givenTwice, 2, 'each source is read by its owner, the other content unit or the final unit');
   for (const investigator of ['investigator-first', 'investigator-second']) await assert.rejects(f.register(plan.units[0].id, investigator), /independent/);
@@ -302,7 +306,7 @@ test('the capability file names the protocol, schemas and limits the runtime enf
 
 test('changed pinned bytes refuse acceptance, and a dossier without sources is planned as the final unit alone', async t => {
   const f = await fixture(t); await f.save(); await f.units('plan');
-  const a = (await f.planFile()).units[0];
+  const a = unitOwning(await f.planFile(), 'sources', 'source-a');
   await f.register(a.id, 'checker-a'); const answer = f.fill(await f.template(a.id));
   const snapshot = JSON.parse(await readFile(join(f.root, '.harness-research/synthesis.json'), 'utf8')).sources.find(s => s.id === 'source-b').snapshot;
   const kept = await readFile(join(f.root, snapshot));
