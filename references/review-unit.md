@@ -30,9 +30,14 @@ hashes and set `read_original` to `true` only after inspecting that original;
 otherwise set it to `false` with a concrete `access_error`. Verdicts are
 `supported`, `narrow` or `unsupported`, each with a note on what you checked.
 
-The final unit owns the assessment and any prose that cites nothing. It is given
-the whole dossier: read the saved report and brief as a whole and judge coverage
-and usefulness as the review guide describes. A content unit has no assessment.
+A content unit attests each owned item against its exact sources only. You are not
+shown neighbouring prose and attest nothing about it, about the order of items, or
+about a comparison row as a whole.
+
+The final unit owns the assessment and any prose that cites nothing. Its assignment
+carries the whole saved `dossier`, every comparison row whole: read the report and
+brief as a whole and judge coverage, usefulness, consistency between items and their
+order as the review guide describes. A content unit has no assessment.
 
 Return the filled JSON to the host, which records it; do not register yourself or
 change any saved file. A unit answer that omits an owned item, attests a different

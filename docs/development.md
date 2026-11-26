@@ -246,7 +246,7 @@ representative guidance-start response. Stage-only rows count their own referenc
 | Investigator stage | 1,143 |
 | Synthesis writer stage | 1,614 |
 | Independent reviewer stage | 1,528 |
-| Review unit reviewer stage | 2,027 |
+| Review unit reviewer stage | 2,086 |
 | New synthesis: coordinator entry and workflow | 4,411 |
 | New synthesis: all stages in one context | 8,696 |
 | Synthesis resume, verify or refresh | 2,877 |
@@ -254,7 +254,7 @@ representative guidance-start response. Stage-only rows count their own referenc
 | Optional local topic asset intake | 5,970 |
 | Parallel coordinator with Codex adapter | 5,977 |
 | Parallel coordinator with Claude Code adapter | 5,961 |
-| Review units coordinator | 5,715 |
+| Review units coordinator | 5,942 |
 | Delegated investigator with packet contract | 2,278 |
 | Legacy 0.9 queued coordinator | 5,042 |
 | Legacy 0.9 reuse or refresh | 2,076 |

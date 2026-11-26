@@ -318,7 +318,7 @@ export async function updateAssetRevision(project,synthesisState,result) {
       else delete entry.used_in_digest;
     }
   }
-  const revision={digest:synthesisState.digest,status:result.status,inputFingerprint:state.inputFingerprint,author:synthesisState.author,reviewer:synthesisState.review?.worker||null,...(synthesisState.schema===4?{reviewers:synthesisState.review.reviewers}:{}),updated_at:now()};
+  const revision={digest:synthesisState.digest,status:result.status,inputFingerprint:state.inputFingerprint,author:synthesisState.author,reviewer:synthesisState.review?.worker||null,...(synthesisState.schema===4?{reviewers:Array.isArray(synthesisState.review?.reviewers)?synthesisState.review.reviewers:[]}:{}),updated_at:now()};
   const old=state.revisions.findIndex(r=>r.digest===revision.digest);
   if (state.current && ['digest','status','inputFingerprint','author','reviewer','reviewers'].every(k=>stable(state.current[k])===stable(revision[k]))) {if (stable(state.inventory) !== oldInventory) await persist(root,state); else await projections(root,state);return;}
   if (old<0) state.revisions.push(revision); else state.revisions[old]=revision;

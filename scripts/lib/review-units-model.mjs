@@ -2,7 +2,8 @@
 // explicit ownership, durable receipts and a strict assembly into the ordinary review object.
 // Pure planning and checking live here; the command and its state live in review-units.mjs.
 import { readFile } from 'node:fs/promises';
-import { hash, stable, identifier, text, localFile, parseJson } from './run-storage.mjs';
+import { join } from 'node:path';
+import { hash, stable, identifier, text, localFile, parseJson, exists } from './run-storage.mjs';
 import { proseItems, digestSource, validateReview } from './synthesis-model.mjs';
 
 export const PROTOCOL = 'harness-review-units-v1';
@@ -71,17 +72,18 @@ export function computePlan(state, maxUnits, collection = null) {
   for (const f of d.facts) if (factArea.get(f.id) === undefined) throw new Error(`Fact ${f.id} has no area.`);
   const used = new Set([...d.sources.map(s => sourceArea.get(s.id)), ...d.facts.map(f => factArea.get(f.id))]);
   const areas = order.filter((a, i) => used.has(a) && order.indexOf(a) === i);
-  // Each unit has a rank that depends only on its own areas: the area's own hash, or above the cap the
-  // bucket that the area's hash selects. Units are ordered by rank and ties go to the lower rank, so
-  // adding or removing other areas never reorders units or moves an item between unchanged units.
+  // One rank rule on both sides of the cap: a unit's rank is the lowest hash among its own areas.
+  // Units are ordered by rank and ties go to the lower rank, so adding or removing other areas, even
+  // across the cap, never reorders two units whose own areas did not change or moves an item between them.
   const areaHash = a => hash(`review-unit\0${a}`);
   let groups;
-  if (areas.length <= maxUnits) groups = areas.map(a => ({ rank: areaHash(a), areas: [a] }));
+  if (areas.length <= maxUnits) groups = areas.map(a => [a]);
   else {
     const buckets = new Map();
     for (const a of areas) { const b = parseInt(areaHash(a).slice(0, 12), 16) % maxUnits; if (!buckets.has(b)) buckets.set(b, []); buckets.get(b).push(a); }
-    groups = [...buckets].map(([b, g]) => ({ rank: String(b).padStart(2, '0'), areas: g }));
+    groups = [...buckets.values()];
   }
+  groups = groups.map(g => ({ rank: g.map(areaHash).sort()[0], areas: g }));
   groups.sort((x, y) => x.rank < y.rank ? -1 : x.rank > y.rank ? 1 : 0);
   const units = groups.map(({ areas: g }) => ({ id: 'unit-' + digestOf({ grain, areas: g }).slice(0, 16), kind: 'content', areas: g }));
   if (new Set(units.map(u => u.id)).size !== units.length) throw new Error('Review unit identity collision.');
@@ -117,7 +119,9 @@ export function computePlan(state, maxUnits, collection = null) {
   const placed = proseContexts(d);
   const view = { sources: id => ({ record: sourceById.get(id), pin: digestSource(pins.get(id)) }), facts: id => factById.get(id), findings: id => findingById.get(id), prose: id => ({ item: proseById.get(id), context: placed.get(id) }) };
   const content = set => Object.fromEntries(['sources', ...GROUPS].map(g => [g, set[g].map(view[g])]));
-  const basis = (kind, o, g) => digestOf({ protocol: PROTOCOL, kind, context, owns: { ...content(o), assessment: o.assessment }, given: content(g) });
+  // The final unit attests coverage, usefulness, consistency and order across the whole dossier, so its
+  // basis also holds the whole dossier: any change anywhere means the final unit is reviewed again.
+  const basis = (kind, o, g) => digestOf({ protocol: PROTOCOL, kind, context, owns: { ...content(o), assessment: o.assessment }, given: content(g), ...(kind === 'final' ? { dossier: d } : {}) });
   const planned = [...units.map((u, i) => { const g = given(owns[i]); return { ...u, owns: owns[i], given: g, basis: basis('content', owns[i], g) }; }),
     { id: FINAL, kind: 'final', areas: [], owns: finalOwns, given: finalGiven, basis: basis('final', finalOwns, finalGiven) }];
   const plan = { schema: 1, protocol: PROTOCOL, digest: state.digest, grain, ...(collection ? { registry_digest: collection.registry_digest } : {}), max_units: maxUnits, units: planned };
@@ -215,6 +219,29 @@ export async function checkPins(root, state, unit) {
   }
 }
 
+// A receipt the host retired (review-units retry) is never used again by anything: plan, assemble,
+// or a review already recorded. Retirement is an immutable file named by the receipt's hash.
+export const retirementFile = sha256 => `${DATA}/retired-${sha256}.json`;
+export async function retirement(root, sha256) {
+  const path = join(root, retirementFile(sha256));
+  if (!await exists(path)) return null;
+  try { return parseJson(await readFile(path, 'utf8')); } catch { return { reason: 'an unreadable retirement record' }; }
+}
+
+// Every reader of a recorded assembled review checks its shape first and reports, never throws.
+const RECEIPT_FIELDS = ['unit', 'kind', 'reviewer', 'invocation', 'attempt', 'plan', 'digest', 'basis', 'kept', 'file', 'sha256'];
+const record = value => Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+export function assembledShape(review) {
+  if (!record(review)) throw new Error('Assembled review is missing or malformed.');
+  for (const group of ['originals', 'facts', 'findings', 'prose']) if (!Array.isArray(review[group]) || !review[group].every(record)) throw new Error(`Assembled review ${group} are missing or malformed.`);
+  if (!record(review.assessment)) throw new Error('Assembled review assessment is missing or malformed.');
+  if (!Array.isArray(review.reviewers) || !review.reviewers.every(r => typeof r === 'string')) throw new Error('Assembled review reviewers are missing or malformed.');
+  if (!record(review.units)) throw new Error('Assembled review units are missing or malformed.');
+  if (!Array.isArray(review.units.receipts) || !review.units.receipts.every(record)) throw new Error('Assembled review receipts are missing or malformed.');
+  for (const entry of review.units.receipts) for (const field of RECEIPT_FIELDS) if (!Object.hasOwn(entry, field)) throw new Error(`An assembled review receipt is missing ${field}.`);
+}
+export const wellShaped = review => { try { assembledShape(review); return true; } catch { return false; } };
+
 export function makeReceipt(state, planDigest, unit, attempt, answer) {
   return { schema: 1, protocol: PROTOCOL, kind: 'review-unit-receipt', plan: planDigest, digest: state.digest, unit: unit.id, unit_kind: unit.kind, basis: unit.basis, attempt: attempt.number, reviewer: attempt.reviewer, invocation: attempt.invocation, owns: unit.owns, given: unit.given, pins: unitPins(state, unit), answer };
 }
@@ -225,6 +252,8 @@ export async function checkReceipt(root, state, unit, ref, expected = {}) {
   let bytes;
   try { bytes = await readFile(await localFile(root, ref.file)); } catch { throw new Error(`Review unit receipt for ${unit.id} is unavailable.`); }
   if (hash(bytes) !== ref.sha256) throw new Error(`Review unit receipt for ${unit.id} changed.`);
+  const retired = await retirement(root, ref.sha256);
+  if (retired) throw new Error(`Review unit receipt for ${unit.id} was retired by ${retired.reason}; review the unit again.`);
   const receipt = parseJson(bytes.toString('utf8'));
   keys(receipt, RECEIPT, 'review unit receipt');
   if (receipt.schema !== 1 || receipt.protocol !== PROTOCOL || receipt.kind !== 'review-unit-receipt') throw new Error('Unrecognized review unit receipt.');
@@ -271,7 +300,9 @@ export function assembleReview(state, plan, planDigest, entries) {
 
 // Re-run on every status and verify, as the collection registry is.
 export async function checkAssembledReview(root, state, collection) {
-  const review = state.review, u = review.units;
+  const review = state.review;
+  assembledShape(review);
+  const u = review.units;
   keys(u, ['schema', 'protocol', 'plan', 'grain', 'max_units', 'receipts'], 'assembled review units');
   if (u.schema !== 1 || u.protocol !== PROTOCOL || !Array.isArray(u.receipts)) throw new Error('Unrecognized assembled review.');
   if ((u.grain === 'collection') !== Boolean(collection)) throw new Error('Assembled review plan no longer matches the saved collection provenance.');
@@ -282,7 +313,7 @@ export async function checkAssembledReview(root, state, collection) {
   if (!planned?.equals(Buffer.from(planBytes(plan)))) throw new Error(`Assembled review plan file ${planFile(digest)} is missing or changed.`);
   const entries = [];
   for (const entry of u.receipts) {
-    const unit = plan.units.find(x => x.id === entry?.unit);
+    const unit = plan.units.find(x => x.id === entry.unit);
     if (!unit) throw new Error('Assembled review names a unit outside its plan.');
     const receipt = await checkReceipt(root, state, unit, entry, { reviewer: entry.reviewer, invocation: entry.invocation, attempt: entry.attempt, plan: entry.plan, digest: entry.digest });
     entries.push({ unit, receipt, file: entry.file, sha256: entry.sha256 });

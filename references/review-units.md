@@ -72,20 +72,37 @@ source mode, every owned and given item in full, the heading each prose item sit
 under (for a comparison cell: its title, subjects, criterion and subject), and the
 hashes of every owned and given source. A unit whose basis is unchanged is `kept`
 with its earlier receipt; review the others and the final unit
-with new invocations, then assemble. `stop` cancels outstanding units and refuses
-late answers; confirm each with `finish`, then `plan` resumes with accepted units
-intact. A kept unit can be reviewed again with `retry`. A receipt given up by
-`retry`, an unsuccessful `finish` or `stop` is retired and never kept again.
+with new invocations, then assemble. `stop` cancels outstanding units, running or
+completed without an accepted answer, and refuses their late answers, also after
+`plan` resumes; confirm each with `finish`, then `plan` resumes with accepted units
+intact and `retry` dispatches a cancelled unit again. A kept or accepted unit can
+be reviewed again with `retry`, which retires its receipt: a retired receipt is
+used by nothing again, and an assembled review resting on it is no longer complete.
 
-If an assembled review stops checking out (a receipt or the plan file is missing
-or changed) while the evidence is intact, `status` reports phase `review-invalid`
-with `assembled_review` problems and `next_step`. Run `plan`: it sets that review
-aside in synthesis history, returns `set_aside`, and plans again, keeping valid
-receipts; review the remaining units and assemble.
+## What each unit attests
+
+A content unit's reviewer is shown its owned items and what they cite, never the
+neighbouring prose, and attests each owned item against its exact sources. The
+final unit is given the whole saved dossier, every comparison row whole, and
+attests coverage, usefulness, consistency between items and their order. Any change
+to the dossier, its order included, means a new final review.
+
+## When an assembled review stops checking out
+
+If a receipt is missing, changed or retired, the plan file changed, or the stored
+review is malformed, while the evidence is intact, `synthesis status` and `verify`
+report it stale and `review-units status` reports phase `review-invalid` with
+`assembled_review` problems and `next_step`. Do what `next_step` says: `finish` any
+running invocation, then `plan` with the same options. It keeps a changed plan file
+beside the one it rewrites, sets the review aside in synthesis history, returns
+`set_aside`, and plans a new generation keeping every receipt that still holds.
+Every command checks everything before writing; a refusal changes nothing.
 
 An assembled review sets `reviewer` to `null` and lists `reviewers`, with each
 unit's reviewer in `review.units.receipts`. Its saved state is schema 4, which
 runtimes before 1.6.0 refuse rather than misread. A later single review replaces it.
+A case that was ever assembled is stored at schema 3 or 4 afterwards, never schema
+2; 1.5.1 reads schema 3.
 
 A supplied document new to an asset's inventory from 1.6.0 on has the origin
 `supplied:` and its name inside the supplied folder, never a folder of the

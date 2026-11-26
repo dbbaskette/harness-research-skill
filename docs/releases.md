@@ -23,7 +23,9 @@ computer out of supplied documents' origins (Marketing Studio issue 550).
 - **Durable receipts.** Each accepted answer leaves an immutable receipt bound to
   its attempt, its basis (owned and given content and their pins) and the exact
   capture and original hashes. `finish`, `retry` and `stop` work as they do for
-  collection; other units' receipts are never touched.
+  collection; other units' receipts are never touched. A receipt given up by
+  `retry` is retired: nothing uses it again, and a recorded review resting on it is
+  reported invalid until `plan` sets that review aside. `stop` refuses late answers.
 - **Strict assembly.** `assemble` refuses a missing, duplicate, stale, foreign or
   non-independent receipt or a changed pinned file, and records the ordinary review
   with the same `accepted` rule, its `reviewers` and its receipts. `status` and

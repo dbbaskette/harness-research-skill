@@ -1,10 +1,10 @@
 # Harness Research 1.6.0 verification
 
 The 1.6.0 working tree passed the local checks on a macOS 27 development host with
-Node.js 22: 263 Node tests with zero failures and one skip (the Python-gated
+Node.js 22: 273 Node tests with zero failures and one skip (the Python-gated
 comparative validator), and context-map validation after regenerating the
 measurements for the changed entry and the two new references. Every test that
-existed in 1.5.1 is unchanged and passes; 23 tests are new.
+existed in 1.5.1 is unchanged and passes; 33 tests are new.
 
 The new tests check that:
 
@@ -69,6 +69,36 @@ test that fails without it (`tests/review-units-fixes.test.mjs` and
   documents already in it, for a 1.5.1-shaped asset and for the 1.5.1 case;
 - a deleted receipt after assembly shows as `review-invalid` with a next step, and
   `plan` sets the review aside in history and plans a new generation.
+
+A second independent review found that a review already recorded could rest on a
+receipt retired afterwards, that `plan` could write before a check that then
+refused, and several neighbours of the first round's fixes. Each fix has a test
+in `tests/review-units-round2.test.mjs`, and all ten fail on the previous commit:
+
+- a receipt retired by `retry` after assembly makes `synthesis status`, `verify`,
+  `review-units status` and `stop` report the review invalid, collection status no
+  longer calls it ready, and `plan` then leads to a complete review without it;
+- every refusing review-units command leaves the case byte for byte as it was
+  (compared over every file and folder), `status` with no plan writes nothing, and
+  where status names `plan` as the next step, `plan` with the same options succeeds:
+  after `finish` when an invocation is running, and over a changed plan file, whose
+  bytes are kept beside the plan written again;
+- one rank rule on both sides of `max_units`: adding or removing an area across the
+  cap never moves a tied finding between units whose own areas did not change;
+- a malformed stored assembled review (no review, `units` missing, null or a
+  string, `receipts` missing, null, not an array, a null entry, an entry missing any
+  field, and others) is reported by every reader and never thrown, and `plan`
+  recovers from each;
+- `review-units status` without a plan reads the review kind from the state schema;
+- any change to the dossier, its order included, changes the final unit's basis,
+  and the final unit's assignment carries the whole dossier with every comparison
+  row whole;
+- `stop` cancels an attempt the host saw complete without an accepted answer, and
+  its late answer is refused, also after `plan` resumes.
+
+The single-review path was compared again with the 1.5.1 tree on the same
+scenario (save, template, review with an extra field, status, verify, a second
+review, a corrected save): every response and every written file is identical.
 
 The synthetic timing test (`tests/review-units-concurrency.test.mjs`) runs three
 content units of 150 ms simulated work plus the final unit, through the real

@@ -46,7 +46,7 @@ async function readState(path) {
   if (state.schema >= 3 && !['unchanged', 'revision'].includes(state.save_policy)) throw new Error('Unrecognized synthesis save policy; preserve it.');
   // Schema 4, and only schema 4, holds a review assembled from review units; runtimes before 1.6.0
   // refuse it. Schema 2 and 3 are read as 1.5.1 read them, whatever fields their stored review has.
-  if (state.schema === 4 && !state.review?.units) throw new Error('Unrecognized synthesis state; preserve it.');
+  // A malformed schema-4 review is read and then reported by status as an invalid review.
   return state;
 }
 async function preserveState(derived, state) {
@@ -105,7 +105,7 @@ async function stateStatus(root, state) {
   }
   let accepted = false;
   if (state.schema === 4) {
-    try { for (const reviewer of state.review.reviewers) await verifyCollectionReviewer(root, reviewer); accepted = await checkAssembledReview(root, state, state.collection ? await collectionGrain(root) : null); } catch (e) { problems.push(`Review invalid: ${e.message}`); }
+    try { accepted = await checkAssembledReview(root, state, state.collection ? await collectionGrain(root) : null); for (const reviewer of state.review.reviewers) await verifyCollectionReviewer(root, reviewer); } catch (e) { accepted = false; problems.push(`Review invalid: ${e.message}`); }
   } else if (state.review) { try { await verifyCollectionReviewer(root, state.review.worker); accepted = validateReview(state, state.review, state.review.worker).accepted; } catch (e) { problems.push(`Review invalid: ${e.message}`); } }
   return { status: problems.length ? 'stale' : !state.review ? 'draft' : accepted ? 'complete' : 'needs-revision', problems, artifact_problems: [...new Set(artifactProblems)], integrity_checks: { files_checked: checked.size, bytes_hashed: bytesHashed } };
 }
@@ -128,8 +128,13 @@ async function materialize(root, state, current) {
   }
   return { artifact_integrity: current.artifact_problems.length ? 'failed' : regenerated.length ? 'repaired' : 'verified', regenerated_files: regenerated, preserved_files: preserved };
 }
+// What a result says about an assembled review, read defensively: status reports a malformed one.
+function assembledSummary(review) {
+  const units = review && typeof review.units === 'object' ? review.units : null;
+  return { reviewers: Array.isArray(review?.reviewers) ? review.reviewers.filter(r => typeof r === 'string') : [], review_units: { protocol: units?.protocol ?? null, plan: units?.plan ?? null, units: Array.isArray(units?.receipts) ? units.receipts.length : 0 } };
+}
 function result(state, current, compact) {
-  const base = { schema: 2, ...current, digest: state.digest, author: state.author, reviewer: state.review?.worker || null, ...(state.schema === 4 ? { reviewers: state.review.reviewers, review_units: { protocol: state.review.units.protocol, plan: state.review.units.plan, units: state.review.units.receipts.length } } : {}), ...(state.layout ? { layout: state.layout } : {}), ...(state.collection ? { collection: state.collection } : {}), outputs: OUTPUTS.map(f => outputPath(state, f)) };
+  const base = { schema: 2, ...current, digest: state.digest, author: state.author, reviewer: state.review?.worker || null, ...(state.schema === 4 ? assembledSummary(state.review) : {}), ...(state.layout ? { layout: state.layout } : {}), ...(state.collection ? { collection: state.collection } : {}), outputs: OUTPUTS.map(f => outputPath(state, f)) };
   if (compact) return { ...base, counts: { sources: state.sources.length, facts: state.dossier.facts.length, findings: state.dossier.findings.length }, template_command: 'synthesis template --project DIR' };
   return { ...base, sources: state.sources, review_template: reviewTemplate(state), caveat: 'Worker identities and original-read attestations are supplied by the harness. Hashes and structural validation do not prove truth or process independence.' };
 }

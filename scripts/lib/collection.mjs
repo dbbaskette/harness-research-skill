@@ -2,6 +2,7 @@ import { readFile, writeFile, realpath } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { exists, directory, localFile, readText, atomic, hash, stable, parseJson, identifier, text, acquireLock, releaseLock } from './run-storage.mjs';
 import { validateDossier, DEFAULT_PURPOSE } from './synthesis-model.mjs';
+import { checkAssembledReview } from './review-units-model.mjs';
 
 const OWNER = 'harness-research-collection';
 const STATE = '.harness-research/collection.json';
@@ -168,7 +169,13 @@ async function status(root, state, inputsVerified = false) {
   } catch(error) { problems.push(error.message); }
   let phase = state.status === 'stopped' ? 'stopped' : state.registry ? 'combining-findings' : 'investigating';
   if (state.final_digest) {
-    try { const saved = parseJson(await readText(root, '.harness-research/synthesis.json')); if (saved.digest === state.final_digest) phase = saved.review?.accepted ? 'ready-for-review' : saved.review ? 'needs-revision' : 'independent-check'; } catch { /* No final dossier yet. */ }
+    let saved = null;
+    try { saved = parseJson(await readText(root, '.harness-research/synthesis.json')); if (saved.digest === state.final_digest) phase = saved.review?.accepted ? 'ready-for-review' : saved.review ? 'needs-revision' : 'independent-check'; } catch { /* No final dossier yet. */ }
+    // A review assembled from units is rechecked, receipts and retirements included, before it counts.
+    if (saved?.schema === 4 && saved.digest === state.final_digest && !problems.length) {
+      try { if (!await checkAssembledReview(root, saved, await collectionGrain(root))) phase = 'needs-revision'; }
+      catch (error) { problems.push(`Assembled review no longer checks out: ${error.message}`); }
+    }
   }
   if(problems.length) phase='needs-attention';
   return { schema: VERSION, protocol: state.protocol, request_digest: state.request_digest, generation: state.generation, status: problems.length?'stale':state.status, batch_capture:true, artifact_integrity:problems.length?'failed':'verified', problems, phase, execution_mode: state.request.execution_mode, max_investigators: state.request.max_investigators, workstreams: state.workstreams.map(s => ({id:s.id, status:s.attempts.at(-1)?.status ?? 'pending', attempt:s.attempts.at(-1)?.number ?? 1, investigator:s.attempts.at(-1)?.investigator ?? null})), ...(state.registry ? {registry_digest:state.registry.digest,registry_file:state.registry.file} : {}), ...(state.final_digest ? {final_digest:state.final_digest} : {}), timing:timing(state), caveat: 'Invocation registration and capture permissions are supplied by the host; these local records cannot prove identity, source truth or actual process cancellation.' };
