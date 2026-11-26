@@ -4,7 +4,7 @@ import { exists, directory, localFile, readText, atomic, hash, stable, parseJson
 import { OWNER, digestSource, validateDossier, validateReview, reviewTemplate } from './synthesis-model.mjs';
 import { renderOutputs } from './synthesis-output.mjs';
 import { OUTPUT_NAMES, outputPrefix, outputPath, digestContent, managedSource } from './synthesis-layout.mjs';
-import { assetContext, verifyAssetDossier, updateAssetRevision } from './topic-assets.mjs';
+import { assetContext, verifyAssetDossier, updateAssetRevision, checkAssetRevision } from './topic-assets.mjs';
 import { verifyCollectionDossier, bindCollectionDossier, verifyCollectionReviewer, collectionGrain } from './collection.mjs';
 import { checkAssembledReview } from './review-units-model.mjs';
 
@@ -149,6 +149,13 @@ async function writeTemplate(root, name, template, state) {
   if (managed(relative(root, join(parent, basename(path))).split(sep).join('/'))) throw new Error('--out cannot write through an alias to managed research files.');
   await writeFile(path, JSON.stringify(template, null, 2) + '\n', { flag: 'wx', mode: 0o600 });
 }
+// The refusal preserveState could make, made without writing.
+async function checkPreserve(derived, state) {
+  const history = join(derived, 'synthesis-history'), folder = await exists(history);
+  if (folder && (!folder.isDirectory() || folder.isSymbolicLink())) throw new Error(`Research storage must be a real directory: ${history}`);
+  const path = join(history, `${state.digest}-${hash(stable(state)).slice(0, 16)}.json`), info = await exists(path);
+  if (info && (!info.isFile() || info.isSymbolicLink() || await readFile(path, 'utf8') !== JSON.stringify(state, null, 2) + '\n')) throw new Error('Synthesis history changed; preserve and inspect it.');
+}
 // Every refusal materialize could make, made without writing: review units call it before any write.
 async function checkMaterialize(root, state, status) {
   const output = join(root, outputPrefix(state)); await protectOutputs(output, state);
@@ -172,7 +179,9 @@ export const synthesisStatus = stateStatus;
 export { writeTemplate };
 export async function recordAssembledReview(root, state, review, current, context, compact = false) {
   const derived = join(root, '.harness-research');
+  await checkPreserve(derived, state);
   await checkMaterialize(root, { ...state, schema: 4, save_policy: state.save_policy ?? 'revision', review }, review.accepted ? 'complete' : 'needs-revision');
+  if (context) await checkAssetRevision(root);
   await preserveState(derived, state);
   state.schema = 4; state.save_policy ??= 'revision'; state.review = review;
   await atomic(join(derived, 'synthesis.json'), JSON.stringify(state, null, 2) + '\n');
@@ -184,13 +193,15 @@ export async function recordAssembledReview(root, state, review, current, contex
 }
 // Sets aside an assembled review that no longer checks out: the state is kept in history, as a
 // replaced review is, and the dossier returns to a draft awaiting review.
-export async function checkSetAside(root, state) {
+export async function checkSetAside(root, state, context) {
   const next = { ...state, schema: 3, review: null };
+  await checkPreserve(join(root, '.harness-research'), state);
   await checkMaterialize(root, next, (await stateStatus(root, next)).status);
+  if (context) await checkAssetRevision(root);
 }
 export async function setAsideAssembledReview(root, state, context) {
   const derived = join(root, '.harness-research');
-  await checkSetAside(root, state);
+  await checkSetAside(root, state, context);
   await preserveState(derived, state);
   state.schema = 3; state.review = null;
   await atomic(join(derived, 'synthesis.json'), JSON.stringify(state, null, 2) + '\n');

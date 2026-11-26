@@ -51,6 +51,13 @@ async function immutable(root, name, bytes) {
   } else await writeFile(path, bytes, { flag: 'wx', mode: 0o600 });
   return `${DATA}/${name}`;
 }
+// The refusal immutable() could make, made without writing.
+async function checkImmutable(root, name, bytes) {
+  const folder = await exists(join(root, DATA));
+  if (folder && (!folder.isDirectory() || folder.isSymbolicLink())) throw new Error(`Research storage must be a real directory: ${join(root, DATA)}`);
+  const info = await exists(join(root, DATA, name));
+  if (info && (!info.isFile() || info.isSymbolicLink() || !(await readFile(join(root, DATA, name))).equals(Buffer.from(bytes)))) throw new Error('Immutable review-units record changed; preserve and inspect it.');
+}
 async function readPlan(root, state) {
   const bytes = await readFile(await localFile(root, state.plan.file));
   if (hash(bytes) !== state.plan.sha256) throw new Error('Review plan record changed; preserve and inspect it.');
@@ -65,11 +72,13 @@ const receiptOf = unit => unit.kept ?? (unit.attempts.at(-1)?.status === 'accept
 // every check of a receipt reads, plus the reason in the receipt index. (stop and an unsuccessful
 // finish never meet an accepted receipt: an accepted attempt has already ended as completed.)
 const indexed = (state, ref) => ref ? state.receipts.find(e => e.file === ref.file && e.sha256 === ref.sha256) : null;
-async function retire(root, state, ref, reason, note) {
-  const entry = indexed(state, ref); if (!entry) return;
-  const name = retirementFile(entry.sha256).slice(DATA.length + 1);
-  if (!await exists(join(root, DATA, name))) await immutable(root, name, json({ schema: 1, protocol: PROTOCOL, kind: 'review-unit-retirement', receipt: { file: entry.file, sha256: entry.sha256 }, unit: entry.unit, reason, note }));
-  entry.retired ??= { reason, note, at: now() };
+async function retire(root, state, ref, unit, reason, note) {
+  if (!ref?.sha256) return;
+  // Written whether or not the index lists the receipt, so it is retired either way.
+  const name = retirementFile(ref.sha256).slice(DATA.length + 1);
+  if (!await exists(join(root, DATA, name))) await immutable(root, name, json({ schema: 1, protocol: PROTOCOL, kind: 'review-unit-retirement', receipt: { file: ref.file, sha256: ref.sha256 }, unit, reason, note }));
+  const entry = indexed(state, ref);
+  if (entry) entry.retired ??= { reason, note, at: now() };
 }
 function usable(state, ref) {
   const entry = indexed(state, ref);
@@ -91,6 +100,7 @@ function timing(state, current = Date.now()) {
 const SET_ASIDE = 'Run review-units plan: it sets the assembled review aside (kept in synthesis history) and plans the review again.';
 const FINISH_FIRST = 'Confirm every running review invocation terminal with review-units finish, then run review-units plan: it sets the assembled review aside (kept in synthesis history) and plans the review again.';
 const PLAN_AGAIN = 'Run review-units plan: it keeps the changed plan file beside the plan it writes again.';
+const PLAN_BLOCKED = 'Review plan record is not a regular file; preserve and inspect it.';
 const REPLAN_RUNNING = 'Host must confirm every registered review invocation terminal with finish before replanning; cancellation requests alone do not release capacity.';
 const RESUME_RUNNING = 'Host must confirm every registered review invocation terminal with finish before resuming.';
 const reviewOnly = current => current.status === 'stale' && current.problems.length > 0 && current.problems.every(p => p.startsWith('Review invalid'));
@@ -105,6 +115,8 @@ async function report(root, state, synthesis, check = true) {
   const current = synthesis.state.digest === state.plan.state_digest;
   let plan = null, planProblem = false;
   try { plan = await readPlan(root, state); } catch (error) { problems.push(error.message); planProblem = true; }
+  // plan refuses a plan record that is a folder or a link, so status must not send the host there.
+  const record = await exists(join(root, state.plan.file)), blocked = Boolean(record) && (!record.isFile() || record.isSymbolicLink());
   if (plan && current && check) {
     for (const [index, record] of state.units.entries()) {
       const ref = receiptOf(record);
@@ -112,12 +124,14 @@ async function report(root, state, synthesis, check = true) {
       try { usable(state, ref); await checkReceipt(root, synthesis.state, plan.units[index], ref); } catch (error) { problems.push(error.message); }
     }
   }
-  const assembled = current && synthesis.state.schema === 4 && synthesis.state.review?.units?.plan === state.plan.digest;
   const ready = state.units.every(u => receiptOf(u)) && state.units.find(u => u.id === FINAL)?.attempts.at(-1)?.status === 'accepted';
+  // Never 'assembled' while a unit of this plan has no kept or accepted receipt.
+  const assembled = current && ready && synthesis.state.schema === 4 && synthesis.state.review?.units?.plan === state.plan.digest;
   const phase = broken ? 'review-invalid' : problems.length ? 'needs-attention' : !current ? 'needs-plan' : state.status === 'stopped' ? 'stopped' : assembled ? 'assembled' : ready ? 'ready-to-assemble' : 'reviewing';
   const counts = unit => Object.fromEntries(['sources', 'facts', 'findings', 'prose'].map(g => [g, unit.owns[g].length]));
   return { schema: VERSION, protocol: PROTOCOL, status: problems.length || broken ? 'stale' : !current ? 'needs-plan' : state.status, phase, artifact_integrity: problems.length || broken ? 'failed' : 'verified', problems,
-    ...(broken ? { assembled_review: { status: 'invalid', problems: broken }, next_step: running(state).length ? FINISH_FIRST : SET_ASIDE } : planProblem && current ? { next_step: PLAN_AGAIN } : {}),
+    ...(broken ? { assembled_review: { status: 'invalid', problems: broken } } : {}),
+    ...(current && blocked ? { next_step: PLAN_BLOCKED } : broken ? { next_step: running(state).length ? FINISH_FIRST : SET_ASIDE } : planProblem && current ? { next_step: PLAN_AGAIN } : {}),
     digest: synthesis.state.digest, plan: state.plan.digest, plan_file: state.plan.file, planned_digest: state.plan.state_digest, generation: state.generation,
     grain: plan?.grain ?? null, max_units: state.plan.max_units, max_reviewers: state.max_reviewers, running: running(state).length,
     units: state.units.map((u, i) => ({ id: u.id, kind: plan?.units[i]?.kind ?? null, areas: plan?.units[i]?.areas ?? [], status: unitStatus(u), attempt: u.attempts.at(-1)?.number ?? null, reviewer: u.kept?.reviewer ?? u.attempts.at(-1)?.reviewer ?? null, kept: Boolean(u.kept), owns: plan ? counts(plan.units[i]) : null, given_sources: plan?.units[i]?.given.sources.length ?? null })),
@@ -168,7 +182,9 @@ async function planAction(root, existing, synthesis, input) {
   const stored = await storedPlan(root, name, bytes);
   const again = !existing || existing.plan.digest !== digest || Boolean(broken);
   if (existing && running(existing).length && (again || existing.status === 'stopped')) throw new Error(again ? REPLAN_RUNNING : RESUME_RUNNING);
-  if (broken) await checkSetAside(root, synthesis.state);
+  if (broken) await checkSetAside(root, synthesis.state, synthesis.context);
+  if (stored.changed) await checkImmutable(root, `plan-${digest}-changed-${hash(stored.changed)}.json`, stored.changed);
+  if (existing && again) await checkImmutable(root, `history-${existing.generation}-${hash(stable(existing))}.json`, json(existing));
   // Writes only from here.
   if (stored.changed) {
     // The plan file is derived from the saved state: keep the changed bytes, then write the plan again.
@@ -276,7 +292,7 @@ export async function runReviewUnitsCli(argv) {
       const unit = unitRecord(state, input.unit), previous = unit.attempts.at(-1);
       if (previous?.status === 'reserved') throw new Error('A retry is already reserved.');
       if (previous?.status === 'running') { previous.status = 'cancelled'; previous.cancellation_requested_at = now(); }
-      await retire(root, state, previous?.status === 'accepted' ? previous.receipt : null, 'retry', input.reason); await retire(root, state, unit.kept, 'retry', input.reason);
+      await retire(root, state, previous?.status === 'accepted' ? previous.receipt : null, unit.id, 'retry', input.reason); await retire(root, state, unit.kept, unit.id, 'retry', input.reason);
       unit.kept = null;
       unit.attempts.push({ number: (previous?.number ?? 0) + 1, status: 'reserved', reason: input.reason });
       await saveState(root, state); return await report(root, state, synthesis, false);

@@ -1,10 +1,10 @@
 # Harness Research 1.6.0 verification
 
 The 1.6.0 working tree passed the local checks on a macOS 27 development host with
-Node.js 22: 274 Node tests with zero failures and one skip (the Python-gated
+Node.js 22: 282 Node tests with zero failures and one skip (the Python-gated
 comparative validator), and context-map validation after regenerating the
 measurements for the changed entry and the two new references. Every test that
-existed in 1.5.1 is unchanged and passes; 34 tests are new.
+existed in 1.5.1 is unchanged and passes; 42 tests are new.
 
 The new tests check that:
 
@@ -96,6 +96,25 @@ in `tests/review-units-round2.test.mjs`, and each fails on the code before it:
 - `stop` cancels an attempt the host saw complete without an accepted answer, and
   its late answer is refused, also after `plan` resumes;
 - `assemble` and `plan` refuse a changed output backup before writing anything.
+
+A third review changed files inside the case by hand. Tests in
+`tests/review-units-round3.test.mjs` cover each fix, and each fails on the code
+before it except the `retry` result, which already reported an assembled review
+as no longer complete (the host page now warns to plan before registering):
+
+- a receipt is retired if either its retirement file or the receipt index says so,
+  for synthesis status and verify, review-units status, stop, plan and collection
+  status, for a content unit and the final unit; status never says `assembled`
+  while a unit of that review has no receipt;
+- plan checks the synthesis history and review-units history files before its first
+  write, and assemble checks the topic-asset files its revision update replaces;
+- retry retires a receipt the receipt index does not list;
+- a plan record that is a folder or a link is reported with plan's own sentence.
+
+What the checks catch is a missing or changed plan file, a missing or changed
+receipt, a retired receipt and a malformed stored review. They hold for a case
+driven through the commands; a case whose `.harness-research` files are edited by
+hand is outside what Harness Research attests.
 
 The single-review path was compared again with the 1.5.1 tree on the same
 scenario (save, template, review with an extra field, status, verify, a second

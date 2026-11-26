@@ -294,6 +294,15 @@ export async function verifyAssetDossier(project,dossier) {
     }
   }
 }
+// The refusals updateAssetRevision could make once its marker has been read: replacing a file that is
+// not a regular one. Review units call this before writing anything.
+export async function checkAssetRevision(project) {
+  const root=await realpath(resolve(project));
+  for (const name of [markerName,'topic.json',inventoryName,'asset-manifest.json']) {
+    const info=await exists(join(root,name));
+    if (info && (!info.isFile() || info.isSymbolicLink())) throw new Error(`Refusing to replace an unowned/nonregular output: ${join(root,name)}`);
+  }
+}
 export async function updateAssetRevision(project,synthesisState,result) {
   const root=await realpath(resolve(project)),state=await marker(root);
   if (!state) return;

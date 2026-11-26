@@ -220,12 +220,16 @@ export async function checkPins(root, state, unit) {
 }
 
 // A receipt the host retired (review-units retry) is never used again by anything: plan, assemble,
-// or a review already recorded. Retirement is an immutable file named by the receipt's hash.
+// or a review already recorded. Retirement is written twice, as an immutable file named by the
+// receipt's hash and as a flag in the receipt index, and a receipt is retired if either says so.
 export const retirementFile = sha256 => `${DATA}/retired-${sha256}.json`;
 export async function retirement(root, sha256) {
   const path = join(root, retirementFile(sha256));
-  if (!await exists(path)) return null;
-  try { return parseJson(await readFile(path, 'utf8')); } catch { return { reason: 'an unreadable retirement record' }; }
+  if (await exists(path)) { try { return parseJson(await readFile(path, 'utf8')); } catch { return { reason: 'an unreadable retirement record' }; } }
+  let index = null;
+  try { index = parseJson(await readFile(join(root, '.harness-research/review-units.json'), 'utf8')); } catch { return null; }
+  const entry = Array.isArray(index?.receipts) ? index.receipts.find(r => r?.sha256 === sha256 && r.retired) : null;
+  return entry ? { reason: entry.retired.reason ?? 'the receipt index' } : null;
 }
 
 // Every reader of a recorded assembled review checks its shape first and reports, never throws.

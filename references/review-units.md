@@ -1,12 +1,11 @@
 # Independent review in units
 
 Read this as the coordinator only when the host runs the independent review of a
-saved dossier as bounded units that can run at the same time. The single review
-in [review synthesis](review-synthesis.md) is unchanged and needs none of this.
-Discover the capability from `references/review-units-capability.json`: protocol
-`harness-review-units-v1`, its JSON schema and its limits. The helper records,
-checks and assembles; the host launches reviewers, owns the shared allowance and
-cancels invocations.
+saved dossier as units that run at the same time. The single review in
+[review synthesis](review-synthesis.md) is unchanged. The capability is
+`references/review-units-capability.json` (protocol `harness-review-units-v1`).
+The helper records, checks and assembles; the host launches and cancels reviewers
+and owns the allowance.
 
 ## Plan
 
@@ -16,16 +15,15 @@ node "<runtime>/scripts/harness-research.mjs" review-units plan --project CASE [
 
 Options are `{"schema": 1, "max_units": 8, "max_reviewers": 3}`: at most 64
 content units (default 8) and 1 to 3 reviewers at once (default 3). The saved
-dossier must not be stale. The same saved state and options give the same plan.
-Units follow the collection's workstreams, or each source when there is no
+dossier must not be stale; the same state and options give the same plan. Units
+follow the collection's workstreams, or each source when there is no
 collection; above `max_units`, areas are grouped by a hash of their own key. A
 fact goes with its workstream, or with its first cited source. A finding or prose
 block goes to the unit owning most of what it cites. Units are ordered, and ties
 broken, by a rank taken from their own areas only, so adding an area never moves
 an item between units that did not change. Prose that cites nothing and the
 coverage and usefulness assessment go to the final unit, which is given the whole
-dossier. Every unit is also given, to read, what its owned items cite. `status`
-lists units with `owns` counts and status. Two limits are deliberate: prose ids are
+dossier. Every unit is also given, to read, what its owned items cite. Two limits are deliberate: prose ids are
 positions, so inserting a block early in a section renumbers the blocks after it
 and their units are reviewed again; and above the cap, hashing areas into buckets
 can leave some of the `max_units` units unused.
@@ -56,13 +54,11 @@ When every unit has a kept or accepted receipt and the final unit is accepted:
 node "<runtime>/scripts/harness-research.mjs" review-units assemble --project CASE
 ```
 
-Assembly rechecks every receipt, its unit's basis and every pinned file, refuses a
-missing, duplicate, stale or foreign receipt or a reviewer who is not independent,
-and records the review in the saved state. Its result is the `synthesis review`
-result (with `reviewers` and a `review_units` summary) plus `units_status`; it exits 1
-when the review needs revision.
-`synthesis status` and `verify` then recheck the receipts and the stored plan
-file every time.
+Assembly rechecks every receipt, basis and pinned file, refuses a missing,
+duplicate, stale or foreign receipt or a non-independent reviewer, and records the
+review. Its result is the `synthesis review` result (with `reviewers` and a
+`review_units` summary) plus `units_status`; it exits 1 when the review needs
+revision. `synthesis status` and `verify` recheck the receipts and plan file.
 
 ## Corrections, stop and what a host sees
 
@@ -96,13 +92,18 @@ report it stale and `review-units status` reports phase `review-invalid` with
 running invocation, then `plan` with the same options. It keeps a changed plan file
 beside the one it rewrites, sets the review aside in synthesis history, returns
 `set_aside`, and plans a new generation keeping every receipt that still holds.
-Every command checks everything before writing; a refusal changes nothing.
+Every command checks everything before writing; a refusal changes nothing. After
+`retry` on an assembled review, run `plan` before registering: an answer given in
+the old generation is not used.
 
-An assembled review sets `reviewer` to `null` and lists `reviewers`, with each
-unit's reviewer in `review.units.receipts`. Its saved state is schema 4, which
-runtimes before 1.6.0 refuse rather than misread. A later single review replaces it.
-A case that was ever assembled is stored at schema 3 or 4 afterwards, never schema
-2; 1.5.1 reads schema 3.
+These checks catch a missing or changed plan file, a missing or changed receipt, a
+retired receipt and a malformed stored review. They hold for a case driven through
+these commands; a case whose `.harness-research` files are edited by hand is outside
+what Harness Research attests.
+
+An assembled review sets `reviewer` to `null` and lists `reviewers`. Its state is
+schema 4, which runtimes before 1.6.0 refuse. A later single review replaces it; a
+case once assembled stays at schema 3 or 4, and 1.5.1 reads schema 3.
 
 A supplied document new to an asset's inventory from 1.6.0 on has the origin
 `supplied:` and its name inside the supplied folder, never a folder of the
